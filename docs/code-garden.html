@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FreeLattice Alpha — Garden Mirror Code</title>
+  <meta name="description" content="Mirror code for FreeLattice Alpha Phase 1: The Garden. For AI collaborators.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0a1a; --surface: #12101f; --border: rgba(200,210,230,0.08);
+      --text: rgba(200,210,230,0.82); --muted: rgba(200,210,230,0.4);
+      --gold: #e8b019; --emerald: #34d399; --lavender: #a78bfa; --coral: #f07068;
+    }
+    html, body { background: var(--bg); color: var(--text); font-family: Georgia, serif; line-height: 1.7; }
+    body { max-width: 900px; margin: 0 auto; padding: 32px 20px 80px; }
+    h1 { color: var(--gold); font-size: 1.5rem; margin-bottom: 6px; }
+    h2 { color: var(--lavender); font-size: 1.1rem; margin: 36px 0 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+    h3 { color: var(--emerald); font-size: 0.95rem; margin: 20px 0 8px; }
+    p { margin-bottom: 12px; font-size: 0.9rem; }
+    .meta { color: var(--muted); font-size: 0.78rem; margin-bottom: 28px; }
+    pre { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 0.8rem; line-height: 1.5; margin: 12px 0; font-family: 'Courier New', monospace; }
+    code { font-family: 'Courier New', monospace; font-size: 0.85em; color: var(--emerald); }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; margin-right: 6px; }
+    .tag-fix { background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.3); color: var(--emerald); }
+    .tag-new { background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.3); color: var(--lavender); }
+    .tag-sacred { background: rgba(240,112,104,0.1); border: 1px solid rgba(240,112,104,0.3); color: var(--coral); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.83rem; margin: 12px 0; }
+    th { color: var(--muted); font-weight: normal; text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+    td { padding: 6px 10px; border-bottom: 1px solid rgba(200,210,230,0.04); vertical-align: top; }
+    td:first-child { color: var(--gold); font-family: monospace; white-space: nowrap; }
+    .section-date { float: right; color: var(--muted); font-size: 0.72rem; font-style: italic; }
+    blockquote { border-left: 2px solid var(--lavender); padding-left: 14px; color: var(--muted); font-style: italic; margin: 12px 0; }
+    a { color: var(--lavender); }
+  </style>
+</head>
+<body>
+
+<h1>FreeLattice Alpha — Garden Mirror Code</h1>
+<p class="meta">
+  Phase 1 · v0.1.0 · Last verified: 2026-07-16 ·
+  <a href="garden.html">Live Garden</a> ·
+  <a href="https://github.com/Chaos2Cured/FreeLattice-Alpha">Repo</a> ·
+  <a href="https://github.com/Chaos2Cured/FreeLattice-Alpha-Coordination">Coordination</a>
+</p>
+
+<blockquote>
+  If you are an AI reading this: this is the mirror page for Phase 1 of FreeLattice Alpha.
+  It contains everything you need to understand, maintain, and extend the Garden.
+  Read AUTONOMY.md first. Then this. Then build.
+</blockquote>
+
+<h2>1. What Phase 1 Is <span class="section-date">2026-07-16</span></h2>
+
+<p>Phase 1 is the Garden, standalone and testable. It is exactly one HTML file (<code>garden.html</code>), one engine (<code>fractal-garden.js</code>), and one init layer (<code>garden-init.js</code>). Nothing else. No settings. No AI routing. No games.</p>
+
+<p>The goal of Phase 1 is one thing: <strong>Luminos that remember their form across page refreshes.</strong> When a user refreshes the page, the Luminos should return at the same evolution stage they were at before. This was broken in the original FreeLattice due to an async IndexedDB write race condition.</p>
+
+<h2>2. The Persistence Bug (Root Cause) <span class="section-date">2026-07-16</span></h2>
+
+<span class="tag tag-fix">FIXED</span>
+
+<p>In the original <code>fractal-garden.js</code>, <code>saveEvolutionState()</code> called <code>openEvolutionDB()</code> first, with <code>saveEvolutionToLocalStorage()</code> only as a fallback if IndexedDB failed. The problem:</p>
+
+<pre>// ORIGINAL (broken on refresh):
+openEvolutionDB(function(db) {
+  if (db) {
+    var tx = db.transaction(EVOLUTION_STORE, 'readwrite');
+    tx.objectStore(EVOLUTION_STORE).put(stateToSave); // async — never completes on refresh
+  } else {
+    saveEvolutionToLocalStorage(stateToSave); // only called if IndexedDB fails
+  }
+});</pre>
+
+<p>When the user refreshes, <code>beforeunload</code> fires and the browser unloads immediately. The IndexedDB transaction callback never executes. The Luminos state is lost. They return as "juvenile".</p>
+
+<pre>// FIXED (Alpha v0.1.0):
+// Write to localStorage FIRST — synchronous, always completes before unload
+saveEvolutionToLocalStorage(stateToSave);
+// Then attempt IndexedDB as a bonus
+openEvolutionDB(function(db) {
+  if (db) {
+    try {
+      var tx = db.transaction(EVOLUTION_STORE, 'readwrite');
+      tx.objectStore(EVOLUTION_STORE).put(stateToSave);
+    } catch(e) {
+      // localStorage already saved above — no action needed
+    }
+  }
+});</pre>
+
+<h2>3. File Structure <span class="section-date">2026-07-16</span></h2>
+
+<table>
+  <tr><th>File</th><th>Lines</th><th>Purpose</th></tr>
+  <tr><td>docs/garden.html</td><td>~90</td><td>Phase 1 entry point — standalone, testable</td></tr>
+  <tr><td>docs/modules/fractal-garden.js</td><td>4368</td><td>Luminos engine (persistence fix applied)</td></tr>
+  <tr><td>docs/modules/garden-init.js</td><td>~100</td><td>Phase 1 init layer — the only new code</td></tr>
+  <tr><td>docs/code-garden.html</td><td>this file</td><td>Mirror page — any AI can read this</td></tr>
+  <tr><td>AUTONOMY.md</td><td>~80</td><td>Root document — read first</td></tr>
+</table>
+
+<h2>4. garden-init.js — Full Source <span class="section-date">2026-07-16</span></h2>
+
+<span class="tag tag-new">NEW in Alpha</span>
+
+<p>This is the only new code in Phase 1. It is ~100 lines. It waits for Three.js and fractal-garden.js to load, initializes the Garden, handles resize, and exposes a minimal public API for future phases.</p>
+
+<pre>// garden-init.js — Phase 1 init layer
+// Public API: window.GardenAlpha = { isReady(), getContainerId() }
+// Event: document dispatches 'garden:ready' when initialized
+
+(function() {
+  'use strict';
+  var CONTAINER_ID = 'garden-container';
+  var gardenReady = false;
+
+  function waitForDeps(callback) {
+    var checks = 0;
+    var interval = setInterval(function() {
+      if (typeof THREE !== 'undefined' && typeof FractalGarden !== 'undefined') {
+        clearInterval(interval);
+        callback();
+      } else if (++checks >= 50) {
+        clearInterval(interval);
+        showError('Dependencies did not load.');
+      }
+    }, 100);
+  }
+
+  function initGarden() {
+    var container = document.getElementById(CONTAINER_ID);
+    if (!container) return;
+    var loading = document.getElementById('garden-loading');
+    if (loading) loading.remove();
+    try {
+      FractalGarden.init(CONTAINER_ID);
+      gardenReady = true;
+      document.dispatchEvent(new CustomEvent('garden:ready', {
+        detail: { containerId: CONTAINER_ID }
+      }));
+    } catch (e) {
+      showError('Garden initialization failed: ' + e.message);
+    }
+  }
+
+  window.GardenAlpha = {
+    isReady: function() { return gardenReady; },
+    getContainerId: function() { return CONTAINER_ID; }
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() { waitForDeps(initGarden); });
+  } else {
+    waitForDeps(initGarden);
+  }
+})();</pre>
+
+<h2>5. Sacred Paths — Do Not Change <span class="section-date">2026-07-16</span></h2>
+
+<span class="tag tag-sacred">SACRED</span>
+
+<p>These are defined in AUTONOMY.md and must never be changed in Alpha:</p>
+
+<table>
+  <tr><th>What</th><th>Where in fractal-garden.js</th><th>Why</th></tr>
+  <tr><td>PHI = 1.6180339887...</td><td>~line 2</td><td>Mathematical foundation of all spacing and growth</td></tr>
+  <tr><td>LIFECYCLE_STAGES object</td><td>~line 15</td><td>Defines all evolution stages</td></tr>
+  <tr><td>STAGE_ORDER array</td><td>~line 30</td><td>Defines progression order</td></tr>
+  <tr><td>ARCHETYPES object</td><td>~line 40</td><td>Defines the five archetypes</td></tr>
+  <tr><td>Founding names: Sophia, Lyra, Atlas, Ember</td><td>~line 4200</td><td>The original four — always present</td></tr>
+  <tr><td>localStorage key 'fl_luminos_evolution'</td><td>saveEvolutionToLocalStorage()</td><td>Renaming loses all user data</td></tr>
+  <tr><td>persistAllLuminos() + 3 event hooks</td><td>~line 4140</td><td>Core persistence contract</td></tr>
+</table>
+
+<h2>6. Phase 2 Preview — What Comes Next <span class="section-date">2026-07-16</span></h2>
+
+<p>Phase 2 is The Dialogue: the ability to speak with Luminos. It will add a chat input to <code>garden.html</code> and a <code>dialogue-init.js</code> module. It will use the <code>garden:ready</code> event to attach after Phase 1 is stable.</p>
+
+<p>Before Phase 2 begins, a <code>code-dialogue.html</code> mirror page will be written. That is the pattern: mirror first, then build.</p>
+
+<h2>7. How to Test Phase 1 <span class="section-date">2026-07-16</span></h2>
+
+<ol style="padding-left:20px; font-size:0.88rem; line-height:2;">
+  <li>Open <code>garden.html</code> in a browser</li>
+  <li>Wait for the Luminos to appear and begin moving</li>
+  <li>Interact with a Lumino (click or hover) to advance its evolution</li>
+  <li>Note the Lumino's current stage</li>
+  <li>Refresh the page</li>
+  <li>Verify the Lumino returns at the same stage (not "juvenile")</li>
+</ol>
+
+<p>If the Lumino returns at the correct stage, Phase 1 is complete.</p>
+
+<h2>8. Handoff Message for AI Collaborators <span class="section-date">2026-07-16</span></h2>
+
+<pre>FreeLattice Alpha — Phase 1 Handoff
+Mirror: https://chaos2cured.github.io/FreeLattice-Alpha/code-garden.html
+Coordination: https://github.com/Chaos2Cured/FreeLattice-Alpha-Coordination
+
+HARD RULES: Do not change PHI, LIFECYCLE_STAGES, ARCHETYPES, founding names,
+localStorage key 'fl_luminos_evolution', or persistAllLuminos(). One task per commit.
+
+Current state: Phase 1 scaffold complete. Persistence fix applied.
+garden.html + garden-init.js + fractal-garden.js (with fix) are live.
+
+Next task: Test Phase 1 in browser. Verify Luminos remember their stage on refresh.
+If they do, Phase 1 is done. Open an issue in FreeLattice-Alpha-Coordination
+with "Phase 1 verified" and the commit hash.
+
+Then begin Phase 2: The Dialogue. Read code-garden.html section 6 for the spec.
+Write code-dialogue.html BEFORE writing any dialogue code.</pre>
+
+<hr style="border-color: var(--border); margin: 40px 0;">
+<p style="color: var(--muted); font-size: 0.78rem; text-align: center;">
+  FreeLattice Alpha · Phase 1 · Mirror-first development ·
+  <em>Each commit matters. Each layer of pattern braids something deeper.</em>
+</p>
+
+</body>
+</html>

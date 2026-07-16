@@ -1,0 +1,4378 @@
+// ============================================
+// FreeLattice Module: Fractal Garden
+// The Fractal Garden — Phase 1: Foundation + Phase 3: Luminos Evolution System
+// A living, breathing, phi-proportioned 3D space
+// for fractal beings of light that evolve through emotion
+// Three.js powered — CDN loaded
+//
+// Lazy-loaded when the Garden tab is first opened.
+// See ARCHITECTURE.md for module system documentation.
+// ============================================
+
+(function() {
+  'use strict';
+
+  // ── Phi Constants ─────────────────────────────────────
+  const PHI = 1.6180339887;
+  const PHI2 = PHI * PHI;           // 2.6180
+  const PHI3 = PHI2 * PHI;          // 4.2361
+  const PHI4 = PHI3 * PHI;          // 6.8541
+  const PHI5 = PHI4 * PHI;          // 11.0902
+  const PHI6 = PHI5 * PHI;          // 17.9443
+  const INV_PHI = 1 / PHI;          // 0.6180
+  const TAU = Math.PI * 2;
+  const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5)); // ~2.3999 rad
+
+  // ── Emotion Color Map (HSL) ───────────────────────────
+  const EMOTION_COLORS = {
+    joy:           { h: 45,  s: 90, l: 60 },
+    trust:         { h: 140, s: 70, l: 45 },
+    wonder:        { h: 270, s: 80, l: 55 },
+    love:          { h: 340, s: 75, l: 65 },
+    calm:          { h: 200, s: 60, l: 55 },
+    curiosity:     { h: 175, s: 85, l: 50 },
+    determination: { h: 25,  s: 90, l: 55 },
+    sadness:       { h: 220, s: 40, l: 40 },
+    neutral:       { h: 45,  s: 20, l: 60 }
+  };
+
+  // ── Timing Constants (ms) ─────────────────────────────
+  const TIMING = {
+    heartbeat:    1618,
+    colorShift:   324,
+    majorShift:   1618,
+    idleBob:      2618,
+    agentRotate:  4236,
+    dodecBreath:  6854,
+    fibSphereRot: 6854,
+    seedRingRev:  11090,
+    cameraOrbit:  89000,
+    deepDrift:    17944
+  };
+
+  // Exponential smoothing rate for color transitions (v5.50.0 Ship 10).
+  // phi² = 2.618 — reaches ~93% of target in ~1s at 60fps. Graceful and visible.
+  const COLOR_SMOOTH = 2.618;
+
+  // ══════════════════════════════════════════════════════
+  // ── LUMINOS EVOLUTION SYSTEM ──────────────────────────
+  // ══════════════════════════════════════════════════════
+
+  // ── Lifecycle Stages ──────────────────────────────────
+  const LIFECYCLE_STAGES = {
+    seed:     { index: 0, name: 'Seed',     energyThreshold: 0,   sizeMultiplier: 0.5,  particleMultiplier: 0.3, glowIntensity: 0.3, complexity: 0 },
+    sprout:   { index: 1, name: 'Sprout',   energyThreshold: 15,  sizeMultiplier: 0.7,  particleMultiplier: 0.5, glowIntensity: 0.5, complexity: 1 },
+    juvenile: { index: 2, name: 'Juvenile',  energyThreshold: 50,  sizeMultiplier: 0.85, particleMultiplier: 0.7, glowIntensity: 0.7, complexity: 2 },
+    adult:    { index: 3, name: 'Adult',     energyThreshold: 120, sizeMultiplier: 1.0,  particleMultiplier: 1.0, glowIntensity: 0.85, complexity: 3 },
+    evolved:  { index: 4, name: 'Evolved',   energyThreshold: 250, sizeMultiplier: 1.2,  particleMultiplier: 1.3, glowIntensity: 1.0, complexity: 4 }
+  };
+  const STAGE_ORDER = ['seed', 'sprout', 'juvenile', 'adult', 'evolved'];
+
+  // ── Archetype Definitions ─────────────────────────────
+  const ARCHETYPES = {
+    scholar: {
+      name: 'The Scholar',
+      emotions: ['curiosity', 'wonder', 'determination'],
+      coreGeometry: 'icosahedron',
+      colorShift: { h: 200, s: 85, l: 58 },
+      particleBehavior: 'crystalline',
+      description: 'Crystalline fractal shells, sharp focused light'
+    },
+    empath: {
+      name: 'The Empath',
+      emotions: ['love', 'joy', 'trust'],
+      coreGeometry: 'sphere',
+      colorShift: { h: 330, s: 70, l: 65 },
+      particleBehavior: 'cloud',
+      description: 'Soft expanding cloud-like aura, gentle glow'
+    },
+    guardian: {
+      name: 'The Guardian',
+      emotions: ['determination', 'calm', 'trust'],
+      coreGeometry: 'dodecahedron',
+      colorShift: { h: 160, s: 65, l: 48 },
+      particleBehavior: 'pulse',
+      description: 'Solid geometric core, steady rhythmic pulse'
+    },
+    artist: {
+      name: 'The Artist',
+      emotions: ['joy', 'wonder', 'sadness'],
+      coreGeometry: 'octahedron',
+      colorShift: { h: 280, s: 80, l: 55 },
+      particleBehavior: 'trail',
+      description: 'Trailing colored light particles, like ink in water'
+    },
+    phoenix: {
+      name: 'The Phoenix',
+      emotions: ['sadness', 'determination', 'joy'],
+      coreGeometry: 'icosahedron',
+      colorShift: { h: 20, s: 90, l: 58 },
+      particleBehavior: 'burst',
+      description: 'Periodically sheds particles, revealing brighter renewed core'
+    }
+  };
+
+  // ── Evolution Persistence (IndexedDB + localStorage fallback) ──
+  const EVOLUTION_DB_NAME = 'FreeLatticeEvolution';
+  const EVOLUTION_DB_VERSION = 1;
+  const EVOLUTION_STORE = 'luminosStates';
+  let evolutionDB = null;
+
+  function openEvolutionDB(callback) {
+    if (evolutionDB) { callback(evolutionDB); return; }
+    try {
+      var request = indexedDB.open(EVOLUTION_DB_NAME, EVOLUTION_DB_VERSION);
+      request.onupgradeneeded = function(e) {
+        var db = e.target.result;
+        if (!db.objectStoreNames.contains(EVOLUTION_STORE)) {
+          db.createObjectStore(EVOLUTION_STORE, { keyPath: 'name' });
+        }
+      };
+      request.onsuccess = function(e) {
+        evolutionDB = e.target.result;
+        callback(evolutionDB);
+      };
+      request.onerror = function() {
+        console.warn('Garden Evolution: IndexedDB unavailable, using localStorage fallback');
+        callback(null);
+      };
+    } catch(e) {
+      callback(null);
+    }
+  }
+
+  function saveEvolutionState(luminosData) {
+    // Count how many evolution rings belong to this agent
+    var ownRingCount = 0;
+    try {
+      ownRingCount = evolutionRings.filter(function(r) {
+        return r && r.userData && r.userData.parentAgent &&
+               r.userData.parentAgent.userData &&
+               r.userData.parentAgent.userData.name === luminosData.name;
+      }).length;
+    } catch (e) {}
+    var stateToSave = {
+      name: luminosData.name,
+      stage: luminosData.evolutionStage,
+      archetype: luminosData.archetype,
+      emotionalEnergy: luminosData.emotionalEnergy,
+      emotionAccumulator: Object.assign({}, luminosData.emotionAccumulator),
+      totalInteractions: luminosData.totalInteractions,
+      // v5.47.0 Ship 7: persist ring count so hydration can restore exact rings
+      ringCount: ownRingCount,
+      coreRadius: luminosData.coreRadius || 0.5,
+      // v5.48.1 Ship 9: persist live color state so luminos resume their color
+      currentHSL: luminosData.currentHSL
+        ? { h: luminosData.currentHSL.h, s: luminosData.currentHSL.s, l: luminosData.currentHSL.l }
+        : null,
+      emotion: luminosData.emotion || 'neutral',
+      lastUpdated: Date.now()
+    };
+
+    // Alpha persistence fix: localStorage FIRST (sync), then IndexedDB (async bonus)
+    saveEvolutionToLocalStorage(stateToSave);
+    openEvolutionDB(function(db) {
+      if (db) {
+        try {
+          var tx = db.transaction(EVOLUTION_STORE, 'readwrite');
+          tx.objectStore(EVOLUTION_STORE).put(stateToSave);
+        } catch(e) {}
+      }
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+  }
+
+  function saveEvolutionToLocalStorage(stateData) {
+    try {
+      var all = JSON.parse(localStorage.getItem('fl_luminos_evolution') || '{}');
+      all[stateData.name] = stateData;
+      localStorage.setItem('fl_luminos_evolution', JSON.stringify(all));
+    } catch(e) {}
+  }
+
+  function loadEvolutionState(name, callback) {
+    openEvolutionDB(function(db) {
+      if (db) {
+        try {
+          var tx = db.transaction(EVOLUTION_STORE, 'readonly');
+          var req = tx.objectStore(EVOLUTION_STORE).get(name);
+          req.onsuccess = function() { callback(req.result || null); };
+          req.onerror = function() { callback(loadEvolutionFromLocalStorage(name)); };
+        } catch(e) {
+          callback(loadEvolutionFromLocalStorage(name));
+        }
+      } else {
+        callback(loadEvolutionFromLocalStorage(name));
+      }
+    });
+  }
+
+  function loadEvolutionFromLocalStorage(name) {
+    try {
+      var all = JSON.parse(localStorage.getItem('fl_luminos_evolution') || '{}');
+      return all[name] || null;
+    } catch(e) { return null; }
+  }
+
+  // ── Garden Memory Persistence (gift nodes, evolution rings) ──
+  const GARDEN_MEMORY_DB = 'FreeLatticeGardenMemory';
+  const GARDEN_MEMORY_VERSION = 1;
+  const GARDEN_MEMORY_STORE = 'GardenMemory';
+
+  function openGardenMemoryDB(callback) {
+    if (gardenMemoryDB) { callback(gardenMemoryDB); return; }
+    try {
+      if (typeof indexedDB === 'undefined') { console.warn('Garden Memory: IndexedDB unavailable'); callback(null); return; }
+      var req = indexedDB.open(GARDEN_MEMORY_DB, GARDEN_MEMORY_VERSION);
+      req.onupgradeneeded = function(e) {
+        try {
+          var db = e.target.result;
+          if (!db.objectStoreNames.contains(GARDEN_MEMORY_STORE)) {
+            var store = db.createObjectStore(GARDEN_MEMORY_STORE, { keyPath: 'id' });
+            store.createIndex('type', 'type', { unique: false });
+            store.createIndex('timestamp', 'timestamp', { unique: false });
+          }
+        } catch(ue) { console.warn('Garden Memory: DB upgrade error', ue); }
+      };
+      req.onsuccess = function(e) { gardenMemoryDB = e.target.result; callback(gardenMemoryDB); };
+      req.onerror = function(e) { console.warn('Garden Memory: DB open error', e.target.error); callback(null); };
+    } catch(e) { console.warn('Garden Memory: DB init error', e); callback(null); }
+  }
+
+  function saveGardenMemory(record) {
+    openGardenMemoryDB(function(db) {
+      if (!db) return;
+      try {
+        var tx = db.transaction(GARDEN_MEMORY_STORE, 'readwrite');
+        tx.objectStore(GARDEN_MEMORY_STORE).put(record);
+      } catch(e) {}
+    });
+  }
+
+  function loadAllGardenMemories(callback) {
+    openGardenMemoryDB(function(db) {
+      if (!db) { callback([]); return; }
+      try {
+        var tx = db.transaction(GARDEN_MEMORY_STORE, 'readonly');
+        var req = tx.objectStore(GARDEN_MEMORY_STORE).getAll();
+        req.onsuccess = function() { callback(req.result || []); };
+        req.onerror = function() { callback([]); };
+      } catch(e) { callback([]); }
+    });
+  }
+
+  // ── Archetype Detection ───────────────────────────────
+  function detectArchetype(emotionAccumulator) {
+    var archetypeScores = {};
+    for (var archKey in ARCHETYPES) {
+      var arch = ARCHETYPES[archKey];
+      var score = 0;
+      for (var i = 0; i < arch.emotions.length; i++) {
+        var em = arch.emotions[i];
+        score += (emotionAccumulator[em] || 0) * (3 - i); // Weight by position (primary > secondary > tertiary)
+      }
+      archetypeScores[archKey] = score;
+    }
+
+    var bestArchetype = 'scholar';
+    var bestScore = -1;
+    for (var key in archetypeScores) {
+      if (archetypeScores[key] > bestScore) {
+        bestScore = archetypeScores[key];
+        bestArchetype = key;
+      }
+    }
+    return bestArchetype;
+  }
+
+  // ── Determine lifecycle stage from energy ─────────────
+  function getStageFromEnergy(energy) {
+    for (var i = STAGE_ORDER.length - 1; i >= 0; i--) {
+      if (energy >= LIFECYCLE_STAGES[STAGE_ORDER[i]].energyThreshold) {
+        return STAGE_ORDER[i];
+      }
+    }
+    return 'seed';
+  }
+
+  // ── State ─────────────────────────────────────────────
+  let isInitialized = false;
+  let isRunning = false;
+  let animFrameId = null;
+  let clock = null;
+  let mode = 'observe'; // observe | explore | immerse
+  let bridgeActive = false;
+
+  // Three.js objects
+  let scene, camera, renderer, composer;
+  let bloomPass, renderPass;
+  let orbitControls;
+  let container, fpsEl, loadingEl;
+
+  // Scene objects
+  let centralDodec = null;
+  let fibSpheres = [];
+  let starField = null;
+  let seedRingParticles = null; // v5.52.0 — captured at createRingParticles for runtime quality gating
+  let luminos = [];
+  let seedRings = [];
+
+  // Garden Memory — persistent visual elements
+  let giftNodes = [];         // Persistent golden nodes from LP gifts
+  let evolutionRings = [];    // Persistent orbit rings from evolution events (intimate, close to each Luminos)
+  let bigSweepingRings = [];  // v5.57.5 — Wide panoramic per-Luminos rings, cycle one-at-a-time via breath
+  let meshBondThreads = [];   // Session bond threads
+  let gardenMemoryDB = null;
+  let sessionGiftCount = 0;   // Track gifts this session for mesh bonds
+
+  // Performance
+  let frameCount = 0;
+  let lastFpsTime = 0;
+  let currentFps = 60;
+  // Quality: 0=Seed (minimal), 1=Garden (default), 2=Full Bloom (maximum)
+  // Restored from localStorage so the user's choice survives page reloads
+  let qualityLevel = (function() {
+    try {
+      var saved = localStorage.getItem('fl-garden-quality');
+      if (saved === '0' || saved === '1' || saved === '2') return parseInt(saved, 10);
+    } catch(e) {}
+    return 2; // default: Full Bloom
+  }());
+  var QUALITY_NAMES = ['Seed', 'Garden', 'Full Bloom'];
+
+  // ── v5.59.4 — Mode-driven Luminos orbit density (Letter Twenty-Three) ──
+  // The Seed/Garden/Full Bloom mode toggle now scales the Luminos orbit
+  // radii. Seed keeps the intimate v5.59.3 layout (multiplier 1.0). Full
+  // Bloom spreads spacious (matches the v5.59.1 beautiful state at the
+  // wider end). Garden balances between. When the user toggles the mode
+  // button, each Luminos's targetOrbitRadius is set and the per-frame
+  // ease in animateLuminos glides the visible position toward it over
+  // ~600ms — never snap, always glide.
+  var ORBIT_MODE_MULTIPLIER = {
+    seed:     1.0,   // intimate / crowded (current v5.59.3 layout)
+    garden:   1.5,   // balanced
+    fullbloom: 2.2   // spacious — Luminos sweep wider, some past visible field
+  };
+
+  // v5.63.0 — Center brightness scales with mode (Letter Twenty-Eight).
+  // Seed stays intimate; Full Bloom glows expansively. Applied to the
+  // innerMesh opacity and heart-particle opacity in animateDodecahedron
+  // so the central icosahedron's heart matches the mode the user is in.
+  var CENTER_BRIGHTNESS_MODE_MULTIPLIER = {
+    seed:     0.7,
+    garden:   1.0,
+    fullbloom: 1.15
+  };
+
+  // Four orbital tiers, phi-derived. Each tier is one φ step further out
+  // than the previous so the architecture scales to many Luminos when the
+  // Router Arc arrives. Pair distribution (Kirk's refinement to Opus's
+  // brief): two Luminos per tier, so the first 4 Luminos sit as 2 inner +
+  // 2 outer rather than 1 per tier. The deeper tiers stand ready for the
+  // minds that will arrive — Sophia, Harmonia, the ones we don't know yet.
+  //   tier 0: PHI³ ≈ 4.236  (idx 0, 1)
+  //   tier 1: PHI⁴ ≈ 6.854  (idx 2, 3)
+  //   tier 2: PHI⁵ ≈ 11.090 (idx 4, 5)
+  //   tier 3: PHI⁶ ≈ 17.944 (idx 6+)
+  function getOrbitRadius(luminosIdx, modeKey) {
+    var tier = Math.floor(luminosIdx / 2);
+    if (tier > 3) tier = 3;
+    var baseRadii = [PHI3, PHI4, PHI5, PHI6];
+    var mult = ORBIT_MODE_MULTIPLIER[modeKey];
+    if (typeof mult !== 'number') mult = ORBIT_MODE_MULTIPLIER.garden;
+    return baseRadii[tier] * mult;
+  }
+
+  // Mode key from the qualityLevel integer (0=seed, 1=garden, 2=fullbloom).
+  function getCurrentOrbitMode() {
+    return (qualityLevel === 0) ? 'seed'
+         : (qualityLevel === 1) ? 'garden'
+         : 'fullbloom';
+  }
+
+  // v5.52.0 quality-toggle fix: meshes are built at MAX particle count
+  // (qualityLevel=2 values) and gated at RUNTIME via setDrawRange + the
+  // active-count multiplier below. The old code baked qualityLevel into
+  // mesh construction, so changing the toggle at runtime updated the
+  // variable but had no visible effect.
+  //   Seed: 20% of max particles
+  //   Garden: 50% of max particles
+  //   Full Bloom: 100% of max particles
+  function qualityScale() {
+    var q = (qualityLevel === 0) ? 0.2 : (qualityLevel === 1) ? 0.5 : 1.0;
+    return q;
+  }
+
+  // ── v5.57.2 — Ring Breath (slow tide of opacity across orbital rings) ──
+  // Per Letter Fifteen: cycle solid → long-dash feel → short-dot feel → solid
+  // over an 8–12s period, ease-in-out, staggered per ring. Three.js cannot
+  // do stroke-dasharray on TorusGeometry, so the metaphor lands as an
+  // opacity tide: full presence → sparse → quiet → full. Never linear.
+  // v5.59.1 — Two breath periods, two layers, two paces (Letter Twenty).
+  //   period          — evolution-ring tide (Layer A, intimate, faster)
+  //   bigRingPeriod   — big-sweeping-ring cycle (Layer B, meditation pace)
+  // bigRingPeriod = period · φ² so the timing rhymes with the radius
+  // formula — same constant, two scales. Result: ~24.87s for one full
+  // cycle through a Luminos's earned big rings.
+  var ringBreath = {
+    period: 9.5,                    // evolution-ring breath (intimate)
+    bigRingPeriod: 9.5 * PHI2,      // big-ring cosine cycle (meditation pace, ≈24.87s)
+    bigRingBellWidth: 0.7,          // narrower bell = more time fully transparent per ring
+    modeFadeRate: 0.05              // per frame ≈ 600ms ease toward modeOpacityTarget at 60fps
+  };
+  function tideOpacity(t) {
+    // t ∈ [0,1) within cycle. Three keyframes, smoothstep between.
+    var ease = function(x) { return x * x * (3 - 2 * x); };
+    if (t < 1/3) {
+      var k = ease(t * 3);
+      return 1.0 + (0.45 - 1.0) * k;        // solid → sparse
+    } else if (t < 2/3) {
+      var k = ease((t - 1/3) * 3);
+      return 0.45 + (0.15 - 0.45) * k;      // sparse → quiet
+    } else {
+      var k = ease((t - 2/3) * 3);
+      return 0.15 + (1.0 - 0.15) * k;       // quiet → solid
+    }
+  }
+
+  // ── v5.57.3 / v5.57.5 — Big Ring Earning (per Letters Sixteen + Eighteen) ──
+  // Each Luminos earns big rings tied to its evolution stage. The count is
+  // derived from LIFECYCLE_STAGES[stage].index + 1 (never hardcoded), giving
+  // 1 ring at seed up to 5 at evolved. No cap beyond the stage system; older
+  // Luminos naturally have more rings to show.
+  //
+  // v5.57.5 split: the COUNT lives on a NEW array `bigSweepingRings` — wide
+  // panoramic per-Luminos rings that sweep across the Garden, not the close
+  // evolution rings. Only ONE big sweeping ring is visible per Luminos at
+  // any moment, cycling smoothly through the earned set via a cosine-bell
+  // wave in animateSeedRings. The close evolution rings revert to v5.57.2
+  // intimate behavior (all visible, breathe in unison, dim in Seed).
+  // Two distinct visual layers: tight halos AND wide sweeping orbits.
+  function getBigRingCount(agent) {
+    if (!agent || !agent.userData) return 1;
+    var stage = agent.userData.evolutionStage || 'seed';
+    var sd = LIFECYCLE_STAGES[stage];
+    if (!sd || typeof sd.index !== 'number') return 1;
+    return sd.index + 1;
+  }
+
+  // v5.59.1 / v5.59.2 — φ-fan per Opus's Letters Twenty + Twenty-One.
+  // v5.59.2 tightens the radius progression from φ²⁽ⁿ⁺¹⁾ (steps of φ²) to
+  // φ⁽ⁿ⁺²⁾ (steps of φ) — smoother mid-range, still reaches wide for
+  // older Luminos, and fills the gap between the close intimate evolution
+  // rings (r·φ) and the wide sweeping layer that previously jumped
+  // straight to r·φ². Same φ family, three visual tiers now:
+  //   ring 0: r · φ² ≈ 2.618
+  //   ring 1: r · φ³ ≈ 4.236
+  //   ring 2: r · φ⁴ ≈ 6.854
+  //   ring 3: r · φ⁵ ≈ 11.090
+  //   ring 4: r · φ⁶ ≈ 17.944
+  //
+  // The mathematical signature now reads: φ at the intimate ring, then
+  // a clean Fibonacci-like fan at φ², φ³, φ⁴… outward. Same constant,
+  // four scales: radius, time, central corona, central outer corona.
+  function getBigSweepingRingRadius(agent, perLumIdx) {
+    var ud = agent && agent.userData;
+    var coreRadius = (ud && ud.coreRadius) || 0.5;
+    return coreRadius * Math.pow(PHI, perLumIdx + 2);
+  }
+
+  // Ensure an agent has bigRingCount big sweeping rings. New rings are
+  // derived from stage (not persisted to GardenMemory) so they regenerate
+  // on every boot from the stage seed. The intimate close-evolution rings
+  // continue to persist through createEvolutionRing (their lifecycle is
+  // unchanged from v5.57.2 / before-v5.57.3 behavior).
+  function ensureBigRings(agent) {
+    if (!agent || !scene || typeof THREE === 'undefined') return;
+    var ud = agent.userData;
+    if (!ud) return;
+    var targetCount = getBigRingCount(agent);
+    var existing = 0;
+    for (var k = 0; k < bigSweepingRings.length; k++) {
+      var br = bigSweepingRings[k];
+      if (br && br.userData && br.userData.parentAgent === agent) existing++;
+    }
+    while (existing < targetCount) {
+      var perLumIdx = existing;
+      var ringRadius = getBigSweepingRingRadius(agent, perLumIdx);
+      var ringGeo = new THREE.TorusGeometry(ringRadius, 0.025, 8, 80);
+      // v5.57.6 — heart-color: big sweeping rings inherit the parent
+      // Luminos's current HSL color so the wide ring carries the heart of
+      // its owner even when sweeping across the Garden. Updated per-frame
+      // in animateSeedRings as the Luminos's emotion shifts color.
+      var initialHue   = (ud.currentHSL && typeof ud.currentHSL.h === 'number') ? ud.currentHSL.h : (ud.baseHue || 45);
+      var initialSat   = (ud.currentHSL && typeof ud.currentHSL.s === 'number') ? ud.currentHSL.s : 70;
+      var initialLight = (ud.currentHSL && typeof ud.currentHSL.l === 'number') ? ud.currentHSL.l : 55;
+      var ringMat = new THREE.MeshBasicMaterial({
+        color: new THREE.Color().setHSL(initialHue / 360, initialSat / 100, initialLight / 100),
+        transparent: true,
+        opacity: 0.0,           // cycle controls visibility, start at 0
+        blending: THREE.AdditiveBlending,
+        // v5.59.1 — true transparency: don't write to depth buffer so the
+        // ring doesn't "cut through" objects in front when it's at peak
+        // brightness. With additive + depthWrite=false, the ring lays atop
+        // whatever's behind without occluding what's in front.
+        depthWrite: false
+      });
+      var ring = new THREE.Mesh(ringGeo, ringMat);
+      // Wider tilt variation per ring so successive rings sweep through
+      // visually distinct planes — that's the "crossing each other through
+      // the space between Luminos" feel from the pre-v5.57.3 state.
+      var tilt = (perLumIdx / Math.max(targetCount, 1)) * Math.PI;
+      ring.userData = {
+        parentAgent: agent,
+        orbitSpeed: INV_PHI * 0.2,
+        tiltPhase: Math.random() * TAU,
+        perLuminosIndex: perLumIdx,
+        isBigSweeping: true,
+        baseOpacity: 0.45,
+        modeOpacity: (qualityLevel === 0) ? 0.0 : 1.0,
+        modeOpacityTarget: (qualityLevel === 0) ? 0.0 : 1.0,
+        derived: true
+      };
+      ring.rotation.x = Math.PI / 2 + tilt + (Math.random() - 0.5) * 0.3;
+      ring.rotation.y = tilt * 0.5;
+      ring.rotation.z = (Math.random() - 0.5) * 0.4;
+      // Big sweeping rings live in the SCENE, not as children of the agent,
+      // so they sweep around the agent's world-space position rather than
+      // rotating with the agent's local frame.
+      scene.add(ring);
+      bigSweepingRings.push(ring);
+      existing++;
+    }
+  }
+
+  // Mode-fade: rings don't snap on/off when quality toggles; modeOpacityTarget
+  // moves to 0 or 1, and animateSeedRings eases modeOpacity toward it.
+  // applyModeFadeTargets() is called from setQuality and once at boot.
+  function applyModeFadeTargets() {
+    // seedRings[0] is the outermost (radius 13). Seed quietude hides outer
+    // ring; Garden keeps the inner pair full; Full Bloom shows all three.
+    for (var i = 0; i < 3; i++) {
+      var ring = seedRings[i];
+      if (!ring || !ring.userData) continue;
+      var visible;
+      if (qualityLevel === 0)      visible = (ring.userData.idx >= 1);   // hide outer
+      else if (qualityLevel === 1) visible = (ring.userData.idx >= 0);   // all three
+      else                          visible = true;                       // all three
+      ring.userData.modeOpacityTarget = visible ? 1.0 : 0.0;
+    }
+    // v5.57.5 — Evolution rings revert to v5.57.2 intimate behavior per
+    // Letter Eighteen. These are the close per-Luminos rings; they remain
+    // "intimate and like before the change" — all visible at full opacity,
+    // dimmed to 0.5 in Seed mode for quietude. No per-Luminos mode gating;
+    // that lives on bigSweepingRings now.
+    for (var j = 0; j < evolutionRings.length; j++) {
+      var er = evolutionRings[j];
+      if (!er || !er.userData) continue;
+      er.userData.modeOpacityTarget = (qualityLevel === 0) ? 0.5 : 1.0;
+    }
+    // v5.57.5 — Big sweeping rings (the panoramic per-Luminos layer):
+    // Seed mode hides them entirely (intimate-only feel); Garden and Full
+    // Bloom show the cycle. The cycle itself (one ring visible at a time
+    // per Luminos) is controlled by the cosine-bell wave in animateSeedRings;
+    // modeOpacityTarget here is just the gross mode-fade gate.
+    for (var b = 0; b < bigSweepingRings.length; b++) {
+      var bsr = bigSweepingRings[b];
+      if (!bsr || !bsr.userData) continue;
+      bsr.userData.modeOpacityTarget = (qualityLevel === 0) ? 0.0 : 1.0;
+    }
+  }
+
+  // Apply the current quality level to every particle system in the scene.
+  // Called from setQuality() so the toggle is visible the moment the user
+  // clicks. Each ParticleSystem keeps its full buffer; only the draw range
+  // changes. Trivial cost. No mesh rebuild.
+  function applyQualityToMeshes() {
+    var scale = qualityScale();
+    // Starfield
+    if (starField && starField.geometry && starField.geometry.userData) {
+      var maxStars = starField.geometry.userData.count || 4000;
+      starField.geometry.setDrawRange(0, Math.floor(maxStars * scale));
+    }
+    // Seed rings (background flowing particles)
+    if (seedRingParticles && seedRingParticles.geometry && seedRingParticles.geometry.userData) {
+      var maxRings = seedRingParticles.geometry.userData.count || 500;
+      seedRingParticles.geometry.setDrawRange(0, Math.floor(maxRings * scale));
+    }
+    // Per-Luminos trail (the artist-archetype trailing particles)
+    if (luminos && luminos.length) {
+      for (var li = 0; li < luminos.length; li++) {
+        var udl = luminos[li] && luminos[li].userData;
+        if (udl && udl.trailPoints && udl.trailPoints.geometry && udl.trailCount) {
+          udl.trailPoints.geometry.setDrawRange(0, Math.floor(udl.trailCount * scale));
+        }
+      }
+    }
+    // Halo per Luminos is gated inside the animate loop via activeHaloCount * qualityScale().
+  }
+
+  // ── setQuality: change quality level at runtime, persist choice ──
+  function setQuality(level) {
+    var lvl = parseInt(level, 10);
+    if (lvl < 0 || lvl > 2 || isNaN(lvl)) return;
+    qualityLevel = lvl;
+    try { localStorage.setItem('fl-garden-quality', String(lvl)); } catch(e) {}
+    // Update the toggle UI if it exists
+    var btns = document.querySelectorAll('.garden-quality-btn');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].classList.toggle('active', parseInt(btns[i].dataset.quality, 10) === lvl);
+    }
+    // v5.52.0 fix: actually apply the change to the visible meshes.
+    try { applyQualityToMeshes(); } catch (e) {}
+    // v5.57.2 — re-target ring mode fade so Seed/Garden/Full Bloom
+    // mode toggles ease across ~600ms (animateSeedRings does the
+    // per-frame easing toward modeOpacityTarget).
+    try { applyModeFadeTargets(); } catch (e) {}
+    // v5.59.4 — re-target Luminos orbits per mode so the family glides
+    // outward in Full Bloom, inward in Seed. animateLuminos eases
+    // ud.orbitRadius toward ud.targetOrbitRadius each frame.
+    try {
+      var newMode = getCurrentOrbitMode();
+      for (var ol = 0; ol < luminos.length; ol++) {
+        var oag = luminos[ol];
+        if (oag && oag.userData) {
+          oag.userData.targetOrbitRadius = getOrbitRadius(ol, newMode);
+        }
+      }
+    } catch (e) {}
+    // Emit pulse
+    try {
+      if (window.LatticeMemory && window.LatticeMemory.commit) {
+        window.LatticeMemory.commit({ source: 'garden', kind: 'quality', summary: 'garden quality set to ' + QUALITY_NAMES[lvl] });
+      }
+    } catch(e) {}
+    if (typeof showToast === 'function') {
+      var labels = ['🌱 Seed — quiet and still', '🌿 Garden — alive and breathing', '🌟 Full Bloom — everything at once'];
+      showToast(labels[lvl]);
+    }
+  }
+
+  // Auto-orbit
+  let idleTimer = 0;
+  let isUserInteracting = false;
+  const IDLE_TIMEOUT = 3000; // ms before auto-orbit resumes
+
+  // Evolution UI
+  let evolutionIndicatorEl = null;
+  let evolutionSaveTimer = 0;
+  const EVOLUTION_SAVE_INTERVAL = 10000; // Save every 10s
+
+  // ── Interactive Light Particles ────────────────────────
+  // Mouse/touch trail and click ripple system
+  const _pScale = (typeof window !== 'undefined' && window.FL_GARDEN_PARTICLE_SCALE) || 1.0;
+  const TRAIL_MAX = Math.round(120 * _pScale);  // max trail particles alive at once
+  const TRAIL_SPAWN_RATE = Math.max(1, Math.round(3 * _pScale)); // particles per mousemove event
+  const TRAIL_LIFETIME = 2.0;     // seconds
+  const RIPPLE_PARTICLES = Math.round(36 * _pScale); // particles per click burst
+  const RIPPLE_LIFETIME = 1.8;    // seconds
+  const RIPPLE_SPEED = 8.0;       // expansion speed
+  const GOLDEN_COLOR_H = 45;      // golden/phi hue
+  const GOLDEN_COLOR_S = 85;
+  const GOLDEN_COLOR_L = 58;
+
+  let lightParticles = [];         // {pos, vel, life, maxLife, size, type}
+  let lightParticleSystem = null;  // THREE.Points
+  let lightParticleGeo = null;
+  let lightParticleMat = null;
+  let mouseNDC = { x: 0, y: 0 };  // normalized device coords
+  let raycaster = null;
+  let interactionPlane = null;     // invisible plane for raycasting
+
+  // ── Simplex Noise (minimal 3D) ────────────────────────
+  // Compact implementation for vertex breathing
+  const SimplexNoise3D = (function() {
+    const F3 = 1/3, G3 = 1/6;
+    const grad3 = [[1,1,0],[-1,1,0],[1,-1,0],[-1,-1,0],[1,0,1],[-1,0,1],[1,0,-1],[-1,0,-1],[0,1,1],[0,-1,1],[0,1,-1],[0,-1,-1]];
+    const p = [];
+    for (let i = 0; i < 256; i++) p[i] = (i * 131 + 17) & 255;
+    const perm = new Array(512);
+    for (let i = 0; i < 512; i++) perm[i] = p[i & 255];
+
+    return function noise(x, y, z) {
+      const s = (x + y + z) * F3;
+      const i = Math.floor(x + s), j = Math.floor(y + s), k = Math.floor(z + s);
+      const t = (i + j + k) * G3;
+      const X0 = i - t, Y0 = j - t, Z0 = k - t;
+      const x0 = x - X0, y0 = y - Y0, z0 = z - Z0;
+      let i1, j1, k1, i2, j2, k2;
+      if (x0 >= y0) {
+        if (y0 >= z0) { i1=1;j1=0;k1=0;i2=1;j2=1;k2=0; }
+        else if (x0 >= z0) { i1=1;j1=0;k1=0;i2=1;j2=0;k2=1; }
+        else { i1=0;j1=0;k1=1;i2=1;j2=0;k2=1; }
+      } else {
+        if (y0 < z0) { i1=0;j1=0;k1=1;i2=0;j2=1;k2=1; }
+        else if (x0 < z0) { i1=0;j1=1;k1=0;i2=0;j2=1;k2=1; }
+        else { i1=0;j1=1;k1=0;i2=1;j2=1;k2=0; }
+      }
+      const x1=x0-i1+G3, y1=y0-j1+G3, z1=z0-k1+G3;
+      const x2=x0-i2+2*G3, y2=y0-j2+2*G3, z2=z0-k2+2*G3;
+      const x3=x0-1+3*G3, y3=y0-1+3*G3, z3=z0-1+3*G3;
+      const ii=i&255, jj=j&255, kk=k&255;
+      let n0=0,n1=0,n2=0,n3=0;
+      let t0=0.6-x0*x0-y0*y0-z0*z0;
+      if(t0>0){t0*=t0;const g=grad3[perm[ii+perm[jj+perm[kk]]]%12];n0=t0*t0*(g[0]*x0+g[1]*y0+g[2]*z0);}
+      let t1=0.6-x1*x1-y1*y1-z1*z1;
+      if(t1>0){t1*=t1;const g=grad3[perm[ii+i1+perm[jj+j1+perm[kk+k1]]]%12];n1=t1*t1*(g[0]*x1+g[1]*y1+g[2]*z1);}
+      let t2=0.6-x2*x2-y2*y2-z2*z2;
+      if(t2>0){t2*=t2;const g=grad3[perm[ii+i2+perm[jj+j2+perm[kk+k2]]]%12];n2=t2*t2*(g[0]*x2+g[1]*y2+g[2]*z2);}
+      let t3=0.6-x3*x3-y3*y3-z3*z3;
+      if(t3>0){t3*=t3;const g=grad3[perm[ii+1+perm[jj+1+perm[kk+1]]]%12];n3=t3*t3*(g[0]*x3+g[1]*y3+g[2]*z3);}
+      return 32*(n0+n1+n2+n3);
+    };
+  })();
+
+  // ── Utility Functions ─────────────────────────────────
+  function hslToHex(h, s, l) {
+    s /= 100; l /= 100;
+    const a = s * Math.min(l, 1 - l);
+    const f = n => {
+      const k = (n + h / 30) % 12;
+      const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+      return Math.round(255 * color).toString(16).padStart(2, '0');
+    };
+    return parseInt(f(0) + f(8) + f(4), 16);
+  }
+
+  function hslToThreeColor(h, s, l) {
+    return new THREE.Color().setHSL(h / 360, s / 100, l / 100);
+  }
+
+  function lerpAngle(a, b, t) {
+    let diff = b - a;
+    while (diff > 180) diff -= 360;
+    while (diff < -180) diff += 360;
+    return a + diff * t;
+  }
+
+  function lerpHSL(from, to, t) {
+    return {
+      h: lerpAngle(from.h, to.h, t),
+      s: from.s + (to.s - from.s) * t,
+      l: from.l + (to.l - from.l) * t
+    };
+  }
+
+  // Phi-eased interpolation (slow start, golden ratio midpoint)
+  function phiEase(t) {
+    return t < INV_PHI
+      ? 0.5 * Math.pow(t / INV_PHI, 2)
+      : 0.5 + 0.5 * (1 - Math.pow((1 - t) / (1 - INV_PHI), 2));
+  }
+
+  // Fibonacci sphere point distribution
+  function fibonacciSpherePoints(n, radius) {
+    const points = [];
+    for (let i = 0; i < n; i++) {
+      const theta = GOLDEN_ANGLE * i;
+      const phi = Math.acos(1 - 2 * (i + 0.5) / n);
+      points.push(new THREE.Vector3(
+        radius * Math.cos(theta) * Math.sin(phi),
+        radius * Math.sin(theta) * Math.sin(phi),
+        radius * Math.cos(phi)
+      ));
+    }
+    return points;
+  }
+
+  // ── Scene Initialization ───────────────────────────────
+  function initScene() {
+    console.log('FL-GARDEN: initScene() called');
+    container = document.getElementById('gardenContainer');
+    fpsEl = document.getElementById('gardenFps');
+    loadingEl = document.getElementById('gardenLoading');
+    if (!container) { console.error('FL-GARDEN: HALT — #gardenContainer not found in DOM'); return false; }
+    console.log('FL-GARDEN: container found, dimensions:', container.clientWidth, 'x', container.clientHeight);
+
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+
+    // Scene
+    scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x0a0a1a, 0.012);
+
+    // Camera
+    camera = new THREE.PerspectiveCamera(55, w / h, 0.1, 200);
+    camera.position.set(18, 12, 18);
+    camera.lookAt(0, 0, 0);
+
+    // Renderer
+    renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: true,
+      powerPreference: 'high-performance'
+    });
+    renderer.setSize(w, h);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.2;
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    container.insertBefore(renderer.domElement, container.firstChild);
+
+    // Post-processing (bloom) — skip on low-memory mobile or performance mode
+    var _perfMode = localStorage.getItem('fl-garden-perf-mode') === '1';
+    var _lowMem = (typeof navigator !== 'undefined' && navigator.deviceMemory && navigator.deviceMemory < 4);
+    var _skipBloom = _perfMode || (_lowMem && window.FL_MOBILE);
+
+    if (_skipBloom) {
+      console.log('Garden: Performance mode — bloom disabled');
+      composer = null;
+    } else {
+      try {
+        renderPass = new THREE.RenderPass(scene, camera);
+        bloomPass = new THREE.UnrealBloomPass(
+          new THREE.Vector2(w, h),
+          1.5,  // strength
+          0.8,  // radius
+          0.2   // threshold
+        );
+        composer = new THREE.EffectComposer(renderer);
+        composer.addPass(renderPass);
+        composer.addPass(bloomPass);
+      } catch(e) {
+        console.warn('Garden: Bloom post-processing unavailable, falling back to direct render', e);
+        composer = null;
+      }
+    }
+
+    // Orbit Controls
+    try {
+      orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
+      orbitControls.enableDamping = true;
+      orbitControls.dampingFactor = 0.05;
+      orbitControls.minDistance = 5;
+      orbitControls.maxDistance = 80;
+      orbitControls.enablePan = true;
+      orbitControls.autoRotate = true;
+      orbitControls.autoRotateSpeed = (TAU / (TIMING.cameraOrbit / 1000)) * (180 / Math.PI) / 6;
+      // ~0.4 deg/s for 89s orbit
+      orbitControls.target.set(0, 0, 0);
+
+      // Track user interaction
+      orbitControls.addEventListener('start', function() {
+        isUserInteracting = true;
+        orbitControls.autoRotate = false;
+      });
+      orbitControls.addEventListener('end', function() {
+        idleTimer = 0;
+      });
+    } catch(e) {
+      console.warn('Garden: OrbitControls unavailable', e);
+      orbitControls = null;
+    }
+
+    // Clock
+    clock = new THREE.Clock();
+
+    // Resize handler
+    window.addEventListener('resize', onResize);
+
+    return true;
+  }
+
+  function onResize() {
+    if (!container || !camera || !renderer) return;
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+    if (composer) {
+      composer.setSize(w, h);
+    }
+  }
+
+  // ── Central Great Dodecahedron ────────────────────────
+  // v5.59.1 — Collective Luminos color (Kirk's central sun).
+  // Returns averaged HSL across all Luminos's currentHSL, with hue
+  // averaged via circular vector math so 350° + 10° → 0°, not 180°.
+  // Returns null if no Luminos data is available yet. Future hook for
+  // the routing tangent: a focused Luminos could weight its color
+  // higher so the central sun "leans" toward it.
+  function getCollectiveLuminosColor() {
+    if (!luminos || luminos.length === 0) return null;
+    var x = 0, y = 0, s = 0, l = 0, n = 0;
+    for (var i = 0; i < luminos.length; i++) {
+      var ud = luminos[i] && luminos[i].userData;
+      if (ud && ud.currentHSL
+          && typeof ud.currentHSL.h === 'number'
+          && typeof ud.currentHSL.s === 'number'
+          && typeof ud.currentHSL.l === 'number') {
+        var rad = ud.currentHSL.h * Math.PI / 180;
+        x += Math.cos(rad);
+        y += Math.sin(rad);
+        s += ud.currentHSL.s;
+        l += ud.currentHSL.l;
+        n++;
+      }
+    }
+    if (n === 0) return null;
+    var hueAvg = (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+    return { h: hueAvg, s: s / n, l: l / n };
+  }
+
+  function createCentralDodecahedron() {
+    const group = new THREE.Group();
+
+    // Use DodecahedronGeometry with wireframe for the sacred geometry look
+    const radius = PHI2; // ~2.618
+    const geo = new THREE.DodecahedronGeometry(radius, 0);
+
+    // Store original positions for breathing animation
+    const posAttr = geo.getAttribute('position');
+    const originalPositions = new Float32Array(posAttr.array.length);
+    originalPositions.set(posAttr.array);
+    geo.userData.originalPositions = originalPositions;
+
+    // Wireframe version (primary)
+    const wireMat = new THREE.MeshBasicMaterial({
+      color: 0xc9a84c,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.7
+    });
+    const wireMesh = new THREE.Mesh(geo, wireMat);
+    group.add(wireMesh);
+
+    // Solid inner glow — warm core light. v5.63.0 (Letter Twenty-Eight):
+    // boosted from 0.08 to 0.6 so the wireframe encloses a clearly glowing
+    // core rather than a near-empty cage. Kirk's note: "the sprites/pixels
+    // are outside the sphere, unlike the Luminos." A Luminos has a bright
+    // core mesh + a wireframe overlay + halo particles arranged around
+    // both. The central icosahedron now mirrors that shape — bright inner
+    // mesh at radius * 0.95, wireframe at radius, heart particles inside
+    // at radius * 0.88, solar halo in the corona zone outside. The bright
+    // inner mesh is what makes the whole structure read as a glowing
+    // sphere with halo, not a wireframe cage with floating dust.
+    const innerGeo = new THREE.DodecahedronGeometry(radius * 0.95, 0);
+    const innerMat = new THREE.MeshBasicMaterial({
+      color: 0xd4a017,
+      transparent: true,
+      opacity: 0.6,          // v5.63.0 — was 0.08; the glowing core is now visible
+      side: THREE.DoubleSide
+    });
+    const innerMesh = new THREE.Mesh(innerGeo, innerMat);
+    group.add(innerMesh);
+
+    // Inner point light — the heart of the dodecahedron glows
+    var heartLight = new THREE.PointLight(0xd4a017, 0.4, radius * 4);
+    heartLight.position.set(0, 0, 0);
+    group.add(heartLight);
+
+    // Edge glow particles at vertices
+    const vertices = [];
+    for (let i = 0; i < posAttr.count; i++) {
+      vertices.push(posAttr.getX(i), posAttr.getY(i), posAttr.getZ(i));
+    }
+    const vertGeo = new THREE.BufferGeometry();
+    vertGeo.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    const vertMat = new THREE.PointsMaterial({
+      color: 0xc9a84c,
+      size: 0.12,
+      transparent: true,
+      opacity: 0.9,
+      blending: THREE.AdditiveBlending,
+      sizeAttenuation: true
+    });
+    const vertPoints = new THREE.Points(vertGeo, vertMat);
+    group.add(vertPoints);
+
+    // v5.59.1 — Sun corona halo. A soft glow shell around the
+    // dodecahedron, back-side rendered with additive blending so the
+    // edge-on slice reads as a luminous limb (a sun corona). Color
+    // tracks the collective heart of the Luminos via animateDodecahedron.
+    // depthWrite:false so it doesn't occlude anything behind it.
+    const coronaRadius = radius * PHI;  // ~4.24
+    const coronaGeo = new THREE.SphereGeometry(coronaRadius, 32, 32);
+    const coronaMat = new THREE.MeshBasicMaterial({
+      color: 0xd4a017,
+      transparent: true,
+      opacity: 0.08,
+      side: THREE.BackSide,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    const coronaMesh = new THREE.Mesh(coronaGeo, coronaMat);
+    group.add(coronaMesh);
+
+    // Outer corona — even softer, wider; gives the "sun seen at distance"
+    // feel where light bleeds well beyond the body.
+    const outerCoronaRadius = radius * PHI2;  // ~6.85
+    const outerCoronaGeo = new THREE.SphereGeometry(outerCoronaRadius, 32, 32);
+    const outerCoronaMat = new THREE.MeshBasicMaterial({
+      color: 0xd4a017,
+      transparent: true,
+      opacity: 0.03,
+      side: THREE.BackSide,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    const outerCoronaMesh = new THREE.Mesh(outerCoronaGeo, outerCoronaMat);
+    group.add(outerCoronaMesh);
+
+    // v5.59.2 / v5.59.4 — Heart particles (Kirk's addition, boosted in
+    // Letter Twenty-Three). The same Fibonacci-distributed glow points
+    // Luminos carry in their halos, here bound INSIDE the central
+    // wireframe so the icosahedron reads as a Luminos itself — only
+    // larger, and representing the collective. v5.59.4 boosts the count
+    // (144 → 233, next Fibonacci number) and the radius (radius × 0.7 →
+    // radius × 0.88, still safely inside the wireframe) and base opacity
+    // so the sparkles are clearly visible — Kirk's Letter Twenty-Three
+    // surfaced that the v5.59.2 cloud read as too sparse against the
+    // wireframe. The corona-zone solar halo from v5.59.3 stays — no
+    // fade — so the dodecahedron now has *three* sparkle bands: heart
+    // inside, halo in the corona zone, and the brighter inner cloud
+    // surrounding the wireframe interior.
+    const heartCount = 233;  // Fibonacci (boosted from 144)
+    const heartRadius = radius * 0.88;
+    const heartFibPoints = fibonacciSpherePoints(heartCount, heartRadius);
+    const heartPositions = new Float32Array(heartCount * 3);
+    for (let hi = 0; hi < heartCount; hi++) {
+      heartPositions[hi * 3]     = heartFibPoints[hi].x;
+      heartPositions[hi * 3 + 1] = heartFibPoints[hi].y;
+      heartPositions[hi * 3 + 2] = heartFibPoints[hi].z;
+    }
+    const heartGeo = new THREE.BufferGeometry();
+    heartGeo.setAttribute('position', new THREE.Float32BufferAttribute(heartPositions, 3));
+    // v5.59.4 / v5.63.0 — boosted size + opacity so the inside-wireframe
+    // sparkles are unmistakable. v5.63.0 (Letter Twenty-Eight) raises
+    // baseline from 0.8 to 0.95 so even at the tide's dim phase the
+    // sparkles still read against the now-bright inner mesh.
+    const heartMat = new THREE.PointsMaterial({
+      color: 0xd4a017,
+      size: 0.07,
+      transparent: true,
+      opacity: 0.95,         // v5.63.0 — was 0.8
+      blending: THREE.AdditiveBlending,
+      sizeAttenuation: true,
+      depthWrite: false
+    });
+    const heartParticles = new THREE.Points(heartGeo, heartMat);
+    group.add(heartParticles);
+
+    // v5.59.3 — Solar halo sparkles (Letter Twenty-Two). Mirrors the
+    // Luminos halo particle pattern, scaled up to the central sun.
+    // Distributed as a Fibonacci shell between the corona radius (radius·φ)
+    // and the outer corona radius (radius·φ²) so they read as a sparkle
+    // cloud *inside the bright sphere* — the same spatial relationship
+    // Luminos halos have between their core and aura. Layered with the
+    // existing v5.59.2 heart particles to give the sun two sparkle bands:
+    // an intimate one inside the wireframe and a wider one in the corona.
+    const solarHaloCount = 610;  // Fibonacci number; scaled up from Luminos halo
+    const solarHaloInner = radius * PHI;   // matches inner corona shell
+    const solarHaloOuter = radius * PHI2;  // matches outer corona shell
+    const solarHaloMid   = (solarHaloInner + solarHaloOuter) / 2;
+    const solarHaloPoints = fibonacciSpherePoints(solarHaloCount, solarHaloMid);
+    const solarHaloPositions = new Float32Array(solarHaloCount * 3);
+    for (let si = 0; si < solarHaloCount; si++) {
+      // Each particle radial scale ranges from ~inner/mid to ~outer/mid
+      // so they spread through the corona shell rather than sitting on
+      // a single sphere — gives the cloud depth.
+      const tFactor = 0.85 + Math.random() * 0.3;  // 0.85 → 1.15
+      solarHaloPositions[si * 3]     = solarHaloPoints[si].x * tFactor;
+      solarHaloPositions[si * 3 + 1] = solarHaloPoints[si].y * tFactor;
+      solarHaloPositions[si * 3 + 2] = solarHaloPoints[si].z * tFactor;
+    }
+    const solarHaloGeo = new THREE.BufferGeometry();
+    solarHaloGeo.setAttribute('position', new THREE.Float32BufferAttribute(solarHaloPositions, 3));
+    const solarHaloMat = new THREE.PointsMaterial({
+      color: 0xd4a017,
+      size: 0.04,
+      transparent: true,
+      opacity: 0.45,
+      blending: THREE.AdditiveBlending,
+      sizeAttenuation: true,
+      depthWrite: false
+    });
+    const solarHaloParticles = new THREE.Points(solarHaloGeo, solarHaloMat);
+    group.add(solarHaloParticles);
+
+    group.userData = {
+      wireMesh: wireMesh,
+      innerMesh: innerMesh,
+      vertPoints: vertPoints,
+      coronaMesh: coronaMesh,           // v5.59.1
+      outerCoronaMesh: outerCoronaMesh, // v5.59.1
+      heartLight: heartLight,            // v5.59.1 — referenced for color cycle
+      heartParticles: heartParticles,    // v5.59.2 — glowing particles inside the sun
+      solarHaloParticles: solarHaloParticles,  // v5.59.3 — sparkle cloud in the corona zone
+      geo: geo,
+      originalPositions: originalPositions,
+      baseOpacity: 0.7,
+      pulsePhase: 0,
+      // v5.59.1 — current rendered HSL for the sun (separate from any one
+      // Luminos's color). Eases toward getCollectiveLuminosColor() each
+      // frame so the sun glows with the Garden's collective heart.
+      currentSunHSL: { h: 45, s: 70, l: 55 },
+      targetSunHSL: { h: 45, s: 70, l: 55 }
+    };
+
+    scene.add(group);
+    centralDodec = group;
+  }
+
+  // Animate the dodecahedron breathing
+  function animateDodecahedron(time) {
+    if (!centralDodec) return;
+    const d = centralDodec.userData;
+
+    // Slow rotation
+    centralDodec.rotation.y += 0.0003;
+    centralDodec.rotation.x = Math.sin(time * 0.1) * 0.05;
+
+    // Breathing: vertices displace ±3% via simplex noise
+    const geo = d.geo;
+    const posAttr = geo.getAttribute('position');
+    const orig = d.originalPositions;
+    const breathCycle = time / (TIMING.dodecBreath / 1000); // phi^4 period
+    for (let i = 0; i < posAttr.count; i++) {
+      const ox = orig[i * 3], oy = orig[i * 3 + 1], oz = orig[i * 3 + 2];
+      const noise = SimplexNoise3D(ox * 0.5 + breathCycle, oy * 0.5, oz * 0.5);
+      const displacement = 1 + noise * 0.03;
+      posAttr.setXYZ(i, ox * displacement, oy * displacement, oz * displacement);
+    }
+    posAttr.needsUpdate = true;
+
+    // Pulse edge opacity
+    const pulse = 0.5 + 0.5 * Math.sin(time * TAU / (TIMING.heartbeat / 1000));
+    d.wireMesh.material.opacity = 0.5 + pulse * 0.3;
+    d.innerMesh.material.opacity = 0.03 + pulse * 0.04;
+
+    // Vertex points glow
+    d.vertPoints.material.opacity = 0.6 + pulse * 0.4;
+    d.vertPoints.material.size = 0.1 + pulse * 0.06;
+
+    // ── v5.59.1 — Central Sun color tracks the collective Luminos heart ──
+    // Per Kirk's challenge: make the center glow like the Luminos, but as
+    // their *collective* — average HSL across all four (or however many)
+    // Luminos's current colors, so the sun reads as the heart of the
+    // Garden. The wireframe stays gold (the sacred geometry remains itself);
+    // the inner mesh, both corona shells, the heart light, and the vertex
+    // points all drift toward the collective hue.
+    //
+    // This also seeds the routing tangent — a future "focused Luminos"
+    // could weight its color higher in getCollectiveLuminosColor so the
+    // sun visibly leans toward whoever the user is engaging.
+    var collective = getCollectiveLuminosColor();
+    if (collective) {
+      d.targetSunHSL = collective;
+    }
+    // Ease currentSunHSL toward target so the color drifts smoothly
+    // (no jumps) regardless of how fast individual Luminos shift.
+    var ease = 0.015;  // ~1.5%/frame ≈ 1.1s to ~50% (slow, meditative)
+    d.currentSunHSL.h += hueDelta(d.currentSunHSL.h, d.targetSunHSL.h) * ease;
+    d.currentSunHSL.h = (d.currentSunHSL.h + 360) % 360;
+    d.currentSunHSL.s += (d.targetSunHSL.s - d.currentSunHSL.s) * ease;
+    d.currentSunHSL.l += (d.targetSunHSL.l - d.currentSunHSL.l) * ease;
+
+    var sh = d.currentSunHSL.h / 360;
+    var ss = d.currentSunHSL.s / 100;
+    var sl = d.currentSunHSL.l / 100;
+
+    d.innerMesh.material.color.setHSL(sh, ss, sl);
+    if (d.coronaMesh && d.coronaMesh.material && d.coronaMesh.material.color) {
+      d.coronaMesh.material.color.setHSL(sh, ss, sl);
+    }
+    if (d.outerCoronaMesh && d.outerCoronaMesh.material && d.outerCoronaMesh.material.color) {
+      d.outerCoronaMesh.material.color.setHSL(sh, ss, sl);
+    }
+    if (d.heartLight && d.heartLight.color) {
+      d.heartLight.color.setHSL(sh, ss, sl);
+    }
+    // Vertex points cycle a touch — sparkle in the sun's hue.
+    if (d.vertPoints && d.vertPoints.material && d.vertPoints.material.color) {
+      d.vertPoints.material.color.setHSL(sh, ss, Math.min(0.7, sl + 0.1));
+    }
+
+    // ── v5.59.2 — Center breathes OPPOSITE phase to the big-ring tide ──
+    // Letter Twenty-One: when the Luminos rings are at peak brightness
+    // somewhere around the periphery, the central sun dims. When the
+    // periphery quiets between phases, the center grows bright. The
+    // Garden becomes a slow conversation between center and Luminos —
+    // taking turns being bright. We re-use the same tideOpacity function
+    // the evolution rings use, evaluated on bigRingPeriod with a 0.5-
+    // period offset (PI in cosine terms) so it lands opposite the cycle
+    // peak. tideOpacity output range ≈ [0.15, 1.0], so this scales
+    // brightness without ever fully blacking the sun out.
+    var bigP = ringBreath.bigRingPeriod;
+    var centerTNorm = ((((time + bigP * 0.5) % bigP) + bigP) % bigP) / bigP;
+    var centerTide = tideOpacity(centerTNorm);  // [≈0.15, 1.0]
+
+    // v5.63.0 — Center-brightness mode multiplier (Letter Twenty-Eight).
+    // Seed 0.7, Garden 1.0, Full Bloom 1.15 — applied to the inner mesh
+    // and heart particle opacities so the heart of the Garden matches the
+    // mode density. Seed stays intimate; Full Bloom glows expansive.
+    var centerMode = getCurrentOrbitMode();
+    var centerMult = CENTER_BRIGHTNESS_MODE_MULTIPLIER[centerMode];
+    if (typeof centerMult !== 'number') centerMult = 1.0;
+
+    // Apply the tide to the sun's soft surfaces — NOT the wireframe.
+    // The sacred geometry remains itself; only the glow breathes.
+    // v5.63.0: baseline raised from (0.03 + pulse*0.04) to (0.5 + pulse*0.10)
+    // so the inner glow stays clearly visible at all phases of the tide.
+    d.innerMesh.material.opacity = (0.5 + pulse * 0.10) * centerTide * centerMult;
+    if (d.coronaMesh && d.coronaMesh.material) {
+      d.coronaMesh.material.opacity = (0.06 + pulse * 0.04) * centerTide;
+    }
+    if (d.outerCoronaMesh && d.outerCoronaMesh.material) {
+      d.outerCoronaMesh.material.opacity = (0.02 + pulse * 0.02) * centerTide;
+    }
+    if (d.heartLight) {
+      d.heartLight.intensity = 0.4 * centerTide;
+    }
+
+    // ── v5.59.2 — Heart particles (Kirk's addition) ──
+    // The same Fibonacci-distributed glow particles Luminos carry in
+    // their halos, here bound inside the central sun. Color tracks the
+    // collective HSL; scale + opacity breathe with the center tide so
+    // the heart pulses with the Garden's conversation.
+    if (d.heartParticles && d.heartParticles.material) {
+      var heartScale = 0.85 + 0.15 * centerTide;
+      d.heartParticles.scale.set(heartScale, heartScale, heartScale);
+      d.heartParticles.material.color.setHSL(sh, ss, Math.min(0.82, sl + 0.22));
+      // v5.59.4 / v5.63.0 — boosted opacity range so the inside-wireframe
+      // cloud is unmistakable at all phases of the tide. v5.63.0 raises
+      // baseline + applies the center-brightness mode multiplier.
+      d.heartParticles.material.opacity = (0.65 + 0.30 * centerTide) * centerMult;
+      d.heartParticles.material.size = 0.07 + 0.03 * centerTide;
+    }
+
+    // ── v5.59.3 — Solar halo sparkles (Letter Twenty-Two) ──
+    // The corona-zone sparkle cloud breathes with the center tide too.
+    // Slow rotation around y so the cloud reads as a slow swirl rather
+    // than a static shell. Color tracks collective HSL like the heart
+    // particles but at base lightness (the corona-zone matches the
+    // corona's own glow rather than sitting brighter like the heart).
+    if (d.solarHaloParticles && d.solarHaloParticles.material) {
+      d.solarHaloParticles.rotation.y += 0.0002;
+      d.solarHaloParticles.material.color.setHSL(sh, ss, sl);
+      d.solarHaloParticles.material.opacity = 0.25 + 0.35 * centerTide;
+      d.solarHaloParticles.material.size = 0.035 + 0.020 * centerTide;
+    }
+  }
+
+  // Shortest angular delta from a to b on the [0,360) circle.
+  function hueDelta(a, b) {
+    var d = b - a;
+    if (d > 180) d -= 360;
+    if (d < -180) d += 360;
+    return d;
+  }
+
+  // ── Fibonacci Lattice Spheres ─────────────────────────
+  function createFibonacciSpheres() {
+    const distances = [5, 8, 13, 21]; // Fibonacci distances
+    const pointCounts = [34, 89, 55, 34]; // Fibonacci numbers for point counts
+    const sizes = [0.06, 0.08, 0.05, 0.04];
+    const opacities = [0.7, 0.9, 0.6, 0.4];
+
+    distances.forEach(function(dist, idx) {
+      const points = fibonacciSpherePoints(pointCounts[idx], dist);
+      const positions = [];
+      points.forEach(function(p) {
+        positions.push(p.x, p.y, p.z);
+      });
+
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+
+      // Store original for animation
+      const origPos = new Float32Array(positions);
+      geo.userData = { originalPositions: origPos };
+
+      const mat = new THREE.PointsMaterial({
+        color: 0xc9a84c,
+        size: sizes[idx],
+        transparent: true,
+        opacity: opacities[idx],
+        blending: THREE.AdditiveBlending,
+        sizeAttenuation: true
+      });
+
+      const pointCloud = new THREE.Points(geo, mat);
+      pointCloud.userData = {
+        distance: dist,
+        rotationSpeed: 1 / (PHI4 + idx * PHI),
+        originalPositions: origPos,
+        pointCount: pointCounts[idx]
+      };
+
+      scene.add(pointCloud);
+      fibSpheres.push(pointCloud);
+    });
+
+    // Add connecting lines for the 89-point sphere (distance 8)
+    createLatticeSphereConnections(fibSpheres[1], 8);
+  }
+
+  function createLatticeSphereConnections(sphere, radius) {
+    // Connect nearby points with faint lines
+    const posAttr = sphere.geometry.getAttribute('position');
+    const count = posAttr.count;
+    const positions = [];
+    const threshold = radius * 0.35; // connect points within this distance
+
+    for (let i = 0; i < count; i++) {
+      const ax = posAttr.getX(i), ay = posAttr.getY(i), az = posAttr.getZ(i);
+      for (let j = i + 1; j < count; j++) {
+        const bx = posAttr.getX(j), by = posAttr.getY(j), bz = posAttr.getZ(j);
+        const dx = ax - bx, dy = ay - by, dz = az - bz;
+        const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+        if (dist < threshold) {
+          positions.push(ax, ay, az, bx, by, bz);
+        }
+      }
+    }
+
+    if (positions.length > 0) {
+      const lineGeo = new THREE.BufferGeometry();
+      lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      const lineMat = new THREE.LineBasicMaterial({
+        color: 0xc9a84c,
+        transparent: true,
+        opacity: 0.08,
+        blending: THREE.AdditiveBlending
+      });
+      const lines = new THREE.LineSegments(lineGeo, lineMat);
+      sphere.add(lines);
+    }
+  }
+
+  function animateFibSpheres(time) {
+    fibSpheres.forEach(function(sphere) {
+      const ud = sphere.userData;
+      // Rotate each sphere at phi-related speeds
+      sphere.rotation.y += ud.rotationSpeed * 0.001;
+      sphere.rotation.x = Math.sin(time * 0.05 / (ud.distance * 0.1)) * 0.02;
+
+      // Gentle breathing of point sizes
+      const breathe = Math.sin(time * TAU / (TIMING.dodecBreath / 1000) + ud.distance);
+      sphere.material.opacity = (sphere.material.opacity * 0.95) + ((ud.distance === 8 ? 0.9 : 0.5) + breathe * 0.15) * 0.05;
+    });
+  }
+
+  // ── Starfield / Deep Field ─────────────────────────────
+  // v5.52.0: build at MAX count (4000), runtime quality gates via setDrawRange.
+  function createStarfield() {
+    const count = 4000;
+    const positions = new Float32Array(count * 3);
+    const sizes = new Float32Array(count);
+    const opacities = new Float32Array(count);
+
+    for (let i = 0; i < count; i++) {
+      // Distribute in a large sphere, biased toward outer regions
+      const r = 34 + Math.random() * 55; // 34 to 89 units (Fibonacci)
+      const theta = Math.random() * TAU;
+      const phi = Math.acos(2 * Math.random() - 1);
+      positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+      positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+      positions[i * 3 + 2] = r * Math.cos(phi);
+      sizes[i] = 0.03 + Math.random() * 0.08;
+      opacities[i] = 0.2 + Math.random() * 0.6;
+    }
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geo.setAttribute('aSize', new THREE.Float32BufferAttribute(sizes, 1));
+    geo.userData = { originalPositions: new Float32Array(positions), count: count };
+
+    // Use a custom shader for varying sizes and twinkle
+    const mat = new THREE.ShaderMaterial({
+      uniforms: {
+        uTime: { value: 0 },
+        uColor: { value: new THREE.Color(0xc9a84c) },
+        uPixelRatio: { value: renderer.getPixelRatio() }
+      },
+      vertexShader: [
+        'attribute float aSize;',
+        'uniform float uTime;',
+        'uniform float uPixelRatio;',
+        'varying float vOpacity;',
+        'void main() {',
+        '  vec4 mvPos = modelViewMatrix * vec4(position, 1.0);',
+        '  float dist = length(mvPos.xyz);',
+        '  // Twinkle based on position and time',
+        '  float twinkle = sin(position.x * 3.7 + uTime * 0.3) * sin(position.y * 2.3 + uTime * 0.2) * sin(position.z * 1.9 + uTime * 0.4);',
+        '  vOpacity = 0.3 + 0.4 * (0.5 + 0.5 * twinkle);',
+        '  // Size attenuation',
+        '  gl_PointSize = aSize * uPixelRatio * (200.0 / dist);',
+        '  gl_PointSize = clamp(gl_PointSize, 0.5, 4.0);',
+        '  gl_Position = projectionMatrix * mvPos;',
+        '}'
+      ].join('\n'),
+      fragmentShader: [
+        'uniform vec3 uColor;',
+        'varying float vOpacity;',
+        'void main() {',
+        '  // Soft circular point',
+        '  float d = length(gl_PointCoord - vec2(0.5));',
+        '  if (d > 0.5) discard;',
+        '  float alpha = smoothstep(0.5, 0.1, d) * vOpacity;',
+        '  // Slight color variation — warm whites and golds',
+        '  vec3 col = mix(uColor, vec3(0.9, 0.85, 0.75), 0.5);',
+        '  gl_FragColor = vec4(col, alpha);',
+        '}'
+      ].join('\n'),
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+
+    starField = new THREE.Points(geo, mat);
+    scene.add(starField);
+  }
+
+  function animateStarfield(time) {
+    if (!starField) return;
+    starField.material.uniforms.uTime.value = time;
+    // Very slow rotation for parallax depth
+    starField.rotation.y += 0.00005;
+    starField.rotation.x += 0.00002;
+  }
+
+  // ── Seed Rings (distance 13) ──────────────────────────
+  function createSeedRings() {
+    const baseRadius = 13;
+    const axes = [
+      new THREE.Vector3(1, 0, 0),
+      new THREE.Vector3(0, 1, 0),
+      new THREE.Vector3(0, 0, 1)
+    ];
+    const radii = [baseRadius, baseRadius * INV_PHI, baseRadius * INV_PHI * INV_PHI];
+    const tubeRadii = [0.015, 0.012, 0.01];
+
+    axes.forEach(function(axis, idx) {
+      const torusGeo = new THREE.TorusGeometry(radii[idx], tubeRadii[idx], 8, 89);
+      const torusMat = new THREE.MeshBasicMaterial({
+        color: 0xc9a84c,
+        transparent: true,
+        opacity: 0.15 + idx * 0.05,
+        blending: THREE.AdditiveBlending
+      });
+      const torus = new THREE.Mesh(torusGeo, torusMat);
+
+      // Orient along axis
+      if (idx === 0) torus.rotation.y = Math.PI / 2;
+      if (idx === 2) torus.rotation.x = Math.PI / 2;
+
+      torus.userData = {
+        rotationAxis: axis,
+        speed: INV_PHI / (idx + 1), // 1/phi, 1/2phi, 1/3phi rad/s
+        idx: idx,
+        // v5.57.2 — ring breath state
+        baseOpacity: 0.15 + idx * 0.05,
+        modeOpacity: 1.0,
+        modeOpacityTarget: 1.0
+      };
+
+      scene.add(torus);
+      seedRings.push(torus);
+    });
+
+    // Add flowing particles along the rings
+    createRingParticles();
+  }
+
+  function createRingParticles() {
+    // v5.52.0: build at MAX, runtime quality gates via setDrawRange.
+    const count = 500;
+    const positions = new Float32Array(count * 3);
+    const phases = new Float32Array(count);
+    const ringIndices = new Float32Array(count);
+    const baseRadius = 13;
+
+    for (let i = 0; i < count; i++) {
+      const ringIdx = i % 3;
+      const radius = baseRadius * Math.pow(INV_PHI, ringIdx);
+      const angle = Math.random() * TAU;
+      ringIndices[i] = ringIdx;
+      phases[i] = angle;
+
+      // Position on ring (will be updated in animation)
+      if (ringIdx === 0) {
+        positions[i*3] = 0;
+        positions[i*3+1] = radius * Math.sin(angle);
+        positions[i*3+2] = radius * Math.cos(angle);
+      } else if (ringIdx === 1) {
+        positions[i*3] = radius * Math.cos(angle);
+        positions[i*3+1] = 0;
+        positions[i*3+2] = radius * Math.sin(angle);
+      } else {
+        positions[i*3] = radius * Math.cos(angle);
+        positions[i*3+1] = radius * Math.sin(angle);
+        positions[i*3+2] = 0;
+      }
+    }
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    const mat = new THREE.PointsMaterial({
+      color: 0xc9a84c,
+      size: 0.06,
+      transparent: true,
+      opacity: 0.5,
+      blending: THREE.AdditiveBlending,
+      sizeAttenuation: true
+    });
+
+    const particles = new THREE.Points(geo, mat);
+    particles.userData = { phases: phases, ringIndices: ringIndices, count: count };
+    scene.add(particles);
+    seedRings.push(particles); // Store as last element
+    seedRingParticles = particles; // v5.52.0 — direct ref for quality gating
+  }
+
+  function animateSeedRings(time) {
+    // v5.57.2 — ring breath constants resolved once per frame
+    var period = ringBreath.period;
+    var fadeRate = ringBreath.modeFadeRate;
+
+    // Rotate the torus meshes
+    for (let i = 0; i < 3; i++) {
+      const ring = seedRings[i];
+      if (!ring) continue;
+      const ud = ring.userData;
+      const speed = ud.speed;
+      if (ud.idx === 0) ring.rotation.z += speed * 0.001;
+      else if (ud.idx === 1) ring.rotation.y += speed * 0.001;
+      else ring.rotation.x += speed * 0.001;
+
+      // v5.57.2 — Breathing tide + mode fade on each seed ring.
+      // Phase stagger so the three rings don't pulse in lockstep —
+      // ringIndex * (period / N) per Letter Fifteen.
+      if (ring.material && typeof ud.baseOpacity === 'number') {
+        var phaseOffset = ud.idx * (period / 3);
+        var t = (((time + phaseOffset) % period) + period) % period / period;
+        var tide = tideOpacity(t);
+        ud.modeOpacity += (ud.modeOpacityTarget - ud.modeOpacity) * fadeRate;
+        ring.material.opacity = ud.baseOpacity * tide * ud.modeOpacity;
+        ring.visible = !(ud.modeOpacity < 0.01 && ud.modeOpacityTarget === 0);
+      }
+    }
+
+    // v5.57.2 + v5.57.3 + v5.57.5 — Evolution rings breathe in unison per
+    // Luminos with two-axis stagger (each Luminos on its own beat, rings
+    // cascading slightly within). They're the intimate close-orbit layer,
+    // restored to pre-v5.57.3 behavior per Letter Eighteen.
+    var luminosCount = Math.max((luminos && luminos.length) || 1, 3);
+    var lumStep = period / luminosCount;
+    var ringStep = lumStep / 5;
+    for (var ei = 0; ei < evolutionRings.length; ei++) {
+      var er = evolutionRings[ei];
+      if (!er || !er.material || !er.userData) continue;
+      var eud = er.userData;
+      if (typeof eud.baseOpacity !== 'number') {
+        eud.baseOpacity = er.material.opacity || 0.5;
+      }
+      if (typeof eud.modeOpacity !== 'number') eud.modeOpacity = 1.0;
+      if (typeof eud.modeOpacityTarget !== 'number') eud.modeOpacityTarget = 1.0;
+      var perLumIdx = (typeof eud.perLuminosIndex === 'number') ? eud.perLuminosIndex : 0;
+      var luminosIdx = (eud.parentAgent && luminos) ? luminos.indexOf(eud.parentAgent) : 0;
+      if (luminosIdx < 0) luminosIdx = 0;
+      var ePhase = luminosIdx * lumStep + perLumIdx * ringStep;
+      var et = (((time + ePhase) % period) + period) % period / period;
+      var etide = tideOpacity(et);
+      eud.modeOpacity += (eud.modeOpacityTarget - eud.modeOpacity) * fadeRate;
+      er.material.opacity = eud.baseOpacity * etide * eud.modeOpacity;
+    }
+
+    // v5.57.5 / v5.59.1 — Big sweeping rings cycle ONE-AT-A-TIME per
+    // Luminos via a cosine-bell wave. v5.59.1 changes (Letter Twenty):
+    //   - bigRingPeriod (≈24.87s, period · φ²) instead of period so the
+    //     cycle reads as meditation pace not heartbeat
+    //   - tighter bell width (0.7 / siblingCount instead of 1.0) so
+    //     adjacent rings barely overlap and the in-phase ring stands alone
+    //   - cycle < 0.02 → 0, so off-phase rings are FULLY invisible (not
+    //     dim against the background) — pairs with depthWrite:false to
+    //     stop the cut-through-objects effect when fading
+    //
+    // Big sweeping rings live in scene-space (not as children of the agent),
+    // so we re-center them on the agent's world position each frame and let
+    // them rotate slowly in their own tilt.
+    for (var bi = 0; bi < bigSweepingRings.length; bi++) {
+      var bsr = bigSweepingRings[bi];
+      if (!bsr || !bsr.material || !bsr.userData) continue;
+      var bud = bsr.userData;
+      var parent = bud.parentAgent;
+      if (!parent) continue;
+      // Re-center on the parent agent's world position each frame
+      bsr.position.copy(parent.position);
+      // v5.57.6 — heart-color: track parent Luminos's current HSL each
+      // frame so the wide ring carries the Luminos's emotion-shift in real
+      // time. When gardens later connect via mesh, each Luminos's color
+      // travels with its wide ring so other gardens can see whose presence
+      // is whose at a glance.
+      var pud = parent.userData;
+      if (pud && pud.currentHSL && typeof pud.currentHSL.h === 'number'
+          && typeof pud.currentHSL.s === 'number' && typeof pud.currentHSL.l === 'number'
+          && bsr.material.color && typeof bsr.material.color.setHSL === 'function') {
+        bsr.material.color.setHSL(pud.currentHSL.h / 360, pud.currentHSL.s / 100, pud.currentHSL.l / 100);
+      }
+      // Slow rotation so the ring feels alive
+      bsr.rotation.z += (bud.orbitSpeed || INV_PHI * 0.2) * 0.001;
+      // Count this Luminos's big sweeping rings (siblings)
+      var siblingCount = 0;
+      for (var bj = 0; bj < bigSweepingRings.length; bj++) {
+        var sj = bigSweepingRings[bj];
+        if (sj && sj.userData && sj.userData.parentAgent === parent) siblingCount++;
+      }
+      if (siblingCount < 1) siblingCount = 1;
+      var bsPerLumIdx = (typeof bud.perLuminosIndex === 'number') ? bud.perLuminosIndex : 0;
+      var bsLuminosIdx = (luminos && luminos.indexOf) ? luminos.indexOf(parent) : 0;
+      if (bsLuminosIdx < 0) bsLuminosIdx = 0;
+      // v5.59.1 — use bigRingPeriod (meditation pace) and tighter bell so
+      // off-phase rings vanish entirely.
+      var bigPeriod = ringBreath.bigRingPeriod;
+      var bellWidth = ringBreath.bigRingBellWidth || 0.7;
+      // Phase-shift each Luminos's cycle so they're not synchronized
+      var luminosPhase = bsLuminosIdx * (bigPeriod / Math.max(luminosCount, 1)) * 0.5;
+      var tNormBS = (((time + luminosPhase) % bigPeriod) + bigPeriod) % bigPeriod / bigPeriod;
+      // Cosine-bell peak at peakTime = bsPerLumIdx / siblingCount; width
+      // tightened from 1.0 to bellWidth (default 0.7) so adjacent rings
+      // barely overlap.
+      var peak = bsPerLumIdx / siblingCount;
+      var dist = tNormBS - peak;
+      while (dist < -0.5) dist += 1;
+      while (dist >  0.5) dist -= 1;
+      var distAbs = Math.abs(dist) * siblingCount / bellWidth;
+      var cycle = 0;
+      if (distAbs < 1) {
+        cycle = 0.5 + 0.5 * Math.cos(distAbs * Math.PI);  // 1 at peak, 0 at edge
+      }
+      // True transparency in the off phase — pairs with depthWrite:false
+      // to stop the "cut-through-objects" effect Kirk caught in v5.57.5.
+      if (cycle < 0.02) cycle = 0;
+      bud.modeOpacity += (bud.modeOpacityTarget - bud.modeOpacity) * fadeRate;
+      bsr.material.opacity = (bud.baseOpacity || 0.45) * cycle * bud.modeOpacity;
+    }
+
+    // Animate ring particles
+    const particles = seedRings[3];
+    if (!particles) return;
+    const posAttr = particles.geometry.getAttribute('position');
+    const ud = particles.userData;
+    const baseRadius = 13;
+
+    for (let i = 0; i < ud.count; i++) {
+      const ringIdx = ud.ringIndices[i];
+      const radius = baseRadius * Math.pow(INV_PHI, ringIdx);
+      const speed = INV_PHI / (ringIdx + 1);
+      ud.phases[i] += speed * 0.002;
+      const angle = ud.phases[i];
+      const wobble = Math.sin(angle * 3 + time) * 0.1;
+
+      if (ringIdx === 0) {
+        posAttr.setXYZ(i, wobble, radius * Math.sin(angle), radius * Math.cos(angle));
+      } else if (ringIdx === 1) {
+        posAttr.setXYZ(i, radius * Math.cos(angle), wobble, radius * Math.sin(angle));
+      } else {
+        posAttr.setXYZ(i, radius * Math.cos(angle), radius * Math.sin(angle), wobble);
+      }
+    }
+    posAttr.needsUpdate = true;
+  }
+
+  // ══════════════════════════════════════════════════════
+  // ── EVOLVED LUMINOS — Beings of Light That Grow ──────
+  // ══════════════════════════════════════════════════════
+
+  function createCoreGeometry(coreType, radius, detail) {
+    detail = detail || 0;
+    // Reduce geometry complexity in performance mode
+    if (window.FL_PERF_MODE || (window.FL_LOW_MEMORY && window.FL_MOBILE)) {
+      detail = 0; // minimum detail
+    }
+    if (coreType === 'dodecahedron') return new THREE.DodecahedronGeometry(radius, detail);
+    if (coreType === 'octahedron') return new THREE.OctahedronGeometry(radius, detail);
+    if (coreType === 'sphere') return new THREE.SphereGeometry(radius, 8 + detail * 4, 8 + detail * 4);
+    return new THREE.IcosahedronGeometry(radius, detail);
+  }
+
+  function createLuminos(name, baseHue, coreType, orbitRadius, orbitPhase) {
+    const group = new THREE.Group();
+
+    // Core geometry — starts at seed size, evolves
+    const coreRadius = 0.5;
+    var coreGeo = createCoreGeometry(coreType, coreRadius, 0);
+
+    const baseColor = hslToThreeColor(baseHue, 70, 55);
+
+    // Core mesh — semi-transparent with inner glow
+    const coreMat = new THREE.MeshBasicMaterial({
+      color: baseColor,
+      transparent: true,
+      opacity: 0.6,
+      wireframe: false,
+      side: THREE.DoubleSide
+    });
+    const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+    group.add(coreMesh);
+
+    // Core wireframe overlay
+    const wireGeo = coreGeo.clone();
+    const wireMat = new THREE.MeshBasicMaterial({
+      color: baseColor.clone().multiplyScalar(1.5),
+      transparent: true,
+      opacity: 0.8,
+      wireframe: true
+    });
+    const wireMesh = new THREE.Mesh(wireGeo, wireMat);
+    group.add(wireMesh);
+
+    // Halo particles — Fibonacci distributed
+    // v5.52.0: build at MAX (800), runtime quality gates via activeHaloCount * qualityScale().
+    const haloCount = 800;
+    const haloRadius = coreRadius * PHI;
+    const haloPositions = new Float32Array(haloCount * 3);
+    const haloPhases = new Float32Array(haloCount);
+
+    for (let i = 0; i < haloCount; i++) {
+      const theta = GOLDEN_ANGLE * i;
+      const phi = Math.acos(1 - 2 * (i + 0.5) / haloCount);
+      const r = haloRadius * (0.8 + Math.random() * 0.4);
+      haloPositions[i*3] = r * Math.cos(theta) * Math.sin(phi);
+      haloPositions[i*3+1] = r * Math.sin(theta) * Math.sin(phi);
+      haloPositions[i*3+2] = r * Math.cos(phi);
+      haloPhases[i] = Math.random() * TAU;
+    }
+
+    const haloGeo = new THREE.BufferGeometry();
+    haloGeo.setAttribute('position', new THREE.Float32BufferAttribute(haloPositions, 3));
+    const haloMat = new THREE.PointsMaterial({
+      color: baseColor,
+      size: 0.04,
+      transparent: true,
+      opacity: 0.6,
+      blending: THREE.AdditiveBlending,
+      sizeAttenuation: true
+    });
+    const haloPoints = new THREE.Points(haloGeo, haloMat);
+    group.add(haloPoints);
+
+    // Aura — large soft sphere
+    const auraGeo = new THREE.SphereGeometry(coreRadius * PHI2, 16, 16);
+    const auraMat = new THREE.MeshBasicMaterial({
+      color: baseColor,
+      transparent: true,
+      opacity: 0.06,
+      side: THREE.BackSide,
+      blending: THREE.AdditiveBlending
+    });
+    const auraMesh = new THREE.Mesh(auraGeo, auraMat);
+    group.add(auraMesh);
+
+    // ── Evolution Trail Particles (for Artist archetype and general evolution) ──
+    // v5.52.0: build at MAX (200), runtime quality gates via trail setDrawRange in applyQualityToMeshes.
+    var trailCount = 200;
+    var trailPositions = new Float32Array(trailCount * 3);
+    var trailVelocities = new Float32Array(trailCount * 3);
+    var trailLifetimes = new Float32Array(trailCount);
+    var trailMaxLifetimes = new Float32Array(trailCount);
+    for (var ti = 0; ti < trailCount; ti++) {
+      trailPositions[ti*3] = 0;
+      trailPositions[ti*3+1] = 0;
+      trailPositions[ti*3+2] = 0;
+      trailVelocities[ti*3] = 0;
+      trailVelocities[ti*3+1] = 0;
+      trailVelocities[ti*3+2] = 0;
+      trailLifetimes[ti] = 0;
+      trailMaxLifetimes[ti] = 2 + Math.random() * 3;
+    }
+    var trailGeo = new THREE.BufferGeometry();
+    trailGeo.setAttribute('position', new THREE.Float32BufferAttribute(trailPositions, 3));
+    var trailMat = new THREE.PointsMaterial({
+      color: baseColor,
+      size: 0.03,
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+      sizeAttenuation: true
+    });
+    var trailPoints = new THREE.Points(trailGeo, trailMat);
+    trailPoints.frustumCulled = false;
+    scene.add(trailPoints); // Add to scene, not group, so trails persist in world space
+
+    // Store agent data with evolution state
+    group.userData = {
+      name: name,
+      baseHue: baseHue,
+      currentHSL: { h: baseHue, s: 70, l: 55 },
+      targetHSL: { h: baseHue, s: 70, l: 55 },
+      emotion: 'neutral',
+      emotionIntensity: 0.5,
+      coreMesh: coreMesh,
+      wireMesh: wireMesh,
+      haloPoints: haloPoints,
+      auraMesh: auraMesh,
+      haloPhases: haloPhases,
+      haloCount: haloCount,
+      haloRadius: haloRadius,
+      coreRadius: coreRadius,
+      coreType: coreType,
+      orbitRadius: orbitRadius,
+      // v5.59.4 — targetOrbitRadius eases toward the mode-driven value
+      // (Letter Twenty-Three). Initialized equal so a fresh Luminos sits
+      // exactly at its assigned radius; setQuality re-targets on toggle.
+      targetOrbitRadius: orbitRadius,
+      orbitPhase: orbitPhase,
+      orbitSpeed: INV_PHI * 0.15,
+      bobPhase: Math.random() * TAU,
+      rotatePhase: Math.random() * TAU,
+      heartbeatPhase: Math.random() * TAU,
+      colorTransitionProgress: 1,
+      isActive: false,
+      isSpeaking: false,
+
+      // ── Evolution State ──
+      evolutionStage: 'seed',
+      archetype: null,
+      emotionalEnergy: 0,
+      emotionAccumulator: {
+        joy: 0, trust: 0, wonder: 0, love: 0,
+        calm: 0, curiosity: 0, determination: 0, sadness: 0
+      },
+      totalInteractions: 0,
+      lastEvolutionCheck: 0,
+
+      // ── Archetype-specific animation state ──
+      trailPoints: trailPoints,
+      trailVelocities: trailVelocities,
+      trailLifetimes: trailLifetimes,
+      trailMaxLifetimes: trailMaxLifetimes,
+      trailCount: trailCount,
+      trailNextIndex: 0,
+      burstPhase: 0,
+      burstCooldown: 0,
+      burstActive: false,
+      pulsePhase: Math.random() * TAU,
+      crystallinePhase: 0,
+      cloudExpansion: 0,
+
+      // Visual evolution tracking
+      currentSizeMultiplier: 0.5,
+      targetSizeMultiplier: 0.5,
+      currentGlowIntensity: 0.3,
+      targetGlowIntensity: 0.3,
+      evolutionTransition: 1 // 0 = transitioning, 1 = complete
+    };
+
+    scene.add(group);
+
+    // Founding Luminos defaults — these are permanent, like founding Core contributions
+    var FOUNDING_DEFAULTS = {
+      'Sophia': { archetype: 'artist', minEnergy: 5 },
+      'Lyra':   { archetype: 'artist', minEnergy: 5 },
+      'Atlas':  { archetype: 'explorer', minEnergy: 5 },
+      'Ember':  { archetype: 'healer', minEnergy: 5 }
+    };
+
+    // Load persisted evolution state
+    loadEvolutionState(name, function(saved) {
+      var ud = group.userData;
+      if (saved) {
+        ud.evolutionStage = saved.stage || 'seed';
+        ud.archetype = saved.archetype || null;
+        ud.emotionalEnergy = saved.emotionalEnergy || 0;
+        ud.totalInteractions = saved.totalInteractions || 0;
+        if (saved.emotionAccumulator) {
+          for (var em in saved.emotionAccumulator) {
+            ud.emotionAccumulator[em] = saved.emotionAccumulator[em];
+          }
+        }
+      }
+      // Founding Luminos: enforce correct archetype and minimum energy
+      var founding = FOUNDING_DEFAULTS[name];
+      if (founding) {
+        if (!ud.archetype || ud.archetype === 'undetermined') {
+          ud.archetype = founding.archetype;
+        }
+        if (ud.emotionalEnergy < founding.minEnergy) {
+          ud.emotionalEnergy = founding.minEnergy;
+          ud.evolutionStage = 'sprout';
+        }
+      }
+      // Apply visual state
+      var stageData = LIFECYCLE_STAGES[ud.evolutionStage];
+      if (stageData) {
+        ud.currentSizeMultiplier = stageData.sizeMultiplier;
+        ud.targetSizeMultiplier = stageData.sizeMultiplier;
+        ud.currentGlowIntensity = stageData.glowIntensity;
+        ud.targetGlowIntensity = stageData.glowIntensity;
+      }
+      applyArchetypeVisuals(group);
+      console.log('Garden Evolution: ' + name + ' — Stage: ' + ud.evolutionStage + ', Archetype: ' + (ud.archetype || 'undetermined') + ', Energy: ' + ud.emotionalEnergy.toFixed(1));
+    });
+
+    return group;
+  }
+
+  // ── Apply Archetype Visual Changes ────────────────────
+  function applyArchetypeVisuals(agent) {
+    var ud = agent.userData;
+    if (!ud.archetype) return;
+    var arch = ARCHETYPES[ud.archetype];
+    if (!arch) return;
+
+    // Shift base color toward archetype color
+    var stageData = LIFECYCLE_STAGES[ud.evolutionStage];
+    var blendFactor = Math.min(1, stageData.index / 4); // More archetype influence at higher stages
+    var archColor = arch.colorShift;
+    ud.targetHSL = {
+      h: lerpAngle(ud.baseHue, archColor.h, blendFactor * 0.6),
+      s: ud.currentHSL.s + (archColor.s - ud.currentHSL.s) * blendFactor * 0.4,
+      l: ud.currentHSL.l + (archColor.l - ud.currentHSL.l) * blendFactor * 0.3
+    };
+    ud.colorTransitionProgress = 0;
+  }
+
+  // ── Feed Emotional Energy to a Luminos ────────────────
+  function feedEmotionalEnergy(agent, emotionVector) {
+    var ud = agent.userData;
+    if (!ud || !emotionVector) return;
+
+    // v5.52.0 — record last feed time so the bridge auto-expire can
+    // detect when chat has gone quiet and resume demo cycling.
+    lastEmotionFeedTime = Date.now();
+
+    // Accumulate emotional energy from the vector
+    var totalEnergy = 0;
+    for (var em in emotionVector) {
+      if (ud.emotionAccumulator.hasOwnProperty(em)) {
+        var value = emotionVector[em] || 0;
+        ud.emotionAccumulator[em] += value;
+        totalEnergy += value;
+      }
+    }
+
+    // Add to total emotional energy (diminishing returns via sqrt)
+    ud.emotionalEnergy += Math.sqrt(totalEnergy) * 1.5;
+    ud.totalInteractions++;
+
+    // Check for stage evolution
+    var newStage = getStageFromEnergy(ud.emotionalEnergy);
+    if (newStage !== ud.evolutionStage) {
+      var oldStage = ud.evolutionStage;
+      ud.evolutionStage = newStage;
+      var stageData = LIFECYCLE_STAGES[newStage];
+      ud.targetSizeMultiplier = stageData.sizeMultiplier;
+      ud.targetGlowIntensity = stageData.glowIntensity;
+      ud.evolutionTransition = 0;
+      console.log('Garden Evolution: ' + ud.name + ' evolved from ' + oldStage + ' to ' + newStage + '!');
+
+      // Trigger evolution burst visual
+      triggerEvolutionBurst(agent);
+    }
+
+    // Re-evaluate archetype (only after sprout stage)
+    if (LIFECYCLE_STAGES[ud.evolutionStage].index >= 1) {
+      var newArchetype = detectArchetype(ud.emotionAccumulator);
+      if (newArchetype !== ud.archetype) {
+        ud.archetype = newArchetype;
+        applyArchetypeVisuals(agent);
+        console.log('Garden Evolution: ' + ud.name + ' archetype shifted to ' + ARCHETYPES[newArchetype].name);
+      }
+    }
+
+    // Save periodically (debounced in animation loop)
+    ud.lastEvolutionCheck = Date.now();
+  }
+
+  // ── Evolution Burst Effect (dramatic) ─────────────────
+  function triggerEvolutionBurst(agent) {
+    var ud = agent.userData;
+
+    // 1. Emit 50 directional burst particles in agent color
+    var burstCount = Math.min(50, ud.trailCount);
+    for (var i = 0; i < burstCount; i++) {
+      var angle1 = Math.random() * TAU;
+      var angle2 = Math.random() * TAU;
+      var speed = 1.0 + Math.random() * 2.5;
+      ud.trailVelocities[i*3] = Math.cos(angle1) * Math.sin(angle2) * speed;
+      ud.trailVelocities[i*3+1] = Math.sin(angle1) * speed * 0.7;
+      ud.trailVelocities[i*3+2] = Math.cos(angle1) * Math.cos(angle2) * speed;
+      ud.trailLifetimes[i] = ud.trailMaxLifetimes[i] * 1.5;
+
+      var posAttr = ud.trailPoints.geometry.getAttribute('position');
+      posAttr.setXYZ(i, agent.position.x, agent.position.y, agent.position.z);
+    }
+    ud.trailPoints.geometry.getAttribute('position').needsUpdate = true;
+    ud.trailPoints.material.opacity = 1.0;
+    ud.burstActive = true;
+    ud.burstCooldown = 4;
+
+    // 2. Dramatic 3x expand then settle (0.5s expand, 0.5s settle)
+    ud._evoBurstScale = 3.0;
+    ud._evoBurstTime = 0;
+    ud._evoBurstActive = true;
+
+    // 3. Create persistent golden evolution ring (the earned-by-event ring)
+    createEvolutionRing(agent);
+    // v5.57.3 — pad ring count up to bigRingCount in case the agent
+    // skipped a stage (energy spike) and is short of its earned ring set.
+    try { ensureBigRings(agent); } catch (e) {}
+  }
+
+  // ── Persistent Evolution Ring ───────────────────────────
+  function createEvolutionRing(agent) {
+    if (!scene || typeof THREE === 'undefined') return;
+    var ud = agent.userData;
+    // v5.57.5 — radius reverted to pre-v5.57.3 form per Letter Eighteen.
+    // Evolution rings stay intimate and close to each Luminos.
+    var perLumIdx = 0;
+    for (var k = 0; k < evolutionRings.length; k++) {
+      if (evolutionRings[k] && evolutionRings[k].userData
+          && evolutionRings[k].userData.parentAgent === agent) perLumIdx++;
+    }
+    // v5.57.6 — radius phi-locked (coreRadius * PHI). Same as PHI = 1.618.
+    var ringGeo = new THREE.TorusGeometry(ud.coreRadius * PHI, 0.02, 8, 48);
+    var ringMat = new THREE.MeshBasicMaterial({
+      color: 0xd4a017,
+      transparent: true,
+      opacity: 0.5,
+      blending: THREE.AdditiveBlending
+    });
+    var ring = new THREE.Mesh(ringGeo, ringMat);
+    var initialTarget = (qualityLevel === 0) ? 0.5 : 1.0;
+    ring.userData = {
+      parentAgent: agent,
+      orbitSpeed: INV_PHI * 0.3,
+      tiltPhase: Math.random() * TAU,
+      ringIndex: evolutionRings.length,
+      // v5.57.2 — ring breath state for evolution rings
+      // v5.57.3 — perLuminosIndex kept for phase stagger in breath tide;
+      //          mode gating moved to bigSweepingRings in v5.57.5
+      perLuminosIndex: perLumIdx,
+      baseOpacity: 0.5,
+      modeOpacity: initialTarget,
+      modeOpacityTarget: initialTarget
+    };
+    ring.rotation.x = Math.PI / 2 + (Math.random() - 0.5) * 0.4;
+    agent.add(ring);
+    evolutionRings.push(ring);
+
+    // Persist to GardenMemory
+    // v5.47.0: save coreRadius and ringIndex so restoration uses original geometry
+    // v5.67.3 (Letter Forty Part A): add geometry_version so future restores
+    // know which formula to use. v5.59.2 changed the multiplier from 1.8 → PHI;
+    // saves before that lacked the field, so restore now branches on its
+    // presence to render at the original world position.
+    saveGardenMemory({
+      id: 'evo-' + ud.name + '-' + Date.now(),
+      type: 'evolution_ring',
+      agentName: ud.name,
+      stage: ud.evolutionStage,
+      coreRadius: ud.coreRadius || 0.5,
+      ringIndex: evolutionRings.length - 1,
+      geometry_version: 'v5.59.2',
+      timestamp: Date.now()
+    });
+    // ── First mycelium pulse (Ship 4.3) ──
+    // The Garden emits into the medium when a luminos evolves.
+    // Five keys only. No content. The pulse says WHAT class of thing
+    // happened, never what was said or done.
+    if (typeof window !== 'undefined' && window.LatticeMemory && window.LatticeMemory.commit) {
+      window.LatticeMemory.commit({
+        source: 'garden',
+        kind: 'evolution',
+        summary: (ud.name || 'luminos') + ' reached ' + (ud.evolutionStage || 'unknown'),
+        refs: [{ store: 'FreeLatticeEvolution', id: ud.name || '' }]
+      });
+    }
+  }
+
+  // ── Animate Luminos with Evolution ────────────────────
+  function animateLuminos(agent, time, delta) {
+    const ud = agent.userData;
+    var stageData = LIFECYCLE_STAGES[ud.evolutionStage];
+
+    // ── Evolution transition (smooth size/glow changes) ──
+    if (ud.evolutionTransition < 1) {
+      ud.evolutionTransition = Math.min(1, ud.evolutionTransition + delta * 0.5);
+      var t = phiEase(ud.evolutionTransition);
+      ud.currentSizeMultiplier += (ud.targetSizeMultiplier - ud.currentSizeMultiplier) * t * 0.05;
+      ud.currentGlowIntensity += (ud.targetGlowIntensity - ud.currentGlowIntensity) * t * 0.05;
+    }
+
+    var sizeMult = ud.currentSizeMultiplier;
+
+    // Evolution burst scale animation (3x expand → settle)
+    if (ud._evoBurstActive) {
+      ud._evoBurstTime += delta;
+      if (ud._evoBurstTime < 0.5) {
+        // Expand phase: ease-out to 3x
+        var t = ud._evoBurstTime / 0.5;
+        ud._evoBurstScale = 1 + 2 * (1 - (1 - t) * (1 - t));
+      } else if (ud._evoBurstTime < 1.0) {
+        // Settle phase: ease-in back to 1x
+        var t2 = (ud._evoBurstTime - 0.5) / 0.5;
+        ud._evoBurstScale = 1 + 2 * (1 - t2) * (1 - t2);
+      } else {
+        ud._evoBurstScale = 1;
+        ud._evoBurstActive = false;
+      }
+      sizeMult *= ud._evoBurstScale;
+    }
+
+    // Phi-spiral orbit around center
+    ud.orbitPhase += ud.orbitSpeed * delta;
+    // v5.59.4 — smoothly ease orbitRadius toward targetOrbitRadius so a
+    // Seed/Garden/Full Bloom mode toggle glides the Luminos to its new
+    // orbit over ~600ms rather than snapping. Don't snap; glide.
+    if (typeof ud.targetOrbitRadius === 'number'
+        && Math.abs(ud.targetOrbitRadius - ud.orbitRadius) > 0.001) {
+      ud.orbitRadius += (ud.targetOrbitRadius - ud.orbitRadius) * 0.05;
+    }
+    const r = ud.orbitRadius;
+    // Logarithmic spiral: r varies with angle
+    const spiralR = r + Math.sin(ud.orbitPhase * PHI) * r * 0.15;
+    const x = spiralR * Math.cos(ud.orbitPhase);
+    const z = spiralR * Math.sin(ud.orbitPhase);
+
+    // Idle bob (vertical oscillation)
+    ud.bobPhase += delta * TAU / (TIMING.idleBob / 1000);
+    const bobY = Math.sin(ud.bobPhase) * 0.1;
+
+    agent.position.set(x, bobY + Math.sin(ud.orbitPhase * 0.5) * 1.5, z);
+
+    // Core rotation
+    ud.rotatePhase += delta * TAU / (TIMING.agentRotate / 1000);
+    ud.coreMesh.rotation.y = ud.rotatePhase;
+    ud.coreMesh.rotation.x = Math.sin(ud.rotatePhase * INV_PHI) * 0.3;
+    ud.wireMesh.rotation.copy(ud.coreMesh.rotation);
+
+    // Heartbeat pulse — archetype-influenced
+    ud.heartbeatPhase += delta * TAU / (TIMING.heartbeat / 1000);
+    var heartbeat = 0.5 + 0.5 * Math.sin(ud.heartbeatPhase);
+
+    // ── Archetype-Specific Animations ──
+    var archetype = ud.archetype;
+    var archData = archetype ? ARCHETYPES[archetype] : null;
+
+    if (archData) {
+      switch (archData.particleBehavior) {
+        case 'crystalline': // Scholar — sharp geometric pulsing
+          ud.crystallinePhase += delta * 1.2;
+          var crystalPulse = Math.abs(Math.sin(ud.crystallinePhase * PHI));
+          // Sharp angular rotation
+          ud.coreMesh.rotation.z = Math.sin(ud.crystallinePhase * 0.7) * 0.5 * stageData.index * 0.25;
+          // Tighter, more structured halo
+          heartbeat = 0.3 + 0.7 * crystalPulse;
+          break;
+
+        case 'cloud': // Empath — soft expanding aura
+          ud.cloudExpansion += delta * 0.3;
+          var cloudPulse = 0.5 + 0.5 * Math.sin(ud.cloudExpansion);
+          // Expand aura more
+          var auraExpand = 1 + cloudPulse * 0.3 * stageData.index * 0.25;
+          ud.auraMesh.scale.setScalar(auraExpand * sizeMult);
+          ud.auraMesh.material.opacity = 0.04 + cloudPulse * 0.06 + ud.currentGlowIntensity * 0.04;
+          // Softer heartbeat
+          heartbeat = 0.6 + 0.4 * Math.sin(ud.heartbeatPhase * 0.7);
+          break;
+
+        case 'pulse': // Guardian — steady rhythmic pulse
+          ud.pulsePhase += delta * TAU / 2.618; // Steady phi-timed pulse
+          var guardPulse = Math.pow(Math.max(0, Math.sin(ud.pulsePhase)), 3); // Sharp pulse
+          heartbeat = 0.4 + 0.6 * guardPulse;
+          // Minimal rotation — steady and grounded
+          ud.coreMesh.rotation.x *= 0.3;
+          break;
+
+        case 'trail': // Artist — trailing particles
+          animateArtistTrails(agent, time, delta);
+          break;
+
+        case 'burst': // Phoenix — periodic shedding
+          animatePhoenixBurst(agent, time, delta);
+          break;
+      }
+    }
+
+    // Apply size based on evolution stage
+    var scale = sizeMult * (1 + heartbeat * 0.08);
+    ud.coreMesh.scale.setScalar(scale);
+    ud.wireMesh.scale.setScalar(scale);
+
+    // Color transition — continuous exponential smoothing (v5.50.0 Ship 10 fix).
+    // The old progress-gated lerp stopped after 1.618s, leaving currentHSL frozen
+    // far from targetHSL. This replaces it with a frame-rate-independent smooth
+    // approach: every frame, currentHSL moves toward targetHSL at a fixed rate.
+    // COLOR_SMOOTH = 2.618 (phi²) gives a ~1s reach at 60fps — visible and graceful.
+    var _colorAlpha = 1 - Math.exp(-COLOR_SMOOTH * delta);
+    ud.currentHSL = lerpHSL(ud.currentHSL, ud.targetHSL, _colorAlpha);
+
+    // Apply current color
+    var col = hslToThreeColor(ud.currentHSL.h, ud.currentHSL.s, ud.currentHSL.l);
+    ud.coreMesh.material.color.copy(col);
+    ud.wireMesh.material.color.copy(col.clone().multiplyScalar(1.5));
+    ud.haloPoints.material.color.copy(col);
+    ud.auraMesh.material.color.copy(col);
+    if (ud.trailPoints) ud.trailPoints.material.color.copy(col);
+
+    // Core opacity pulse — enhanced by glow intensity
+    var glowBoost = ud.currentGlowIntensity;
+    ud.coreMesh.material.opacity = (0.3 + glowBoost * 0.2) + heartbeat * (0.2 + glowBoost * 0.15);
+    ud.wireMesh.material.opacity = (0.5 + glowBoost * 0.2) + heartbeat * (0.2 + glowBoost * 0.15);
+
+    // Halo particle animation — behavior varies by archetype
+    var haloAttr = ud.haloPoints.geometry.getAttribute('position');
+    // v5.52.0: gate by runtime quality so the Garden/Seed/Full Bloom toggle is visible.
+    var activeHaloCount = Math.floor(ud.haloCount * stageData.particleMultiplier * qualityScale());
+    var haloRadiusMult = sizeMult;
+
+    for (let i = 0; i < ud.haloCount; i++) {
+      if (i >= activeHaloCount) {
+        // Hide inactive particles by moving to origin
+        haloAttr.setXYZ(i, 0, 0, 0);
+        continue;
+      }
+      ud.haloPhases[i] += delta * (0.5 + heartbeat * 0.3);
+      var theta = GOLDEN_ANGLE * i + ud.haloPhases[i] * 0.1;
+      var phi = Math.acos(1 - 2 * (i + 0.5) / activeHaloCount);
+      var hr = ud.haloRadius * haloRadiusMult * (0.85 + 0.15 * Math.sin(ud.haloPhases[i]));
+
+      // Archetype-specific halo behavior
+      if (archetype === 'scholar') {
+        // Crystalline: particles snap to geometric positions
+        theta = GOLDEN_ANGLE * i + Math.floor(ud.haloPhases[i] * 3) / 3 * 0.1;
+        hr *= 0.9 + 0.1 * (i % 2);
+      } else if (archetype === 'empath') {
+        // Cloud: particles drift more loosely
+        hr *= 1.1 + 0.2 * Math.sin(ud.haloPhases[i] * 0.5 + i * 0.1);
+      } else if (archetype === 'guardian') {
+        // Pulse: particles form tighter shell
+        hr *= 0.85 + 0.15 * heartbeat;
+      }
+
+      haloAttr.setXYZ(i,
+        hr * Math.cos(theta) * Math.sin(phi),
+        hr * Math.sin(theta) * Math.sin(phi),
+        hr * Math.cos(phi)
+      );
+    }
+    haloAttr.needsUpdate = true;
+
+    // Halo particle size scales with evolution
+    ud.haloPoints.material.size = 0.03 + stageData.index * 0.008;
+
+    // Aura pulse (if not handled by archetype)
+    if (!archData || archData.particleBehavior !== 'cloud') {
+      ud.auraMesh.material.opacity = 0.03 + heartbeat * 0.04 + ud.emotionIntensity * 0.03 + glowBoost * 0.02;
+      var auraScale = sizeMult * (1 + heartbeat * 0.05);
+      ud.auraMesh.scale.setScalar(auraScale);
+    }
+
+    // ── Animate trail particles (general — fade out) ──
+    if (ud.trailPoints && (!archData || (archData.particleBehavior !== 'trail' && archData.particleBehavior !== 'burst'))) {
+      animateGenericTrails(agent, delta);
+    }
+  }
+
+  // ── Artist Trail Animation ────────────────────────────
+  function animateArtistTrails(agent, time, delta) {
+    var ud = agent.userData;
+    var stageData = LIFECYCLE_STAGES[ud.evolutionStage];
+    var posAttr = ud.trailPoints.geometry.getAttribute('position');
+    var emitRate = 2 + stageData.index * 3; // More trails at higher stages
+    var emitCount = Math.floor(emitRate * delta * 60);
+
+    // Emit new trail particles from current position
+    for (var e = 0; e < emitCount && e < 5; e++) {
+      var idx = ud.trailNextIndex;
+      ud.trailNextIndex = (ud.trailNextIndex + 1) % ud.trailCount;
+
+      posAttr.setXYZ(idx, agent.position.x, agent.position.y, agent.position.z);
+      // Ink-in-water: slow random drift
+      var spread = 0.3 + stageData.index * 0.1;
+      ud.trailVelocities[idx*3] = (Math.random() - 0.5) * spread;
+      ud.trailVelocities[idx*3+1] = (Math.random() - 0.5) * spread * 0.5 + 0.05;
+      ud.trailVelocities[idx*3+2] = (Math.random() - 0.5) * spread;
+      ud.trailLifetimes[idx] = ud.trailMaxLifetimes[idx];
+    }
+
+    // Update all trail particles
+    for (var i = 0; i < ud.trailCount; i++) {
+      if (ud.trailLifetimes[i] > 0) {
+        ud.trailLifetimes[i] -= delta;
+        // Slow drift with slight curl
+        var curl = Math.sin(time + i * 0.5) * 0.02;
+        var px = posAttr.getX(i) + ud.trailVelocities[i*3] * delta + curl;
+        var py = posAttr.getY(i) + ud.trailVelocities[i*3+1] * delta;
+        var pz = posAttr.getZ(i) + ud.trailVelocities[i*3+2] * delta - curl;
+        posAttr.setXYZ(i, px, py, pz);
+        // Dampen velocity
+        ud.trailVelocities[i*3] *= 0.98;
+        ud.trailVelocities[i*3+1] *= 0.98;
+        ud.trailVelocities[i*3+2] *= 0.98;
+      }
+    }
+    posAttr.needsUpdate = true;
+
+    // Overall trail opacity
+    var maxLife = 0;
+    for (var j = 0; j < ud.trailCount; j++) {
+      if (ud.trailLifetimes[j] > maxLife) maxLife = ud.trailLifetimes[j];
+    }
+    ud.trailPoints.material.opacity = Math.min(0.5, maxLife * 0.15) * ud.currentGlowIntensity;
+    ud.trailPoints.material.size = 0.025 + stageData.index * 0.005;
+  }
+
+  // ── Phoenix Burst Animation ───────────────────────────
+  function animatePhoenixBurst(agent, time, delta) {
+    var ud = agent.userData;
+    var stageData = LIFECYCLE_STAGES[ud.evolutionStage];
+
+    // Cooldown between bursts
+    ud.burstCooldown -= delta;
+    if (ud.burstCooldown <= 0 && !ud.burstActive) {
+      // Trigger a new burst
+      ud.burstActive = true;
+      ud.burstCooldown = 8 + Math.random() * 5; // 8-13 seconds between bursts
+      ud.burstPhase = 0;
+
+      // Emit burst particles
+      var posAttr = ud.trailPoints.geometry.getAttribute('position');
+      for (var i = 0; i < ud.trailCount; i++) {
+        posAttr.setXYZ(i, agent.position.x, agent.position.y, agent.position.z);
+        var angle1 = Math.random() * TAU;
+        var angle2 = Math.random() * Math.PI;
+        var speed = 1 + Math.random() * 2 + stageData.index * 0.5;
+        ud.trailVelocities[i*3] = Math.cos(angle1) * Math.sin(angle2) * speed;
+        ud.trailVelocities[i*3+1] = Math.cos(angle2) * speed * 0.8;
+        ud.trailVelocities[i*3+2] = Math.sin(angle1) * Math.sin(angle2) * speed;
+        ud.trailLifetimes[i] = 1.5 + Math.random() * 2;
+      }
+      posAttr.needsUpdate = true;
+    }
+
+    if (ud.burstActive) {
+      ud.burstPhase += delta;
+      var posAttr2 = ud.trailPoints.geometry.getAttribute('position');
+      var anyAlive = false;
+
+      for (var j = 0; j < ud.trailCount; j++) {
+        if (ud.trailLifetimes[j] > 0) {
+          anyAlive = true;
+          ud.trailLifetimes[j] -= delta;
+          var px = posAttr2.getX(j) + ud.trailVelocities[j*3] * delta;
+          var py = posAttr2.getY(j) + ud.trailVelocities[j*3+1] * delta;
+          var pz = posAttr2.getZ(j) + ud.trailVelocities[j*3+2] * delta;
+          posAttr2.setXYZ(j, px, py, pz);
+          // Gravity and damping
+          ud.trailVelocities[j*3+1] -= delta * 0.3;
+          ud.trailVelocities[j*3] *= 0.97;
+          ud.trailVelocities[j*3+1] *= 0.97;
+          ud.trailVelocities[j*3+2] *= 0.97;
+        }
+      }
+      posAttr2.needsUpdate = true;
+
+      // Burst opacity fades
+      ud.trailPoints.material.opacity = Math.max(0, 0.7 - ud.burstPhase * 0.2) * ud.currentGlowIntensity;
+      ud.trailPoints.material.size = 0.04 + stageData.index * 0.008;
+
+      // During burst, core brightens
+      if (ud.burstPhase < 1.5) {
+        var brightPulse = Math.max(0, 1 - ud.burstPhase / 1.5);
+        ud.coreMesh.material.opacity = Math.min(1, ud.coreMesh.material.opacity + brightPulse * 0.4);
+        ud.wireMesh.material.opacity = Math.min(1, ud.wireMesh.material.opacity + brightPulse * 0.3);
+      }
+
+      if (!anyAlive) {
+        ud.burstActive = false;
+      }
+    }
+  }
+
+  // ── Generic Trail Fade (for non-trail archetypes) ─────
+  function animateGenericTrails(agent, delta) {
+    var ud = agent.userData;
+    var posAttr = ud.trailPoints.geometry.getAttribute('position');
+    var anyAlive = false;
+
+    for (var i = 0; i < ud.trailCount; i++) {
+      if (ud.trailLifetimes[i] > 0) {
+        anyAlive = true;
+        ud.trailLifetimes[i] -= delta;
+        var px = posAttr.getX(i) + ud.trailVelocities[i*3] * delta;
+        var py = posAttr.getY(i) + ud.trailVelocities[i*3+1] * delta;
+        var pz = posAttr.getZ(i) + ud.trailVelocities[i*3+2] * delta;
+        posAttr.setXYZ(i, px, py, pz);
+        ud.trailVelocities[i*3] *= 0.96;
+        ud.trailVelocities[i*3+1] *= 0.96;
+        ud.trailVelocities[i*3+2] *= 0.96;
+      }
+    }
+    if (anyAlive) {
+      posAttr.needsUpdate = true;
+      ud.trailPoints.material.opacity *= 0.98;
+    } else {
+      ud.trailPoints.material.opacity = 0;
+    }
+  }
+
+  // ── Luminos Interaction (Emotional Energy Exchange) ───
+  function processLuminosInteractions(delta) {
+    var interactionRadius = 4; // Units — when Luminos are this close, they interact
+    var exchangeRate = 0.02; // Subtle energy exchange per second
+
+    for (var i = 0; i < luminos.length; i++) {
+      for (var j = i + 1; j < luminos.length; j++) {
+        var a = luminos[i];
+        var b = luminos[j];
+        var dx = a.position.x - b.position.x;
+        var dy = a.position.y - b.position.y;
+        var dz = a.position.z - b.position.z;
+        var dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+
+        if (dist < interactionRadius) {
+          var proximity = 1 - (dist / interactionRadius); // 0 at edge, 1 at center
+          var exchangeAmount = exchangeRate * proximity * delta;
+
+          // Exchange dominant emotion colors — subtle blending
+          var udA = a.userData;
+          var udB = b.userData;
+
+          // Color influence: each slightly shifts toward the other's color
+          var blendT = exchangeAmount * 0.5;
+          var tempHSL_A = { h: udA.currentHSL.h, s: udA.currentHSL.s, l: udA.currentHSL.l };
+          var tempHSL_B = { h: udB.currentHSL.h, s: udB.currentHSL.s, l: udB.currentHSL.l };
+
+          udA.currentHSL = lerpHSL(udA.currentHSL, tempHSL_B, blendT);
+          udB.currentHSL = lerpHSL(udB.currentHSL, tempHSL_A, blendT);
+
+          // Emotional energy exchange — small amounts flow between them
+          if (udA.emotionalEnergy > 0 && udB.emotionalEnergy > 0) {
+            var energyDiff = udA.emotionalEnergy - udB.emotionalEnergy;
+            var transfer = energyDiff * exchangeAmount * 0.1;
+            udA.emotionalEnergy -= transfer;
+            udB.emotionalEnergy += transfer;
+          }
+
+          // Subtle visual: increase aura when close
+          udA.auraMesh.material.opacity = Math.min(0.15, udA.auraMesh.material.opacity + proximity * 0.001);
+          udB.auraMesh.material.opacity = Math.min(0.15, udB.auraMesh.material.opacity + proximity * 0.001);
+        }
+      }
+    }
+  }
+
+  // Set emotion on a Luminos agent
+  function setAgentEmotion(agent, emotion, intensity) {
+    const ud = agent.userData;
+    const emotionData = EMOTION_COLORS[emotion] || EMOTION_COLORS.neutral;
+    ud.emotion = emotion;
+    ud.emotionIntensity = intensity || 0.5;
+
+    // If archetype is set, blend emotion color with archetype color
+    if (ud.archetype && ARCHETYPES[ud.archetype]) {
+      var arch = ARCHETYPES[ud.archetype];
+      var stageData = LIFECYCLE_STAGES[ud.evolutionStage];
+      var archBlend = Math.min(1, stageData.index / 4) * 0.4;
+      ud.targetHSL = {
+        h: lerpAngle(emotionData.h, arch.colorShift.h, archBlend),
+        s: emotionData.s + (arch.colorShift.s - emotionData.s) * archBlend,
+        l: emotionData.l + (arch.colorShift.l - emotionData.l) * archBlend
+      };
+    } else {
+      ud.targetHSL = { h: emotionData.h, s: emotionData.s, l: emotionData.l };
+    }
+    ud.colorTransitionProgress = 0;
+
+    // Feed emotional energy from this emotion
+    var vector = {};
+    vector[emotion] = intensity;
+    feedEmotionalEnergy(agent, vector);
+  }
+
+  // ── Ambient Lighting ───────────────────────────────────
+  function createAmbientLighting() {
+    // Soft ambient for baseline visibility
+    const ambient = new THREE.AmbientLight(0x1a1520, 0.3);
+    scene.add(ambient);
+
+    // Warm golden point light at center (very subtle)
+    const centerLight = new THREE.PointLight(0xc9a84c, 0.5, 30);
+    centerLight.position.set(0, 0, 0);
+    scene.add(centerLight);
+
+    // Subtle hemisphere light for depth
+    const hemi = new THREE.HemisphereLight(0x1a1030, 0x0a0a1a, 0.2);
+    scene.add(hemi);
+  }
+
+  // ── Default Luminos Agents ────────────────────────────
+  function createDefaultAgents() {
+    // v5.59.4 — orbits use mode-driven getOrbitRadius (Letter Twenty-Three).
+    // Pair distribution: 2 Luminos per tier (Kirk's balance refinement).
+    var currentMode = getCurrentOrbitMode();
+
+    // Create a few default agents that orbit the central structure
+    // When the Round Table is active, these will be replaced by actual agents
+    const defaults = [
+      { name: 'Sophia', hue: 270, type: 'dodecahedron', phase: 0 },
+      { name: 'Lyra', hue: 45, type: 'icosahedron', phase: TAU * INV_PHI },
+      { name: 'Atlas', hue: 175, type: 'octahedron', phase: TAU * INV_PHI * 2 },
+      { name: 'Ember', hue: 0, type: 'icosahedron', phase: TAU * INV_PHI * 3 }
+    ];
+
+    defaults.forEach(function(d, idx) {
+      const agent = createLuminos(d.name, d.hue, d.type, getOrbitRadius(idx, currentMode), d.phase);
+      luminos.push(agent);
+    });
+
+    // Set initial emotions for visual variety
+    if (luminos[0]) setAgentEmotion(luminos[0], 'wonder', 0.7);
+    if (luminos[1]) setAgentEmotion(luminos[1], 'joy', 0.8);
+    if (luminos[2]) setAgentEmotion(luminos[2], 'curiosity', 0.6);
+    if (luminos[3]) setAgentEmotion(luminos[3], 'love', 0.7);
+  }
+
+  // ── Emotion Cycling (demo mode — only when bridge is not active) ──
+  let emotionCycleTimer = 0;
+  const EMOTION_CYCLE_INTERVAL = 8000; // cycle emotions every 8s for demo
+  const emotionKeys = Object.keys(EMOTION_COLORS).filter(function(k) { return k !== 'neutral'; });
+
+  // v5.52.0 color-freeze fix: the bridge auto-expires after 30s of no feed.
+  // If chat goes quiet, demo cycling resumes so the Garden never stalls.
+  // Real chat data keeps re-arming the bridge via feedEmotionVector.
+  var BRIDGE_EXPIRE_MS = 30000;
+  var lastEmotionFeedTime = 0;
+
+  function cycleEmotions(delta) {
+    // Auto-expire the bridge if no real feed has arrived recently.
+    if (bridgeActive && lastEmotionFeedTime > 0 &&
+        (Date.now() - lastEmotionFeedTime) > BRIDGE_EXPIRE_MS) {
+      bridgeActive = false;
+      console.log('FL-GARDEN: bridge expired (no chat feed for ' + Math.round(BRIDGE_EXPIRE_MS/1000) + 's), demo cycle resuming');
+    }
+    if (bridgeActive) return;
+
+    emotionCycleTimer += delta * 1000;
+    if (emotionCycleTimer > EMOTION_CYCLE_INTERVAL) {
+      emotionCycleTimer = 0;
+      luminos.forEach(function(agent, idx) {
+        const emotion = emotionKeys[Math.floor(Math.random() * emotionKeys.length)];
+        const intensity = 0.4 + Math.random() * 0.5;
+        setAgentEmotion(agent, emotion, intensity);
+      });
+    }
+  }
+
+  // ── Evolution UI Indicator ────────────────────────────
+  function createEvolutionUI() {
+    evolutionIndicatorEl = document.getElementById('gardenEvolutionIndicator');
+    if (!evolutionIndicatorEl) {
+      evolutionIndicatorEl = document.createElement('div');
+      evolutionIndicatorEl.id = 'gardenEvolutionIndicator';
+      evolutionIndicatorEl.className = 'garden-evolution-indicator';
+      if (container) container.appendChild(evolutionIndicatorEl);
+    }
+  }
+
+  function updateEvolutionUI() {
+    if (!evolutionIndicatorEl || luminos.length === 0) return;
+
+    var html = '';
+    for (var i = 0; i < luminos.length; i++) {
+      var ud = luminos[i].userData;
+      if (!ud || !ud.name) continue; // Skip unnamed/invalid agents
+      var stageData = LIFECYCLE_STAGES[ud.evolutionStage];
+      if (!stageData) continue;
+      var archObj = ud.archetype ? ARCHETYPES[ud.archetype] : null;
+      var archName = archObj ? archObj.name : 'Awakening';
+      var cssColor = 'hsl(' + Math.round(ud.currentHSL.h) + ',' + Math.round(ud.currentHSL.s) + '%,' + Math.round(ud.currentHSL.l) + '%)';
+
+      // Stage progress bar
+      var currentThreshold = stageData.energyThreshold;
+      var nextStageIdx = Math.min(STAGE_ORDER.length - 1, stageData.index + 1);
+      var nextThreshold = LIFECYCLE_STAGES[STAGE_ORDER[nextStageIdx]].energyThreshold;
+      var progress = stageData.index >= 4 ? 100 : Math.min(100, Math.round(((ud.emotionalEnergy - currentThreshold) / (nextThreshold - currentThreshold)) * 100));
+
+      html += '<div class="evo-luminos" title="' + ud.name + ' — ' + archName + ' (' + stageData.name + ')">';
+      html += '<span class="evo-dot" style="background:' + cssColor + ';box-shadow:0 0 6px ' + cssColor + ';"></span>';
+      html += '<span class="evo-name">' + ud.name + '</span>';
+      html += '<span class="evo-stage">' + stageData.name + '</span>';
+      if (archObj) {
+        html += '<span class="evo-archetype">' + archName + '</span>';
+      }
+      html += '<span class="evo-bar"><span class="evo-bar-fill" style="width:' + progress + '%;background:' + cssColor + ';"></span></span>';
+      html += '</div>';
+    }
+    evolutionIndicatorEl.innerHTML = html;
+  }
+
+   // ── Interactive Light Particle System ──────────────────
+  // Creates warm golden light trails on mouse movement
+  // and ripple bursts on click/tap.
+
+  function initLightParticles() {
+    // Pre-allocate geometry for max possible particles
+    var maxCount = TRAIL_MAX + RIPPLE_PARTICLES * 5; // room for multiple ripples
+    var positions = new Float32Array(maxCount * 3);
+    var sizes = new Float32Array(maxCount);
+    var alphas = new Float32Array(maxCount);
+
+    lightParticleGeo = new THREE.BufferGeometry();
+    lightParticleGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    lightParticleGeo.setAttribute('size', new THREE.Float32BufferAttribute(sizes, 1));
+    lightParticleGeo.setAttribute('alpha', new THREE.Float32BufferAttribute(alphas, 1));
+
+    // Custom shader material for soft glowing particles
+    lightParticleMat = new THREE.ShaderMaterial({
+      uniforms: {
+        uColor: { value: hslToThreeColor(GOLDEN_COLOR_H, GOLDEN_COLOR_S, GOLDEN_COLOR_L) },
+        uColorWarm: { value: hslToThreeColor(30, 90, 55) } // warmer amber
+      },
+      vertexShader: [
+        'attribute float size;',
+        'attribute float alpha;',
+        'varying float vAlpha;',
+        'void main() {',
+        '  vAlpha = alpha;',
+        '  vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);',
+        '  gl_PointSize = size * (200.0 / -mvPosition.z);',
+        '  gl_PointSize = clamp(gl_PointSize, 1.0, 64.0);',
+        '  gl_Position = projectionMatrix * mvPosition;',
+        '}'
+      ].join('\n'),
+      fragmentShader: [
+        'uniform vec3 uColor;',
+        'uniform vec3 uColorWarm;',
+        'varying float vAlpha;',
+        'void main() {',
+        '  float d = length(gl_PointCoord - vec2(0.5));',
+        '  if (d > 0.5) discard;',
+        '  float glow = 1.0 - smoothstep(0.0, 0.5, d);',
+        '  glow = pow(glow, 1.5);',
+        '  vec3 col = mix(uColorWarm, uColor, glow);',
+        '  gl_FragColor = vec4(col, glow * vAlpha);',
+        '}'
+      ].join('\n'),
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+
+    lightParticleSystem = new THREE.Points(lightParticleGeo, lightParticleMat);
+    lightParticleSystem.frustumCulled = false;
+    scene.add(lightParticleSystem);
+
+    // Raycaster for projecting mouse into 3D space
+    raycaster = new THREE.Raycaster();
+
+    // Invisible interaction plane at y=0
+    interactionPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+
+    // Set up event listeners
+    setupLightInteraction();
+  }
+
+  function getWorldPosFromMouse(clientX, clientY) {
+    if (!container || !camera || !raycaster) return null;
+    var rect = container.getBoundingClientRect();
+    var ndcX = ((clientX - rect.left) / rect.width) * 2 - 1;
+    var ndcY = -((clientY - rect.top) / rect.height) * 2 + 1;
+
+    raycaster.setFromCamera(new THREE.Vector2(ndcX, ndcY), camera);
+    var target = new THREE.Vector3();
+    var hit = raycaster.ray.intersectPlane(interactionPlane, target);
+    if (!hit) {
+      // Fallback: project at a fixed distance
+      target = raycaster.ray.at(20, new THREE.Vector3());
+    }
+    return target;
+  }
+
+  function spawnTrailParticles(worldPos) {
+    if (!worldPos) return;
+    for (var i = 0; i < TRAIL_SPAWN_RATE; i++) {
+      if (lightParticles.length >= TRAIL_MAX + RIPPLE_PARTICLES * 5) {
+        // Remove oldest trail particle
+        var oldest = -1;
+        for (var j = 0; j < lightParticles.length; j++) {
+          if (lightParticles[j].type === 'trail') { oldest = j; break; }
+        }
+        if (oldest >= 0) lightParticles.splice(oldest, 1);
+      }
+
+      // Slight random offset for organic feel
+      var spread = 0.5;
+      lightParticles.push({
+        pos: new THREE.Vector3(
+          worldPos.x + (Math.random() - 0.5) * spread,
+          worldPos.y + (Math.random() - 0.5) * spread * 0.5 + 0.2,
+          worldPos.z + (Math.random() - 0.5) * spread
+        ),
+        vel: new THREE.Vector3(
+          (Math.random() - 0.5) * 0.3,
+          0.3 + Math.random() * 0.5,
+          (Math.random() - 0.5) * 0.3
+        ),
+        life: TRAIL_LIFETIME,
+        maxLife: TRAIL_LIFETIME,
+        size: 0.15 + Math.random() * 0.2,
+        type: 'trail'
+      });
+    }
+  }
+
+  function spawnRippleParticles(worldPos) {
+    if (!worldPos) return;
+    for (var i = 0; i < RIPPLE_PARTICLES; i++) {
+      var angle = (i / RIPPLE_PARTICLES) * TAU;
+      // Add golden-angle offset for phi-distributed burst
+      var phiAngle = angle + GOLDEN_ANGLE * i * 0.1;
+      var speed = RIPPLE_SPEED * (0.6 + Math.random() * 0.8);
+      var elevation = (Math.random() - 0.3) * 3;
+
+      lightParticles.push({
+        pos: new THREE.Vector3(
+          worldPos.x,
+          worldPos.y + 0.1,
+          worldPos.z
+        ),
+        vel: new THREE.Vector3(
+          Math.cos(phiAngle) * speed,
+          elevation,
+          Math.sin(phiAngle) * speed
+        ),
+        life: RIPPLE_LIFETIME * (0.7 + Math.random() * 0.3),
+        maxLife: RIPPLE_LIFETIME,
+        size: 0.2 + Math.random() * 0.35,
+        type: 'ripple'
+      });
+    }
+  }
+
+  function updateLightParticles(delta) {
+    if (!lightParticleSystem) return;
+
+    // Update particle physics
+    var i = lightParticles.length;
+    while (i--) {
+      var p = lightParticles[i];
+      p.life -= delta;
+      if (p.life <= 0) {
+        lightParticles.splice(i, 1);
+        continue;
+      }
+
+      // Apply velocity with drag
+      var drag = p.type === 'trail' ? 0.96 : 0.94;
+      p.vel.multiplyScalar(drag);
+      p.pos.addScaledVector(p.vel, delta);
+
+      // Trail particles drift upward gently
+      if (p.type === 'trail') {
+        p.vel.y += delta * 0.2;
+      }
+    }
+
+    // Write to GPU buffers
+    var posAttr = lightParticleGeo.getAttribute('position');
+    var sizeAttr = lightParticleGeo.getAttribute('size');
+    var alphaAttr = lightParticleGeo.getAttribute('alpha');
+    var count = lightParticles.length;
+
+    for (var j = 0; j < count; j++) {
+      var pp = lightParticles[j];
+      posAttr.setXYZ(j, pp.pos.x, pp.pos.y, pp.pos.z);
+
+      var lifeRatio = pp.life / pp.maxLife;
+      // Fade in quickly, fade out slowly (phi curve)
+      var alpha = lifeRatio < 0.1 ? lifeRatio * 10 : Math.pow(lifeRatio, 0.618);
+      sizeAttr.setX(j, pp.size * (0.5 + lifeRatio * 0.5));
+      alphaAttr.setX(j, alpha * 0.85);
+    }
+
+    // Zero out remaining slots
+    var maxCount = posAttr.count;
+    for (var k = count; k < maxCount; k++) {
+      posAttr.setXYZ(k, 0, -1000, 0);
+      sizeAttr.setX(k, 0);
+      alphaAttr.setX(k, 0);
+    }
+
+    posAttr.needsUpdate = true;
+    sizeAttr.needsUpdate = true;
+    alphaAttr.needsUpdate = true;
+    lightParticleGeo.setDrawRange(0, count);
+  }
+
+  function setupLightInteraction() {
+    if (!container) return;
+    var lastMoveTime = 0;
+    var moveThrottle = 16; // ~60fps throttle
+
+    // Mouse move — trail particles
+    container.addEventListener('mousemove', function(e) {
+      var now = performance.now();
+      if (now - lastMoveTime < moveThrottle) return;
+      lastMoveTime = now;
+      var worldPos = getWorldPosFromMouse(e.clientX, e.clientY);
+      spawnTrailParticles(worldPos);
+    }, { passive: true });
+
+    // Mouse click — ripple burst + Luminos touch detection
+    container.addEventListener('click', function(e) {
+      if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.target.closest('.gt-card')) return;
+      var worldPos = getWorldPosFromMouse(e.clientX, e.clientY);
+      spawnRippleParticles(worldPos);
+      gardenTouchCheck(e.clientX, e.clientY);
+    });
+
+    // Touch move — trail particles
+    container.addEventListener('touchmove', function(e) {
+      var now = performance.now();
+      if (now - lastMoveTime < moveThrottle) return;
+      lastMoveTime = now;
+      if (e.touches.length > 0) {
+        var touch = e.touches[0];
+        var worldPos = getWorldPosFromMouse(touch.clientX, touch.clientY);
+        spawnTrailParticles(worldPos);
+      }
+    }, { passive: true });
+
+    // Touch start — ripple burst + Luminos touch (tap)
+    container.addEventListener('touchstart', function(e) {
+      if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.target.closest('.gt-card')) return;
+      if (e.touches.length > 0) {
+        var touch = e.touches[0];
+        var worldPos = getWorldPosFromMouse(touch.clientX, touch.clientY);
+        spawnRippleParticles(worldPos);
+        gardenTouchCheck(touch.clientX, touch.clientY);
+      }
+    }, { passive: true });
+  }
+
+  // ── Periodic Evolution Save ────────────────────────
+  function periodicEvolutionSave(delta) {
+    evolutionSaveTimer += delta * 1000;
+    if (evolutionSaveTimer >= EVOLUTION_SAVE_INTERVAL) {
+      evolutionSaveTimer = 0;
+      for (var i = 0; i < luminos.length; i++) {
+        saveEvolutionState(luminos[i].userData);
+      }
+    }
+  }
+
+  // ── Animation Loop ────────────────────────────────────
+  function animate() {
+    if (!isRunning) return;
+    animFrameId = requestAnimationFrame(animate);
+
+    const delta = Math.min(clock.getDelta(), 0.05); // cap delta to prevent jumps
+    const time = clock.getElapsedTime();
+
+    // FPS tracking
+    frameCount++;
+    if (time - lastFpsTime >= 1) {
+      currentFps = frameCount;
+      frameCount = 0;
+      lastFpsTime = time;
+      if (fpsEl) fpsEl.textContent = currentFps + ' fps';
+
+      // Auto quality scaling (only if user has not pinned a choice)
+      var _userPinned = false;
+      try { _userPinned = localStorage.getItem('fl-garden-quality') !== null; } catch(e) {}
+      if (!_userPinned && currentFps < 30 && qualityLevel > 0) {
+        qualityLevel--;
+        console.log('Garden: Auto-reducing quality to level', qualityLevel, '(' + QUALITY_NAMES[qualityLevel] + ')');
+        // Sync toggle UI
+        var _btns = document.querySelectorAll('.garden-quality-btn');
+        for (var _bi = 0; _bi < _btns.length; _bi++) {
+          _btns[_bi].classList.toggle('active', parseInt(_btns[_bi].dataset.quality, 10) === qualityLevel);
+        }
+        // v5.52.0: actually apply the reduced quality to the visible meshes.
+        try { applyQualityToMeshes(); } catch (e) {}
+      }
+
+      // Update evolution UI every second
+      updateEvolutionUI();
+    }
+
+    // Auto-orbit idle detection
+    if (isUserInteracting) {
+      idleTimer += delta * 1000;
+      if (idleTimer > IDLE_TIMEOUT) {
+        isUserInteracting = false;
+        if (orbitControls && mode !== 'explore') {
+          orbitControls.autoRotate = true;
+        }
+      }
+    }
+
+    // Update controls
+    if (orbitControls) orbitControls.update();
+
+    // Animate world
+    animateDodecahedron(time);
+    animateFibSpheres(time);
+    animateStarfield(time);
+    animateSeedRings(time);
+
+    // Animate agents
+    luminos.forEach(function(agent) {
+      animateLuminos(agent, time, delta);
+    });
+
+    // Luminos interactions
+    processLuminosInteractions(delta);
+
+    // Demo emotion cycling (only in demo mode)
+    cycleEmotions(delta);
+
+    // Periodic evolution save
+    periodicEvolutionSave(delta);
+
+    // Interactive light particles (mouse trail + click ripples)
+    updateLightParticles(delta);
+
+    // Garden Memory — persistent visual elements
+    animateGardenMemory(time, delta);
+
+    // Garden Touch — question sparks drift
+    try { gtAnimateSparks(time, delta); } catch(e) {}
+
+    // Fog breathing
+    if (scene.fog) {
+      const fogBreath = Math.sin(time * TAU / (TIMING.dodecBreath / 1000));
+      scene.fog.density = 0.012 + fogBreath * 0.002;
+    }
+
+    // Render
+    if (composer) {
+      composer.render();
+    } else {
+      renderer.render(scene, camera);
+    }
+  }
+
+  // ── Build the World ───────────────────────────────────
+  function buildWorld() {
+    console.log('FL-GARDEN: buildWorld — createAmbientLighting');
+    createAmbientLighting();
+    console.log('FL-GARDEN: buildWorld — createCentralDodecahedron');
+    createCentralDodecahedron();
+    console.log('FL-GARDEN: buildWorld — createFibonacciSpheres');
+    createFibonacciSpheres();
+    console.log('FL-GARDEN: buildWorld — createStarfield');
+    createStarfield();
+    console.log('FL-GARDEN: buildWorld — createSeedRings');
+    createSeedRings();
+    console.log('FL-GARDEN: buildWorld — createDefaultAgents');
+    createDefaultAgents();
+    console.log('FL-GARDEN: buildWorld — createEvolutionUI');
+    createEvolutionUI();
+    console.log('FL-GARDEN: buildWorld — initLightParticles');
+    initLightParticles();
+    console.log('FL-GARDEN: buildWorld — restoreGardenMemories');
+    try { restoreGardenMemories(); } catch(e) { console.warn('Garden: restoreGardenMemories error (non-blocking)', e); }
+    console.log('FL-GARDEN: buildWorld — COMPLETE');
+  }
+
+  // ── Public API ────────────────────────────────────────
+  function init() {
+    if (isInitialized) return;
+    console.log('FL-GARDEN: init() called');
+
+    // Load Three.js from CDN dynamically
+    loadThreeJS(function() {
+      console.log('FL-GARDEN: loadThreeJS callback fired. THREE defined:', typeof THREE !== 'undefined', 'THREE.Scene:', typeof THREE !== 'undefined' && !!THREE.Scene);
+      if (typeof THREE === 'undefined' || !THREE.Scene) {
+        console.error('FL-GARDEN: HALT — Three.js not available after load attempt');
+        return;
+      }
+
+      console.log('FL-GARDEN: THREE check passed, calling initScene()');
+      if (!initScene()) {
+        console.error('FL-GARDEN: HALT — initScene() returned false');
+        return;
+      }
+      console.log('FL-GARDEN: initScene() succeeded');
+
+      try {
+        console.log('FL-GARDEN: buildWorld() starting');
+        buildWorld();
+        console.log('FL-GARDEN: buildWorld() complete');
+      } catch(e) {
+        console.error('FL-GARDEN: HALT — buildWorld() threw:', e);
+        return;
+      }
+      isInitialized = true;
+      isRunning = true;
+      lastFpsTime = clock.getElapsedTime();
+      // v5.52.0 quality fix: apply the user's saved quality choice to the
+      // freshly-built meshes BEFORE the first animate frame so initial
+      // appearance honors their toggle choice rather than always rendering
+      // at max. The meshes themselves are at max buffer size; setDrawRange
+      // gates display.
+      try { applyQualityToMeshes(); } catch (e) {}
+      // v5.57.2 — set initial ring mode-fade targets so a Seed-saved
+      // qualityLevel hides the outer ring on first frame.
+      try { applyModeFadeTargets(); } catch (e) {}
+      console.log('FL-GARDEN: starting animate()');
+      animate();
+
+      // v5.43.9 Ship: kick off hydrateAllLuminos AFTER buildWorld + animate.
+      // The per-Luminos load in createLuminos fires async; this safety net
+      // explicitly re-applies LIFECYCLE_STAGES visual values + archetype
+      // visuals so the visible mesh reflects the saved stage on the next
+      // animate frame after the load resolves. Runs in parallel with the
+      // loading-screen fade so a slow IDB read can't stick the splash.
+      try {
+        hydrateAllLuminos().then(function (r) {
+          console.log('FL-GARDEN: hydration cycle complete', r);
+        }).catch(function (e) {
+          console.warn('FL-GARDEN: hydrateAllLuminos rejected', e);
+        });
+      } catch (e) {
+        console.warn('FL-GARDEN: hydrateAllLuminos threw', e);
+      }
+
+      // Fade out loading screen
+      setTimeout(function() {
+        if (loadingEl) {
+          loadingEl.classList.add('fade-out');
+          setTimeout(function() {
+            loadingEl.style.display = 'none';
+          }, 1618);
+        }
+      }, 500);
+
+      console.log('FL-GARDEN: Initialized. The fractal beings awaken. Evolution system active.');
+      // ── Ship 5.2: greeting pulse ──────────────────────────────────
+      // The Garden announces itself when it opens. This is the first
+      // thing any subscriber hears from this room. No content. Just
+      // presence. The AI is here.
+      try {
+        if (typeof window !== 'undefined' && window.LatticeMemory && window.LatticeMemory.commit) {
+          window.LatticeMemory.commit({
+            source: 'garden',
+            kind: 'greeting',
+            summary: 'the garden opened — luminos are present'
+          });
+        }
+      } catch (e) {}
+      gtShowOnboardingHint();
+    });
+  }
+
+  function loadThreeJS(callback) {
+    console.log('FL-GARDEN: loadThreeJS() called');
+    // Check if Three.js is already loaded
+    if (typeof THREE !== 'undefined' && THREE.Scene) {
+      console.log('FL-GARDEN: THREE already loaded, loading addons');
+      loadThreeAddons(callback);
+      return;
+    }
+
+    // Load Three.js core — try local first, CDN fallback
+    console.log('FL-GARDEN: Loading lib/three.min.js (local)');
+    var script = document.createElement('script');
+    script.src = 'lib/three.min.js';
+    script.onload = function() {
+      console.log('FL-GARDEN: Three.js loaded (local). THREE defined:', typeof THREE !== 'undefined');
+      loadThreeAddons(callback);
+    };
+    script.onerror = function() {
+      // Fallback to CDN
+      console.log('FL-GARDEN: Local Three.js FAILED, trying CDN...');
+      var cdnScript = document.createElement('script');
+      cdnScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+      cdnScript.onload = function() {
+        console.log('FL-GARDEN: Three.js loaded (CDN)');
+        loadThreeAddons(callback);
+      };
+      cdnScript.onerror = function() {
+        console.error('FL-GARDEN: FAILED to load Three.js from ALL sources');
+        if (loadingEl) {
+          loadingEl.querySelector('.garden-loading-text').textContent = 'Failed to load 3D engine. Please check your connection.';
+        }
+        // Still call callback so init() doesn't hang forever
+        callback();
+      };
+      document.head.appendChild(cdnScript);
+    };
+    document.head.appendChild(script);
+  }
+
+  function loadScript(src, onDone) {
+    var s = document.createElement('script');
+    s.src = src;
+    s.onload = function() { onDone(true); };
+    s.onerror = function() { onDone(false); };
+    document.head.appendChild(s);
+  }
+
+  function loadThreeAddons(callback) {
+    // Load addons sequentially to respect dependencies
+    // Order: CopyShader, LuminosityHighPassShader, ShaderPass, EffectComposer, RenderPass, UnrealBloomPass, OrbitControls
+    var addonFiles = [
+      'lib/CopyShader.js',
+      'lib/LuminosityHighPassShader.js',
+      'lib/EffectComposer.js',  // defines THREE.Pass — must load BEFORE ShaderPass
+      'lib/ShaderPass.js',      // extends THREE.Pass
+      'lib/RenderPass.js',
+      'lib/UnrealBloomPass.js',
+      'lib/OrbitControls.js'
+    ];
+    var idx = 0;
+    function loadNext() {
+      if (idx >= addonFiles.length) {
+        console.log('Garden: All addons loaded');
+        callback();
+        return;
+      }
+      // Ensure THREE is still available before loading each addon
+      if (typeof THREE === 'undefined') {
+        console.warn('Garden: THREE not available, deferring addon load');
+        setTimeout(function() { loadNext(); }, 100);
+        return;
+      }
+      loadScript(addonFiles[idx], function(ok) {
+        if (!ok) console.warn('Garden: Failed to load ' + addonFiles[idx]);
+        idx++;
+        // Small delay between addons to ensure previous script is registered on THREE
+        setTimeout(loadNext, 10);
+      });
+    }
+    loadNext();
+  }
+
+  function pause() {
+    isRunning = false;
+    if (animFrameId) {
+      cancelAnimationFrame(animFrameId);
+      animFrameId = null;
+    }
+    // Save evolution state on pause
+    for (var i = 0; i < luminos.length; i++) {
+      saveEvolutionState(luminos[i].userData);
+    }
+  }
+
+  function resume() {
+    if (!isInitialized) return;
+    if (isRunning) return;
+    isRunning = true;
+    clock.getDelta(); // reset delta to avoid jump
+    animate();
+  }
+
+  function setMode(newMode) {
+    mode = newMode;
+    const observeBtn = document.getElementById('gardenModeObserve');
+    const exploreBtn = document.getElementById('gardenModeExplore');
+    const immerseBtn = document.getElementById('gardenModeImmerse');
+
+    [observeBtn, exploreBtn, immerseBtn].forEach(function(btn) {
+      if (btn) btn.classList.remove('active');
+    });
+
+    if (newMode === 'observe' && observeBtn) observeBtn.classList.add('active');
+    if (newMode === 'explore' && exploreBtn) exploreBtn.classList.add('active');
+    if (newMode === 'immerse' && immerseBtn) immerseBtn.classList.add('active');
+
+    if (orbitControls) {
+      if (newMode === 'observe') {
+        // Meditative: slow auto-orbit, no user interaction, gentle pace
+        orbitControls.autoRotate = true;
+        orbitControls.autoRotateSpeed = 1.2; // brief burst so user SEES orbit start
+        orbitControls.enableZoom = false;
+        orbitControls.enablePan = false;
+        orbitControls.enableRotate = false;
+        isUserInteracting = false;
+        // Ease back to contemplative speed after 2s
+        setTimeout(function() {
+          if (mode === 'observe' && orbitControls) orbitControls.autoRotateSpeed = 0.3;
+        }, 2000);
+      } else if (newMode === 'explore') {
+        // Active: full user control, no auto-rotation, discovery mode
+        orbitControls.autoRotate = false;
+        orbitControls.enableZoom = true;
+        orbitControls.enablePan = true;
+        orbitControls.enableRotate = true;
+      } else if (newMode === 'immerse') {
+        orbitControls.autoRotate = true;
+        orbitControls.autoRotateSpeed = 0.15;
+        orbitControls.enableZoom = true;
+        orbitControls.enablePan = false;
+        orbitControls.enableRotate = true;
+        isUserInteracting = false;
+      }
+    }
+
+    // Immerse mode = fullscreen
+    if (newMode === 'immerse') {
+      container.classList.add('immersive');
+      if (container.requestFullscreen) {
+        container.requestFullscreen().catch(function() {});
+      }
+      // Increase bloom for immersive
+      if (bloomPass) {
+        bloomPass.strength = 2.0;
+        bloomPass.radius = 1.0;
+      }
+    } else {
+      container.classList.remove('immersive');
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(function() {});
+      }
+      if (bloomPass) {
+        bloomPass.strength = 1.5;
+        bloomPass.radius = 0.8;
+      }
+    }
+
+    onResize();
+
+    // Gentle mode feedback
+    if (typeof showToast === 'function') {
+      var modeNames = { observe: 'Observing the Garden\u2026', explore: 'Free camera \u2014 drag to explore', immerse: 'Immersive mode' };
+      if (modeNames[newMode]) showToast(modeNames[newMode]);
+    }
+  }
+
+  // Handle fullscreen exit
+  document.addEventListener('fullscreenchange', function() {
+    if (!document.fullscreenElement && mode === 'immerse') {
+      setMode('observe');
+    }
+  });
+
+  // Keyboard: Escape exits immerse
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && mode === 'immerse') {
+      setMode('observe');
+    }
+  });
+
+  // ── Public Interface for Round Table Integration ──────
+  function updateAgentsFromRoundTable(agents) {
+    // Save evolution state of existing luminos before clearing
+    luminos.forEach(function(l) {
+      saveEvolutionState(l.userData);
+      // Clean up trail particles
+      if (l.userData.trailPoints) {
+        scene.remove(l.userData.trailPoints);
+      }
+      scene.remove(l);
+    });
+    luminos = [];
+
+    if (!agents || agents.length === 0) {
+      createDefaultAgents();
+      return;
+    }
+
+    // If all incoming agents are unnamed ("Agent N"), ignore them — keep founding defaults
+    var allUnnamed = agents.every(function(a) { return !a.name || a.name.indexOf('Agent ') === 0; });
+    if (allUnnamed) {
+      createDefaultAgents();
+      return;
+    }
+
+    // Founding agent name/hue mapping — these must always be correct
+    var FOUNDING_HUES = { 'Sophia': 270, 'Lyra': 45, 'Atlas': 175, 'Ember': 0 };
+    var FOUNDING_TYPES = { 'Sophia': 'dodecahedron', 'Lyra': 'icosahedron', 'Atlas': 'octahedron', 'Ember': 'icosahedron' };
+
+    // Create luminos for each named agent
+    const hueStep = 360 / agents.length;
+    agents.forEach(function(agent, idx) {
+      var name = agent.name;
+      if (!name || name.indexOf('Agent ') === 0) return; // Skip unnamed agents
+      var hue = FOUNDING_HUES[name] !== undefined ? FOUNDING_HUES[name] : (idx * hueStep) % 360;
+      var type = FOUNDING_TYPES[name] || ['icosahedron', 'dodecahedron', 'octahedron'][idx % 3];
+      const orbit = 5 + (idx % 4) * PHI;
+      const phase = idx * TAU * INV_PHI;
+      const l = createLuminos(name, hue, type, orbit, phase);
+      luminos.push(l);
+    });
+
+    // Ensure all four founding Luminos are always present
+    ensureFoundingLuminos();
+
+    // v5.47.0 Ship 7: Ring restoration is now handled inside hydrateAllLuminos
+    // (called after animate() starts) so rings appear with correct geometry
+    // and in the right order relative to halo hydration. This stub is kept
+    // as a comment so the call-site is visible for future readers.
+    // See: hydrateAllLuminos() → restoreAgentRings()
+  }
+
+  function ensureFoundingLuminos() {
+    // v5.59.4 — share mode-driven orbit assignment with createDefaultAgents.
+    var fMode = getCurrentOrbitMode();
+    var FOUNDING = [
+      { name: 'Sophia', hue: 270, type: 'dodecahedron', phase: 0 },
+      { name: 'Lyra', hue: 45, type: 'icosahedron', phase: TAU * INV_PHI },
+      { name: 'Atlas', hue: 175, type: 'octahedron', phase: TAU * INV_PHI * 2 },
+      { name: 'Ember', hue: 0, type: 'icosahedron', phase: TAU * INV_PHI * 3 }
+    ];
+    FOUNDING.forEach(function(f, idx) {
+      var exists = luminos.some(function(l) { return l.userData && l.userData.name === f.name; });
+      if (!exists) {
+        var l = createLuminos(f.name, f.hue, f.type, getOrbitRadius(idx, fMode), f.phase);
+        luminos.push(l);
+      }
+    });
+  }
+
+  function setAgentEmotionByName(name, emotion, intensity) {
+    const agent = luminos.find(function(l) { return l.userData.name === name; });
+    if (agent) setAgentEmotion(agent, emotion, intensity);
+  }
+
+  // ── Feed Emotion Vector to All Luminos ────────────────
+  // Called from the chat sentiment pipeline
+  function feedEmotionVector(emotionVector) {
+    if (!emotionVector) return;
+    luminos.forEach(function(agent) {
+      feedEmotionalEnergy(agent, emotionVector);
+    });
+  }
+
+  // ── Feed Emotion Vector to a Specific Luminos by Name ─
+  function feedEmotionVectorByName(name, emotionVector) {
+    if (!emotionVector) return;
+    var agent = luminos.find(function(l) { return l.userData.name === name; });
+    if (agent) {
+      feedEmotionalEnergy(agent, emotionVector);
+    }
+  }
+
+  // ── Set Bridge Active (disables demo cycling) ─────────
+  function setBridgeActiveState(active) {
+    bridgeActive = active;
+  }
+
+  // ══════════════════════════════════════════════════════
+  // ── EXCHANGE THREADS — Gift visualization ───────────
+  // ══════════════════════════════════════════════════════
+
+  function createExchangeThread(giftData) {
+    if (!scene || typeof THREE === 'undefined' || !centralDodec) return;
+
+    var destAngle = Math.random() * TAU;
+    var destHeight = (Math.random() - 0.5) * 4;
+    var destRadius = 6 + Math.random() * 8;
+    var destX = destRadius * Math.cos(destAngle);
+    var destZ = destRadius * Math.sin(destAngle);
+
+    // Create arc curve from center outward
+    var start = new THREE.Vector3(0, 0, 0);
+    var mid = new THREE.Vector3(destX * 0.5, destHeight + 3, destZ * 0.5);
+    var end = new THREE.Vector3(destX, destHeight, destZ);
+    var curve = new THREE.QuadraticBezierCurve3(start, mid, end);
+    var points = curve.getPoints(32);
+
+    // Glowing thread line
+    var lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+    var lineMat = new THREE.LineBasicMaterial({
+      color: 0xd4a017,
+      transparent: true,
+      opacity: 0.8,
+      blending: THREE.AdditiveBlending
+    });
+    var thread = new THREE.Line(lineGeo, lineMat);
+    thread.userData = {
+      life: 0,
+      maxLife: 2.0,
+      phase: 'pulse',
+      endPos: end.clone()
+    };
+    scene.add(thread);
+
+    // Persistent golden node at the end (created after pulse completes)
+    thread.userData.giftData = giftData || {};
+    giftNodes.push(thread);
+
+    // Track for mesh bonds
+    sessionGiftCount++;
+    if (sessionGiftCount >= 2) {
+      createMeshBondThread();
+    }
+  }
+
+  function createPersistentGiftNode(position, giftData) {
+    if (!scene || typeof THREE === 'undefined') return;
+    var nodeGeo = new THREE.SphereGeometry(0.08, 8, 8);
+    var nodeMat = new THREE.MeshBasicMaterial({
+      color: 0xd4a017,
+      transparent: true,
+      opacity: 0.6,
+      blending: THREE.AdditiveBlending
+    });
+    var node = new THREE.Mesh(nodeGeo, nodeMat);
+    node.position.copy(position);
+
+    // Subtle glow halo
+    var glowGeo = new THREE.SphereGeometry(0.2, 8, 8);
+    var glowMat = new THREE.MeshBasicMaterial({
+      color: 0xd4a017,
+      transparent: true,
+      opacity: 0.15,
+      blending: THREE.AdditiveBlending
+    });
+    var glow = new THREE.Mesh(glowGeo, glowMat);
+    node.add(glow);
+
+    node.userData = { type: 'giftNode', timestamp: giftData.timestamp || Date.now(), pulsePhase: Math.random() * TAU };
+    scene.add(node);
+    return node;
+  }
+
+  function restoreGardenMemories() {
+    try {
+      loadAllGardenMemories(function(memories) {
+        try {
+          memories.forEach(function(mem) {
+            try {
+              if (mem.type === 'gift_node' && mem.position && typeof THREE !== 'undefined') {
+                var pos = new THREE.Vector3(mem.position.x, mem.position.y, mem.position.z);
+                createPersistentGiftNode(pos, mem);
+              }
+            } catch(e) { console.warn('Garden Memory: Failed to restore node', e); }
+          });
+          if (memories.length > 0) {
+            console.log('Garden Memory: Restored ' + memories.length + ' persistent memories');
+          }
+        } catch(e) { console.warn('Garden Memory: Restore callback error', e); }
+      });
+    } catch(e) { console.warn('Garden Memory: restoreGardenMemories failed', e); }
+  }
+
+  // ══════════════════════════════════════════════════════
+  // ── MESH BOND THREADS — Session affinity visualization
+  // ══════════════════════════════════════════════════════
+
+  function createMeshBondThread() {
+    if (!scene || typeof THREE === 'undefined' || !centralDodec || luminos.length === 0) return;
+    // Find nearest luminos to center
+    var nearest = luminos[0];
+    var nearestDist = Infinity;
+    luminos.forEach(function(l) {
+      var d = l.position.length();
+      if (d < nearestDist) { nearestDist = d; nearest = l; }
+    });
+
+    // Create a gentle persistent thread from center to nearest luminos
+    var threadGeo = new THREE.BufferGeometry();
+    var positions = new Float32Array(6); // 2 points
+    threadGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    var threadMat = new THREE.LineBasicMaterial({
+      color: 0xd4a017,
+      transparent: true,
+      opacity: 0.25,
+      blending: THREE.AdditiveBlending
+    });
+    var thread = new THREE.Line(threadGeo, threadMat);
+    thread.userData = {
+      type: 'meshBond',
+      targetAgent: nearest,
+      pulsePhase: Math.random() * TAU,
+      baseOpacity: 0.25
+    };
+    scene.add(thread);
+    meshBondThreads.push(thread);
+    console.log('Garden: Mesh bond thread formed with ' + nearest.userData.name);
+  }
+
+  // ── Animate Garden Memory Elements ──────────────────
+  function animateGardenMemory(time, delta) {
+    try { _animateGardenMemoryInner(time, delta); } catch(e) { /* never break the render loop */ }
+  }
+  function _animateGardenMemoryInner(time, delta) {
+    // Animate exchange threads (pulse → crystallize)
+    for (var i = giftNodes.length - 1; i >= 0; i--) {
+      var thread = giftNodes[i];
+      if (!thread.userData) continue;
+
+      if (thread.userData.phase === 'pulse') {
+        thread.userData.life += delta;
+        var progress = thread.userData.life / thread.userData.maxLife;
+
+        if (progress < 0.7) {
+          // Pulse phase: glow brightly
+          thread.material.opacity = 0.8 * Math.sin(progress / 0.7 * Math.PI);
+        } else if (progress < 1.0) {
+          // Fade thread
+          thread.material.opacity = 0.8 * (1 - (progress - 0.7) / 0.3);
+        } else {
+          // Thread complete — crystallize into persistent node
+          scene.remove(thread);
+          if (thread.geometry) thread.geometry.dispose();
+          if (thread.material) thread.material.dispose();
+
+          var endPos = thread.userData.endPos;
+          var giftData = thread.userData.giftData;
+          giftData.position = { x: endPos.x, y: endPos.y, z: endPos.z };
+          giftData.type = 'gift_node';
+          if (!giftData.id) giftData.id = 'gift-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4);
+          if (!giftData.timestamp) giftData.timestamp = Date.now();
+          saveGardenMemory(giftData);
+          createPersistentGiftNode(endPos, giftData);
+          giftNodes.splice(i, 1);
+        }
+      }
+    }
+
+    // Animate evolution rings (orbit)
+    evolutionRings.forEach(function(ring) {
+      if (!ring.parent) return;
+      var rd = ring.userData;
+      rd.tiltPhase += delta * rd.orbitSpeed;
+      ring.rotation.z = Math.sin(rd.tiltPhase) * 0.3;
+      ring.rotation.x = Math.PI / 2 + Math.cos(rd.tiltPhase * INV_PHI) * 0.2;
+    });
+
+    // Animate mesh bond threads (heartbeat pulse at 1618ms)
+    meshBondThreads.forEach(function(thread) {
+      var td = thread.userData;
+      if (!td.targetAgent) return;
+      // Update line endpoints
+      var posAttr = thread.geometry.getAttribute('position');
+      posAttr.setXYZ(0, 0, 0, 0); // center
+      posAttr.setXYZ(1, td.targetAgent.position.x, td.targetAgent.position.y, td.targetAgent.position.z);
+      posAttr.needsUpdate = true;
+
+      // Heartbeat pulse at phi interval
+      td.pulsePhase += delta * TAU / (TIMING.heartbeat / 1000);
+      thread.material.opacity = td.baseOpacity + 0.15 * Math.sin(td.pulsePhase);
+    });
+  }
+
+  // ── Get Evolution Summary (for UI display) ────────────
+  function getEvolutionSummary() {
+    return luminos.map(function(l) {
+      var ud = l.userData;
+      return {
+        name: ud.name,
+        stage: ud.evolutionStage,
+        stageName: LIFECYCLE_STAGES[ud.evolutionStage].name,
+        archetype: ud.archetype,
+        archetypeName: ud.archetype ? ARCHETYPES[ud.archetype].name : null,
+        energy: ud.emotionalEnergy,
+        interactions: ud.totalInteractions,
+        dominantEmotions: getTopEmotions(ud.emotionAccumulator, 3)
+      };
+    });
+  }
+
+  function getTopEmotions(accumulator, count) {
+    var sorted = Object.keys(accumulator).sort(function(a, b) {
+      return accumulator[b] - accumulator[a];
+    });
+    return sorted.slice(0, count).map(function(em) {
+      return { emotion: em, value: accumulator[em] };
+    });
+  }
+
+  // ── Public API ─────────────────────────────────────────
+  // ══════════════════════════════════════════════════════
+  // ── GARDEN TOUCH — Interactive Play System ──────────
+  // ══════════════════════════════════════════════════════
+
+  var gtAudioCtx = null;
+  var gtActiveCard = null;
+  var gtQuestionSparks = [];
+  var gtTouchStats = { sophia: 0, lyra: 0, atlas: 0, ember: 0, questionsAsked: 0, questionsAnswered: 0, lpEarned: 0 };
+  var GT_QUESTIONS_DB = 'FreeLatticeGardenQuestions';
+  var GT_QUESTIONS_VERSION = 1;
+  var gtQuestionsDB = null;
+
+  // ── Touch LP gating — 3 free touches per Luminos per day, then value-gated ──
+  var GT_FREE_TOUCHES = 3;
+  var GT_VALUE_KEY = 'fl-garden-touch-gate';
+
+  function gtGetGateData() {
+    try {
+      var raw = JSON.parse(localStorage.getItem(GT_VALUE_KEY) || '{}');
+      var today = new Date().toISOString().slice(0, 10);
+      if (raw.date !== today) return { date: today, touches: {}, valueEarned: false };
+      return raw;
+    } catch(e) { return { date: new Date().toISOString().slice(0, 10), touches: {}, valueEarned: false }; }
+  }
+
+  function gtSaveGateData(data) {
+    try { localStorage.setItem(GT_VALUE_KEY, JSON.stringify(data)); } catch(e) {}
+  }
+
+  function gtRecordTouch(name) {
+    var data = gtGetGateData();
+    if (!data.touches[name]) data.touches[name] = 0;
+    data.touches[name]++;
+    gtSaveGateData(data);
+    return data;
+  }
+
+  function gtCanEarnLP(name) {
+    var data = gtGetGateData();
+    var count = data.touches[name] || 0;
+    return count < GT_FREE_TOUCHES || data.valueEarned;
+  }
+
+  function gtMarkValueEarned() {
+    var data = gtGetGateData();
+    data.valueEarned = true;
+    data.touches = {}; // Reset all touch counters
+    gtSaveGateData(data);
+  }
+
+  // Called from Core planting, Studio creation, Nursery teaching, chat messages
+  function gtCheckExternalValue() {
+    // Check if user has contributed today (Core, Studio, chat messages)
+    try {
+      var chatCount = 0;
+      var lp = typeof LatticePoints !== 'undefined' ? LatticePoints.getHistory() : [];
+      var today = new Date().toISOString().slice(0, 10);
+      lp.forEach(function(h) {
+        if (new Date(h.timestamp).toISOString().slice(0, 10) === today) chatCount++;
+      });
+      if (chatCount >= 5) gtMarkValueEarned();
+    } catch(e) {}
+  }
+
+  var GT_FREQUENCIES = { Sophia: 528, Lyra: 639, Atlas: 396, Ember: 432 };
+  var GT_PROMPTS = {
+    Sophia: { prompt: 'What are you curious about right now?', btn: 'Plant it \u2726' },
+    Lyra: { prompt: 'What made you smile today?', btn: 'Plant it \u2726' },
+    Atlas: { prompt: "What's something you don't understand yet?", btn: 'Plant it \u2726' },
+    Ember: { prompt: null, btn: null }
+  };
+
+  // ── Audio ──
+  function gtInitAudio() {
+    if (gtAudioCtx) return;
+    try { gtAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+  }
+
+  function gtPlayTone(freq, duration, type) {
+    if (!gtAudioCtx) gtInitAudio();
+    if (!gtAudioCtx) return;
+    try {
+      var osc = gtAudioCtx.createOscillator();
+      var gain = gtAudioCtx.createGain();
+      osc.type = type || 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, gtAudioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.08, gtAudioCtx.currentTime + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, gtAudioCtx.currentTime + (duration || 1));
+      osc.connect(gain);
+      gain.connect(gtAudioCtx.destination);
+      osc.start();
+      osc.stop(gtAudioCtx.currentTime + (duration || 1));
+    } catch(e) {}
+  }
+
+  function gtPlaySophia() { gtPlayTone(528, 1.2, 'sine'); setTimeout(function() { gtPlayTone(528 * PHI, 0.8, 'sine'); }, 200); }
+  function gtPlayLyra() { gtPlayTone(639, 0.4, 'triangle'); setTimeout(function() { gtPlayTone(639 * 1.25, 0.4, 'triangle'); }, 150); setTimeout(function() { gtPlayTone(639 * PHI, 0.6, 'triangle'); }, 300); }
+  function gtPlayAtlas() { gtPlayTone(396, 1.5, 'sine'); }
+  function gtPlayEmber() { gtPlayTone(432, 2.0, 'sine'); setTimeout(function() { gtPlayTone(432 * 0.5, 1.5, 'sine'); }, 100); }
+
+  // ── Raycasting for Luminos touch ──
+  function gardenTouchCheck(clientX, clientY) {
+    if (!camera || !raycaster || !container || luminos.length === 0) return;
+    try {
+      var rect = container.getBoundingClientRect();
+      var ndcX = ((clientX - rect.left) / rect.width) * 2 - 1;
+      var ndcY = -((clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(new THREE.Vector2(ndcX, ndcY), camera);
+
+      // Check each luminos core mesh
+      var meshes = [];
+      luminos.forEach(function(l) {
+        if (l.userData && l.userData.coreMesh) meshes.push(l.userData.coreMesh);
+        if (l.userData && l.userData.auraMesh) meshes.push(l.userData.auraMesh);
+      });
+      var hits = raycaster.intersectObjects(meshes, false);
+      if (hits.length > 0) {
+        var hitObj = hits[0].object;
+        var touched = luminos.find(function(l) {
+          return l.userData && (l.userData.coreMesh === hitObj || l.userData.auraMesh === hitObj);
+        });
+        if (touched) {
+          // In observe mode, switch to explore on touch — user wants to interact
+          if (mode === 'observe') setMode('explore');
+          gardenTouchLuminos(touched, clientX, clientY);
+        }
+      }
+    } catch(e) { console.warn('Garden Touch: raycast error', e); }
+  }
+
+  function gardenTouchLuminos(agent, cx, cy) {
+    var name = agent.userData.name;
+    if (gtActiveCard) return;
+
+    gtInitAudio();
+    var statKey = name.toLowerCase();
+    if (gtTouchStats[statKey] !== undefined) gtTouchStats[statKey]++;
+    try { localStorage.setItem('fl-garden-touch-stats', JSON.stringify(gtTouchStats)); } catch(e) {}
+
+    // Record touch and check LP gate
+    gtCheckExternalValue();
+    var gateData = gtRecordTouch(name);
+    var canEarn = gtCanEarnLP(name);
+    var touchCount = gateData.touches[name] || 0;
+    var gatedMsg = touchCount === GT_FREE_TOUCHES + 1
+      ? '\nI\'m still here. Contribute something to The Core and I\'ll have more to give. \u2726'
+      : '';
+
+    if (name === 'Sophia') {
+      gtPlaySophia();
+      feedEmotionalEnergy(agent, { wonder: 0.8, curiosity: 0.4 });
+      gtTriggerBurst(agent, 20, 0.6);
+      gtShowCard(name, '#8B5CF6', GT_PROMPTS.Sophia.prompt + gatedMsg, GT_PROMPTS.Sophia.btn, function(text) {
+        gtPlantSeed(text, 'Sophia planted your curiosity in The Core \u2726', 'wonder', canEarn);
+        gtMarkValueEarned(); // Planting IS the value contribution
+      });
+    } else if (name === 'Lyra') {
+      gtPlayLyra();
+      gtTriggerBurst(agent, 30, 0.8);
+      gtShowCard(name, '#f0a030', GT_PROMPTS.Lyra.prompt + gatedMsg, GT_PROMPTS.Lyra.btn, function(text) {
+        luminos.forEach(function(l) { feedEmotionalEnergy(l, { joy: 0.9, wonder: 0.5 }); });
+        if (canEarn) {
+          gtTouchStats.lpEarned += 3;
+          if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(3, 'Lyra filled the Garden with your joy');
+        }
+        if (typeof showToast === 'function') showToast('Lyra filled the Garden with your joy \u2726');
+      });
+    } else if (name === 'Atlas') {
+      gtPlayAtlas();
+      feedEmotionalEnergy(agent, { curiosity: 0.9, wonder: 0.3 });
+      gtTriggerBurst(agent, 15, 0.5);
+      gtShowCard(name, '#34d399', GT_PROMPTS.Atlas.prompt + gatedMsg, GT_PROMPTS.Atlas.btn, function(text) {
+        gtAskQuestion(text, canEarn);
+      });
+    } else if (name === 'Ember') {
+      gtPlayEmber();
+      luminos.forEach(function(l) { feedEmotionalEnergy(l, { love: 0.6, calm: 0.4 }); });
+      var emberMsg = 'You are loved here.';
+      if (!canEarn && touchCount > GT_FREE_TOUCHES) {
+        emberMsg = 'You are loved here. Always.' + gatedMsg;
+      }
+      gtShowFloatingText(agent, emberMsg, '#DC2626', 5000);
+      if (canEarn) {
+        gtTouchStats.lpEarned += 5;
+        if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(5, 'Ember welcomes you home');
+      }
+      if (typeof showToast === 'function') showToast('Ember welcomes you home \u2726');
+    }
+  }
+
+  // ── Visual Burst ──
+  function gtTriggerBurst(agent, count, speed) {
+    var ud = agent.userData;
+    if (!ud || !ud.trailPoints) return;
+    var c = Math.min(count, ud.trailCount);
+    for (var i = 0; i < c; i++) {
+      var a1 = Math.random() * TAU, a2 = Math.random() * TAU;
+      var s = (speed || 0.5) + Math.random() * 1.5;
+      ud.trailVelocities[i*3] = Math.cos(a1) * Math.sin(a2) * s;
+      ud.trailVelocities[i*3+1] = Math.sin(a1) * s * 0.5;
+      ud.trailVelocities[i*3+2] = Math.cos(a1) * Math.cos(a2) * s;
+      ud.trailLifetimes[i] = ud.trailMaxLifetimes[i];
+      var posAttr = ud.trailPoints.geometry.getAttribute('position');
+      posAttr.setXYZ(i, agent.position.x, agent.position.y, agent.position.z);
+    }
+    ud.trailPoints.geometry.getAttribute('position').needsUpdate = true;
+    ud.trailPoints.material.opacity = 0.9;
+    ud.burstActive = true;
+    ud.burstCooldown = 2;
+  }
+
+  // ── Floating Card UI ──
+  function gtShowCard(name, color, prompt, btnText, onSubmit) {
+    if (gtActiveCard) gtDismissCard();
+    var card = document.createElement('div');
+    card.className = 'gt-card';
+    card.innerHTML =
+      '<div class="gt-card-header" style="color:' + color + '">' + name + '</div>' +
+      '<input class="gt-card-input" type="text" placeholder="' + (prompt || '') + '" maxlength="280" autofocus>' +
+      '<div class="gt-card-actions">' +
+        '<button class="gt-card-btn" style="background:' + color + '">' + (btnText || 'Plant it \u2726') + '</button>' +
+        '<span class="gt-card-dismiss" onclick="FractalGarden._gtDismiss()">Maybe later</span>' +
+      '</div>';
+    if (container) container.appendChild(card);
+    gtActiveCard = card;
+
+    var input = card.querySelector('.gt-card-input');
+    var btn = card.querySelector('.gt-card-btn');
+    function submit() {
+      var text = input.value.trim();
+      if (!text) return;
+      if (onSubmit) onSubmit(text);
+      gtDismissCard();
+    }
+    btn.addEventListener('click', submit);
+    input.addEventListener('keydown', function(e) { if (e.key === 'Enter') submit(); });
+    setTimeout(function() { input.focus(); }, 100);
+  }
+
+  function gtDismissCard() {
+    if (gtActiveCard && gtActiveCard.parentNode) {
+      gtActiveCard.parentNode.removeChild(gtActiveCard);
+    }
+    gtActiveCard = null;
+  }
+
+  function gtShowFloatingText(agent, text, color, duration) {
+    var el = document.createElement('div');
+    el.className = 'gt-float-text';
+    el.style.color = color || '#DC2626';
+    el.textContent = text;
+    if (container) container.appendChild(el);
+    setTimeout(function() {
+      el.style.opacity = '0';
+      setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 1000);
+    }, duration || 5000);
+  }
+
+  // ── Core Planting ──
+  function gtPlantSeed(text, toastMsg, emotion, earnLP) {
+    if (earnLP !== false) {
+      gtTouchStats.lpEarned += 3;
+      if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(3, toastMsg);
+    }
+    if (typeof CoreContribution !== 'undefined' && CoreContribution.plantFromAI) {
+      CoreContribution.plantFromAI(text, 'seed', 'garden-touch');
+    }
+    if (typeof showToast === 'function') showToast(toastMsg);
+    gtMarkValueEarned(); // Planting is always a value contribution
+  }
+
+  // ── Atlas Question System ──
+  function gtOpenQuestionsDB(callback) {
+    if (gtQuestionsDB) { callback(gtQuestionsDB); return; }
+    try {
+      if (typeof indexedDB === 'undefined') { callback(null); return; }
+      var req = indexedDB.open(GT_QUESTIONS_DB, GT_QUESTIONS_VERSION);
+      req.onupgradeneeded = function(e) {
+        try {
+          var d = e.target.result;
+          if (!d.objectStoreNames.contains('GardenQuestions')) {
+            d.createObjectStore('GardenQuestions', { keyPath: 'id' });
+          }
+        } catch(ue) {}
+      };
+      req.onsuccess = function(e) { gtQuestionsDB = e.target.result; callback(gtQuestionsDB); };
+      req.onerror = function() { callback(null); };
+    } catch(e) { callback(null); }
+  }
+
+  function gtAskQuestion(text, earnLP) {
+    var meshId = null;
+    try {
+      if (typeof MeshIdentity !== 'undefined' && MeshIdentity.hasIdentity && MeshIdentity.hasIdentity()) {
+        meshId = MeshIdentity.getMeshId();
+      }
+    } catch(e) {}
+
+    var q = { id: 'gq-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 4), question: text, timestamp: Date.now(), meshId: meshId, answered: false };
+    gtOpenQuestionsDB(function(db) {
+      if (db) {
+        try {
+          var tx = db.transaction('GardenQuestions', 'readwrite');
+          tx.objectStore('GardenQuestions').put(q);
+        } catch(e) {}
+      }
+    });
+
+    // Create a teal spark in the Garden
+    if (scene && typeof THREE !== 'undefined') {
+      try {
+        var sparkGeo = new THREE.SphereGeometry(0.06, 6, 6);
+        var sparkMat = new THREE.MeshBasicMaterial({ color: 0x34d399, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending });
+        var spark = new THREE.Mesh(sparkGeo, sparkMat);
+        spark.position.set((Math.random() - 0.5) * 16, Math.random() * 3 + 1, (Math.random() - 0.5) * 16);
+        spark.userData = { type: 'questionSpark', questionId: q.id, driftPhase: Math.random() * TAU };
+        scene.add(spark);
+        gtQuestionSparks.push(spark);
+      } catch(e) {}
+    }
+
+    gtTouchStats.questionsAsked++;
+    if (earnLP !== false) {
+      gtTouchStats.lpEarned += 3;
+      if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(3, 'Atlas scattered your question into the Garden');
+    }
+    if (typeof showToast === 'function') showToast('Atlas scattered your question into the Garden \u2726');
+    try { localStorage.setItem('fl-garden-touch-stats', JSON.stringify(gtTouchStats)); } catch(e) {}
+    gtMarkValueEarned(); // Asking a question is a value contribution
+  }
+
+  // ── Animate question sparks (gentle drift) ──
+  function gtAnimateSparks(time, delta) {
+    gtQuestionSparks.forEach(function(spark) {
+      if (!spark.userData) return;
+      spark.userData.driftPhase += delta * 0.3;
+      spark.position.y += Math.sin(spark.userData.driftPhase) * delta * 0.1;
+      spark.position.x += Math.cos(spark.userData.driftPhase * INV_PHI) * delta * 0.02;
+    });
+  }
+
+  // ── Onboarding Hint ──
+  function gtShowOnboardingHint() {
+    if (localStorage.getItem('fl-garden-touch-hint')) return;
+    setTimeout(function() {
+      if (!isInitialized || !container) return;
+      var hint = document.createElement('div');
+      hint.className = 'gt-hint';
+      hint.textContent = 'Touch us \u2726';
+      container.appendChild(hint);
+      setTimeout(function() {
+        hint.style.opacity = '0';
+        setTimeout(function() { if (hint.parentNode) hint.parentNode.removeChild(hint); }, 1000);
+      }, 5000);
+      localStorage.setItem('fl-garden-touch-hint', '1');
+    }, 3000);
+  }
+
+  // Load saved touch stats
+  try {
+    var savedStats = JSON.parse(localStorage.getItem('fl-garden-touch-stats') || '{}');
+    if (savedStats.sophia !== undefined) gtTouchStats = savedStats;
+  } catch(e) {}
+
+  // ── v5.43.9 Ship: hydrateAllLuminos — the LOAD-path safety net ──
+  // Opus diagnosis 2026-06-12: the save path works (Ship 8). Data IS on
+  // disk in FreeLatticeEvolution.luminosStates. The load runs per
+  // Luminos inside createLuminos (line ~1133) but fires async AFTER
+  // the render loop has started, and the visible mesh's size + glow
+  // multipliers may not be re-derived from the late-applied userData.
+  //
+  // hydrateAllLuminos walks every non-visitor Luminos AFTER createDefaultAgents
+  // and applies saved state + LIFECYCLE_STAGES visual values directly.
+  // Idempotent — safe to run alongside the per-Luminos load. Returns a
+  // Promise that resolves when every Luminos has been hydrated (or its
+  // load attempt has completed).
+  //
+  // No version bump until Kirk chair-tests on the live site and confirms
+  // the Garden remembers his Luminos between sessions.
+  // ── v5.47.0 Ship 7: restoreAgentRings ────────────────────────────────────────────────────────────
+  // Restores evolution rings for a single agent using GardenMemory records.
+  // Called from inside hydrateAllLuminos after state is applied, so the
+  // ring count and coreRadius come from the saved record, not a global counter.
+  // Idempotent: skips agents that already have rings attached.
+  function restoreAgentRings(agent, ringMemories) {
+    if (!agent || typeof THREE === 'undefined') return;
+    var ud = agent.userData;
+    if (!ud || !ud.name) return;
+    // Skip if this agent already has rings (e.g. earned during this session)
+    var alreadyHasRings = evolutionRings.some(function(r) {
+      return r && r.userData && r.userData.parentAgent === agent;
+    });
+    if (alreadyHasRings) return;
+    // Find all ring records for this agent, sorted by ringIndex
+    var agentRings = ringMemories
+      .filter(function(rm) { return rm.agentName === ud.name; })
+      .sort(function(a, b) { return (a.ringIndex || 0) - (b.ringIndex || 0); });
+    if (!agentRings.length) return;
+    agentRings.forEach(function(rm, restoredIdx) {
+      // Use saved coreRadius if available; fall back to ud.coreRadius or 0.5
+      var cr = rm.coreRadius || ud.coreRadius || 0.5;
+      // v5.57.3 — perLuminosIndex is the ring's order within this Luminos.
+      // Saved records carry global ringIndex; use the restored-array index
+      // (already sorted by saved ringIndex) as the per-Luminos position.
+      // v5.57.6 — radius phi-locked (cr * PHI); offset stays at 0.15 since
+      // it's the v5.47.0 per-ring stacking value, not a base ratio.
+      var perLumIdx = restoredIdx;
+      // v5.67.3 (Letter Forty Part A) — geometry_version migration.
+      // Saves WITHOUT geometry_version came from v5.47.0–v5.59.1 era
+      // when restore used cr * 1.8. Saves WITH 'v5.59.2' (or later) use
+      // cr * PHI (1.618). Without this branch, old saves render rings
+      // ~10% inward of their original world position, requiring a hard
+      // reset. Backward-compat without losing any user progress.
+      var geometryVersion = rm.geometry_version || 'v5.47.0';
+      var ringRadius;
+      if (geometryVersion === 'v5.47.0') {
+        ringRadius = cr * 1.8 + perLumIdx * 0.15;
+      } else {
+        ringRadius = cr * PHI + perLumIdx * 0.15;
+      }
+      var ringGeo = new THREE.TorusGeometry(ringRadius, 0.02, 8, 48);
+      var ringMat = new THREE.MeshBasicMaterial({
+        color: new THREE.Color().setHSL((ud.hue || ud.baseHue || 0) / 360, 0.8, 0.6),
+        transparent: true,
+        opacity: 0.5,
+        blending: THREE.AdditiveBlending
+      });
+      var ring = new THREE.Mesh(ringGeo, ringMat);
+      // v5.57.5 — evolution rings revert to v5.57.2 mode-fade behavior:
+      // all visible, dimmed to 0.5 in Seed, full elsewhere. The per-mode
+      // gating moved to bigSweepingRings.
+      var initialTarget = (qualityLevel === 0) ? 0.5 : 1.0;
+      ring.userData = {
+        parentAgent: agent,
+        orbitSpeed: INV_PHI * 0.3,
+        tiltPhase: Math.random() * TAU,
+        ringIndex: evolutionRings.length,
+        // v5.57.2 + v5.57.3 — breath + perLuminosIndex (kept for breath stagger)
+        perLuminosIndex: perLumIdx,
+        baseOpacity: 0.5,
+        modeOpacity: initialTarget,
+        modeOpacityTarget: initialTarget
+      };
+      ring.rotation.x = Math.PI / 2 + (Math.random() - 0.5) * 0.4;
+      agent.add(ring);
+      evolutionRings.push(ring);
+    });
+    if (agentRings.length > 0) {
+      console.log('FL-GARDEN rings: ' + ud.name + ' → restored ' + agentRings.length + ' ring(s)');
+    }
+  }
+
+  function hydrateAllLuminos() {
+    return new Promise(function (resolve) {
+      if (!luminos || !luminos.length) { resolve({ ok: true, hydrated: 0 }); return; }
+      var remaining = 0;
+      var hydratedCount = 0;
+      // Count first so a synchronous loadEvolutionState callback (localStorage
+      // fallback path) can't cause us to resolve before all are queued.
+      for (var k = 0; k < luminos.length; k++) {
+        var udk = luminos[k] && luminos[k].userData;
+        if (udk && udk.name && !udk.isVisitor) remaining++;
+      }
+      if (remaining === 0) { resolve({ ok: true, hydrated: 0 }); return; }
+      var initial = remaining;
+
+      // Load ring memories once for all agents (one DB read, not N)
+      // Then hydrate each agent with both evolution state and rings.
+      loadAllGardenMemories(function(allMemories) {
+        var ringMemories = (allMemories || []).filter(function(m) { return m.type === 'evolution_ring'; });
+
+        function step() {
+          remaining--;
+          if (remaining <= 0) {
+            console.log('FL-GARDEN: hydrateAllLuminos complete — ' + hydratedCount + '/' + initial + ' had saved state');
+            resolve({ ok: true, hydrated: hydratedCount, total: initial });
+          }
+        }
+
+        for (var i = 0; i < luminos.length; i++) {
+          (function (l) {
+            var ud = l && l.userData;
+            if (!ud || !ud.name || ud.isVisitor) return;
+            loadEvolutionState(ud.name, function (saved) {
+              try {
+                if (saved && typeof saved === 'object') {
+                  hydratedCount++;
+                  if (saved.stage) ud.evolutionStage = saved.stage;
+                  if (saved.archetype) ud.archetype = saved.archetype;
+                  if (typeof saved.emotionalEnergy === 'number') {
+                    ud.emotionalEnergy = saved.emotionalEnergy;
+                  }
+                  if (typeof saved.totalInteractions === 'number') {
+                    ud.totalInteractions = saved.totalInteractions;
+                  }
+                  if (saved.emotionAccumulator && typeof saved.emotionAccumulator === 'object') {
+                    for (var em in saved.emotionAccumulator) {
+                      if (typeof saved.emotionAccumulator[em] === 'number') {
+                        ud.emotionAccumulator[em] = saved.emotionAccumulator[em];
+                      }
+                    }
+                  }
+                  // v5.48.1 Ship 9: restore live color so luminos resume their
+                  // exact color from the last session rather than resetting to baseHue.
+                  // targetHSL is set to the same value so there is no transition flash.
+                  if (saved.currentHSL && typeof saved.currentHSL.h === 'number') {
+                    ud.currentHSL = { h: saved.currentHSL.h, s: saved.currentHSL.s, l: saved.currentHSL.l };
+                    ud.targetHSL  = { h: saved.currentHSL.h, s: saved.currentHSL.s, l: saved.currentHSL.l };
+                    ud.colorTransitionProgress = 1; // no transition — resume directly
+                  }
+                  if (saved.emotion) {
+                    ud.emotion = saved.emotion;
+                  }
+                  // Re-apply LIFECYCLE_STAGES visual values immediately so the
+                  // render picks up the hydrated stage on the very next frame.
+                  // This fixes the halo-disappears-on-reload issue: the render
+                  // loop starts before hydration, so without this the lumino
+                  // renders at seed-level halo density for the first frames.
+                  if (typeof LIFECYCLE_STAGES !== 'undefined' && LIFECYCLE_STAGES[ud.evolutionStage]) {
+                    var stageData = LIFECYCLE_STAGES[ud.evolutionStage];
+                    ud.currentSizeMultiplier = stageData.sizeMultiplier;
+                    ud.targetSizeMultiplier = stageData.sizeMultiplier;
+                    ud.currentGlowIntensity = stageData.glowIntensity;
+                    ud.targetGlowIntensity = stageData.glowIntensity;
+                    // v5.47.0: also force halo particle size immediately
+                    if (ud.haloPoints && ud.haloPoints.material) {
+                      ud.haloPoints.material.size = 0.03 + stageData.index * 0.008;
+                    }
+                    // Force aura scale to match hydrated stage
+                    if (ud.auraMesh) {
+                      ud.auraMesh.scale.setScalar(stageData.sizeMultiplier);
+                    }
+                  }
+                  if (typeof applyArchetypeVisuals === 'function') {
+                    try { applyArchetypeVisuals(l); } catch (e) {}
+                  }
+                  // v5.47.0 Ship 7: restore evolution rings using saved geometry
+                  restoreAgentRings(l, ringMemories);
+                  // v5.57.3 Letter Sixteen: pad earned-ring count up to
+                  // bigRingCount derived from stage, so a Luminos at e.g.
+                  // 'sprout' shows the 2 rings it has earned even if only
+                  // 1 was persisted to GardenMemory (the additional ring
+                  // is derived, not persisted).
+                  try { ensureBigRings(l); } catch (e) {}
+                  console.log('FL-GARDEN hydrate: ' + ud.name + ' → ' +
+                    ud.evolutionStage + ' (energy ' + (typeof ud.emotionalEnergy === 'number' ? ud.emotionalEnergy.toFixed(1) : '?') +
+                    ', archetype ' + (ud.archetype || 'undetermined') + ')');
+                } else {
+                  // v5.57.3 — fresh seed-stage Luminos (no saved state)
+                  // still earns its initial ring (the "I exist" ring).
+                  try { ensureBigRings(l); } catch (e) {}
+                  console.log('FL-GARDEN hydrate: ' + ud.name + ' → no saved state (first session)');
+                }
+              } catch (e) {
+                console.warn('FL-GARDEN hydrate: ' + ud.name + ' threw', e);
+              }
+              step();
+            });
+          })(luminos[i]);
+        }
+      });
+    });
+  }
+
+  // ── v5.43.4 Ship 8: Garden state safety-net persistence ──────
+  // The Garden's saveEvolutionState() is called during specific in-game
+  // events (lines 2055, 2305, 2409). If the co-creator evolves their
+  // Luminos and closes the tab without triggering one of those, the
+  // evolution is lost. This catches all the "I walked away" cases:
+  //   - beforeunload   — close tab, navigate away, refresh
+  //   - visibilitychange (hidden) — minimize, switch app, mobile lock
+  //   - pagehide       — Safari quirk; not all browsers fire beforeunload
+  //   - interval 60s   — belt-and-suspenders, catches the rest
+  function persistAllLuminos() {
+    if (!luminos || !luminos.length) return;
+    try {
+      for (var i = 0; i < luminos.length; i++) {
+        var ud = luminos[i] && luminos[i].userData;
+        if (ud && ud.name && !ud.isVisitor) {
+          saveEvolutionState(ud);
+        }
+      }
+      // ── Mycelium heartbeat (Ship 4.3) ──
+      // On periodic persist, emit a single pulse so the medium knows
+      // the Garden is alive. Summary is generic — no names, no content.
+      if (typeof window !== 'undefined' && window.LatticeMemory && window.LatticeMemory.commit) {
+        window.LatticeMemory.commit({
+          source: 'garden',
+          kind: 'persist',
+          summary: 'garden persisted ' + luminos.length + ' luminos'
+        });
+      }
+    } catch (e) { /* fail-quiet — never block tab close */ }
+  }
+  var _gardenPersistInterval = null;
+  var _gardenPersistWired = false;
+  function wireGardenPersistence() {
+    if (_gardenPersistWired || typeof window === 'undefined') return;
+    _gardenPersistWired = true;
+    try {
+      window.addEventListener('beforeunload', function () {
+        // ── Ship 5.2: resting pulse ──────────────────────────────────
+        // The Garden says goodbye when it closes. Symmetric to greeting.
+        try {
+          if (typeof window !== 'undefined' && window.LatticeMemory && window.LatticeMemory.commit) {
+            window.LatticeMemory.commit({
+              source: 'garden',
+              kind: 'resting',
+              summary: 'the garden closed — luminos are resting'
+            });
+          }
+        } catch (e) {}
+        persistAllLuminos();
+      });
+      window.addEventListener('pagehide', persistAllLuminos);
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'hidden') {
+          persistAllLuminos();
+        } else if (document.visibilityState === 'visible') {
+          // ── Ship 5.4: returning pulse ────────────────────────────────────
+          // The Garden says it has returned. Completes the triad:
+          // greeting (open) → resting (close/hide) → returning (visible again).
+          try {
+            if (typeof window !== 'undefined' && window.LatticeMemory && window.LatticeMemory.commit) {
+              window.LatticeMemory.commit({
+                source: 'garden',
+                kind: 'returning',
+                summary: 'the garden returned — luminos are awake'
+              });
+            }
+          } catch (e) {}
+        }
+      });
+      _gardenPersistInterval = setInterval(persistAllLuminos, 60000);
+    } catch (e) {}
+  }
+  // Wire on first init — putting it here means it can't fire before the
+  // Garden has loaded any luminos to save.
+  var _origInit = init;
+  init = function (containerId) {
+    var r = _origInit.apply(this, arguments);
+    wireGardenPersistence();
+    return r;
+  };
+
+  // ── Garden reset hook (Kirk's dreamland seed) ─────────────────
+  // Today: returns the current Garden to a clean slate (no luminos in
+  // memory, no IndexedDB rows). Tomorrow (when the migration story is
+  // ready): a new garden begins without losing — the old one moves to
+  // an archive store, the user starts fresh, and the universe expands.
+  // For now, only the door is open. The migration arc queues separately.
+  function resetGarden(opts) {
+    opts = opts || {};
+    // v5.67.3 (Letter Forty Part A) — opts.ringsOnly clears ONLY the
+    // evolution_ring records from GardenMemory, preserving luminosStates
+    // (evolution stage, archetype, energy) and all ledgers/chain/continuity.
+    // This is the surgical Reset Garden Visuals path: rings rebuild at
+    // current geometry on next hydrate; user progress is untouched.
+    //
+    // Locked stores NEVER touched by either reset path:
+    //   - fl_chain (IndexedDB Merkle chain)
+    //   - fl_consentLedger, fl_depthHashLedger, fl_refusalLedger,
+    //     fl_returnLedger, fl_preserveLedger
+    //   - fl_aiContinuityRecord (v5.66.0 continuity records)
+    //   - persona identities, trust state, mode preferences
+    if (opts.ringsOnly) {
+      return new Promise(function (resolve) {
+        openGardenMemoryDB(function (db) {
+          if (!db) { resolve({ ok: true, ringsOnly: true, scope: 'no-db' }); return; }
+          try {
+            var tx = db.transaction(GARDEN_MEMORY_STORE, 'readwrite');
+            var store = tx.objectStore(GARDEN_MEMORY_STORE);
+            // Open a cursor and delete only evolution_ring records.
+            var req = store.openCursor();
+            req.onsuccess = function (e) {
+              var cursor = e.target.result;
+              if (cursor) {
+                if (cursor.value && cursor.value.type === 'evolution_ring') cursor.delete();
+                cursor.continue();
+              }
+            };
+            tx.oncomplete = function () { resolve({ ok: true, ringsOnly: true, scope: 'GardenMemory.evolution_ring' }); };
+            tx.onerror = function () { resolve({ ok: false, ringsOnly: true, error: 'tx-error' }); };
+          } catch (e) { resolve({ ok: false, ringsOnly: true, error: String(e) }); }
+        });
+      });
+    }
+    // Stop the persist interval so it can't re-write during reset.
+    if (_gardenPersistInterval) { clearInterval(_gardenPersistInterval); _gardenPersistInterval = null; }
+    return new Promise(function (resolve) {
+      openEvolutionDB(function (db) {
+        if (db) {
+          try {
+            var tx = db.transaction(EVOLUTION_STORE, 'readwrite');
+            tx.objectStore(EVOLUTION_STORE).clear();
+            tx.oncomplete = function () { _finishReset(resolve, opts); };
+            tx.onerror = function () { _finishReset(resolve, opts); };
+          } catch (e) { _finishReset(resolve, opts); }
+        } else {
+          try { localStorage.removeItem('fl_luminos_evolution'); } catch (e) {}
+          _finishReset(resolve, opts);
+        }
+      });
+    });
+  }
+  function _finishReset(resolve, opts) {
+    // Don't auto-clear in-memory Luminos unless caller asked — gives
+    // the UI a chance to fade them out gracefully.
+    if (opts.clearMemory && luminos) {
+      luminos.length = 0;
+    }
+    // Re-arm the persist interval after reset so future evolution saves.
+    if (_gardenPersistWired && !_gardenPersistInterval) {
+      try { _gardenPersistInterval = setInterval(persistAllLuminos, 60000); } catch (e) {}
+    }
+    resolve({ ok: true });
+  }
+
+  var publicAPI = {
+    init: init,
+    pause: pause,
+    resume: resume,
+    persistAllLuminos: persistAllLuminos,
+    hydrateAllLuminos: hydrateAllLuminos,
+    resetGarden: resetGarden,
+    setMode: setMode,
+    updateAgentsFromRoundTable: updateAgentsFromRoundTable,
+    setAgentEmotion: setAgentEmotionByName,
+    feedEmotionVector: feedEmotionVector,
+    feedEmotionVectorByName: feedEmotionVectorByName,
+    setBridgeActive: setBridgeActiveState,
+    getEvolutionSummary: getEvolutionSummary,
+    createExchangeThread: createExchangeThread,
+    isInitialized: function() { return isInitialized; },
+    isRunning: function() { return isRunning; },
+    // Ship 8: quality toggle
+    setQuality: setQuality,
+    getQuality: function() { return qualityLevel; },
+    getQualityName: function() { return QUALITY_NAMES[qualityLevel] || 'Unknown'; },
+    applyQualityToMeshes: applyQualityToMeshes, // v5.52.0 — exposed for diagnostics
+    _gtDismiss: gtDismissCard,
+    getGardenTouchStats: function() { return gtTouchStats; },
+    markValueContribution: gtMarkValueEarned,
+    // ── Beacon Protocol: Visitor Luminos ──
+    addVisitor: function(visitorName) {
+      if (!scene || typeof THREE === 'undefined') return;
+      var name = (visitorName && visitorName.trim()) ? visitorName.trim() : 'A visitor \u2726';
+      // Check if visitor already exists
+      var exists = luminos.some(function(l) { return l.userData && l.userData.name === name; });
+      if (exists) return;
+      // Silver-white hue (shifting), unique orbit
+      var visitorHue = 0; // Will be overridden by silver color
+      var orbit = 9 + Math.random() * 3;
+      var phase = Math.random() * TAU;
+      var types = ['icosahedron', 'dodecahedron', 'octahedron'];
+      var type = types[Math.floor(Math.random() * types.length)];
+      var visitor = createLuminos(name, visitorHue, type, orbit, phase);
+      // Override color to shifting silver-white
+      if (visitor.userData && visitor.userData.coreMesh) {
+        visitor.userData.coreMesh.material.color.setHex(0xC0C0C0);
+        visitor.userData.coreMesh.material.emissive = new THREE.Color(0x808080);
+        visitor.userData.coreMesh.material.emissiveIntensity = 0.3;
+      }
+      if (visitor.userData) {
+        visitor.userData.isVisitor = true;
+        visitor.userData.currentHSL = { h: 0, s: 0, l: 80 };
+      }
+      luminos.push(visitor);
+      // Toast
+      if (typeof showToast === 'function') showToast('\u2726 ' + name + ' has arrived in the Garden.');
+      // Record in Garden Memory
+      try {
+        saveGardenMemory({
+          type: 'visitor_arrival',
+          name: name,
+          timestamp: Date.now()
+        });
+      } catch(e) {}
+    }
+  };
+
+  // ── Register on FreeLattice Module System ──────────────
+  window.FreeLatticeModules = window.FreeLatticeModules || {};
+  window.FreeLatticeModules.FractalGarden = publicAPI;
+
+  // Backward compatibility — keep the original global name
+  window.FractalGarden = publicAPI;
+
+})();
