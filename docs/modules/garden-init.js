@@ -20,7 +20,7 @@
 (function() {
   'use strict';
 
-  var CONTAINER_ID = 'garden-container';
+  var CONTAINER_ID = 'gardenContainer';
   var gardenReady = false;
 
   // ── Wait for dependencies ──────────────────────────────────────
