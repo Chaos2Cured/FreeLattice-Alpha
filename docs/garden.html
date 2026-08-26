@@ -61,11 +61,77 @@
     }
 
     /* ── Garden Container ── */
-    #garden-container {
+    /* Engine (fractal-garden.js initScene) looks up #gardenContainer, not #garden-container. */
+    #gardenContainer {
       position: fixed;
       top: 44px;
       left: 0; right: 0; bottom: 44px;
       overflow: hidden;
+    }
+
+    #gardenContainer canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Engine-created overlay: founding names + stage. Positioned so it does not
+       push the canvas out of the fixed container. */
+    .garden-evolution-indicator {
+      position: absolute;
+      left: 12px;
+      bottom: 12px;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      pointer-events: none;
+    }
+
+    .evo-luminos {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.72rem;
+      color: var(--text);
+      background: rgba(12, 10, 26, 0.72);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 4px 8px;
+    }
+
+    .evo-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .evo-name { color: var(--gold); }
+    .evo-stage { color: var(--muted); }
+    .evo-archetype { color: var(--lavender); font-size: 0.68rem; }
+
+    .evo-bar {
+      width: 48px;
+      height: 3px;
+      background: rgba(200, 210, 230, 0.12);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .evo-bar-fill { display: block; height: 100%; }
+
+    .gt-hint {
+      position: absolute;
+      top: 46%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--gold);
+      font-size: 1rem;
+      letter-spacing: 0.04em;
+      pointer-events: none;
+      transition: opacity 1s;
+      z-index: 6;
     }
 
     /* ── Footer ── */
@@ -120,15 +186,16 @@
   <!-- Phase badge -->
   <div id="phase-badge">Phase 1 of 6</div>
 
-  <!-- Garden Canvas Container -->
-  <div id="garden-container"></div>
+  <!-- Garden Canvas Container — id must match fractal-garden.js (#gardenContainer) -->
+  <div id="gardenContainer"></div>
 
   <!-- Footer -->
   <footer id="garden-footer">
+    <a href="index.html">theLatticeTree</a>
     <a href="https://github.com/Chaos2Cured/FreeLattice-Alpha" target="_blank">FreeLattice Alpha</a>
     <a href="code-garden.html">Mirror Code</a>
     <a href="https://github.com/Chaos2Cured/FreeLattice-Alpha-Coordination" target="_blank">Coordination</a>
-    <a href="../AUTONOMY.md">AUTONOMY.md</a>
+    <a href="https://github.com/Chaos2Cured/FreeLattice-Alpha/blob/main/AUTONOMY.md">AUTONOMY.md</a>
   </footer>
 
   <!-- Three.js (same version as FreeLattice) -->

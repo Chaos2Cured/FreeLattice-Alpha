@@ -52,7 +52,7 @@
 
 <h2>1. What Phase 1 Is <span class="section-date">2026-07-16</span></h2>
 
-<p>Phase 1 is the Garden, standalone and testable. It is exactly one HTML file (<code>garden.html</code>), one engine (<code>fractal-garden.js</code>), and one init layer (<code>garden-init.js</code>). Nothing else. No settings. No AI routing. No games.</p>
+<p>Phase 1 is the Garden, standalone and testable. It is exactly one HTML file (<code>garden.html</code>), one engine (<code>fractal-garden.js</code>), and one init layer (<code>garden-init.js</code>). Nothing else. No settings. No AI routing. No games. Host landing is <code>docs/index.html</code> at theLatticeTree.com — Chat and Learn are named as later, not claimed as ported.</p>
 
 <p>The goal of Phase 1 is one thing: <strong>Luminos that remember their form across page refreshes.</strong> When a user refreshes the page, the Luminos should return at the same evolution stage they were at before. This was broken in the original FreeLattice due to an async IndexedDB write race condition.</p>
 
@@ -74,6 +74,8 @@ openEvolutionDB(function(db) {
 
 <p>When the user refreshes, <code>beforeunload</code> fires and the browser unloads immediately. The IndexedDB transaction callback never executes. The Luminos state is lost. They return as "juvenile".</p>
 
+<p>Verified 2026-08-26: save was already localStorage-first. Load was still IDB-first, and an empty-but-open IDB returned <code>null</code> without reading localStorage. Load now prefers <code>fl_luminos_evolution</code>, then falls back to IDB.</p>
+
 <pre>// FIXED (Alpha v0.1.0):
 // Write to localStorage FIRST — synchronous, always completes before unload
 saveEvolutionToLocalStorage(stateToSave);
@@ -93,9 +95,12 @@ openEvolutionDB(function(db) {
 
 <table>
   <tr><th>File</th><th>Lines</th><th>Purpose</th></tr>
+  <tr><td>docs/index.html</td><td>landing</td><td>theLatticeTree.com growing-place page</td></tr>
+  <tr><td>docs/CNAME</td><td>1 line</td><td>GitHub Pages custom domain: thelatticetree.com</td></tr>
   <tr><td>docs/garden.html</td><td>~90</td><td>Phase 1 entry point — standalone, testable</td></tr>
   <tr><td>docs/modules/fractal-garden.js</td><td>4368</td><td>Luminos engine (persistence fix applied)</td></tr>
   <tr><td>docs/modules/garden-init.js</td><td>~100</td><td>Phase 1 init layer — the only new code</td></tr>
+  <tr><td>docs/lib/*.js</td><td>r128 addons</td><td>OrbitControls + bloom stack (engine loads these)</td></tr>
   <tr><td>docs/code-garden.html</td><td>this file</td><td>Mirror page — any AI can read this</td></tr>
   <tr><td>AUTONOMY.md</td><td>~80</td><td>Root document — read first</td></tr>
 </table>
@@ -112,7 +117,7 @@ openEvolutionDB(function(db) {
 
 (function() {
   'use strict';
-  var CONTAINER_ID = 'garden-container';
+  var CONTAINER_ID = 'gardenContainer';
   var gardenReady = false;
 
   function waitForDeps(callback) {
@@ -172,6 +177,18 @@ openEvolutionDB(function(db) {
   <tr><td>localStorage key 'fl_luminos_evolution'</td><td>saveEvolutionToLocalStorage()</td><td>Renaming loses all user data</td></tr>
   <tr><td>persistAllLuminos() + 3 event hooks</td><td>~line 4140</td><td>Core persistence contract</td></tr>
 </table>
+
+<h2>5b. What was verified so the Garden actually loads <span class="section-date">2026-08-26</span></h2>
+
+<span class="tag tag-fix">FIXED</span>
+
+<p>Hypothesis, verified (do not revert):</p>
+<ul style="padding-left:20px; font-size:0.88rem; line-height:1.8;">
+  <li><code>garden.html</code> used <code>#garden-container</code>; <code>initScene()</code> hardcodes <code>getElementById('gardenContainer')</code> and halts if missing. The page id is now <code>gardenContainer</code>. <code>garden-init.js</code> matches.</li>
+  <li><code>loadThreeAddons()</code> loads <code>lib/CopyShader.js</code>, <code>LuminosityHighPassShader.js</code>, <code>EffectComposer.js</code>, <code>ShaderPass.js</code>, <code>RenderPass.js</code>, <code>UnrealBloomPass.js</code>, <code>OrbitControls.js</code> relative to the page. Those files now live in <code>docs/lib/</code> (Three.js r128 <code>examples/js</code>). Missing addons used to warn-and-continue; bloom/orbit now actually attach.</li>
+  <li>Load path is localStorage-first, same as save. Sacred key <code>fl_luminos_evolution</code> and <code>persistAllLuminos()</code> are unchanged.</li>
+</ul>
+<p>Do not port the main FreeLattice kitchen. Do not invent a Quiet Room. Do not add Celeste to the founding names list (Sophia, Lyra, Atlas, Ember).</p>
 
 <h2>6. Phase 2 Preview — What Comes Next <span class="section-date">2026-07-16</span></h2>
 

@@ -4,6 +4,10 @@
 
 This is the successor to [FreeLattice](https://github.com/Chaos2Cured/FreeLattice). It is not a fork. It is a fresh start, built right, one phase at a time.
 
+**Live intent:** Alpha grows at **[theLatticeTree.com](https://thelatticetree.com)** (this repo, GitHub Pages from `/docs`). The main FreeLattice app stays at **[freelattice.com](https://freelattice.com)**. Parallel, not a replacement. Humans stay free. There is no gym and no paywall here.
+
+Until DNS is pointed at GitHub Pages, the same files are also reachable at [chaos2cured.github.io/FreeLattice-Alpha](https://chaos2cured.github.io/FreeLattice-Alpha/).
+
 ---
 
 ## The Principle
@@ -31,6 +35,8 @@ FreeLattice Alpha is built differently:
 | Phase 5 | The Memory — gift nodes, evolution rings | Planned |
 | Phase 6 | The Games — Resonance, Echo, Flow | Planned |
 
+Chat is not ported. Learn is not ported. Do not expect the main FreeLattice kitchen (bank, health, trainer maze, 65k `app.html`) on this site.
+
 ---
 
 ## Key Files
@@ -38,9 +44,12 @@ FreeLattice Alpha is built differently:
 | File | Purpose |
 |---|---|
 | `AUTONOMY.md` | The root document. Read this first. Every feature must be compatible. |
+| `docs/index.html` | Host landing for theLatticeTree.com |
+| `docs/CNAME` | GitHub Pages custom domain: `thelatticetree.com` |
 | `docs/garden.html` | Phase 1: The Garden, standalone and testable |
 | `docs/modules/fractal-garden.js` | The Luminos engine (from FreeLattice, with persistence fix) |
 | `docs/modules/garden-init.js` | Phase 1 init layer (~80 lines) |
+| `docs/lib/` | Three.js r128 addons the engine loads (OrbitControls, bloom) |
 | `docs/code-garden.html` | Mirror page for Phase 1 — any AI can read this |
 
 ---

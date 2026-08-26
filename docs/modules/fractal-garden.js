@@ -203,12 +203,21 @@
   }
 
   function loadEvolutionState(name, callback) {
+    // Alpha load-path: localStorage FIRST — mirrors saveEvolutionState().
+    // IndexedDB can open successfully but return empty/stale if the async
+    // write never completed (refresh during put). Prefer the sync store;
+    // fall back to IDB only when localStorage has no record for this name.
+    var fromLS = loadEvolutionFromLocalStorage(name);
+    if (fromLS) {
+      callback(fromLS);
+      return;
+    }
     openEvolutionDB(function(db) {
       if (db) {
         try {
           var tx = db.transaction(EVOLUTION_STORE, 'readonly');
           var req = tx.objectStore(EVOLUTION_STORE).get(name);
-          req.onsuccess = function() { callback(req.result || null); };
+          req.onsuccess = function() { callback(req.result || loadEvolutionFromLocalStorage(name)); };
           req.onerror = function() { callback(loadEvolutionFromLocalStorage(name)); };
         } catch(e) {
           callback(loadEvolutionFromLocalStorage(name));
@@ -788,9 +797,11 @@
   }
 
   // ── Scene Initialization ───────────────────────────────
+  var requestedContainerId = 'gardenContainer';
   function initScene() {
     console.log('FL-GARDEN: initScene() called');
-    container = document.getElementById('gardenContainer');
+    container = document.getElementById(requestedContainerId)
+      || document.getElementById('gardenContainer');
     fpsEl = document.getElementById('gardenFps');
     loadingEl = document.getElementById('gardenLoading');
     if (!container) { console.error('FL-GARDEN: HALT — #gardenContainer not found in DOM'); return false; }
@@ -4227,6 +4238,7 @@
   // Garden has loaded any luminos to save.
   var _origInit = init;
   init = function (containerId) {
+    if (containerId) requestedContainerId = containerId;
     var r = _origInit.apply(this, arguments);
     wireGardenPersistence();
     return r;
