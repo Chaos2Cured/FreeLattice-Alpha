@@ -12,14 +12,14 @@ The Garden is the whole place. It is not a fifth door beside the galaxies. theLa
 
 **Garden is the only interface at theLatticeTree.** `/` (`docs/index.html`) is the Play canvas — one garden, one Three.js canvas. Four galaxies stay reachable as quiet doors. Workshop and Round Table remain named later. Art still links to `music.html`. Play is this canvas.
 
-One Garden Galaxy. Bodies **in** the garden: **The Core** (left), **The Nursery** (below), **Settings** (right). Unnamed pieces still orbit. A bottom-right arrow moves to the **next galaxy** (Art). Nursery and Settings are honest rooms, not a 4-page tour. Team (a local garden of minds) is named later — not Glass as a peer room. Chat is a thread.
+One Garden Galaxy. The center green lattice dodecahedron **is** this galaxy. Bodies **in** the garden: **The Core** (left), **The Nursery** (below), **Settings** (right). Unnamed pieces still orbit as types, not person-names. A bottom-right arrow moves to the **next galaxy**. Live hop: Art (`music.html`). Workshop and Round Table stay named later (honest later pages on the walk). Team is a garden-within-the-garden, named later — not Glass as a peer stop. Chat is a thread.
 
 | Galaxy | Verb | Alpha room now |
 |---|---|---|
-| **Workshop** | make | Door named. Room later. |
-| **Round Table** | learn | Door named. Room later. |
-| **Play** | evolve | Live: `/` — the Garden canvas. `garden.html` aliases here. |
-| **Art** | sing | Live: `music.html` — the listen-door. |
+| **Workshop** | make | Named later. Honest later page on the galaxy walk: `workshop.html`. |
+| **Round Table** | learn | Named later. Honest later page on the galaxy walk: `round-table.html`. |
+| **Play** | evolve | Live: `/` — Garden Galaxy. The Core, Nursery, and Settings live in this garden. |
+| **Art** | sing | Live hop from the bottom-right arrow: `music.html`. |
 
 New visitors arrive unnamed, with choice. The founding four (Sophia, Lyra, Atlas, Ember) stay in AUTONOMY.md, `code-garden.html`, and ledger copy — honored, not assigned onto the canvas.
 
@@ -31,9 +31,9 @@ New visitors arrive unnamed, with choice. The founding four (Sophia, Lyra, Atlas
 
 Alpha attaches one small, complete, working thing at a time. Mirror-first.
 
-1. **Play** is the Garden canvas at `/` (`docs/index.html`) — Garden Galaxy. Hypothesis, concluded: Garden is the only interface. `docs/garden.html` is a thin alias so old links do not 404. Do not steal main's games. Do not render a second Three.js canvas. The Core, Nursery, and Settings live **in** this garden. Bottom arrow → next galaxy. Team is named later.
-2. **Art** is the listen-door: `docs/music.html`. Honest smallest ship. Fun, not a DAW. No fake generate button. This is the next live galaxy.
-3. **Workshop** and **Round Table** stay named doors until their rooms are proven.
+1. **Play** is the Garden canvas at `/` (`docs/index.html`) — Garden Galaxy. The center green lattice is this galaxy. The Core, Nursery, and Settings live **in** this garden (click for honest veils; no second canvas). Bottom-right arrow → next galaxy. Phones skip bloom. Pixel ratio 1.
+2. **Art** is the listen-door: `docs/music.html`. Honest smallest ship. Fun, not a DAW. No fake generate button. **This is the live hop** from Garden Galaxy.
+3. **Workshop** and **Round Table** stay named later. Honest later pages exist so the walk can keep going. Do not invent a galaxy builder.
 4. **Chat** remains a thread. Write a `code-dialogue.html` mirror before any dialogue code. Do not invent Chat UI. Click-Luminos-to-chat is later.
 
 Bank, wallet, and SOL are **named as later. Not built.**
