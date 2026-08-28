@@ -62,9 +62,10 @@ html.garden-leaving body {
   line-height: 72px;
   text-align: center;
   cursor: pointer;
-  opacity: 0.62;
+  opacity: 0.82;
   -webkit-appearance: none;
   appearance: none;
+  text-shadow: 0 0 10px rgba(12, 10, 26, 0.95);
 }
 
 .room-nav:hover,
@@ -81,7 +82,7 @@ html.garden-leaving body {
   #room-label { top: 48px; }
 
   .room-nav {
-    opacity: 0.22;
+    opacity: 0.28;
     font-size: 1.7rem;
   }
 
