@@ -224,6 +224,18 @@ html[data-garden-galaxy="art"] .galaxy-nav-next { opacity: 0.4; }
   pointer-events: none;
 }
 
+#shared-shoulder a {
+  pointer-events: auto;
+  color: inherit;
+  text-decoration: none;
+}
+
+#shared-shoulder a:hover,
+#shared-shoulder a:focus-visible {
+  color: rgba(167, 139, 250, 0.55);
+  outline: none;
+}
+
 @media (min-width: 800px) {
   #galaxy-title { top: 44px; }
   #room-label { top: 70px; }

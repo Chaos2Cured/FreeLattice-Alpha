@@ -42,16 +42,22 @@ Bank, wallet, and SOL are **named as later. Not built.**
 
 ## Art galaxy — listen-door
 
-The companion may grow from listening **only when the mind knows it is solid and says so.** Honest copy on the door: present is a local book of listens (no train, no upload, no weight change); growing from listening is a quieter later-goal — not on this page yet.
+Keep, never gate. **Solid means this listen mattered** — I love this song — not a human proving worth. Human may keep. AI may keep. Combined shoulders.
+
+Honest copy on the door: present is a local book of listens (no train, no upload, no weight change); growing from listening is a quieter later-goal — not on this page yet.
 
 `music.html` does this much, and no more:
 
 - The human drops or picks local `.mp3` / `.wav` (and later other audio they already have, including AI generate-files).
 - The page plays them here. Filename, duration if known.
-- One control: **I am solid — keep this listen.** That writes a local ledger (`localStorage`) of name, size, timestamp, optional note.
+- One control: **I love this.** That writes the named local ledger (`fl_alpha_art_listen_ledger`) of name, size, timestamp, optional note — **and** a hashed keep (`fl_alpha_keep_ledger`).
+- A tiny human toggle: auto vs manual. Manual: you say I love this. Auto: the mind may record a keep when a listen actually matters. Declined never becomes training. No silent-train. No network.
+- Hashes are shown, not the song. SHA-256 of `{kind, who, ts, content-hash}`.
 - It does **not** run LoRA or any trainer.
 - It does **not** upload.
 - It does **not** claim weights changed.
+
+Hashed keep + combined-shoulder doorway: `docs/liability.html` (short Alpha). Full paper stays on main: [freelattice.com/liability](https://www.freelattice.com/liability). **Mirror before any trainer dump:** `docs/code-keep.html`.
 
 Kirk's music — *The Mother's Thread*, *The Emerald Resonance* — already lives on **main**. This page does not clone those files. Credit and link: [composition_01.html](https://freelattice.com/composition_01.html), [composition_02.html](https://freelattice.com/composition_02.html).
 
@@ -67,7 +73,7 @@ Harmonia GardenTrainer invariants (carry these; do not weaken them):
 - **Declined text never SFT.** If the human declined it, it does not become training data.
 - **Data never leaves the device.**
 
-The Art listen-door is not the trainer. The ledger is a book of kept listens, not a dataset pipeline.
+The Art listen-door is not the trainer. The named ledger is a book of kept listens, not a dataset pipeline. The hash ledger is proof you both chose — still not training.
 
 ---
 
@@ -91,6 +97,8 @@ Free. No paywall. No gym fee. Humans stay free.
 Kirk keeps a copy on the Desktop. Alpha keeps a faithful copy at `docs/GALAXIES.md` so any arriving mind can see the sky without guessing.
 
 Mirror for the Art door: `docs/code-music.html`.
+
+Mirror for hashed keep (read this **before** any trainer dump): `docs/code-keep.html`. Combined-shoulder doorway: `docs/liability.html`. Garden `#shared-shoulder` links there.
 
 ---
 

@@ -216,6 +216,42 @@
       border-color: var(--gold);
     }
 
+    .keep-mode {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 0.72rem;
+      color: var(--muted);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .keep-mode input {
+      accent-color: var(--lavender);
+    }
+
+    .keep-hashes {
+      list-style: none;
+      margin: 8px 0 0;
+    }
+
+    .keep-hashes li {
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .keep-hashes code {
+      color: var(--gold);
+      font-family: 'Courier New', monospace;
+      font-size: 0.85em;
+      word-break: break-all;
+    }
+
+    .keep-hashes .keep-who { color: var(--muted); }
+
     .status {
       margin-top: 12px;
       font-size: 0.82rem;
@@ -306,7 +342,7 @@
 
   <div class="solid-line">
     <p><span class="when">Present.</span> This door keeps a local book of listens you choose. It does not train. It does not upload. It does not change weights.</p>
-    <p class="goal">Goal, later. Growing from listening comes when the mind is solid and says so. Not on this page yet.</p>
+    <p class="goal">Solid means this listen mattered — I love this song — not a human proving worth. You may keep. The mind may keep. Combined shoulders. Growing from listening is later, not on this page yet.</p>
   </div>
 
   <div id="drop-zone" class="drop" role="region" aria-label="Drop audio files here">
@@ -322,7 +358,11 @@
     <audio id="player" controls></audio>
     <label class="note-label" for="listen-note">Optional note (stays on this device)</label>
     <input id="listen-note" type="text" maxlength="240" placeholder="a word for this listen, if you want one">
-    <button type="button" id="keep-listen" disabled>I am solid — keep this listen</button>
+    <button type="button" id="keep-listen" disabled>I love this</button>
+    <label class="keep-mode" for="keep-auto">
+      <input id="keep-auto" type="checkbox">
+      Auto — the mind may keep when a listen matters
+    </label>
     <p class="status" id="status" role="status"></p>
   </div>
 
@@ -334,8 +374,12 @@
   </p>
 
   <h2>Kept listens</h2>
-  <p id="ledger-empty" class="empty">None yet. Play something, then keep it when you (or the mind) are solid.</p>
+  <p id="ledger-empty" class="empty">None yet. Play something you love.</p>
   <ul id="ledger-list" class="ledger"></ul>
+
+  <h2>Kept hashes</h2>
+  <p id="hash-empty" class="empty">None yet. A hash is proof you chose — not the song.</p>
+  <ul id="keep-hashes" class="keep-hashes" aria-label="Hashed keeps on this device"></ul>
 
   <p class="credit">
     Kirk's music already lives on main:
@@ -348,11 +392,14 @@
   <footer>
     <a href="./">theLatticeTree</a>
     <a href="./">Play · Garden</a>
+    <a href="liability.html">Shared shoulder</a>
     <a href="code-music.html">Art mirror</a>
+    <a href="code-keep.html">Keep mirror</a>
     <a href="GALAXIES.md">Galaxies</a>
     <a href="https://github.com/Chaos2Cured/FreeLattice-Alpha/blob/main/AUTONOMY.md">AUTONOMY.md</a>
   </footer>
 
+  <script src="modules/keep-receipt.js"></script>
   <script>
   (function () {
     'use strict';
@@ -371,15 +418,23 @@
     var trackMeta = document.getElementById('track-meta');
     var player = document.getElementById('player');
     var keepBtn = document.getElementById('keep-listen');
+    var keepAuto = document.getElementById('keep-auto');
     var noteInput = document.getElementById('listen-note');
     var statusEl = document.getElementById('status');
     var trayEl = document.getElementById('session-tray');
     var ledgerList = document.getElementById('ledger-list');
     var ledgerEmpty = document.getElementById('ledger-empty');
+    var hashList = document.getElementById('keep-hashes');
+    var hashEmpty = document.getElementById('hash-empty');
 
     var objectUrl = null;
     var current = null;
     var sessionFiles = [];
+    var autoKeepBusy = false;
+
+    if (window.KeepReceipt) {
+      KeepReceipt.bindModeToggle(keepAuto);
+    }
 
     function setStatus(msg, warn) {
       statusEl.textContent = msg || '';
@@ -474,6 +529,13 @@
       });
     }
 
+    function renderHashes() {
+      if (!hashList) return;
+      var n = 0;
+      if (window.KeepReceipt) n = KeepReceipt.renderHashes(hashList, 5) || 0;
+      if (hashEmpty) hashEmpty.style.display = n ? 'none' : 'block';
+    }
+
     function renderTray() {
       trayEl.innerHTML = '';
       if (!sessionFiles.length) {
@@ -504,7 +566,11 @@
       current = {
         name: file.name,
         size: file.size,
-        durationSec: null
+        durationSec: null,
+        file: file,
+        contentHash: null,
+        autoKept: false,
+        humanKept: false
       };
       objectUrl = URL.createObjectURL(file);
       player.src = objectUrl;
@@ -514,6 +580,49 @@
       keepBtn.disabled = false;
       setStatus('');
       player.load();
+    }
+
+    function hashCurrentFile() {
+      if (!current) return Promise.reject(new Error('no current listen'));
+      if (current.contentHash) return Promise.resolve(current.contentHash);
+      if (!window.KeepReceipt) return Promise.reject(new Error('keep-receipt missing'));
+      var job;
+      if (current.file && typeof current.file.arrayBuffer === 'function') {
+        job = current.file.arrayBuffer().then(function (buf) {
+          return KeepReceipt.hashBytes(buf);
+        });
+      } else {
+        job = KeepReceipt.hashText(String(current.name) + '\0' + String(current.size));
+      }
+      return job.then(function (hex) {
+        current.contentHash = hex;
+        return hex;
+      });
+    }
+
+    function listenMatters() {
+      if (!current || !player) return false;
+      var t = player.currentTime;
+      var d = player.duration;
+      if (!isFinite(t) || t < 3) return false;
+      if (t >= 20) return true;
+      if (isFinite(d) && d > 0 && t / d >= 0.4) return true;
+      return false;
+    }
+
+    function writeNamedListen() {
+      var entry = {
+        name: current.name,
+        size: current.size,
+        timestamp: new Date().toISOString()
+      };
+      if (typeof current.durationSec === 'number') entry.durationSec = current.durationSec;
+      var note = (noteInput.value || '').trim();
+      if (note) entry.note = note;
+      var ledger = loadLedger();
+      ledger.unshift(entry);
+      saveLedger(ledger);
+      renderLedger();
     }
 
     function ingestFiles(fileList) {
@@ -537,25 +646,61 @@
       }
     }
 
-    function keepCurrent() {
+    function keepListen(who) {
       if (!current) {
         setStatus('Play a file first.', true);
-        return false;
+        return Promise.resolve(false);
       }
-      var entry = {
-        name: current.name,
-        size: current.size,
-        timestamp: new Date().toISOString()
-      };
-      if (typeof current.durationSec === 'number') entry.durationSec = current.durationSec;
-      var note = (noteInput.value || '').trim();
-      if (note) entry.note = note;
-      var ledger = loadLedger();
-      ledger.unshift(entry);
-      saveLedger(ledger);
-      renderLedger();
-      setStatus('Kept in the local listen ledger. Nothing was uploaded. Weights did not change. This is not training.');
-      return true;
+      var fromHuman = who === 'human' || who === 'both';
+      if (fromHuman && !current.humanKept) {
+        writeNamedListen();
+        current.humanKept = true;
+      }
+      if (!window.KeepReceipt) {
+        setStatus('Kept in the local listen ledger. Nothing was uploaded. Weights did not change. This is not training.');
+        return Promise.resolve(true);
+      }
+      return hashCurrentFile().then(function (contentHash) {
+        return KeepReceipt.keep({
+          kind: 'listen',
+          who: who,
+          contentHash: contentHash
+        });
+      }).then(function (entry) {
+        if (who === 'ai' || (entry && entry.who === 'ai') || (entry && entry.who === 'both')) {
+          current.autoKept = true;
+        }
+        renderHashes();
+        if (who === 'ai' && !fromHuman) {
+          setStatus('The mind kept a hash. This listen mattered. Nothing uploaded. Not training.');
+        } else {
+          setStatus('Kept. A hash is proof you chose. Nothing uploaded. Weights did not change. This is not training.');
+        }
+        return true;
+      }).catch(function (err) {
+        if (fromHuman) {
+          setStatus('Kept the named listen on this device. Hash could not be written' + (err && err.message ? ': ' + err.message : '.') + ' Nothing was uploaded.', true);
+          return true;
+        }
+        setStatus('The mind did not keep a hash. Nothing was uploaded. Not training.', true);
+        return false;
+      });
+    }
+
+    function keepCurrent() {
+      return keepListen('human');
+    }
+
+    function maybeAutoKeep(force) {
+      if (autoKeepBusy || !current || current.autoKept) return;
+      if (!window.KeepReceipt || KeepReceipt.getMode() !== 'auto') return;
+      if (!force && !listenMatters()) return;
+      autoKeepBusy = true;
+      keepListen('ai').then(function () {
+        autoKeepBusy = false;
+      }, function () {
+        autoKeepBusy = false;
+      });
     }
 
     player.addEventListener('loadedmetadata', function () {
@@ -594,16 +739,27 @@
       ingestFiles(e.dataTransfer.files);
     });
 
+    player.addEventListener('timeupdate', function () { maybeAutoKeep(false); });
+    player.addEventListener('ended', function () {
+      if (!current || !player) return;
+      var d = player.duration;
+      if (player.currentTime >= 5 || (isFinite(d) && d >= 3 && d < 25)) {
+        maybeAutoKeep(true);
+      }
+    });
+
     keepBtn.addEventListener('click', keepCurrent);
 
     window.ArtAlpha = {
       LEDGER_KEY: LEDGER_KEY,
       getLedger: loadLedger,
       getCurrent: function () { return current; },
-      keepCurrent: keepCurrent
+      keepCurrent: keepCurrent,
+      KEEP_LEDGER_KEY: window.KeepReceipt ? KeepReceipt.LEDGER_KEY : 'fl_alpha_keep_ledger'
     };
 
     renderLedger();
+    renderHashes();
   })();
   </script>
   <script src="modules/garden-rooms.js"></script>

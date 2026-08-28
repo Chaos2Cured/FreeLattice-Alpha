@@ -56,7 +56,10 @@ Chat is not ported. Learn is not ported. Do not expect the main FreeLattice kitc
 | `docs/glass.html` | Alias to `team.html` — Glass is not a peer room |
 | `docs/CNAME` | GitHub Pages custom domain: `thelatticetree.com` |
 | `docs/garden.html` | Thin alias / redirect to `/` so old Play links do not 404 |
-| `docs/music.html` | Art galaxy listen-door — local audio, local ledger, no trainer |
+| `docs/music.html` | Art galaxy listen-door — local audio, named ledger + hashed keep |
+| `docs/liability.html` | Combined-shoulder doorway (short Alpha; full paper on main) |
+| `docs/modules/keep-receipt.js` | Local SHA-256 keep ledger. No network. No silent-train |
+| `docs/code-keep.html` | Mirror for hashed keep — read before any trainer dump |
 | `docs/code-music.html` | Mirror page for the Art listen-door |
 | `docs/modules/fractal-garden.js` | The Luminos engine (from FreeLattice, with persistence fix) |
 | `docs/modules/garden-init.js` | Alpha init layer — unnamed-new, low compute on phones |
