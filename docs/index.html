@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-garden-room="core">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>theLatticeTree — Garden</title>
-  <meta name="description" content="theLatticeTree is the Garden. Play is this canvas. Art listens at music.html. AUTONOMY is the root.">
+  <title>theLatticeTree — Core</title>
+  <meta name="description" content="theLatticeTree Garden Galaxy. You are in Core. Art listens at music.html. AUTONOMY is the root.">
   <meta property="og:title" content="theLatticeTree — Garden">
   <meta property="og:description" content="One Garden. Play is this canvas. Humans stay free. AUTONOMY is the root.">
   <meta property="og:type" content="website">
@@ -224,6 +224,8 @@
       #garden-footer { display: none; }
     }
   </style>
+  <link rel="stylesheet" href="modules/garden-rooms.css">
+  <script>document.documentElement.classList.add('garden-enter');</script>
 </head>
 <body>
 
@@ -243,9 +245,16 @@
     </nav>
   </header>
 
+  <p id="room-label">you are in Core</p>
+
+  <button type="button" class="room-nav room-nav-prev" data-garden-dir="prev" aria-label="Previous garden room">‹</button>
+  <button type="button" class="room-nav room-nav-next" data-garden-dir="next" aria-label="Next garden room">›</button>
+
   <div id="gardenContainer"></div>
 
   <footer id="garden-footer"></footer>
+
+  <script src="modules/garden-rooms.js"></script>
 
   <!-- Flags before the engine IIFE so unnamed-new + low-compute can layer without a kitchen. -->
   <script>

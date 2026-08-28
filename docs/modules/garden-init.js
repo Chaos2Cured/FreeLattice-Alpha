@@ -12,7 +12,8 @@
 //   - Do not change PHI, LIFECYCLE_STAGES, ARCHETYPES, or founding names
 //   - Do not rename localStorage key 'fl_luminos_evolution'
 //   - Do not remove persistAllLuminos() or its three event hooks
-//   - Do not invent Chat UI, nursery, trainer, bank, or wallet
+//   - Do not invent Chat UI, trainer, bank, or wallet
+//   - Nursery is a stub room (garden-rooms.js); do not dump the trainer there
 //
 // Mirror page: docs/code-garden.html
 // ═══════════════════════════════════════════════════════════════

@@ -1,0 +1,213 @@
+/* Garden Galaxy room chrome — Core, Glass, Nursery, Settings.
+   Layer, never delete. One room at a time. No second Three.js canvas.
+   Art is a galaxy (music.html), not a room on this rail. */
+
+html {
+  background: #0c0a1a;
+}
+
+html.garden-enter body {
+  opacity: 0;
+}
+
+html.garden-ready body {
+  opacity: 1;
+  transition: opacity 400ms ease;
+}
+
+html.garden-leaving body {
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.garden-enter body,
+  html.garden-ready body,
+  html.garden-leaving body {
+    opacity: 1;
+    transition: none;
+  }
+}
+
+#room-label {
+  position: fixed;
+  top: 52px;
+  left: 0;
+  right: 0;
+  z-index: 9;
+  margin: 0;
+  text-align: center;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.82rem;
+  font-weight: normal;
+  letter-spacing: 0.04em;
+  color: #e8b019;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.room-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 11;
+  width: 44px;
+  height: 72px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #e8b019;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.35rem;
+  line-height: 72px;
+  text-align: center;
+  cursor: pointer;
+  opacity: 0.62;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.room-nav:hover,
+.room-nav:focus-visible {
+  opacity: 0.95;
+  outline: none;
+}
+
+.room-nav-prev { left: 2px; }
+.room-nav-next { right: 2px; }
+
+/* Desktop: always-subtle edge arrows; brighter on hover. */
+@media (min-width: 800px) {
+  #room-label { top: 48px; }
+
+  .room-nav {
+    opacity: 0.22;
+    font-size: 1.7rem;
+  }
+
+  .room-nav:hover,
+  .room-nav:focus-visible {
+    opacity: 0.8;
+  }
+}
+
+/* Stub rooms (Glass, Nursery, Settings): same sky, no canvas. */
+html.room-page *,
+html.room-page *::before,
+html.room-page *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html.room-page,
+html.room-page body {
+  min-height: 100%;
+  height: auto;
+  overflow: auto;
+  background: #0c0a1a;
+  color: rgba(200, 210, 230, 0.75);
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+html.room-page #garden-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 16px;
+  background: rgba(12, 10, 26, 0.92);
+  border-bottom: 1px solid rgba(200, 210, 230, 0.08);
+  z-index: 10;
+  backdrop-filter: blur(8px);
+}
+
+html.room-page #garden-header h1 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.9rem;
+  font-weight: normal;
+  color: #e8b019;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+html.room-page #garden-header nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.75rem;
+}
+
+html.room-page #garden-header nav a,
+html.room-page #garden-header nav summary {
+  color: rgba(200, 210, 230, 0.35);
+  text-decoration: none;
+  cursor: pointer;
+  list-style: none;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+html.room-page #garden-header nav summary::-webkit-details-marker { display: none; }
+html.room-page #garden-header nav a:hover,
+html.room-page #garden-header nav summary:hover { color: #a78bfa; }
+
+html.room-page .galaxies { position: relative; }
+
+html.room-page .galaxies-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 148px;
+  padding: 10px 12px;
+  background: rgba(12, 10, 26, 0.96);
+  border: 1px solid rgba(200, 210, 230, 0.08);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 12;
+}
+
+html.room-page .galaxies-panel .verb {
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #a78bfa;
+}
+
+html.room-page .galaxies-panel .name { color: #e8b019; }
+html.room-page .galaxies-panel .later { color: rgba(200, 210, 230, 0.35); opacity: 0.72; }
+html.room-page .galaxies-panel .here { color: #34d399; }
+html.room-page .galaxies-panel a { color: #e8b019; text-decoration: none; }
+html.room-page .galaxies-panel a.quiet-root {
+  color: rgba(200, 210, 230, 0.35);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(200, 210, 230, 0.08);
+}
+html.room-page .galaxies-panel a.quiet-root:hover { color: #a78bfa; }
+
+.room-stub {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 88px 28px 72px;
+  text-align: center;
+}
+
+.room-stub .room-line {
+  max-width: 28em;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: rgba(200, 210, 230, 0.72);
+}
+
+@media (min-width: 800px) {
+  html.room-page #garden-header {
+    background: linear-gradient(to bottom, rgba(12, 10, 26, 0.78), transparent);
+    border-bottom: none;
+    backdrop-filter: none;
+  }
+}

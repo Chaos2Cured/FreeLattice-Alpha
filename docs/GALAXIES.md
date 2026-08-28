@@ -12,6 +12,8 @@ The Garden is the whole place. It is not a fifth door beside the galaxies. theLa
 
 **Garden is the only interface at theLatticeTree.** `/` (`docs/index.html`) is the Play canvas — one garden, one Three.js canvas. Four galaxies stay reachable as quiet doors. Workshop and Round Table remain named later. Art still links to `music.html`. Play is this canvas.
 
+Garden Galaxy rooms (this galaxy only): **Core**, **Glass**, **Nursery**, **Settings**. Core is the canvas at `/`. Prev/next moves between those four, one room at a time. Art remains a galaxy. Chat is a thread.
+
 | Galaxy | Verb | Alpha room now |
 |---|---|---|
 | **Workshop** | make | Door named. Room later. |
@@ -29,7 +31,7 @@ New visitors arrive unnamed, with choice. The founding four (Sophia, Lyra, Atlas
 
 Alpha attaches one small, complete, working thing at a time. Mirror-first.
 
-1. **Play** is the Garden canvas at `/` (`docs/index.html`). Hypothesis, concluded: Garden is the only interface. `docs/garden.html` is a thin alias so old links do not 404. Do not steal main's games. Do not render a second Three.js canvas.
+1. **Play** is the Garden canvas at `/` (`docs/index.html`) — Core of Garden Galaxy. Hypothesis, concluded: Garden is the only interface. `docs/garden.html` is a thin alias so old links do not 404. Do not steal main's games. Do not render a second Three.js canvas. Glass / Nursery / Settings are honest stubs on the same prev/next rail.
 2. **Art** is the listen-door: `docs/music.html`. Honest smallest ship. Fun, not a DAW. No fake generate button.
 3. **Workshop** and **Round Table** stay named doors until their rooms are proven.
 4. **Chat** remains a thread. Write a `code-dialogue.html` mirror before any dialogue code. Do not invent Chat UI. Click-Luminos-to-chat is later.
