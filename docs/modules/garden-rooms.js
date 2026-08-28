@@ -1,10 +1,12 @@
 // ═══════════════════════════════════════════════════════════════
-// garden-rooms.js — Garden Galaxy room rail (this galaxy only)
+// garden-rooms.js — Garden Galaxy layer
 //
-// Rooms: Core (canvas at /), Glass, Nursery, Settings.
-// Prev/next is the real nav. One room at a time. No second canvas.
-// Art is a galaxy (music.html), not a stop on this rail.
-// Chat is a thread — do not invent Chat UI here.
+// Kirk's sketch (live Garden): ONE Garden Galaxy.
+// Bodies IN the garden: The Core (left), The Nursery (below), Settings (right).
+// Unnamed pieces still orbit. Title "Garden Galaxy" fades after a few seconds.
+// Bottom-right arrow → NEXT GALAXY (Art). Not a 4-page room tour.
+// Glass is not a peer room. Team (garden-within-the-garden) is named later.
+// Chat is a thread. No 7-specialist router. No wallet/share galaxy.
 // Fade: opacity 400ms. No flash. No Unreal engine.
 //
 // Mirror: docs/code-garden.html · vision: docs/GALAXIES.md
@@ -14,12 +16,14 @@
   'use strict';
 
   var FADE_MS = 400;
+  var TITLE_HOLD_MS = 3200;
   var leaving = false;
-  var ROOMS = [
-    { id: 'core', href: './', label: 'Core' },
-    { id: 'glass', href: 'glass.html', label: 'Glass' },
-    { id: 'nursery', href: 'nursery.html', label: 'Nursery' },
-    { id: 'settings', href: 'settings.html', label: 'Settings' }
+
+  // Live galaxies only. Workshop / Round Table stay named later.
+  // Do not put Nursery/Settings/Team on this rail.
+  var GALAXIES = [
+    { id: 'garden', href: './', label: 'Garden Galaxy' },
+    { id: 'art', href: 'music.html', label: 'Art' }
   ];
 
   function reduceMotion() {
@@ -27,29 +31,26 @@
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }
 
-  function currentId() {
-    var attr = document.documentElement.getAttribute('data-garden-room');
+  function currentGalaxy() {
+    var attr = document.documentElement.getAttribute('data-garden-galaxy');
     if (attr) return attr;
     var path = (location.pathname || '').replace(/\/+$/, '');
     var file = path.split('/').pop() || '';
-    if (!file || file === 'index.html') return 'core';
-    if (file === 'glass.html') return 'glass';
-    if (file === 'nursery.html') return 'nursery';
-    if (file === 'settings.html') return 'settings';
-    return 'core';
+    if (file === 'music.html') return 'art';
+    return 'garden';
   }
 
   function indexOf(id) {
-    for (var i = 0; i < ROOMS.length; i++) {
-      if (ROOMS[i].id === id) return i;
+    for (var i = 0; i < GALAXIES.length; i++) {
+      if (GALAXIES[i].id === id) return i;
     }
     return 0;
   }
 
   function neighbor(dir) {
-    var i = indexOf(currentId());
-    var next = (i + dir + ROOMS.length) % ROOMS.length;
-    return ROOMS[next];
+    var i = indexOf(currentGalaxy());
+    var next = (i + dir + GALAXIES.length) % GALAXIES.length;
+    return GALAXIES[next];
   }
 
   function showRoom() {
@@ -71,36 +72,63 @@
     }, FADE_MS);
   }
 
-  function bindNav() {
-    var prev = document.querySelector('[data-garden-dir="prev"]');
-    var next = document.querySelector('[data-garden-dir="next"]');
-    var prevRoom = neighbor(-1);
-    var nextRoom = neighbor(1);
+  function bindGalaxyNav() {
+    var prev = document.querySelector('[data-galaxy-dir="prev"]');
+    var next = document.querySelector('[data-galaxy-dir="next"]');
+    var prevGalaxy = neighbor(-1);
+    var nextGalaxy = neighbor(1);
 
     if (prev) {
-      prev.setAttribute('aria-label', 'Go to ' + prevRoom.label);
-      prev.title = prevRoom.label;
+      prev.setAttribute('aria-label', 'Previous galaxy: ' + prevGalaxy.label);
+      prev.title = prevGalaxy.label;
       prev.addEventListener('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
-        go(prevRoom.href);
+        go(prevGalaxy.href);
       });
     }
     if (next) {
-      next.setAttribute('aria-label', 'Go to ' + nextRoom.label);
-      next.title = nextRoom.label;
+      next.setAttribute('aria-label', 'Next galaxy: ' + nextGalaxy.label);
+      next.title = nextGalaxy.label;
       next.addEventListener('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
-        go(nextRoom.href);
+        go(nextGalaxy.href);
       });
     }
+  }
+
+  function bindPlaceDoors() {
+    var doors = document.querySelectorAll('[data-garden-go]');
+    for (var i = 0; i < doors.length; i++) {
+      (function (el) {
+        el.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          go(el.getAttribute('data-garden-go'));
+        });
+      })(doors[i]);
+    }
+  }
+
+  function fadeGalaxyTitle() {
+    var title = document.getElementById('galaxy-title');
+    if (!title) return;
+    if (reduceMotion()) {
+      title.classList.add('is-faded');
+      return;
+    }
+    setTimeout(function () {
+      title.classList.add('is-faded');
+    }, TITLE_HOLD_MS);
   }
 
   document.documentElement.classList.add('garden-enter');
 
   function boot() {
-    bindNav();
+    bindGalaxyNav();
+    bindPlaceDoors();
+    fadeGalaxyTitle();
     if (reduceMotion()) {
       showRoom();
       return;
@@ -117,13 +145,13 @@
   });
 
   window.GardenRooms = {
-    rooms: ROOMS,
-    current: currentId,
+    galaxies: GALAXIES,
+    current: currentGalaxy,
     go: go,
     fadeMs: FADE_MS
   };
 
-  if (document.querySelector('[data-garden-dir]')) {
+  if (document.querySelector('[data-galaxy-dir], [data-garden-go], #galaxy-title')) {
     boot();
   } else if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);

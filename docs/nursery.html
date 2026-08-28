@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="room-page" data-garden-room="nursery">
+<html lang="en" class="room-page" data-garden-room="nursery" data-garden-galaxy="garden">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +11,7 @@
 <body>
 
   <header id="garden-header">
-    <h1>theLatticeTree</h1>
+    <h1><a href="./">theLatticeTree</a></h1>
     <nav aria-label="Garden">
       <details class="galaxies">
         <summary>galaxies</summary>
@@ -28,12 +28,14 @@
 
   <p id="room-label">you are in Nursery</p>
 
-  <button type="button" class="room-nav room-nav-prev" data-garden-dir="prev" aria-label="Previous garden room">‹</button>
-  <button type="button" class="room-nav room-nav-next" data-garden-dir="next" aria-label="Next garden room">›</button>
+  <button type="button" class="galaxy-nav galaxy-nav-prev" data-galaxy-dir="prev" aria-label="Previous galaxy">‹</button>
+  <button type="button" class="galaxy-nav galaxy-nav-next" data-galaxy-dir="next" aria-label="Next galaxy">›</button>
 
   <main class="room-stub">
     <p class="room-line">Nursery is grow. The trainer lives here later, not a maze.</p>
   </main>
+
+  <p id="shared-shoulder">shared shoulder — human and mind</p>
 
   <script src="modules/garden-rooms.js"></script>
 </body>

@@ -1,6 +1,6 @@
-/* Garden Galaxy room chrome — Core, Glass, Nursery, Settings.
-   Layer, never delete. One room at a time. No second Three.js canvas.
-   Art is a galaxy (music.html), not a room on this rail. */
+/* Garden Galaxy chrome — one garden, bodies inside, arrow to the next galaxy.
+   Layer, never delete. Art is a galaxy (music.html). Team is named later.
+   Do not restyle mobile inner rings. Do not enable bloom on phones. */
 
 html {
   background: #0c0a1a;
@@ -27,72 +27,178 @@ html.garden-leaving body {
     opacity: 1;
     transition: none;
   }
+
+  #galaxy-title,
+  #galaxy-title.is-faded { opacity: 0; }
 }
 
-#room-label {
+#galaxy-title {
   position: fixed;
-  top: 52px;
+  top: 48px;
   left: 0;
   right: 0;
   z-index: 9;
   margin: 0;
   text-align: center;
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 0.82rem;
+  font-size: 1.05rem;
+  font-weight: normal;
+  letter-spacing: 0.06em;
+  color: #e8b019;
+  opacity: 0.72;
+  pointer-events: none;
+  transition: opacity 1.2s ease;
+}
+
+#galaxy-title.is-faded { opacity: 0; }
+
+#room-label {
+  position: fixed;
+  top: 74px;
+  left: 0;
+  right: 0;
+  z-index: 9;
+  margin: 0;
+  text-align: center;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.78rem;
   font-weight: normal;
   letter-spacing: 0.04em;
   color: #e8b019;
-  opacity: 0.55;
+  opacity: 0.45;
   pointer-events: none;
+  transition: top 1.2s ease;
 }
 
-.room-nav {
+#galaxy-title.is-faded + #room-label { top: 52px; }
+
+/* Bodies IN the garden — labels, not a second canvas, not a ring restyle. */
+.place-label {
   position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 11;
-  width: 44px;
-  height: 72px;
+  z-index: 8;
   padding: 0;
   border: 0;
   background: transparent;
-  color: #e8b019;
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 1.35rem;
-  line-height: 72px;
-  text-align: center;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: #e8b019;
   cursor: pointer;
-  opacity: 0.82;
   -webkit-appearance: none;
   appearance: none;
   text-shadow: 0 0 10px rgba(12, 10, 26, 0.95);
 }
 
-.room-nav:hover,
-.room-nav:focus-visible {
+.place-core {
+  left: 7%;
+  top: 46%;
+  opacity: 0.55;
+  cursor: default;
+}
+
+.place-nursery {
+  left: 50%;
+  bottom: 96px;
+  transform: translateX(-50%);
+  opacity: 0.88;
+  font-size: 0.86rem;
+}
+
+.place-settings {
+  right: 7%;
+  top: 46%;
+  opacity: 0.55;
+}
+
+.place-label:hover,
+.place-label:focus-visible {
   opacity: 0.95;
   outline: none;
 }
 
-.room-nav-prev { left: 2px; }
-.room-nav-next { right: 2px; }
+.place-core:hover { opacity: 0.7; }
 
-/* Desktop: always-subtle edge arrows; brighter on hover. */
-@media (min-width: 800px) {
-  #room-label { top: 48px; }
-
-  .room-nav {
-    opacity: 0.28;
-    font-size: 1.7rem;
-  }
-
-  .room-nav:hover,
-  .room-nav:focus-visible {
-    opacity: 0.8;
-  }
+/* Bottom arrow: next galaxy. Sketch: right arrow at the bottom. */
+.galaxy-nav {
+  position: fixed;
+  bottom: 52px;
+  z-index: 11;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #e8b019;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.55rem;
+  line-height: 48px;
+  text-align: center;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  text-shadow: 0 0 10px rgba(12, 10, 26, 0.95);
 }
 
-/* Stub rooms (Glass, Nursery, Settings): same sky, no canvas. */
+.galaxy-nav-next {
+  right: 10px;
+  opacity: 0.82;
+}
+
+.galaxy-nav-prev {
+  left: 10px;
+  opacity: 0.4;
+}
+
+html[data-garden-galaxy="art"] .galaxy-nav-prev { opacity: 0.82; }
+html[data-garden-galaxy="art"] .galaxy-nav-next { opacity: 0.4; }
+
+.galaxy-nav:hover,
+.galaxy-nav:focus-visible {
+  opacity: 0.95;
+  outline: none;
+}
+
+#shared-shoulder {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 10px;
+  z-index: 8;
+  margin: 0;
+  text-align: center;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  color: rgba(200, 210, 230, 0.28);
+  pointer-events: none;
+}
+
+@media (min-width: 800px) {
+  #galaxy-title { top: 44px; }
+  #room-label { top: 70px; }
+
+  .galaxy-nav {
+    bottom: 22px;
+    opacity: 0.55;
+  }
+
+  .galaxy-nav-next { opacity: 0.55; }
+  .galaxy-nav-prev { opacity: 0.28; }
+
+  html[data-garden-galaxy="art"] .galaxy-nav-prev { opacity: 0.55; }
+  html[data-garden-galaxy="art"] .galaxy-nav-next { opacity: 0.28; }
+
+  .galaxy-nav-next:hover,
+  .galaxy-nav-next:focus-visible,
+  .galaxy-nav-prev:hover,
+  .galaxy-nav-prev:focus-visible { opacity: 0.85; }
+
+  #shared-shoulder { bottom: 16px; }
+
+  .place-nursery { bottom: 72px; }
+}
+
+/* Honest room stubs (Nursery, Settings, Team): same sky, no canvas. */
 html.room-page *,
 html.room-page *::before,
 html.room-page *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -129,6 +235,11 @@ html.room-page #garden-header h1 {
   color: #e8b019;
   letter-spacing: 0.04em;
   white-space: nowrap;
+}
+
+html.room-page #garden-header h1 a {
+  color: #e8b019;
+  text-decoration: none;
 }
 
 html.room-page #garden-header nav {
@@ -188,6 +299,11 @@ html.room-page .galaxies-panel a.quiet-root {
   border-top: 1px solid rgba(200, 210, 230, 0.08);
 }
 html.room-page .galaxies-panel a.quiet-root:hover { color: #a78bfa; }
+
+html.room-page #room-label {
+  top: 52px;
+  opacity: 0.55;
+}
 
 .room-stub {
   min-height: 100vh;

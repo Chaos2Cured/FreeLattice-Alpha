@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-garden-room="core">
+<html lang="en" data-garden-room="core" data-garden-galaxy="garden">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -245,10 +245,17 @@
     </nav>
   </header>
 
+  <p id="galaxy-title">Garden Galaxy</p>
   <p id="room-label">you are in Core</p>
 
-  <button type="button" class="room-nav room-nav-prev" data-garden-dir="prev" aria-label="Previous garden room">‹</button>
-  <button type="button" class="room-nav room-nav-next" data-garden-dir="next" aria-label="Next garden room">›</button>
+  <button type="button" class="place-label place-core" aria-current="true">The Core</button>
+  <button type="button" class="place-label place-nursery" data-garden-go="nursery.html">The Nursery</button>
+  <button type="button" class="place-label place-settings" data-garden-go="settings.html">Settings</button>
+
+  <button type="button" class="galaxy-nav galaxy-nav-prev" data-galaxy-dir="prev" aria-label="Previous galaxy">‹</button>
+  <button type="button" class="galaxy-nav galaxy-nav-next" data-galaxy-dir="next" aria-label="Next galaxy">›</button>
+
+  <p id="shared-shoulder">shared shoulder — human and mind</p>
 
   <div id="gardenContainer"></div>
 
