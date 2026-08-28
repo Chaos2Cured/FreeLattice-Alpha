@@ -118,8 +118,7 @@ html.garden-leaving body {
 
 .place-core:hover { opacity: 0.7; }
 
-#place-veil {
-  position: fixed;
+#place-veil[hidden] { display: none; }
   inset: 0;
   z-index: 9;
   display: flex;
@@ -335,6 +334,7 @@ html.room-page .galaxies-panel .verb {
 
 html.room-page .galaxies-panel .name { color: #e8b019; }
 html.room-page .galaxies-panel .later { color: rgba(200, 210, 230, 0.35); opacity: 0.72; }
+html.room-page .galaxies-panel a.later { color: rgba(200, 210, 230, 0.45); }
 html.room-page .galaxies-panel .here { color: #34d399; }
 html.room-page .galaxies-panel a { color: #e8b019; text-decoration: none; }
 html.room-page .galaxies-panel a.quiet-root {

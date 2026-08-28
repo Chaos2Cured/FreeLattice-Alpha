@@ -23,7 +23,9 @@
   // Do not put Nursery/Settings/Team on this rail.
   var GALAXIES = [
     { id: 'garden', href: './', label: 'Garden Galaxy' },
-    { id: 'art', href: 'music.html', label: 'Art' }
+    { id: 'art', href: 'music.html', label: 'Art' },
+    { id: 'workshop', href: 'workshop.html', label: 'Workshop' },
+    { id: 'round-table', href: 'round-table.html', label: 'Round Table' }
   ];
 
   function reduceMotion() {
@@ -37,6 +39,8 @@
     var path = (location.pathname || '').replace(/\/+$/, '');
     var file = path.split('/').pop() || '';
     if (file === 'music.html') return 'art';
+    if (file === 'workshop.html') return 'workshop';
+    if (file === 'round-table.html') return 'round-table';
     return 'garden';
   }
 

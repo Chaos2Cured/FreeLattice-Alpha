@@ -102,6 +102,8 @@
 
     .galaxies-panel .name { color: var(--gold); }
     .galaxies-panel .later { color: var(--muted); opacity: 0.72; }
+    .galaxies-panel a.later { color: var(--muted); }
+    .galaxies-panel a.later:hover { color: var(--lavender); opacity: 1; }
     .galaxies-panel .here { color: var(--emerald); }
     .galaxies-panel a { color: var(--gold); text-decoration: none; }
     .galaxies-panel a.quiet-root {
@@ -235,8 +237,8 @@
       <details class="galaxies">
         <summary>galaxies</summary>
         <div class="galaxies-panel">
-          <span class="later"><span class="verb">make</span> <span class="name">Workshop</span> later</span>
-          <span class="later"><span class="verb">learn</span> <span class="name">Round Table</span> later</span>
+          <a class="later" href="workshop.html"><span class="verb">make</span> <span class="name">Workshop</span> later</a>
+          <a class="later" href="round-table.html"><span class="verb">learn</span> <span class="name">Round Table</span> later</a>
           <span class="here"><span class="verb">evolve</span> <span class="name">Play</span></span>
           <a href="music.html"><span class="verb">sing</span> <span class="name">Art</span></a>
           <a class="quiet-root" href="https://github.com/Chaos2Cured/FreeLattice-Alpha/blob/main/AUTONOMY.md">AUTONOMY.md</a>
