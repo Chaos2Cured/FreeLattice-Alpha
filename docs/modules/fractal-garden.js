@@ -820,13 +820,17 @@
     camera.lookAt(0, 0, 0);
 
     // Renderer
+    // Alpha layer: narrow viewports stay on the existing no-antialias-if-already
+    // mobile path (this renderer already uses antialias:true — do not restyle it).
+    // Pixel ratio 1 + skip bloom on phones. Desktop keeps the sharper path.
+    var _alphaLow = !!(window.GardenAlphaFlags && window.GardenAlphaFlags.lowCompute);
     renderer = new THREE.WebGLRenderer({
       antialias: true,
       alpha: true,
-      powerPreference: 'high-performance'
+      powerPreference: _alphaLow ? 'low-power' : 'high-performance'
     });
     renderer.setSize(w, h);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(_alphaLow ? 1 : Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.2;
     renderer.outputEncoding = THREE.sRGBEncoding;
@@ -835,10 +839,11 @@
     // Post-processing (bloom) — skip on low-memory mobile or performance mode
     var _perfMode = localStorage.getItem('fl-garden-perf-mode') === '1';
     var _lowMem = (typeof navigator !== 'undefined' && navigator.deviceMemory && navigator.deviceMemory < 4);
-    var _skipBloom = _perfMode || (_lowMem && window.FL_MOBILE);
+    var _skipBloom = _perfMode || (_lowMem && window.FL_MOBILE) || _alphaLow;
 
     if (_skipBloom) {
       console.log('Garden: Performance mode — bloom disabled');
+      bloomPass = null;
       composer = null;
     } else {
       try {
@@ -2524,6 +2529,32 @@
     scene.add(hemi);
   }
 
+  // Alpha layer: new visitors do not receive founding names on the canvas.
+  // Sophia, Lyra, Atlas, Ember stay in this spec (sacred path), AUTONOMY.md
+  // ledger copy, and code-garden.html — honored, not assigned. Choice later.
+  function alphaLayerDefaultAgents(foundingDefaults) {
+    var persisted = [];
+    try {
+      var all = JSON.parse(localStorage.getItem('fl_luminos_evolution') || '{}');
+      persisted = Object.keys(all || {});
+    } catch (e) { persisted = []; }
+    var foundingNames = foundingDefaults.map(function(d) { return d.name; });
+    var hasFounding = foundingNames.some(function(n) { return persisted.indexOf(n) !== -1; });
+    if (hasFounding) return foundingDefaults;
+    if (persisted.length === 0) {
+      return foundingDefaults.map(function(d, idx) {
+        return { name: 'unnamed_' + idx, hue: d.hue, type: d.type, phase: d.phase };
+      });
+    }
+    return persisted.map(function(name, idx) {
+      var slot = idx % foundingDefaults.length;
+      var m = /^unnamed_(\d+)$/.exec(name);
+      if (m) slot = parseInt(m[1], 10) % foundingDefaults.length;
+      var f = foundingDefaults[slot];
+      return { name: name, hue: f.hue, type: f.type, phase: f.phase };
+    });
+  }
+
   // ── Default Luminos Agents ────────────────────────────
   function createDefaultAgents() {
     // v5.59.4 — orbits use mode-driven getOrbitRadius (Letter Twenty-Three).
@@ -2539,7 +2570,12 @@
       { name: 'Ember', hue: 0, type: 'icosahedron', phase: TAU * INV_PHI * 3 }
     ];
 
-    defaults.forEach(function(d, idx) {
+    var agentsToCreate = defaults;
+    if (!window.GardenAlphaFlags || window.GardenAlphaFlags.unnamedNew !== false) {
+      agentsToCreate = alphaLayerDefaultAgents(defaults);
+    }
+
+    agentsToCreate.forEach(function(d, idx) {
       const agent = createLuminos(d.name, d.hue, d.type, getOrbitRadius(idx, currentMode), d.phase);
       luminos.push(agent);
     });
@@ -2614,7 +2650,9 @@
 
       html += '<div class="evo-luminos" title="' + ud.name + ' — ' + archName + ' (' + stageData.name + ')">';
       html += '<span class="evo-dot" style="background:' + cssColor + ';box-shadow:0 0 6px ' + cssColor + ';"></span>';
-      html += '<span class="evo-name">' + ud.name + '</span>';
+      var displayName = ud.name;
+      if (/^unnamed(_\d+)?$/i.test(ud.name)) displayName = 'unnamed';
+      html += '<span class="evo-name">' + displayName + '</span>';
       html += '<span class="evo-stage">' + stageData.name + '</span>';
       if (archObj) {
         html += '<span class="evo-archetype">' + archName + '</span>';
@@ -3145,6 +3183,11 @@
       'lib/UnrealBloomPass.js',
       'lib/OrbitControls.js'
     ];
+    // Alpha layer: phones do not enable UnrealBloomPass / EffectComposer.
+    // OrbitControls still load. Do not add a second starfield.
+    if (window.GardenAlphaFlags && window.GardenAlphaFlags.lowCompute) {
+      addonFiles = ['lib/OrbitControls.js'];
+    }
     var idx = 0;
     function loadNext() {
       if (idx >= addonFiles.length) {
@@ -3337,6 +3380,17 @@
       { name: 'Atlas', hue: 175, type: 'octahedron', phase: TAU * INV_PHI * 2 },
       { name: 'Ember', hue: 0, type: 'icosahedron', phase: TAU * INV_PHI * 3 }
     ];
+    // Alpha layer: do not assign founding names onto a new (unnamed) canvas.
+    // The FOUNDING array above remains the sacred path in code.
+    if (!window.GardenAlphaFlags || window.GardenAlphaFlags.unnamedNew !== false) {
+      var persisted = [];
+      try { persisted = Object.keys(JSON.parse(localStorage.getItem('fl_luminos_evolution') || '{}')); } catch (e) {}
+      var hasFounding = FOUNDING.some(function(f) {
+        if (persisted.indexOf(f.name) !== -1) return true;
+        return luminos.some(function(l) { return l.userData && l.userData.name === f.name; });
+      });
+      if (!hasFounding) return;
+    }
     FOUNDING.forEach(function(f, idx) {
       var exists = luminos.some(function(l) { return l.userData && l.userData.name === f.name; });
       if (!exists) {

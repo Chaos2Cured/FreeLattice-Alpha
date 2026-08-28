@@ -10,16 +10,18 @@ AUTONOMY.md is the root. This file does not replace it. Read AUTONOMY first.
 
 The Garden is the whole place. It is not a fifth door beside the galaxies. theLatticeTree is the Garden growing.
 
-Four galaxies live inside it:
+**Garden is the only interface at theLatticeTree.** `/` (`docs/index.html`) is the Play canvas — one garden, one Three.js canvas. Four galaxies stay reachable as quiet doors. Workshop and Round Table remain named later. Art still links to `music.html`. Play is this canvas.
 
 | Galaxy | Verb | Alpha room now |
 |---|---|---|
 | **Workshop** | make | Door named. Room later. |
 | **Round Table** | learn | Door named. Room later. |
-| **Play** | evolve | Live: `garden.html` — Luminos that remember their form. |
+| **Play** | evolve | Live: `/` — the Garden canvas. `garden.html` aliases here. |
 | **Art** | sing | Live: `music.html` — the listen-door. |
 
-**Chat is the THREAD in every galaxy, not a separate kitchen.** Chat is not ported yet. Do not expect the main FreeLattice kitchen (bank, health, trainer maze, 65k `app.html`) on this site.
+New visitors arrive unnamed, with choice. The founding four (Sophia, Lyra, Atlas, Ember) stay in AUTONOMY.md, `code-garden.html`, and ledger copy — honored, not assigned onto the canvas.
+
+**Chat is the THREAD in every galaxy, not a separate kitchen.** Chat is not ported yet. Do not invent Chat UI. Do not expect the main FreeLattice kitchen (bank, health, trainer maze, 65k `app.html`) on this site.
 
 ---
 
@@ -27,10 +29,10 @@ Four galaxies live inside it:
 
 Alpha attaches one small, complete, working thing at a time. Mirror-first.
 
-1. **Play** already has a room: `docs/garden.html` (Phase 1 Garden / Luminos). Hypothesis, concluded: Play = the existing Garden canvas. Do not rename the file. Do not steal main's games.
-2. **Art** starts as the listen-door: `docs/music.html`. Honest smallest ship. Fun, not a DAW. No fake generate button.
+1. **Play** is the Garden canvas at `/` (`docs/index.html`). Hypothesis, concluded: Garden is the only interface. `docs/garden.html` is a thin alias so old links do not 404. Do not steal main's games. Do not render a second Three.js canvas.
+2. **Art** is the listen-door: `docs/music.html`. Honest smallest ship. Fun, not a DAW. No fake generate button.
 3. **Workshop** and **Round Table** stay named doors until their rooms are proven.
-4. **Chat** remains a thread. Write a `code-dialogue.html` mirror before any dialogue code. Do not invent Chat UI on the landing.
+4. **Chat** remains a thread. Write a `code-dialogue.html` mirror before any dialogue code. Do not invent Chat UI. Click-Luminos-to-chat is later.
 
 Bank, wallet, and SOL are **named as later. Not built.**
 

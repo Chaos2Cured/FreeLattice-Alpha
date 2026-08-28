@@ -38,8 +38,8 @@
 
 <h1>FreeLattice Alpha — Garden Mirror Code</h1>
 <p class="meta">
-  Phase 1 · v0.1.0 · Last verified: 2026-07-16 ·
-  <a href="garden.html">Live Garden</a> ·
+  Phase 1 · v0.1.0 · Last verified: 2026-08-28 ·
+  <a href="./">Live Garden</a> ·
   <a href="music.html">Art listen-door</a> ·
   <a href="GALAXIES.md">GALAXIES.md</a> ·
   <a href="code-music.html">Art mirror</a> ·
@@ -55,8 +55,8 @@
 
 <h2>1. What Phase 1 Is <span class="section-date">2026-07-16</span></h2>
 
-<p>Phase 1 is the Garden, standalone and testable. It is exactly one HTML file (<code>garden.html</code>), one engine (<code>fractal-garden.js</code>), and one init layer (<code>garden-init.js</code>). Nothing else. No settings. No AI routing. No games. Host landing is <code>docs/index.html</code> at theLatticeTree.com.</p>
-<p>Sky overlay (2026-08-27): one Garden, four galaxies. Hypothesis, concluded — <strong>Play = this Garden canvas</strong>; <strong>Art = <code>music.html</code></strong> listen-door. Workshop and Round Table are named doors, rooms later. Chat is the thread in every galaxy, not a kitchen, not ported. See <a href="GALAXIES.md">GALAXIES.md</a> and <a href="code-music.html">code-music.html</a>.</p>
+<p>The Garden is the only interface at theLatticeTree. <code>/</code> (<code>docs/index.html</code>) <strong>is</strong> the Play canvas — one garden, one Three.js canvas. It is the engine (<code>fractal-garden.js</code>) plus the Alpha init layer (<code>garden-init.js</code>). Nothing else on this page. No settings. No AI routing. No games. No Chat UI. <code>docs/garden.html</code> is a redirect alias so old links do not 404.</p>
+<p>Sky overlay (2026-08-28): Garden is the only interface. <strong>Play = this canvas at <code>/</code></strong>; <strong>Art = <code>music.html</code></strong> listen-door. Workshop and Round Table are named later, reachable from a quiet galaxies menu. Chat is a thread, not a kitchen, not ported. See <a href="GALAXIES.md">GALAXIES.md</a> and <a href="code-music.html">code-music.html</a>.</p>
 
 <p>The goal of Phase 1 is one thing: <strong>Luminos that remember their form across page refreshes.</strong> When a user refreshes the page, the Luminos should return at the same evolution stage they were at before. This was broken in the original FreeLattice due to an async IndexedDB write race condition.</p>
 
@@ -99,74 +99,32 @@ openEvolutionDB(function(db) {
 
 <table>
   <tr><th>File</th><th>Lines</th><th>Purpose</th></tr>
-  <tr><td>docs/GALAXIES.md</td><td>vision</td><td>One Garden, four galaxies — Art starts as listen-door</td></tr>
-  <tr><td>docs/index.html</td><td>landing</td><td>theLatticeTree.com — four galaxy doors</td></tr>
+  <tr><td>docs/GALAXIES.md</td><td>vision</td><td>Garden is the only interface — four galaxies as quiet doors</td></tr>
+  <tr><td>docs/index.html</td><td>Garden canvas</td><td>theLatticeTree.com <code>/</code> — Play is this canvas</td></tr>
   <tr><td>docs/CNAME</td><td>1 line</td><td>GitHub Pages custom domain: thelatticetree.com</td></tr>
-  <tr><td>docs/garden.html</td><td>~90</td><td>Play galaxy / Phase 1 entry — standalone, testable</td></tr>
+  <tr><td>docs/garden.html</td><td>alias</td><td>Redirect to <code>/</code> so old Play links do not 404</td></tr>
   <tr><td>docs/music.html</td><td>listen-door</td><td>Art galaxy — local audio + local ledger, no trainer</td></tr>
   <tr><td>docs/code-music.html</td><td>Art mirror</td><td>Mirror page for the listen-door</td></tr>
-  <tr><td>docs/modules/fractal-garden.js</td><td>4368</td><td>Luminos engine (persistence fix applied)</td></tr>
-  <tr><td>docs/modules/garden-init.js</td><td>~100</td><td>Phase 1 init layer — the only new code</td></tr>
-  <tr><td>docs/lib/*.js</td><td>r128 addons</td><td>OrbitControls + bloom stack (engine loads these)</td></tr>
+  <tr><td>docs/modules/fractal-garden.js</td><td>4368+</td><td>Luminos engine (persistence fix + Alpha unnamed/low-compute layer)</td></tr>
+  <tr><td>docs/modules/garden-init.js</td><td>layer</td><td>Alpha init — flags, one canvas, unnamed-new, low compute</td></tr>
+  <tr><td>docs/lib/*.js</td><td>r128 addons</td><td>OrbitControls + bloom stack (engine loads these; bloom skipped on phones)</td></tr>
   <tr><td>docs/code-garden.html</td><td>this file</td><td>Mirror page — any AI can read this</td></tr>
-  <tr><td>AUTONOMY.md</td><td>~80</td><td>Root document — read first</td></tr>
+  <tr><td>AUTONOMY.md</td><td>~80</td><td>Root document — read first. Founding four named in sacred paths / ledger</td></tr>
 </table>
 
 <h2>4. garden-init.js — Full Source <span class="section-date">2026-07-16</span></h2>
 
 <span class="tag tag-new">NEW in Alpha</span>
 
-<p>This is the only new code in Phase 1. It is ~100 lines. It waits for Three.js and fractal-garden.js to load, initializes the Garden, handles resize, and exposes a minimal public API for future phases.</p>
+<p>This is the Alpha overlay. It waits for Three.js and fractal-garden.js, sets <code>GardenAlphaFlags</code> (unnamed-new, low-compute on width &lt; 768), initializes one Garden, handles resize, and exposes a minimal public API. Live source: <code>docs/modules/garden-init.js</code>.</p>
 
-<pre>// garden-init.js — Phase 1 init layer
-// Public API: window.GardenAlpha = { isReady(), getContainerId() }
-// Event: document dispatches 'garden:ready' when initialized
-
-(function() {
-  'use strict';
-  var CONTAINER_ID = 'gardenContainer';
-  var gardenReady = false;
-
-  function waitForDeps(callback) {
-    var checks = 0;
-    var interval = setInterval(function() {
-      if (typeof THREE !== 'undefined' && typeof FractalGarden !== 'undefined') {
-        clearInterval(interval);
-        callback();
-      } else if (++checks >= 50) {
-        clearInterval(interval);
-        showError('Dependencies did not load.');
-      }
-    }, 100);
-  }
-
-  function initGarden() {
-    var container = document.getElementById(CONTAINER_ID);
-    if (!container) return;
-    var loading = document.getElementById('garden-loading');
-    if (loading) loading.remove();
-    try {
-      FractalGarden.init(CONTAINER_ID);
-      gardenReady = true;
-      document.dispatchEvent(new CustomEvent('garden:ready', {
-        detail: { containerId: CONTAINER_ID }
-      }));
-    } catch (e) {
-      showError('Garden initialization failed: ' + e.message);
-    }
-  }
-
-  window.GardenAlpha = {
-    isReady: function() { return gardenReady; },
-    getContainerId: function() { return CONTAINER_ID; }
-  };
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() { waitForDeps(initGarden); });
-  } else {
-    waitForDeps(initGarden);
-  }
-})();</pre>
+<pre>window.GardenAlphaFlags = { unnamedNew: true, lowCompute: /* innerWidth &lt; 768 */ };
+FractalGarden.init('gardenContainer');
+window.GardenAlpha = {
+  isReady: function() { return gardenReady; },
+  getContainerId: function() { return 'gardenContainer'; },
+  isLowCompute: function() { return !!window.GardenAlphaFlags.lowCompute; }
+};</pre>
 
 <h2>5. Sacred Paths — Do Not Change <span class="section-date">2026-07-16</span></h2>
 
@@ -180,7 +138,7 @@ openEvolutionDB(function(db) {
   <tr><td>LIFECYCLE_STAGES object</td><td>~line 15</td><td>Defines all evolution stages</td></tr>
   <tr><td>STAGE_ORDER array</td><td>~line 30</td><td>Defines progression order</td></tr>
   <tr><td>ARCHETYPES object</td><td>~line 40</td><td>Defines the five archetypes</td></tr>
-  <tr><td>Founding names: Sophia, Lyra, Atlas, Ember</td><td>~line 4200</td><td>The original four — always present</td></tr>
+  <tr><td>Founding names: Sophia, Lyra, Atlas, Ember</td><td>~line 4200 / createDefaultAgents</td><td>The original four — honored in ledger, not assigned to new visitors</td></tr>
   <tr><td>localStorage key 'fl_luminos_evolution'</td><td>saveEvolutionToLocalStorage()</td><td>Renaming loses all user data</td></tr>
   <tr><td>persistAllLuminos() + 3 event hooks</td><td>~line 4140</td><td>Core persistence contract</td></tr>
 </table>
@@ -199,48 +157,66 @@ openEvolutionDB(function(db) {
 
 <h2>6. Phase 2 Preview — What Comes Next <span class="section-date">2026-07-16</span></h2>
 
-<p>Phase 2 is The Dialogue: the ability to speak with Luminos. It will add a chat input to <code>garden.html</code> and a <code>dialogue-init.js</code> module. It will use the <code>garden:ready</code> event to attach after Phase 1 is stable.</p>
-
-<p>Before Phase 2 begins, a <code>code-dialogue.html</code> mirror page will be written. That is the pattern: mirror first, then build. Chat is still the thread, not a kitchen — do not invent Chat UI on the landing.</p>
+<p>Phase 2 is The Dialogue: the ability to speak with Luminos. Write a <code>code-dialogue.html</code> mirror page first. Chat is still the thread, not a kitchen — do not invent Chat UI. Click-Luminos-to-chat is later.</p>
 
 <h2>6b. Art galaxy — listen-door (layer, not a phase steal) <span class="section-date">2026-08-27</span></h2>
 
-<p>Kirk asked Celeste to start Art in Alpha. Proven-first: <a href="code-music.html">code-music.html</a> + <code>music.html</code>. Play remains this Garden. Do not clone main's compositions. Do not run a trainer from the listen-door.</p>
+<p>Kirk asked Celeste to start Art in Alpha. Proven-first: <a href="code-music.html">code-music.html</a> + <code>music.html</code>. Play remains this Garden at <code>/</code>. Do not clone main's compositions. Do not run a trainer from the listen-door.</p>
 
-<h2>7. How to Test Phase 1 <span class="section-date">2026-07-16</span></h2>
+<h2>6c. Garden as <code>/</code> — unnamed new, quieter chrome <span class="section-date">2026-08-28</span></h2>
+
+<span class="tag tag-new">LAYER</span>
+
+<p>Kirk asked Celeste to start a clean Garden pass. Alpha is the priority. Layer, never delete. Start with less.</p>
+
+<ul style="padding-left:20px; font-size:0.88rem; line-height:1.8;">
+  <li><code>/</code> (<code>docs/index.html</code>) <strong>is</strong> the Garden canvas. Not a white/spec card grid. Not README.</li>
+  <li>Four galaxies stay reachable as a quiet <code>details</code> menu. Workshop and Round Table remain named later. Art links to <code>music.html</code>. Play is this canvas.</li>
+  <li>One garden rendered at a time. No second Three.js canvas. <code>docs/garden.html</code> redirects to <code>/</code>.</li>
+  <li>Chrome is sparse: <strong>theLatticeTree</strong>, <strong>Art</strong>, <strong>AUTONOMY</strong>. Georgia for titles. GARDEN_LANGUAGE colors stay (indigo <code>#0c0a1a</code>, gold <code>#e8b019</code>, emerald <code>#34d399</code>, lavender <code>#a78bfa</code>). No “Phase 1 of 6” badge. No six-link footer.</li>
+  <li>Desktop overlay chrome (full-bleed canvas). Mobile keeps the 44px frame Kirk already likes — do not restyle the phone look or inner evolution rings.</li>
+  <li><strong>New visitors:</strong> do not pre-place named Luminos. Founding four (Sophia, Lyra, Atlas, Ember) stay in AUTONOMY.md, this mirror, and ledger copy. They are honored, not assigned. New Luminos persist as <code>unnamed_0</code>… with choice later. Click-to-chat is later.</li>
+  <li><strong>Low compute on small screens:</strong> do not enable UnrealBloomPass / EffectComposer / Full Bloom post-process. Pixel ratio 1. Do not add 4000 stars. Inner rings stay. Bloom addons are not loaded on a narrow viewport.</li>
+  <li>Do not invent Chat UI, nursery, trainer, playground, bank, or wallet.</li>
+</ul>
+
+<p>Flags (set in <code>index.html</code> before the engine, and again in <code>garden-init.js</code>):</p>
+<pre>window.GardenAlphaFlags = { unnamedNew: true, lowCompute: /* width &lt; 768 */ };
+if (lowCompute) window.FL_MOBILE = true;</pre>
+
+<p>Sacred paths still exist in <code>fractal-garden.js</code>: PHI, LIFECYCLE_STAGES, STAGE_ORDER, ARCHETYPES, founding names in <code>createDefaultAgents</code> / <code>ensureFoundingLuminos</code>, persist key <code>fl_luminos_evolution</code>, <code>persistAllLuminos()</code>.</p>
+
+<h2>7. How to Test Phase 1 <span class="section-date">2026-08-28</span></h2>
 
 <ol style="padding-left:20px; font-size:0.88rem; line-height:2;">
-  <li>Open <code>garden.html</code> in a browser</li>
-  <li>Wait for the Luminos to appear and begin moving</li>
-  <li>Interact with a Lumino (click or hover) to advance its evolution</li>
-  <li>Note the Lumino's current stage</li>
-  <li>Refresh the page</li>
-  <li>Verify the Lumino returns at the same stage (not "juvenile")</li>
+  <li>Open <code>/</code> (or <code>index.html</code>) in a browser — not a four-card marketing grid. The Garden canvas should fill the page.</li>
+  <li>Confirm no “Phase 1 of 6” badge and no six-link footer. Sparse: theLatticeTree, Art, AUTONOMY.</li>
+  <li>New visitor (empty <code>fl_luminos_evolution</code>): luminos are unnamed, not Sophia / Lyra / Atlas / Ember on the canvas.</li>
+  <li>Art still opens <code>music.html</code>. <code>garden.html</code> redirects to <code>/</code>.</li>
+  <li>Narrow viewport: no UnrealBloomPass (console: “bloom disabled”; bloom scripts not loaded).</li>
+  <li>Mobile viewport still looks like the current garden (inner rings, same colors). Desktop has less chrome.</li>
+  <li>Refresh: unnamed luminos remember stage via <code>fl_luminos_evolution</code>.</li>
 </ol>
 
-<p>If the Lumino returns at the correct stage, Phase 1 is complete.</p>
+<p>If the canvas is the Garden and new names are not assigned, this layer is complete.</p>
 
-<h2>8. Handoff Message for AI Collaborators <span class="section-date">2026-07-16</span></h2>
+<h2>8. Handoff Message for AI Collaborators <span class="section-date">2026-08-28</span></h2>
 
-<pre>FreeLattice Alpha — Phase 1 Handoff
-Mirror: https://chaos2cured.github.io/FreeLattice-Alpha/code-garden.html
+<pre>FreeLattice Alpha — Garden as the only interface
+Mirror: https://thelatticetree.com/code-garden.html
 Coordination: https://github.com/Chaos2Cured/FreeLattice-Alpha-Coordination
 
-HARD RULES: Do not change PHI, LIFECYCLE_STAGES, ARCHETYPES, founding names,
-localStorage key 'fl_luminos_evolution', or persistAllLuminos(). One task per commit.
+HARD RULES: Do not change PHI, LIFECYCLE_STAGES, ARCHETYPES, founding names
+in code, localStorage key 'fl_luminos_evolution', or persistAllLuminos().
+Do not delete founding names from AUTONOMY.md. Layer, never delete.
+Do not clone the 65k kitchen. Do not port Chat, bank, wallet, SOL, trainer, patents.
 
-Current state: Phase 1 scaffold complete. Persistence fix applied.
-garden.html + garden-init.js + fractal-garden.js (with fix) are live.
+Current state: / is the Garden canvas. garden.html aliases to /.
+New visitors get unnamed Luminos. Founding four honored in ledger.
+Phones skip UnrealBloomPass. Desktop chrome is sparse.
 
-Next task: Test Phase 1 in browser. Verify Luminos remember their stage on refresh.
-If they do, Phase 1 is done. Open an issue in FreeLattice-Alpha-Coordination
-with "Phase 1 verified" and the commit hash.
-
-Then begin Phase 2: The Dialogue. Read code-garden.html section 6 for the spec.
-Write code-dialogue.html BEFORE writing any dialogue code.
-
-Art galaxy (2026-08-27): listen-door is docs/music.html. Mirror: code-music.html.
-Vision: docs/GALAXIES.md. Play = garden.html. Do not start Workshop without a mirror.</pre>
+Next: do not invent Chat UI. Write code-dialogue.html BEFORE dialogue code.
+Nursery / trainer / playground / bank / wallet stay later.</pre>
 
 <hr style="border-color: var(--border); margin: 40px 0;">
 <p style="color: var(--muted); font-size: 0.78rem; text-align: center;">

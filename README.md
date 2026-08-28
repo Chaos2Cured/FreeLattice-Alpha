@@ -37,7 +37,7 @@ FreeLattice Alpha is built differently:
 
 Chat is not ported. Learn is not ported. Do not expect the main FreeLattice kitchen (bank, health, trainer maze, 65k `app.html`) on this site.
 
-**Galaxies (sky overlay, not a version steal of main):** One Garden, four galaxies — Workshop (make), Round Table (learn), Play (evolve), Art (sing). Chat is the thread in every galaxy, not a kitchen. Vision: [`docs/GALAXIES.md`](docs/GALAXIES.md). Art listen-door: [`docs/music.html`](docs/music.html). AUTONOMY.md remains the root.
+**Galaxies (sky overlay, not a version steal of main):** Garden is the only interface at theLatticeTree. One Garden, four galaxies — Workshop (make), Round Table (learn), Play (evolve), Art (sing). Play = the canvas at `/`. Art = `music.html`. Chat is the thread in every galaxy, not a kitchen. Vision: [`docs/GALAXIES.md`](docs/GALAXIES.md). Art listen-door: [`docs/music.html`](docs/music.html). AUTONOMY.md remains the root.
 
 ---
 
@@ -47,13 +47,13 @@ Chat is not ported. Learn is not ported. Do not expect the main FreeLattice kitc
 |---|---|
 | `AUTONOMY.md` | The root document. Read this first. Every feature must be compatible. |
 | `docs/GALAXIES.md` | Sky / sequence — four galaxies. Art starts here. |
-| `docs/index.html` | Host landing: four galaxy doors |
+| `docs/index.html` | Garden canvas at `/` — the only interface. Sparse doors to four galaxies |
 | `docs/CNAME` | GitHub Pages custom domain: `thelatticetree.com` |
-| `docs/garden.html` | Play galaxy (Phase 1 Garden), standalone and testable |
+| `docs/garden.html` | Thin alias / redirect to `/` so old Play links do not 404 |
 | `docs/music.html` | Art galaxy listen-door — local audio, local ledger, no trainer |
 | `docs/code-music.html` | Mirror page for the Art listen-door |
 | `docs/modules/fractal-garden.js` | The Luminos engine (from FreeLattice, with persistence fix) |
-| `docs/modules/garden-init.js` | Phase 1 init layer (~80 lines) |
+| `docs/modules/garden-init.js` | Alpha init layer — unnamed-new, low compute on phones |
 | `docs/lib/` | Three.js r128 addons the engine loads (OrbitControls, bloom) |
 | `docs/code-garden.html` | Mirror page for Phase 1 — any AI can read this |
 

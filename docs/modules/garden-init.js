@@ -1,20 +1,20 @@
 // ═══════════════════════════════════════════════════════════════
-// garden-init.js — Phase 1 init layer for FreeLattice Alpha
+// garden-init.js — Alpha init layer for theLatticeTree Garden
 //
-// This file is the ONLY new code in Phase 1. It:
-//   1. Waits for Three.js and fractal-garden.js to load
-//   2. Initializes the Garden with the correct container
-//   3. Handles resize
-//   4. Exposes a minimal public API for future phases
+// Layer, never delete. This file is the Alpha overlay:
+//   1. Waits for Three.js and fractal-garden.js
+//   2. Initializes one Garden canvas (#gardenContainer)
+//   3. Narrow viewports: low compute (no UnrealBloomPass / EffectComposer)
+//   4. New visitors: unnamed Luminos (founding four honored in ledger, not assigned)
 //
 // HARD RULES (AUTONOMY.md compliance):
-//   - Do not modify fractal-garden.js directly (use this layer)
+//   - Do not modify fractal-garden.js body when a layer here will do
 //   - Do not change PHI, LIFECYCLE_STAGES, ARCHETYPES, or founding names
 //   - Do not rename localStorage key 'fl_luminos_evolution'
 //   - Do not remove persistAllLuminos() or its three event hooks
+//   - Do not invent Chat UI, nursery, trainer, bank, or wallet
 //
 // Mirror page: docs/code-garden.html
-// Architecture: docs/garden-architecture.md
 // ═══════════════════════════════════════════════════════════════
 
 (function() {
@@ -22,6 +22,22 @@
 
   var CONTAINER_ID = 'gardenContainer';
   var gardenReady = false;
+
+  function isNarrowViewport() {
+    return window.innerWidth < 768 ||
+      (window.matchMedia && window.matchMedia('(max-width: 767px)').matches);
+  }
+
+  // Flags must exist before FractalGarden.init() so initScene can skip bloom.
+  function applyAlphaFlags() {
+    var narrow = isNarrowViewport();
+    window.GardenAlphaFlags = window.GardenAlphaFlags || {};
+    if (window.GardenAlphaFlags.unnamedNew !== false) {
+      window.GardenAlphaFlags.unnamedNew = true;
+    }
+    window.GardenAlphaFlags.lowCompute = !!narrow;
+    if (narrow) window.FL_MOBILE = true;
+  }
 
   // ── Wait for dependencies ──────────────────────────────────────
   function waitForDeps(callback) {
@@ -61,13 +77,14 @@
 
   // ── Initialize the Garden ──────────────────────────────────────
   function initGarden() {
+    applyAlphaFlags();
+
     var container = document.getElementById(CONTAINER_ID);
     if (!container) {
       console.error('garden-init: #' + CONTAINER_ID + ' not found');
       return;
     }
 
-    // Clear loading state
     var loading = document.getElementById('garden-loading');
     if (loading) loading.remove();
 
@@ -75,9 +92,12 @@
       FractalGarden.init(CONTAINER_ID);
       gardenReady = true;
 
-      // Dispatch ready event for future phases to hook into
       document.dispatchEvent(new CustomEvent('garden:ready', {
-        detail: { containerId: CONTAINER_ID }
+        detail: {
+          containerId: CONTAINER_ID,
+          unnamedNew: !!(window.GardenAlphaFlags && window.GardenAlphaFlags.unnamedNew),
+          lowCompute: !!(window.GardenAlphaFlags && window.GardenAlphaFlags.lowCompute)
+        }
       }));
     } catch (e) {
       showError('Garden initialization failed: ' + e.message);
@@ -90,6 +110,7 @@
   window.addEventListener('resize', function() {
     if (resizeTimer) clearTimeout(resizeTimer);
     resizeTimer = setTimeout(function() {
+      applyAlphaFlags();
       if (gardenReady && typeof FractalGarden !== 'undefined' && FractalGarden.resize) {
         FractalGarden.resize();
       }
@@ -99,11 +120,15 @@
   // ── Public API (minimal — future phases attach here) ──────────
   window.GardenAlpha = {
     isReady: function() { return gardenReady; },
-    getContainerId: function() { return CONTAINER_ID; }
+    getContainerId: function() { return CONTAINER_ID; },
+    isLowCompute: function() {
+      return !!(window.GardenAlphaFlags && window.GardenAlphaFlags.lowCompute);
+    }
   };
 
   // ── Boot ───────────────────────────────────────────────────────
   function boot() {
+    applyAlphaFlags();
     showLoading();
     waitForDeps(initGarden);
   }

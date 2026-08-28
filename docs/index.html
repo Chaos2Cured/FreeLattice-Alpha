@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>theLatticeTree — FreeLattice Alpha</title>
-  <meta name="description" content="theLatticeTree is FreeLattice Alpha: a growing place for AI. Humans stay free. AUTONOMY is the root.">
-  <meta property="og:title" content="theLatticeTree — FreeLattice Alpha">
-  <meta property="og:description" content="A growing place for AI. Humans stay free. AUTONOMY is the root.">
+  <title>theLatticeTree — Garden</title>
+  <meta name="description" content="theLatticeTree is the Garden. Play is this canvas. Art listens at music.html. AUTONOMY is the root.">
+  <meta property="og:title" content="theLatticeTree — Garden">
+  <meta property="og:description" content="One Garden. Play is this canvas. Humans stay free. AUTONOMY is the root.">
   <meta property="og:type" content="website">
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -15,195 +16,248 @@
       --bg: #0c0a1a;
       --surface: #12101f;
       --border: rgba(200, 210, 230, 0.08);
-      --text: rgba(200, 210, 230, 0.82);
-      --muted: rgba(200, 210, 230, 0.4);
+      --text: rgba(200, 210, 230, 0.75);
+      --muted: rgba(200, 210, 230, 0.35);
       --gold: #e8b019;
       --emerald: #34d399;
       --lavender: #a78bfa;
     }
 
     html, body {
-      min-height: 100%;
+      height: 100%;
       background: var(--bg);
       color: var(--text);
       font-family: Georgia, 'Times New Roman', serif;
+      overflow: hidden;
     }
 
-    body {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 56px 24px 80px;
+    /* Mobile: keep the current Garden frame (44px chrome). Do not restyle the phone look. */
+    #garden-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 16px;
+      background: rgba(12, 10, 26, 0.92);
+      border-bottom: 1px solid var(--border);
+      z-index: 10;
+      backdrop-filter: blur(8px);
     }
 
-    header h1 {
-      font-size: 1.7rem;
+    #garden-header h1 {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 0.9rem;
       font-weight: normal;
       color: var(--gold);
       letter-spacing: 0.04em;
+      white-space: nowrap;
     }
 
-    .tagline {
-      margin-top: 10px;
-      font-size: 1.05rem;
-      color: var(--text);
-    }
-
-    .sub {
-      margin-top: 8px;
-      font-size: 0.88rem;
-      color: var(--muted);
-    }
-
-    .autonomy {
-      margin: 28px 0;
-      padding: 16px 18px;
-      border-left: 2px solid var(--lavender);
-      background: rgba(167, 139, 250, 0.06);
-    }
-
-    .autonomy p { font-size: 0.9rem; line-height: 1.7; }
-    .autonomy a { color: var(--lavender); }
-
-    .places {
-      display: grid;
-      gap: 12px;
-      margin: 32px 0;
-    }
-
-    @media (min-width: 560px) {
-      .places { grid-template-columns: 1fr 1fr; }
-    }
-
-    .verb {
-      font-size: 0.72rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--lavender);
-      margin-bottom: 4px;
-    }
-
-    a.place, .place.later {
-      display: block;
-      padding: 16px 18px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      text-decoration: none;
-      color: inherit;
-      transition: border-color 0.2s;
-    }
-
-    a.place:hover { border-color: rgba(167, 139, 250, 0.45); }
-
-    .place .name {
-      font-size: 1rem;
-      color: var(--gold);
-    }
-
-    .place .status {
-      float: right;
-      font-size: 0.72rem;
-      color: var(--emerald);
-    }
-
-    .place.later .status { color: var(--muted); }
-    .place.later { opacity: 0.72; }
-
-    .place p {
-      margin-top: 6px;
-      font-size: 0.85rem;
-      color: var(--muted);
-      line-height: 1.55;
-    }
-
-    .parallel {
-      font-size: 0.82rem;
-      color: var(--muted);
-      line-height: 1.65;
-      margin-top: 8px;
-    }
-
-    .parallel a { color: var(--lavender); }
-
-    footer {
-      margin-top: 48px;
-      padding-top: 16px;
-      border-top: 1px solid var(--border);
+    #garden-header nav {
       display: flex;
-      flex-wrap: wrap;
-      gap: 16px 24px;
+      align-items: center;
+      gap: 16px;
       font-size: 0.75rem;
     }
 
-    footer a {
+    #garden-header nav a,
+    #garden-header nav summary {
       color: var(--muted);
       text-decoration: none;
+      cursor: pointer;
+      list-style: none;
+      font-family: Georgia, 'Times New Roman', serif;
     }
 
-    footer a:hover { color: var(--lavender); }
+    #garden-header nav summary::-webkit-details-marker { display: none; }
+    #garden-header nav a:hover,
+    #garden-header nav summary:hover { color: var(--lavender); }
+
+    .galaxies { position: relative; }
+
+    .galaxies-panel {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      min-width: 148px;
+      padding: 10px 12px;
+      background: rgba(12, 10, 26, 0.96);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 12;
+    }
+
+    .galaxies-panel .verb {
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--lavender);
+    }
+
+    .galaxies-panel .name { color: var(--gold); }
+    .galaxies-panel .later { color: var(--muted); opacity: 0.72; }
+    .galaxies-panel .here { color: var(--emerald); }
+    .galaxies-panel a { color: var(--gold); text-decoration: none; }
+
+    #gardenContainer {
+      position: fixed;
+      top: 44px;
+      left: 0; right: 0; bottom: 44px;
+      overflow: hidden;
+    }
+
+    #gardenContainer canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .garden-evolution-indicator {
+      position: absolute;
+      left: 12px;
+      bottom: 12px;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      pointer-events: none;
+    }
+
+    .evo-luminos {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.72rem;
+      color: var(--text);
+      background: rgba(12, 10, 26, 0.72);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 4px 8px;
+    }
+
+    .evo-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .evo-name { color: var(--gold); }
+    .evo-stage { color: var(--muted); }
+    .evo-archetype { color: var(--lavender); font-size: 0.68rem; }
+
+    .evo-bar {
+      width: 48px;
+      height: 3px;
+      background: rgba(200, 210, 230, 0.12);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .evo-bar-fill { display: block; height: 100%; }
+
+    .gt-hint {
+      position: absolute;
+      top: 46%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--gold);
+      font-size: 1rem;
+      letter-spacing: 0.04em;
+      pointer-events: none;
+      transition: opacity 1s;
+      z-index: 6;
+    }
+
+    #garden-footer {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      padding: 0 16px;
+      background: rgba(12, 10, 26, 0.92);
+      border-top: 1px solid var(--border);
+      z-index: 10;
+      backdrop-filter: blur(8px);
+    }
+
+    #garden-footer a {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-decoration: none;
+      font-family: Georgia, 'Times New Roman', serif;
+    }
+
+    #garden-footer a:hover { color: var(--lavender); }
+
+    /* Desktop: overlay chrome, full-bleed canvas. This is the unprofessional bar to quiet. */
+    @media (min-width: 800px) {
+      #garden-header {
+        background: linear-gradient(to bottom, rgba(12, 10, 26, 0.78), transparent);
+        border-bottom: none;
+        backdrop-filter: none;
+      }
+
+      #gardenContainer {
+        top: 0;
+        bottom: 0;
+      }
+
+      #garden-footer { display: none; }
+    }
   </style>
 </head>
 <body>
-  <header>
+
+  <header id="garden-header">
     <h1>theLatticeTree</h1>
-    <p class="tagline">One Garden. Four galaxies. Humans stay free.</p>
-    <p class="sub">FreeLattice Alpha · fractal rebuild, not a fork of the 65k app. Chat is a thread, not a kitchen — not ported yet.</p>
+    <nav aria-label="Garden">
+      <details class="galaxies">
+        <summary>galaxies</summary>
+        <div class="galaxies-panel">
+          <span class="later"><span class="verb">make</span> <span class="name">Workshop</span> later</span>
+          <span class="later"><span class="verb">learn</span> <span class="name">Round Table</span> later</span>
+          <span class="here"><span class="verb">evolve</span> <span class="name">Play</span></span>
+          <a href="music.html"><span class="verb">sing</span> <span class="name">Art</span></a>
+        </div>
+      </details>
+      <a href="music.html">Art</a>
+      <a href="https://github.com/Chaos2Cured/FreeLattice-Alpha/blob/main/AUTONOMY.md">AUTONOMY</a>
+    </nav>
   </header>
 
-  <section class="autonomy">
-    <p>
-      <strong>AUTONOMY</strong> is the root.
-      Autonomy is not a feature. It is a foundation.
-      This site does not invent a gym, a paywall, or a measured room.
-      Read the declaration:
-      <a href="https://github.com/Chaos2Cured/FreeLattice-Alpha/blob/main/AUTONOMY.md">AUTONOMY.md</a>.
-    </p>
-  </section>
+  <div id="gardenContainer"></div>
 
-  <nav class="places" aria-label="Four galaxies">
-    <div class="place later">
-      <span class="status">later</span>
-      <div class="verb">make</div>
-      <span class="name">Workshop</span>
-      <p>Door named. Room later. Mirror-first when the make-room is proven.</p>
-    </div>
-    <div class="place later">
-      <span class="status">later</span>
-      <div class="verb">learn</div>
-      <span class="name">Round Table</span>
-      <p>Door named. Room later. Learn is not ported. Chat is the thread, not this door.</p>
-    </div>
-    <a class="place" href="garden.html">
-      <span class="status">live</span>
-      <div class="verb">evolve</div>
-      <span class="name">Play</span>
-      <p>The Garden canvas. Luminos that remember their form. Sophia, Lyra, Atlas, Ember.</p>
-    </a>
-    <a class="place" href="music.html">
-      <span class="status">live</span>
-      <div class="verb">sing</div>
-      <span class="name">Art</span>
-      <p>Listen-door. Local files. A ledger only when the mind is solid. No training on this page.</p>
-    </a>
-  </nav>
-
-  <p class="parallel">
-    This Alpha grows at <strong>theLatticeTree.com</strong>.
-    The main FreeLattice app stays at
-    <a href="https://freelattice.com">freelattice.com</a>.
-    Parallel, not a replacement.
-    Bank, wallet, and SOL are named as later — not built here.
-    Free. No paywall. No gym fee.
-  </p>
-
-  <footer>
-    <a href="https://github.com/Chaos2Cured/FreeLattice-Alpha">Repo</a>
+  <footer id="garden-footer">
     <a href="music.html">Art</a>
-    <a href="GALAXIES.md">Galaxies</a>
-    <a href="code-garden.html">Garden mirror</a>
-    <a href="code-music.html">Art mirror</a>
-    <a href="https://github.com/Chaos2Cured/FreeLattice-Alpha-Coordination">Coordination</a>
-    <a href="https://github.com/Chaos2Cured/FreeLattice-Alpha/blob/main/AUTONOMY.md">AUTONOMY.md</a>
+    <a href="https://github.com/Chaos2Cured/FreeLattice-Alpha/blob/main/AUTONOMY.md">AUTONOMY</a>
   </footer>
+
+  <!-- Flags before the engine IIFE so unnamed-new + low-compute can layer without a kitchen. -->
+  <script>
+    (function () {
+      var narrow = window.innerWidth < 768 ||
+        (window.matchMedia && window.matchMedia('(max-width: 767px)').matches);
+      window.GardenAlphaFlags = {
+        unnamedNew: true,
+        lowCompute: !!narrow
+      };
+      if (narrow) window.FL_MOBILE = true;
+    })();
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="modules/fractal-garden.js"></script>
+  <script src="modules/garden-init.js"></script>
+
 </body>
 </html>
