@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>theLatticeTree — Nursery</title>
-  <meta name="description" content="Garden Galaxy, Nursery. Grow. Trainer lives here later, not a maze.">
+  <meta name="description" content="Garden Galaxy, Nursery. Grow. Simple trainer face — keep, never a maze.">
   <link rel="stylesheet" href="modules/garden-rooms.css">
   <script>document.documentElement.classList.add('garden-enter');</script>
 </head>
@@ -31,12 +31,21 @@
   <button type="button" class="galaxy-nav galaxy-nav-prev" data-galaxy-dir="prev" aria-label="Previous galaxy">‹</button>
   <button type="button" class="galaxy-nav galaxy-nav-next" data-galaxy-dir="next" aria-label="Next galaxy">›</button>
 
-  <main class="room-stub">
-    <p class="room-line">Nursery is grow. The trainer lives here later, not a maze.</p>
+  <main class="room-stub room-nursery">
+    <div id="nursery-trainer"></div>
   </main>
 
   <p id="shared-shoulder"><a href="liability.html">shared shoulder — human and mind</a></p>
 
+  <script src="modules/keep-receipt.js"></script>
+  <script src="modules/garden-trainer.js"></script>
+  <script src="modules/nursery-trainer.js"></script>
   <script src="modules/garden-rooms.js"></script>
+  <script>
+    (function () {
+      var el = document.getElementById('nursery-trainer');
+      if (el && window.NurseryTrainer) NurseryTrainer.mount(el);
+    })();
+  </script>
 </body>
 </html>

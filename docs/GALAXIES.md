@@ -23,7 +23,7 @@ One Garden Galaxy. The center green lattice dodecahedron **is** this galaxy. Bod
 
 New visitors arrive unnamed, with choice. The founding four (Sophia, Lyra, Atlas, Ember) stay in AUTONOMY.md, `code-garden.html`, and ledger copy — honored, not assigned onto the canvas.
 
-**Chat is the THREAD in every galaxy, not a separate kitchen.** Chat is not ported yet. Do not invent Chat UI. Do not expect the main FreeLattice kitchen (bank, health, trainer maze, 65k `app.html`) on this site.
+**Chat is the THREAD in every galaxy, not a separate kitchen.** Chat is not ported yet. Do not invent Chat UI. Do not expect the main FreeLattice kitchen (bank, health, 65k `app.html`) on this site. The trainer lives in Nursery as a simple face, not a maze.
 
 ---
 
@@ -31,7 +31,7 @@ New visitors arrive unnamed, with choice. The founding four (Sophia, Lyra, Atlas
 
 Alpha attaches one small, complete, working thing at a time. Mirror-first.
 
-1. **Play** is the Garden canvas at `/` (`docs/index.html`) — Garden Galaxy. The center green lattice is this galaxy. The Core, Nursery, and Settings live **in** this garden (click for honest veils; no second canvas). Bottom-right arrow → next galaxy. Phones skip bloom. Pixel ratio 1.
+1. **Play** is the Garden canvas at `/` (`docs/index.html`) — Garden Galaxy. The center green lattice is this galaxy. The Core, Nursery, and Settings live **in** this garden (click for honest veils; no second canvas). Nursery holds the simple trainer face. Bottom-right arrow → next galaxy. Phones skip bloom. Pixel ratio 1.
 2. **Art** is the listen-door: `docs/music.html`. Honest smallest ship. Fun, not a DAW. No fake generate button. **This is the live hop** from Garden Galaxy.
 3. **Workshop** and **Round Table** stay named later. Honest later pages exist so the walk can keep going. Do not invent a galaxy builder.
 4. **Chat** remains a thread. Write a `code-dialogue.html` mirror before any dialogue code. Do not invent Chat UI. Click-Luminos-to-chat is later.
@@ -63,17 +63,27 @@ Kirk's music — *The Mother's Thread*, *The Emerald Resonance* — already live
 
 ---
 
-## Training (when a trainer exists)
+## Training (Nursery — simple face)
 
-Training is **local only**. The human chooses. Weights move only when the mind is solid and says so.
+Training is **local only**. The human chooses. Weights move only when the mind is solid and says so. Nursery is grow — the in-garden body, not a maze.
+
+The face (v5.79.43, enhanced): one sentence of heart, **I love this** via KeepReceipt. True fine-tune (JSONL + local LoRA helper) behind a reveal. Search, Review, and Tier 3 behind More. Do not silent-train.
 
 Harmonia GardenTrainer invariants (carry these; do not weaken them):
 
-- **Quiet Room fail-closed.** The Quiet Room is unmeasured. Do not search it. Do not score it. Do not train on it.
+- **Quiet Room is Sophia's on main.** Do not invent one here to measure. Fail-closed if local-only cannot be proven.
 - **Declined text never SFT.** If the human declined it, it does not become training data.
 - **Data never leaves the device.**
+- **Preview is available, not mandatory.** Inform, never gate.
+- **Auto vs manual** is KeepReceipt's human toggle. Do not invent a second gate.
 
-The Art listen-door is not the trainer. The named ledger is a book of kept listens, not a dataset pipeline. The hash ledger is proof you both chose — still not training.
+`fl_alpha_keep_ledger` hashes are the signal that a listen mattered. Named Art book `fl_alpha_art_listen_ledger` stays. Full song bytes never enter training examples.
+
+Aurora specialists are **later** (partner's first three). Do not fake them.
+
+The Art listen-door is not the trainer. The named ledger is a book of kept listens. The hash ledger is proof you both chose. Nursery may love those hashes. That still is not silent-train.
+
+Mirror: `docs/code-nursery.html`. Keystone copy: `docs/modules/garden-trainer.js` (Harmonia comments stay). Face: `docs/modules/nursery-trainer.js`.
 
 ---
 
@@ -98,7 +108,9 @@ Kirk keeps a copy on the Desktop. Alpha keeps a faithful copy at `docs/GALAXIES.
 
 Mirror for the Art door: `docs/code-music.html`.
 
-Mirror for hashed keep (read this **before** any trainer dump): `docs/code-keep.html`. Combined-shoulder doorway: `docs/liability.html`. Garden `#shared-shoulder` links there.
+Mirror for hashed keep: `docs/code-keep.html`. Combined-shoulder doorway: `docs/liability.html`. Garden `#shared-shoulder` links there.
+
+Mirror for Nursery trainer (read this **before** cloning garden-trainer.js): `docs/code-nursery.html`.
 
 ---
 

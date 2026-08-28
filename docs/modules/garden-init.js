@@ -12,8 +12,8 @@
 //   - Do not change PHI, LIFECYCLE_STAGES, ARCHETYPES, or founding names
 //   - Do not rename localStorage key 'fl_luminos_evolution'
 //   - Do not remove persistAllLuminos() or its three event hooks
-//   - Do not invent Chat UI, trainer, bank, or wallet
-//   - Nursery is an honest room in the garden; do not dump the trainer there
+//   - Do not invent Chat UI, bank, or wallet
+//   - Nursery holds the simple trainer face (not a maze dump)
 //   - Team is named later; Glass is not a peer room
 //
 // Mirror page: docs/code-garden.html
@@ -40,6 +40,12 @@
     window.GardenAlphaFlags.lowCompute = !!narrow;
     if (window.GardenAlphaFlags.gardenLattice !== false) {
       window.GardenAlphaFlags.gardenLattice = true;
+    }
+    if (window.GardenAlphaFlags.nurseryTrainer !== false) {
+      window.GardenAlphaFlags.nurseryTrainer = true;
+    }
+    if (window.GardenAlphaFlags.trainerRemote !== true) {
+      window.GardenAlphaFlags.trainerRemote = false;
     }
     if (narrow) window.FL_MOBILE = true;
   }

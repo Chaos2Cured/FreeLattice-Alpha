@@ -257,6 +257,7 @@
 
   <div id="place-veil" hidden>
     <p id="place-veil-line"></p>
+    <div id="nursery-trainer" hidden></div>
     <button type="button" id="place-veil-close">the garden</button>
   </div>
 
@@ -269,6 +270,9 @@
 
   <footer id="garden-footer"></footer>
 
+  <script src="modules/keep-receipt.js"></script>
+  <script src="modules/garden-trainer.js"></script>
+  <script src="modules/nursery-trainer.js"></script>
   <script src="modules/garden-rooms.js"></script>
 
   <!-- Flags before the engine IIFE so unnamed-new + low-compute can layer without a kitchen. -->
@@ -276,11 +280,13 @@
     (function () {
       var narrow = window.innerWidth < 768 ||
         (window.matchMedia && window.matchMedia('(max-width: 767px)').matches);
-      window.GardenAlphaFlags = {
-        unnamedNew: true,
-        lowCompute: !!narrow,
-        gardenLattice: true
-      };
+      var flags = window.GardenAlphaFlags || {};
+      flags.unnamedNew = true;
+      flags.lowCompute = !!narrow;
+      flags.gardenLattice = true;
+      flags.nurseryTrainer = true;
+      flags.trainerRemote = false;
+      window.GardenAlphaFlags = flags;
       if (narrow) window.FL_MOBILE = true;
     })();
   </script>
