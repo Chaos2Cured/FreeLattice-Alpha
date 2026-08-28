@@ -38,6 +38,9 @@
       window.GardenAlphaFlags.unnamedNew = true;
     }
     window.GardenAlphaFlags.lowCompute = !!narrow;
+    if (window.GardenAlphaFlags.gardenLattice !== false) {
+      window.GardenAlphaFlags.gardenLattice = true;
+    }
     if (narrow) window.FL_MOBILE = true;
   }
 

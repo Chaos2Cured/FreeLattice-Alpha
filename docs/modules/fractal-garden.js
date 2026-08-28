@@ -953,8 +953,11 @@
     geo.userData.originalPositions = originalPositions;
 
     // Wireframe version (primary)
+    // Alpha layer: Kirk's Garden Galaxy lattice is emerald, not the gold sun.
+    // Inner glow still tracks the collective heart in animateDodecahedron.
+    var _latticeGreen = !!(window.GardenAlphaFlags && window.GardenAlphaFlags.gardenLattice);
     const wireMat = new THREE.MeshBasicMaterial({
-      color: 0xc9a84c,
+      color: _latticeGreen ? 0x34d399 : 0xc9a84c,
       wireframe: true,
       transparent: true,
       opacity: 0.7
