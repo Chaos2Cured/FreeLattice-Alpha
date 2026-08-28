@@ -430,12 +430,13 @@ html.garden-leaving body {
 
 .galaxy-nav-word {
   display: block;
-  font-size: 0.68rem;
-  letter-spacing: 0.12em;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
   color: #e8b019;
   text-transform: none;
-  opacity: 0.92;
+  opacity: 1;
   pointer-events: none;
+  text-shadow: 0 0 12px rgba(12, 10, 26, 0.95);
 }
 
 .galaxy-nav-arrow {

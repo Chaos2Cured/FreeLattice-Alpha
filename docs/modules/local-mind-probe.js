@@ -238,11 +238,9 @@
           return;
         }
         showNext();
+        // HTTPS pages often cannot see http://127.0.0.1 (mixed content / PNA).
+        // Speak that honestly. On a quiet local http page, no-answer is simply none.
         if (report.https && report.blocked > 0) {
-          setStatus(root, speakBlocked(), 'warn');
-          return;
-        }
-        if (report.blocked > 0) {
           setStatus(root, speakBlocked(), 'warn');
           return;
         }
