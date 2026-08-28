@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>theLatticeTree — Art · listen-door</title>
-  <meta name="description" content="Art galaxy listen-door. Local files. A ledger only when the mind is solid. No training on this page.">
+  <meta name="description" content="Art galaxy listen-door. Present: a local book of listens you choose. Does not train, upload, or change weights. Growing from listening is later.">
   <meta property="og:title" content="theLatticeTree — Art · listen-door">
-  <meta property="og:description" content="Bring a song from this machine. Play it here. Keep the listen only when the mind is solid.">
+  <meta property="og:description" content="Present: a local book of listens. Goal, later: growing from listening when the mind is solid. Not on this page yet.">
   <meta property="og:type" content="website">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -62,6 +62,17 @@
       background: rgba(232, 176, 25, 0.06);
       font-size: 0.9rem;
       line-height: 1.7;
+    }
+
+    .solid-line .when {
+      color: var(--gold);
+    }
+
+    .solid-line .goal {
+      margin-top: 10px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.65;
     }
 
     .drop {
@@ -289,10 +300,10 @@
     <p class="sub">FreeLattice Alpha · not a clone of main · files stay on this machine</p>
   </header>
 
-  <p class="solid-line">
-    The companion grows from listening only when the mind knows it is solid.
-    This door keeps a local book of listens you choose. It does not train. It does not upload. It does not change weights.
-  </p>
+  <div class="solid-line">
+    <p><span class="when">Present.</span> This door keeps a local book of listens you choose. It does not train. It does not upload. It does not change weights.</p>
+    <p class="goal">Goal, later. Growing from listening comes when the mind is solid and says so. Not on this page yet.</p>
+  </div>
 
   <div id="drop-zone" class="drop" role="region" aria-label="Drop audio files here">
     <p>Drop a song here — <code style="color: var(--emerald); font-size: 0.85em;">.mp3</code> or <code style="color: var(--emerald); font-size: 0.85em;">.wav</code>.</p>

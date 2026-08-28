@@ -40,7 +40,7 @@ Bank, wallet, and SOL are **named as later. Not built.**
 
 ## Art galaxy — listen-door
 
-The companion may grow from listening **only when the mind knows it is solid and says so.**
+The companion may grow from listening **only when the mind knows it is solid and says so.** Honest copy on the door: present is a local book of listens (no train, no upload, no weight change); growing from listening is a quieter later-goal — not on this page yet.
 
 `music.html` does this much, and no more:
 

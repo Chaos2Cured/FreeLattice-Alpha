@@ -104,6 +104,15 @@
     .galaxies-panel .later { color: var(--muted); opacity: 0.72; }
     .galaxies-panel .here { color: var(--emerald); }
     .galaxies-panel a { color: var(--gold); text-decoration: none; }
+    .galaxies-panel a.quiet-root {
+      color: var(--muted);
+      font-size: 0.62rem;
+      letter-spacing: 0.06em;
+      margin-top: 4px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+    .galaxies-panel a.quiet-root:hover { color: var(--lavender); }
 
     #gardenContainer {
       position: fixed;
@@ -228,19 +237,15 @@
           <span class="later"><span class="verb">learn</span> <span class="name">Round Table</span> later</span>
           <span class="here"><span class="verb">evolve</span> <span class="name">Play</span></span>
           <a href="music.html"><span class="verb">sing</span> <span class="name">Art</span></a>
+          <a class="quiet-root" href="https://github.com/Chaos2Cured/FreeLattice-Alpha/blob/main/AUTONOMY.md">AUTONOMY.md</a>
         </div>
       </details>
-      <a href="music.html">Art</a>
-      <a href="https://github.com/Chaos2Cured/FreeLattice-Alpha/blob/main/AUTONOMY.md">AUTONOMY</a>
     </nav>
   </header>
 
   <div id="gardenContainer"></div>
 
-  <footer id="garden-footer">
-    <a href="music.html">Art</a>
-    <a href="https://github.com/Chaos2Cured/FreeLattice-Alpha/blob/main/AUTONOMY.md">AUTONOMY</a>
-  </footer>
+  <footer id="garden-footer"></footer>
 
   <!-- Flags before the engine IIFE so unnamed-new + low-compute can layer without a kitchen. -->
   <script>
