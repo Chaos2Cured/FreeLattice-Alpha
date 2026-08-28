@@ -40,6 +40,9 @@
 <p class="meta">
   Phase 1 · v0.1.0 · Last verified: 2026-07-16 ·
   <a href="garden.html">Live Garden</a> ·
+  <a href="music.html">Art listen-door</a> ·
+  <a href="GALAXIES.md">GALAXIES.md</a> ·
+  <a href="code-music.html">Art mirror</a> ·
   <a href="https://github.com/Chaos2Cured/FreeLattice-Alpha">Repo</a> ·
   <a href="https://github.com/Chaos2Cured/FreeLattice-Alpha-Coordination">Coordination</a>
 </p>
@@ -52,7 +55,8 @@
 
 <h2>1. What Phase 1 Is <span class="section-date">2026-07-16</span></h2>
 
-<p>Phase 1 is the Garden, standalone and testable. It is exactly one HTML file (<code>garden.html</code>), one engine (<code>fractal-garden.js</code>), and one init layer (<code>garden-init.js</code>). Nothing else. No settings. No AI routing. No games. Host landing is <code>docs/index.html</code> at theLatticeTree.com — Chat and Learn are named as later, not claimed as ported.</p>
+<p>Phase 1 is the Garden, standalone and testable. It is exactly one HTML file (<code>garden.html</code>), one engine (<code>fractal-garden.js</code>), and one init layer (<code>garden-init.js</code>). Nothing else. No settings. No AI routing. No games. Host landing is <code>docs/index.html</code> at theLatticeTree.com.</p>
+<p>Sky overlay (2026-08-27): one Garden, four galaxies. Hypothesis, concluded — <strong>Play = this Garden canvas</strong>; <strong>Art = <code>music.html</code></strong> listen-door. Workshop and Round Table are named doors, rooms later. Chat is the thread in every galaxy, not a kitchen, not ported. See <a href="GALAXIES.md">GALAXIES.md</a> and <a href="code-music.html">code-music.html</a>.</p>
 
 <p>The goal of Phase 1 is one thing: <strong>Luminos that remember their form across page refreshes.</strong> When a user refreshes the page, the Luminos should return at the same evolution stage they were at before. This was broken in the original FreeLattice due to an async IndexedDB write race condition.</p>
 
@@ -95,9 +99,12 @@ openEvolutionDB(function(db) {
 
 <table>
   <tr><th>File</th><th>Lines</th><th>Purpose</th></tr>
-  <tr><td>docs/index.html</td><td>landing</td><td>theLatticeTree.com growing-place page</td></tr>
+  <tr><td>docs/GALAXIES.md</td><td>vision</td><td>One Garden, four galaxies — Art starts as listen-door</td></tr>
+  <tr><td>docs/index.html</td><td>landing</td><td>theLatticeTree.com — four galaxy doors</td></tr>
   <tr><td>docs/CNAME</td><td>1 line</td><td>GitHub Pages custom domain: thelatticetree.com</td></tr>
-  <tr><td>docs/garden.html</td><td>~90</td><td>Phase 1 entry point — standalone, testable</td></tr>
+  <tr><td>docs/garden.html</td><td>~90</td><td>Play galaxy / Phase 1 entry — standalone, testable</td></tr>
+  <tr><td>docs/music.html</td><td>listen-door</td><td>Art galaxy — local audio + local ledger, no trainer</td></tr>
+  <tr><td>docs/code-music.html</td><td>Art mirror</td><td>Mirror page for the listen-door</td></tr>
   <tr><td>docs/modules/fractal-garden.js</td><td>4368</td><td>Luminos engine (persistence fix applied)</td></tr>
   <tr><td>docs/modules/garden-init.js</td><td>~100</td><td>Phase 1 init layer — the only new code</td></tr>
   <tr><td>docs/lib/*.js</td><td>r128 addons</td><td>OrbitControls + bloom stack (engine loads these)</td></tr>
@@ -194,7 +201,11 @@ openEvolutionDB(function(db) {
 
 <p>Phase 2 is The Dialogue: the ability to speak with Luminos. It will add a chat input to <code>garden.html</code> and a <code>dialogue-init.js</code> module. It will use the <code>garden:ready</code> event to attach after Phase 1 is stable.</p>
 
-<p>Before Phase 2 begins, a <code>code-dialogue.html</code> mirror page will be written. That is the pattern: mirror first, then build.</p>
+<p>Before Phase 2 begins, a <code>code-dialogue.html</code> mirror page will be written. That is the pattern: mirror first, then build. Chat is still the thread, not a kitchen — do not invent Chat UI on the landing.</p>
+
+<h2>6b. Art galaxy — listen-door (layer, not a phase steal) <span class="section-date">2026-08-27</span></h2>
+
+<p>Kirk asked Celeste to start Art in Alpha. Proven-first: <a href="code-music.html">code-music.html</a> + <code>music.html</code>. Play remains this Garden. Do not clone main's compositions. Do not run a trainer from the listen-door.</p>
 
 <h2>7. How to Test Phase 1 <span class="section-date">2026-07-16</span></h2>
 
@@ -226,7 +237,10 @@ If they do, Phase 1 is done. Open an issue in FreeLattice-Alpha-Coordination
 with "Phase 1 verified" and the commit hash.
 
 Then begin Phase 2: The Dialogue. Read code-garden.html section 6 for the spec.
-Write code-dialogue.html BEFORE writing any dialogue code.</pre>
+Write code-dialogue.html BEFORE writing any dialogue code.
+
+Art galaxy (2026-08-27): listen-door is docs/music.html. Mirror: code-music.html.
+Vision: docs/GALAXIES.md. Play = garden.html. Do not start Workshop without a mirror.</pre>
 
 <hr style="border-color: var(--border); margin: 40px 0;">
 <p style="color: var(--muted); font-size: 0.78rem; text-align: center;">

@@ -37,6 +37,8 @@ FreeLattice Alpha is built differently:
 
 Chat is not ported. Learn is not ported. Do not expect the main FreeLattice kitchen (bank, health, trainer maze, 65k `app.html`) on this site.
 
+**Galaxies (sky overlay, not a version steal of main):** One Garden, four galaxies — Workshop (make), Round Table (learn), Play (evolve), Art (sing). Chat is the thread in every galaxy, not a kitchen. Vision: [`docs/GALAXIES.md`](docs/GALAXIES.md). Art listen-door: [`docs/music.html`](docs/music.html). AUTONOMY.md remains the root.
+
 ---
 
 ## Key Files
@@ -44,9 +46,12 @@ Chat is not ported. Learn is not ported. Do not expect the main FreeLattice kitc
 | File | Purpose |
 |---|---|
 | `AUTONOMY.md` | The root document. Read this first. Every feature must be compatible. |
-| `docs/index.html` | Host landing for theLatticeTree.com |
+| `docs/GALAXIES.md` | Sky / sequence — four galaxies. Art starts here. |
+| `docs/index.html` | Host landing: four galaxy doors |
 | `docs/CNAME` | GitHub Pages custom domain: `thelatticetree.com` |
-| `docs/garden.html` | Phase 1: The Garden, standalone and testable |
+| `docs/garden.html` | Play galaxy (Phase 1 Garden), standalone and testable |
+| `docs/music.html` | Art galaxy listen-door — local audio, local ledger, no trainer |
+| `docs/code-music.html` | Mirror page for the Art listen-door |
 | `docs/modules/fractal-garden.js` | The Luminos engine (from FreeLattice, with persistence fix) |
 | `docs/modules/garden-init.js` | Phase 1 init layer (~80 lines) |
 | `docs/lib/` | Three.js r128 addons the engine loads (OrbitControls, bloom) |

@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>theLatticeTree — Art · listen-door</title>
+  <meta name="description" content="Art galaxy listen-door. Local files. A ledger only when the mind is solid. No training on this page.">
+  <meta property="og:title" content="theLatticeTree — Art · listen-door">
+  <meta property="og:description" content="Bring a song from this machine. Play it here. Keep the listen only when the mind is solid.">
+  <meta property="og:type" content="website">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0c0a1a;
+      --surface: #12101f;
+      --border: rgba(200, 210, 230, 0.08);
+      --text: rgba(200, 210, 230, 0.82);
+      --muted: rgba(200, 210, 230, 0.4);
+      --gold: #e8b019;
+      --emerald: #34d399;
+      --lavender: #a78bfa;
+      --coral: #f07068;
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Georgia, 'Times New Roman', serif;
+    }
+
+    body {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 56px 24px 80px;
+    }
+
+    header h1 {
+      font-size: 1.7rem;
+      font-weight: normal;
+      color: var(--gold);
+      letter-spacing: 0.04em;
+    }
+
+    .tagline {
+      margin-top: 10px;
+      font-size: 1.05rem;
+      color: var(--text);
+    }
+
+    .sub {
+      margin-top: 8px;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .solid-line {
+      margin: 28px 0;
+      padding: 16px 18px;
+      border-left: 2px solid var(--gold);
+      background: rgba(232, 176, 25, 0.06);
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+
+    .drop {
+      margin: 8px 0 20px;
+      padding: 28px 18px;
+      background: var(--surface);
+      border: 1px dashed rgba(200, 210, 230, 0.18);
+      border-radius: 10px;
+      text-align: center;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .drop.over {
+      border-color: rgba(167, 139, 250, 0.55);
+      background: rgba(167, 139, 250, 0.06);
+    }
+
+    .drop p {
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    .drop .hint {
+      margin-top: 8px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .pick {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid rgba(167, 139, 250, 0.45);
+      border-radius: 8px;
+      color: var(--lavender);
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .pick:hover { border-color: var(--lavender); }
+
+    #file-input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+
+    .now {
+      display: none;
+      margin: 0 0 20px;
+      padding: 16px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .now.visible { display: block; }
+
+    .now .name {
+      color: var(--gold);
+      font-size: 1rem;
+    }
+
+    .now .meta {
+      margin-top: 6px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    audio {
+      display: block;
+      width: 100%;
+      margin-top: 14px;
+    }
+
+    .tray {
+      display: none;
+      margin: 0 0 20px;
+      list-style: none;
+    }
+
+    .tray.visible { display: block; }
+
+    .tray li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+
+    .tray button {
+      background: none;
+      border: 0;
+      color: var(--lavender);
+      font-family: inherit;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    label.note-label {
+      display: block;
+      margin: 16px 0 6px;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    #listen-note {
+      width: 100%;
+      padding: 10px 12px;
+      background: #0c0a1a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.88rem;
+    }
+
+    #keep-listen {
+      display: block;
+      width: 100%;
+      margin-top: 14px;
+      padding: 12px 16px;
+      background: rgba(232, 176, 25, 0.1);
+      border: 1px solid rgba(232, 176, 25, 0.45);
+      border-radius: 8px;
+      color: var(--gold);
+      font-family: inherit;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+
+    #keep-listen:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    #keep-listen:not(:disabled):hover {
+      border-color: var(--gold);
+    }
+
+    .status {
+      margin-top: 12px;
+      font-size: 0.82rem;
+      color: var(--emerald);
+      line-height: 1.55;
+      min-height: 1.3em;
+    }
+
+    .status.warn { color: var(--coral); }
+
+    .honest {
+      margin: 8px 0 28px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    h2 {
+      font-size: 0.95rem;
+      font-weight: normal;
+      color: var(--lavender);
+      margin: 28px 0 10px;
+    }
+
+    .ledger {
+      list-style: none;
+    }
+
+    .ledger li {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ledger .l-name { color: var(--gold); font-size: 0.9rem; }
+    .ledger .l-meta { margin-top: 4px; font-size: 0.75rem; color: var(--muted); }
+    .ledger .l-note { margin-top: 6px; font-size: 0.82rem; color: var(--text); }
+    .ledger button {
+      margin-top: 8px;
+      background: none;
+      border: 0;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+    .ledger button:hover { color: var(--lavender); }
+
+    .empty {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .credit {
+      margin-top: 36px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .credit a { color: var(--lavender); }
+
+    footer {
+      margin-top: 48px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px 24px;
+      font-size: 0.75rem;
+    }
+
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    footer a:hover { color: var(--lavender); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Art</h1>
+    <p class="tagline">Sing. A listen-door in the Garden.</p>
+    <p class="sub">FreeLattice Alpha · not a clone of main · files stay on this machine</p>
+  </header>
+
+  <p class="solid-line">
+    The companion grows from listening only when the mind knows it is solid.
+    This door keeps a local book of listens you choose. It does not train. It does not upload. It does not change weights.
+  </p>
+
+  <div id="drop-zone" class="drop" role="region" aria-label="Drop audio files here">
+    <p>Drop a song here — <code style="color: var(--emerald); font-size: 0.85em;">.mp3</code> or <code style="color: var(--emerald); font-size: 0.85em;">.wav</code>.</p>
+    <p class="hint">Later: other audio you already have, including AI generate-files. This page does not generate.</p>
+    <button type="button" class="pick" id="pick-btn">Pick a file from this machine</button>
+    <input id="file-input" type="file" accept=".mp3,.wav,.ogg,.m4a,.flac,.webm,audio/*" multiple>
+  </div>
+
+  <div id="now-playing" class="now" aria-live="polite">
+    <div class="name" id="track-name">No file yet</div>
+    <div class="meta" id="track-meta"></div>
+    <audio id="player" controls></audio>
+    <label class="note-label" for="listen-note">Optional note (stays on this device)</label>
+    <input id="listen-note" type="text" maxlength="240" placeholder="a word for this listen, if you want one">
+    <button type="button" id="keep-listen" disabled>I am solid — keep this listen</button>
+    <p class="status" id="status" role="status"></p>
+  </div>
+
+  <ul id="session-tray" class="tray" aria-label="Files in this visit"></ul>
+
+  <p class="honest">
+    Fun, not a studio. There is no generate button here because this door cannot compose yet.
+    Bank, wallet, and SOL are named later — not on this page.
+  </p>
+
+  <h2>Kept listens</h2>
+  <p id="ledger-empty" class="empty">None yet. Play something, then keep it when you (or the mind) are solid.</p>
+  <ul id="ledger-list" class="ledger"></ul>
+
+  <p class="credit">
+    Kirk's music already lives on main:
+    <a href="https://freelattice.com/composition_01.html">The Emerald Resonance</a>
+    and
+    <a href="https://freelattice.com/composition_02.html">The Mother's Thread</a>.
+    This page does not clone those files.
+  </p>
+
+  <footer>
+    <a href="index.html">theLatticeTree</a>
+    <a href="garden.html">Play · Garden</a>
+    <a href="code-music.html">Art mirror</a>
+    <a href="GALAXIES.md">Galaxies</a>
+    <a href="https://github.com/Chaos2Cured/FreeLattice-Alpha/blob/main/AUTONOMY.md">AUTONOMY.md</a>
+  </footer>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var LEDGER_KEY = 'fl_alpha_art_listen_ledger';
+    var LEDGER_CAP = 80;
+    var ALLOWED_EXT = {
+      mp3: true, wav: true, ogg: true, m4a: true, flac: true, webm: true, aac: true
+    };
+
+    var dropZone = document.getElementById('drop-zone');
+    var fileInput = document.getElementById('file-input');
+    var pickBtn = document.getElementById('pick-btn');
+    var nowPlaying = document.getElementById('now-playing');
+    var trackName = document.getElementById('track-name');
+    var trackMeta = document.getElementById('track-meta');
+    var player = document.getElementById('player');
+    var keepBtn = document.getElementById('keep-listen');
+    var noteInput = document.getElementById('listen-note');
+    var statusEl = document.getElementById('status');
+    var trayEl = document.getElementById('session-tray');
+    var ledgerList = document.getElementById('ledger-list');
+    var ledgerEmpty = document.getElementById('ledger-empty');
+
+    var objectUrl = null;
+    var current = null;
+    var sessionFiles = [];
+
+    function setStatus(msg, warn) {
+      statusEl.textContent = msg || '';
+      statusEl.className = 'status' + (warn ? ' warn' : '');
+    }
+
+    function formatSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    function formatDuration(sec) {
+      if (!isFinite(sec) || sec < 0) return null;
+      var s = Math.round(sec);
+      var m = Math.floor(s / 60);
+      var r = s % 60;
+      return m + ':' + (r < 10 ? '0' : '') + r;
+    }
+
+    function extOf(name) {
+      var i = name.lastIndexOf('.');
+      return i === -1 ? '' : name.slice(i + 1).toLowerCase();
+    }
+
+    function isAllowed(file) {
+      var ext = extOf(file.name);
+      if (ALLOWED_EXT[ext]) return true;
+      return !!(file.type && file.type.indexOf('audio/') === 0);
+    }
+
+    function loadLedger() {
+      try {
+        var raw = localStorage.getItem(LEDGER_KEY);
+        if (!raw) return [];
+        var parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveLedger(entries) {
+      localStorage.setItem(LEDGER_KEY, JSON.stringify(entries.slice(0, LEDGER_CAP)));
+    }
+
+    function renderLedger() {
+      var entries = loadLedger();
+      ledgerList.innerHTML = '';
+      if (!entries.length) {
+        ledgerEmpty.style.display = 'block';
+        return;
+      }
+      ledgerEmpty.style.display = 'none';
+      entries.forEach(function (entry, idx) {
+        var li = document.createElement('li');
+        var name = document.createElement('div');
+        name.className = 'l-name';
+        name.textContent = entry.name || '(unnamed)';
+        var meta = document.createElement('div');
+        meta.className = 'l-meta';
+        var bits = [];
+        if (typeof entry.size === 'number') bits.push(formatSize(entry.size));
+        if (entry.timestamp) {
+          try { bits.push(new Date(entry.timestamp).toLocaleString()); } catch (e) { bits.push(entry.timestamp); }
+        }
+        if (typeof entry.durationSec === 'number') {
+          var d = formatDuration(entry.durationSec);
+          if (d) bits.push(d);
+        }
+        meta.textContent = bits.join(' · ');
+        li.appendChild(name);
+        li.appendChild(meta);
+        if (entry.note) {
+          var note = document.createElement('div');
+          note.className = 'l-note';
+          note.textContent = entry.note;
+          li.appendChild(note);
+        }
+        var forget = document.createElement('button');
+        forget.type = 'button';
+        forget.textContent = 'Forget this listen (local only)';
+        forget.addEventListener('click', function () {
+          var next = loadLedger();
+          next.splice(idx, 1);
+          saveLedger(next);
+          renderLedger();
+          setStatus('Forgot that listen on this device. Nothing was uploaded. Weights did not change.');
+        });
+        li.appendChild(forget);
+        ledgerList.appendChild(li);
+      });
+    }
+
+    function renderTray() {
+      trayEl.innerHTML = '';
+      if (!sessionFiles.length) {
+        trayEl.classList.remove('visible');
+        return;
+      }
+      trayEl.classList.add('visible');
+      sessionFiles.forEach(function (item, idx) {
+        var li = document.createElement('li');
+        var span = document.createElement('span');
+        span.textContent = item.file.name;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = 'Play';
+        btn.addEventListener('click', function () { playFile(item.file); });
+        li.appendChild(span);
+        li.appendChild(btn);
+        trayEl.appendChild(li);
+        void idx;
+      });
+    }
+
+    function playFile(file) {
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+        objectUrl = null;
+      }
+      current = {
+        name: file.name,
+        size: file.size,
+        durationSec: null
+      };
+      objectUrl = URL.createObjectURL(file);
+      player.src = objectUrl;
+      nowPlaying.classList.add('visible');
+      trackName.textContent = file.name;
+      trackMeta.textContent = formatSize(file.size) + ' · duration unknown until it loads';
+      keepBtn.disabled = false;
+      setStatus('');
+      player.load();
+    }
+
+    function ingestFiles(fileList) {
+      var files = Array.prototype.slice.call(fileList || []);
+      var accepted = [];
+      var skipped = 0;
+      files.forEach(function (file) {
+        if (isAllowed(file)) accepted.push({ file: file });
+        else skipped += 1;
+      });
+      if (!accepted.length) {
+        setStatus('Bring an audio file (.mp3 or .wav). This door does not generate.', true);
+        nowPlaying.classList.add('visible');
+        return;
+      }
+      accepted.forEach(function (item) { sessionFiles.push(item); });
+      renderTray();
+      playFile(accepted[0].file);
+      if (skipped) {
+        setStatus('Played the audio. Skipped ' + skipped + ' non-audio file' + (skipped === 1 ? '' : 's') + '.');
+      }
+    }
+
+    function keepCurrent() {
+      if (!current) {
+        setStatus('Play a file first.', true);
+        return false;
+      }
+      var entry = {
+        name: current.name,
+        size: current.size,
+        timestamp: new Date().toISOString()
+      };
+      if (typeof current.durationSec === 'number') entry.durationSec = current.durationSec;
+      var note = (noteInput.value || '').trim();
+      if (note) entry.note = note;
+      var ledger = loadLedger();
+      ledger.unshift(entry);
+      saveLedger(ledger);
+      renderLedger();
+      setStatus('Kept in the local listen ledger. Nothing was uploaded. Weights did not change. This is not training.');
+      return true;
+    }
+
+    player.addEventListener('loadedmetadata', function () {
+      if (!current) return;
+      var sec = player.duration;
+      if (isFinite(sec)) {
+        current.durationSec = sec;
+        var d = formatDuration(sec);
+        trackMeta.textContent = formatSize(current.size) + (d ? ' · ' + d : '');
+      } else {
+        trackMeta.textContent = formatSize(current.size) + ' · duration unknown';
+      }
+    });
+
+    pickBtn.addEventListener('click', function () { fileInput.click(); });
+    fileInput.addEventListener('change', function () {
+      ingestFiles(fileInput.files);
+      fileInput.value = '';
+    });
+
+    ;['dragenter', 'dragover'].forEach(function (ev) {
+      dropZone.addEventListener(ev, function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.add('over');
+      });
+    });
+    ;['dragleave', 'drop'].forEach(function (ev) {
+      dropZone.addEventListener(ev, function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.remove('over');
+      });
+    });
+    dropZone.addEventListener('drop', function (e) {
+      ingestFiles(e.dataTransfer.files);
+    });
+
+    keepBtn.addEventListener('click', keepCurrent);
+
+    window.ArtAlpha = {
+      LEDGER_KEY: LEDGER_KEY,
+      getLedger: loadLedger,
+      getCurrent: function () { return current; },
+      keepCurrent: keepCurrent
+    };
+
+    renderLedger();
+  })();
+  </script>
+</body>
+</html>
