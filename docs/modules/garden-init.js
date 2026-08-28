@@ -13,7 +13,8 @@
 //   - Do not rename localStorage key 'fl_luminos_evolution'
 //   - Do not remove persistAllLuminos() or its three event hooks
 //   - Do not invent Chat UI, bank, or wallet
-//   - Nursery holds the simple trainer face (not a maze dump)
+//   - Nursery is egg then grow (not a maze dump covering the canvas)
+//   - Settings asks permission before any local-mind look
 //   - Team is named later; Glass is not a peer room
 //
 // Mirror page: docs/code-garden.html

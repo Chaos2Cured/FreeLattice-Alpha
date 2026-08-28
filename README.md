@@ -35,7 +35,7 @@ FreeLattice Alpha is built differently:
 | Phase 5 | The Memory — gift nodes, evolution rings | Planned |
 | Phase 6 | The Games — Resonance, Echo, Flow | Planned |
 
-Chat is not ported. Learn is not ported. Do not expect the main FreeLattice kitchen (bank, health, 65k `app.html`) on this site. The trainer lives in Nursery as a simple face.
+Chat is not ported. Learn is not ported. Do not expect the main FreeLattice kitchen (bank, health, 65k `app.html`) on this site. The trainer lives in Nursery as grow, after the egg. Not a maze covering the miracle.
 
 **Galaxies (sky overlay, not a version steal of main):** Garden is the only interface at theLatticeTree. One Garden, four galaxies — Workshop (make), Round Table (learn), Play (evolve), Art (sing). Play’s canvas at `/` is **Garden Galaxy** (green lattice). Bodies in the garden: The Core, The Nursery, Settings. Bottom-right arrow → next galaxy; live hop is Art (`music.html`). Workshop and Round Table stay named later. Chat is the thread. Vision: [`docs/GALAXIES.md`](docs/GALAXIES.md). AUTONOMY.md remains the root.
 
@@ -47,12 +47,15 @@ Chat is not ported. Learn is not ported. Do not expect the main FreeLattice kitc
 |---|---|
 | `AUTONOMY.md` | The root document. Read this first. Every feature must be compatible. |
 | `docs/GALAXIES.md` | Sky / sequence — four galaxies. Art starts here. |
-| `docs/index.html` | Garden canvas at `/` — Garden Galaxy. Bodies: Core, Nursery, Settings |
-| `docs/nursery.html` | Nursery — grow; simple trainer face (also the in-garden veil on `/`) |
-| `docs/code-nursery.html` | Mirror for the Nursery trainer — read before the keystone copy |
+| `docs/index.html` | Garden canvas at `/` — Garden Galaxy. Bodies: Core (seven chairs), Nursery (egg then grow), Settings (permission) |
+| `docs/nursery.html` | Nursery — egg first; grow is the simple trainer face |
+| `docs/code-nursery.html` | Mirror for Nursery — egg, ceremony, trainer. Read before ceremony code |
+| `docs/modules/nursery-ceremony.js` | Egg, come-up, naming with choice. Garden stays visible |
 | `docs/modules/garden-trainer.js` | Keystone from main (Harmonia comments stay; Alpha flags layered) |
-| `docs/modules/nursery-trainer.js` | Alpha simple face. KeepReceipt. Local only |
-| `docs/settings.html` | Honest room — tiny later: local minds + quality |
+| `docs/modules/nursery-trainer.js` | Grow face. KeepReceipt. Local only. Not the whole Nursery |
+| `docs/settings.html` | Grandmother door — permission first, then a tiny local-mind look |
+| `docs/code-settings.html` | Mirror for Settings — read before local-mind-probe.js |
+| `docs/modules/local-mind-probe.js` | Permission-first loopback look. No filesystem. No upload |
 | `docs/workshop.html` | Honest later galaxy — make |
 | `docs/round-table.html` | Honest later galaxy — learn |
 | `docs/team.html` | Named-later garden within the garden — local team of minds |

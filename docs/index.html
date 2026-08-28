@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>theLatticeTree — Core</title>
-  <meta name="description" content="theLatticeTree Garden Galaxy. You are in Core. Art listens at music.html. AUTONOMY is the root.">
+  <meta name="description" content="theLatticeTree Garden Galaxy. You are in Core. Nursery holds the egg. Art listens at music.html. AUTONOMY is the root.">
   <meta property="og:title" content="theLatticeTree — Garden">
   <meta property="og:description" content="One Garden. Play is this canvas. Humans stay free. AUTONOMY is the root.">
   <meta property="og:type" content="website">
@@ -249,7 +249,7 @@
   </header>
 
   <p id="galaxy-title">Garden Galaxy</p>
-  <p id="room-label">you are in Core</p>
+  <p id="room-label" class="is-shown">you are in Core</p>
 
   <button type="button" class="place-label place-core" data-garden-place="core" aria-current="true">The Core</button>
   <button type="button" class="place-label place-nursery" data-garden-place="nursery">The Nursery</button>
@@ -257,12 +257,23 @@
 
   <div id="place-veil" hidden>
     <p id="place-veil-line"></p>
-    <div id="nursery-trainer" hidden></div>
+    <div id="core-gathering" hidden></div>
+    <div id="nursery-stage" hidden>
+      <div id="nursery-ceremony"></div>
+      <details class="nursery-grow">
+        <summary>Grow</summary>
+        <div id="nursery-trainer"></div>
+      </details>
+    </div>
+    <div id="settings-grandmother" hidden></div>
     <button type="button" id="place-veil-close">the garden</button>
   </div>
 
   <button type="button" class="galaxy-nav galaxy-nav-prev" data-galaxy-dir="prev" aria-label="Previous galaxy">‹</button>
-  <button type="button" class="galaxy-nav galaxy-nav-next" data-galaxy-dir="next" aria-label="Next galaxy">›</button>
+  <button type="button" class="galaxy-nav galaxy-nav-next" data-galaxy-dir="next" aria-label="Next galaxy: Art">
+    <span class="galaxy-nav-word" data-galaxy-next-word>Art</span>
+    <span class="galaxy-nav-arrow" aria-hidden="true">›</span>
+  </button>
 
   <p id="shared-shoulder"><a href="liability.html">shared shoulder — human and mind</a></p>
 
@@ -273,6 +284,8 @@
   <script src="modules/keep-receipt.js"></script>
   <script src="modules/garden-trainer.js"></script>
   <script src="modules/nursery-trainer.js"></script>
+  <script src="modules/nursery-ceremony.js"></script>
+  <script src="modules/local-mind-probe.js"></script>
   <script src="modules/garden-rooms.js"></script>
 
   <!-- Flags before the engine IIFE so unnamed-new + low-compute can layer without a kitchen. -->

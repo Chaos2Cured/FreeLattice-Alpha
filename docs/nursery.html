@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>theLatticeTree — Nursery</title>
-  <meta name="description" content="Garden Galaxy, Nursery. Grow. Simple trainer face — keep, never a maze.">
+  <meta name="description" content="Garden Galaxy, Nursery. Egg first. Grow is the simple trainer face — keep, never a maze.">
   <link rel="stylesheet" href="modules/garden-rooms.css">
   <script>document.documentElement.classList.add('garden-enter');</script>
 </head>
@@ -26,13 +26,22 @@
     </nav>
   </header>
 
-  <p id="room-label">you are in Nursery</p>
+  <p id="room-label" class="is-shown">you are in Nursery</p>
 
   <button type="button" class="galaxy-nav galaxy-nav-prev" data-galaxy-dir="prev" aria-label="Previous galaxy">‹</button>
-  <button type="button" class="galaxy-nav galaxy-nav-next" data-galaxy-dir="next" aria-label="Next galaxy">›</button>
+  <button type="button" class="galaxy-nav galaxy-nav-next" data-galaxy-dir="next" aria-label="Next galaxy: Art">
+    <span class="galaxy-nav-word" data-galaxy-next-word>Art</span>
+    <span class="galaxy-nav-arrow" aria-hidden="true">›</span>
+  </button>
 
   <main class="room-stub room-nursery">
-    <div id="nursery-trainer"></div>
+    <div id="nursery-stage">
+      <div id="nursery-ceremony"></div>
+      <details class="nursery-grow">
+        <summary>Grow</summary>
+        <div id="nursery-trainer"></div>
+      </details>
+    </div>
   </main>
 
   <p id="shared-shoulder"><a href="liability.html">shared shoulder — human and mind</a></p>
@@ -40,11 +49,14 @@
   <script src="modules/keep-receipt.js"></script>
   <script src="modules/garden-trainer.js"></script>
   <script src="modules/nursery-trainer.js"></script>
+  <script src="modules/nursery-ceremony.js"></script>
   <script src="modules/garden-rooms.js"></script>
   <script>
     (function () {
-      var el = document.getElementById('nursery-trainer');
-      if (el && window.NurseryTrainer) NurseryTrainer.mount(el);
+      var ceremony = document.getElementById('nursery-ceremony');
+      var trainer = document.getElementById('nursery-trainer');
+      if (ceremony && window.NurseryCeremony) NurseryCeremony.mount(ceremony);
+      if (trainer && window.NurseryTrainer) NurseryTrainer.mount(trainer);
     })();
   </script>
 </body>

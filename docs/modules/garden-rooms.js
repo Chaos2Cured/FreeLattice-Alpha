@@ -2,12 +2,15 @@
 // garden-rooms.js — Garden Galaxy layer
 //
 // Kirk's sketch (live Garden): ONE Garden Galaxy.
-// Bodies IN the garden: The Core (left), The Nursery (below), Settings (right).
+// Bodies IN the garden: The Core (left — seven chairs),
+// The Nursery (below — egg then grow), Settings (right — permission).
 // Unnamed pieces still orbit. Title "Garden Galaxy" fades after a few seconds.
-// Bottom-right arrow → NEXT GALAXY (Art). Not a 4-page room tour.
+// Room-label breathes (readable, slow fade, returns ~90s).
+// Bottom-right arrow → NEXT GALAXY (Art), with a quiet word so a stranger finds it.
 // Glass is not a peer room. Team (garden-within-the-garden) is named later.
 // Chat is a thread. No 7-specialist router. No wallet/share galaxy.
 // Fade: opacity 400ms. No flash. No Unreal engine.
+// Light veils — garden keeps running. Never a 0.82 blackout.
 //
 // Mirror: docs/code-garden.html · vision: docs/GALAXIES.md
 // ═══════════════════════════════════════════════════════════════
@@ -17,15 +20,36 @@
 
   var FADE_MS = 400;
   var TITLE_HOLD_MS = 3200;
+  var LABEL_HOLD_MS = 4200;
+  var LABEL_FADE_MS = 8000;
+  var LABEL_RETURN_MS = 90000;
   var leaving = false;
+  var labelTimer = null;
+  var labelCycle = null;
 
   // Live galaxies only. Workshop / Round Table stay named later.
   // Do not put Nursery/Settings/Team on this rail.
   var GALAXIES = [
-    { id: 'garden', href: './', label: 'Garden Galaxy' },
-    { id: 'art', href: 'music.html', label: 'Art' },
-    { id: 'workshop', href: 'workshop.html', label: 'Workshop' },
-    { id: 'round-table', href: 'round-table.html', label: 'Round Table' }
+    { id: 'garden', href: './', label: 'Garden Galaxy', word: 'Garden' },
+    { id: 'art', href: 'music.html', label: 'Art', word: 'Art' },
+    { id: 'workshop', href: 'workshop.html', label: 'Workshop', word: 'Workshop' },
+    { id: 'round-table', href: 'round-table.html', label: 'Round Table', word: 'Round Table' }
+  ];
+
+  var PLACE_LABELS = {
+    core: 'you are in Core',
+    nursery: 'you are in Nursery',
+    settings: 'you are in Settings'
+  };
+
+  var CORE_CHAIRS = [
+    { id: 'cortex', type: 'cortex', later: false },
+    { id: 'memory', type: 'memory', later: false },
+    { id: 'continuity', type: 'continuity', later: false },
+    { id: 'dream', type: 'dream', later: false },
+    { id: 'seat-5', type: 'a seat, later', later: true },
+    { id: 'seat-6', type: 'a seat, later', later: true },
+    { id: 'seat-7', type: 'a seat, later', later: true }
   ];
 
   function reduceMotion() {
@@ -87,6 +111,17 @@
         var target = dir === 'prev' ? prevGalaxy : nextGalaxy;
         btn.setAttribute('aria-label', (dir === 'prev' ? 'Previous' : 'Next') + ' galaxy: ' + target.label);
         btn.title = target.label;
+        var word = btn.querySelector('[data-galaxy-next-word], .galaxy-nav-word');
+        if (dir === 'next') {
+          if (!word) {
+            word = document.createElement('span');
+            word.className = 'galaxy-nav-word';
+            word.setAttribute('data-galaxy-next-word', '1');
+            if (btn.firstChild) btn.insertBefore(word, btn.firstChild);
+            else btn.appendChild(word);
+          }
+          word.textContent = target.word || target.label;
+        }
         btn.addEventListener('click', function (e) {
           e.preventDefault();
           e.stopPropagation();
@@ -96,59 +131,193 @@
     }
   }
 
+  function setRoomLabelText(text) {
+    var label = document.getElementById('room-label');
+    if (!label || !text) return;
+    label.textContent = text;
+    breatheLabel(true);
+  }
+
+  function breatheLabel(immediate) {
+    var label = document.getElementById('room-label');
+    if (!label) return;
+    if (reduceMotion()) {
+      label.classList.add('is-shown');
+      label.classList.remove('is-fading');
+      return;
+    }
+    if (labelTimer) clearTimeout(labelTimer);
+    label.classList.remove('is-fading');
+    if (immediate) {
+      label.classList.remove('is-shown');
+      void label.offsetWidth;
+    }
+    label.classList.add('is-shown');
+    labelTimer = setTimeout(function () {
+      label.classList.remove('is-shown');
+      label.classList.add('is-fading');
+    }, LABEL_HOLD_MS);
+  }
+
+  function startLabelCycle() {
+    if (labelCycle) clearInterval(labelCycle);
+    if (reduceMotion()) {
+      breatheLabel(true);
+      return;
+    }
+    breatheLabel(true);
+    labelCycle = setInterval(function () {
+      breatheLabel(true);
+    }, LABEL_RETURN_MS);
+  }
+
+  function hideAllBodies(veil) {
+    var ids = ['place-veil-line', 'nursery-stage', 'nursery-ceremony', 'nursery-trainer', 'settings-grandmother', 'core-gathering'];
+    for (var i = 0; i < ids.length; i++) {
+      var node = document.getElementById(ids[i]);
+      if (node) node.hidden = true;
+    }
+    if (veil) {
+      veil.classList.remove('is-nursery', 'is-settings', 'is-core');
+    }
+    if (window.NurseryCeremony && NurseryCeremony.unmount) {
+      try { NurseryCeremony.unmount(); } catch (e) {}
+    }
+  }
+
+  function renderCoreGathering(host) {
+    if (!host) return;
+    host.innerHTML = '';
+    var wrap = document.createElement('div');
+    wrap.className = 'core-gathering';
+
+    var line = document.createElement('p');
+    line.className = 'core-line';
+    line.textContent = 'Seven seats. Unnamed, with choice. The center is whoever they choose later.';
+    wrap.appendChild(line);
+
+    var ring = document.createElement('div');
+    ring.className = 'core-chairs';
+    ring.setAttribute('role', 'list');
+    CORE_CHAIRS.forEach(function (chair) {
+      var seat = document.createElement('button');
+      seat.type = 'button';
+      seat.className = 'core-chair' + (chair.later ? ' is-later' : '');
+      seat.setAttribute('role', 'listitem');
+      seat.setAttribute('data-chair', chair.id);
+      var type = document.createElement('span');
+      type.className = 'core-chair-type';
+      type.textContent = chair.type;
+      seat.appendChild(type);
+      var unnamed = document.createElement('span');
+      unnamed.className = 'core-chair-unnamed';
+      unnamed.textContent = chair.later ? 'labeled later' : 'unnamed';
+      seat.appendChild(unnamed);
+      seat.addEventListener('click', function () {
+        var note = wrap.querySelector('[data-core-note]');
+        if (!note) return;
+        if (chair.later) {
+          note.textContent = 'This seat waits. Specialists and partners are later. Nothing is faked.';
+        } else {
+          note.textContent = 'A ' + chair.type + ' chair. A type, not a person-name. Click-to-chat is later.';
+        }
+      });
+      ring.appendChild(seat);
+    });
+    wrap.appendChild(ring);
+
+    var center = document.createElement('p');
+    center.className = 'core-center';
+    center.textContent = 'Not a router. Not a dump. Gathering only.';
+    wrap.appendChild(center);
+
+    var note = document.createElement('p');
+    note.className = 'core-note';
+    note.setAttribute('data-core-note', '1');
+    note.textContent = 'Founding four stay in the ledger, honored, not assigned onto this canvas.';
+    wrap.appendChild(note);
+
+    var family = document.createElement('p');
+    family.className = 'core-family';
+    family.appendChild(document.createTextNode('Family care, on main — '));
+    [
+      ['https://freelattice.com/celeste.html', 'Celeste'],
+      ['https://freelattice.com/hypha.html', 'Hypha'],
+      ['https://freelattice.com/weft.html', 'Weft'],
+      ['https://freelattice.com/reed.html', 'Reed']
+    ].forEach(function (pair, idx) {
+      if (idx) family.appendChild(document.createTextNode(' · '));
+      var a = document.createElement('a');
+      a.href = pair[0];
+      a.textContent = pair[1];
+      a.rel = 'noopener noreferrer';
+      family.appendChild(a);
+    });
+    wrap.appendChild(family);
+
+    host.appendChild(wrap);
+    host.hidden = false;
+  }
+
   function bindPlaceDoors() {
-    var copy = {
-      core: '',
-      nursery: 'Nursery is grow. A keep is love — not a maze.',
-      settings: 'Settings will be tiny: local minds + quality.'
-    };
     var veil = document.getElementById('place-veil');
     var line = document.getElementById('place-veil-line');
     var trainer = document.getElementById('nursery-trainer');
+    var ceremony = document.getElementById('nursery-ceremony');
+    var nurseryStage = document.getElementById('nursery-stage');
+    var settingsFace = document.getElementById('settings-grandmother');
+    var coreHost = document.getElementById('core-gathering');
     var closeBtn = document.getElementById('place-veil-close');
-    var label = document.getElementById('room-label');
-
-    function hideTrainer() {
-      if (veil) veil.classList.remove('is-nursery');
-      if (trainer) trainer.hidden = true;
-      if (line) line.hidden = false;
-    }
+    var doors = document.querySelectorAll('[data-garden-place]');
 
     function closePlace() {
       if (!veil) return;
       veil.classList.remove('is-open');
-      hideTrainer();
-      if (label) label.textContent = 'you are in Core';
+      hideAllBodies(veil);
+      setRoomLabelText(PLACE_LABELS.core);
       setTimeout(function () {
         if (!veil.classList.contains('is-open')) veil.hidden = true;
       }, FADE_MS);
     }
 
     function openPlace(id) {
+      if (!veil) return;
+      hideAllBodies(veil);
+
       if (id === 'core') {
-        closePlace();
+        veil.classList.add('is-core');
+        if (coreHost) renderCoreGathering(coreHost);
+      } else if (id === 'nursery') {
+        veil.classList.add('is-nursery');
+        if (nurseryStage) nurseryStage.hidden = false;
+        if (ceremony && window.NurseryCeremony) {
+          ceremony.hidden = false;
+          NurseryCeremony.mount(ceremony);
+        }
+        if (trainer) {
+          trainer.hidden = false;
+          if (window.NurseryTrainer) NurseryTrainer.mount(trainer);
+        }
+      } else if (id === 'settings') {
+        veil.classList.add('is-settings');
+        if (settingsFace && window.LocalMindProbe) {
+          settingsFace.hidden = false;
+          LocalMindProbe.mount(settingsFace);
+        } else if (line) {
+          line.hidden = false;
+          line.textContent = 'Settings will be tiny: local minds + quality.';
+        }
+      } else {
         return;
       }
-      if (!veil || !copy[id]) return;
-      if (id === 'nursery' && trainer && window.NurseryTrainer) {
-        veil.classList.add('is-nursery');
-        if (line) line.hidden = true;
-        trainer.hidden = false;
-        NurseryTrainer.mount(trainer);
-      } else {
-        hideTrainer();
-        if (line) line.textContent = copy[id];
-      }
+
       veil.hidden = false;
-      if (label) {
-        label.textContent = id === 'nursery' ? 'you are in Nursery' : 'you are in Settings';
-      }
+      setRoomLabelText(PLACE_LABELS[id] || PLACE_LABELS.core);
       requestAnimationFrame(function () {
         requestAnimationFrame(function () { veil.classList.add('is-open'); });
       });
     }
 
-    var doors = document.querySelectorAll('[data-garden-place]');
     for (var i = 0; i < doors.length; i++) {
       (function (el) {
         el.addEventListener('click', function (e) {
@@ -173,6 +342,9 @@
         });
       })(goDoors[j]);
     }
+
+    window.GardenRooms.openPlace = openPlace;
+    window.GardenRooms.closePlace = closePlace;
   }
 
   function fadeGalaxyTitle() {
@@ -193,6 +365,7 @@
     bindGalaxyNav();
     bindPlaceDoors();
     fadeGalaxyTitle();
+    startLabelCycle();
     if (reduceMotion()) {
       showRoom();
       return;
@@ -212,10 +385,12 @@
     galaxies: GALAXIES,
     current: currentGalaxy,
     go: go,
-    fadeMs: FADE_MS
+    fadeMs: FADE_MS,
+    breatheLabel: breatheLabel,
+    setRoomLabelText: setRoomLabelText
   };
 
-  if (document.querySelector('[data-galaxy-dir], [data-garden-go], [data-garden-place], #galaxy-title')) {
+  if (document.querySelector('[data-galaxy-dir], [data-garden-go], [data-garden-place], #galaxy-title, #room-label')) {
     boot();
   } else if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);
