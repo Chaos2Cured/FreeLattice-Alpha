@@ -998,7 +998,7 @@
     const vertGeo = new THREE.BufferGeometry();
     vertGeo.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
     const vertMat = new THREE.PointsMaterial({
-      color: 0xc9a84c,
+      color: _latticeGreen ? 0x34d399 : 0xc9a84c,
       size: 0.12,
       transparent: true,
       opacity: 0.9,

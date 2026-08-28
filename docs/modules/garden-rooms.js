@@ -77,28 +77,22 @@
   }
 
   function bindGalaxyNav() {
-    var prev = document.querySelector('[data-galaxy-dir="prev"]');
-    var next = document.querySelector('[data-galaxy-dir="next"]');
     var prevGalaxy = neighbor(-1);
     var nextGalaxy = neighbor(1);
+    var buttons = document.querySelectorAll('[data-galaxy-dir]');
 
-    if (prev) {
-      prev.setAttribute('aria-label', 'Previous galaxy: ' + prevGalaxy.label);
-      prev.title = prevGalaxy.label;
-      prev.addEventListener('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        go(prevGalaxy.href);
-      });
-    }
-    if (next) {
-      next.setAttribute('aria-label', 'Next galaxy: ' + nextGalaxy.label);
-      next.title = nextGalaxy.label;
-      next.addEventListener('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        go(nextGalaxy.href);
-      });
+    for (var i = 0; i < buttons.length; i++) {
+      (function (btn) {
+        var dir = btn.getAttribute('data-galaxy-dir');
+        var target = dir === 'prev' ? prevGalaxy : nextGalaxy;
+        btn.setAttribute('aria-label', (dir === 'prev' ? 'Previous' : 'Next') + ' galaxy: ' + target.label);
+        btn.title = target.label;
+        btn.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          go(target.href);
+        });
+      })(buttons[i]);
     }
   }
 
