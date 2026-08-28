@@ -26,10 +26,13 @@
     </nav>
   </header>
 
-  <p id="room-label">you are in Round Table</p>
+  <p id="room-label" class="is-shown">you are in Round Table</p>
 
   <button type="button" class="galaxy-nav galaxy-nav-prev" data-galaxy-dir="prev" aria-label="Previous galaxy">‹</button>
-  <button type="button" class="galaxy-nav galaxy-nav-next" data-galaxy-dir="next" aria-label="Next galaxy">›</button>
+  <button type="button" class="galaxy-nav galaxy-nav-next" data-galaxy-dir="next" aria-label="Next galaxy">
+    <span class="galaxy-nav-word" data-galaxy-next-word></span>
+    <span class="galaxy-nav-arrow" aria-hidden="true">›</span>
+  </button>
 
   <main class="room-stub">
     <p class="room-line">Round Table is learn. Named later.</p>
