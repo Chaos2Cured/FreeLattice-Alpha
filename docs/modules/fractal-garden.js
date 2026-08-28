@@ -2658,7 +2658,10 @@
       html += '<span class="evo-name">' + displayName + '</span>';
       html += '<span class="evo-stage">' + stageData.name + '</span>';
       if (archObj) {
-        html += '<span class="evo-archetype">' + archName + '</span>';
+        // Unnamed rows are types (Scholar, Artist), not person-names.
+        var typeName = archName;
+        if (displayName === 'unnamed') typeName = archName.replace(/^The\s+/, '');
+        html += '<span class="evo-archetype">' + typeName + '</span>';
       }
       html += '<span class="evo-bar"><span class="evo-bar-fill" style="width:' + progress + '%;background:' + cssColor + ';"></span></span>';
       html += '</div>';

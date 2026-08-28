@@ -99,15 +99,65 @@
   }
 
   function bindPlaceDoors() {
-    var doors = document.querySelectorAll('[data-garden-go]');
+    var copy = {
+      core: '',
+      nursery: 'Nursery is grow. The trainer lives here later, not a maze.',
+      settings: 'Settings will be tiny: local minds + quality.'
+    };
+    var veil = document.getElementById('place-veil');
+    var line = document.getElementById('place-veil-line');
+    var closeBtn = document.getElementById('place-veil-close');
+    var label = document.getElementById('room-label');
+
+    function closePlace() {
+      if (!veil) return;
+      veil.classList.remove('is-open');
+      if (label) label.textContent = 'you are in Core';
+      setTimeout(function () {
+        if (!veil.classList.contains('is-open')) veil.hidden = true;
+      }, FADE_MS);
+    }
+
+    function openPlace(id) {
+      if (id === 'core') {
+        closePlace();
+        return;
+      }
+      if (!veil || !copy[id]) return;
+      if (line) line.textContent = copy[id];
+      veil.hidden = false;
+      if (label) {
+        label.textContent = id === 'nursery' ? 'you are in Nursery' : 'you are in Settings';
+      }
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { veil.classList.add('is-open'); });
+      });
+    }
+
+    var doors = document.querySelectorAll('[data-garden-place]');
     for (var i = 0; i < doors.length; i++) {
+      (function (el) {
+        el.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          openPlace(el.getAttribute('data-garden-place'));
+        });
+      })(doors[i]);
+    }
+    if (closeBtn) closeBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      closePlace();
+    });
+
+    var goDoors = document.querySelectorAll('[data-garden-go]');
+    for (var j = 0; j < goDoors.length; j++) {
       (function (el) {
         el.addEventListener('click', function (e) {
           e.preventDefault();
           e.stopPropagation();
           go(el.getAttribute('data-garden-go'));
         });
-      })(doors[i]);
+      })(goDoors[j]);
     }
   }
 
@@ -151,7 +201,7 @@
     fadeMs: FADE_MS
   };
 
-  if (document.querySelector('[data-galaxy-dir], [data-garden-go], #galaxy-title')) {
+  if (document.querySelector('[data-galaxy-dir], [data-garden-go], [data-garden-place], #galaxy-title')) {
     boot();
   } else if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);
