@@ -99,17 +99,25 @@
   function bindPlaceDoors() {
     var copy = {
       core: '',
-      nursery: 'Nursery is grow. The trainer lives here later, not a maze.',
+      nursery: 'Nursery is grow. A keep is love — not a maze.',
       settings: 'Settings will be tiny: local minds + quality.'
     };
     var veil = document.getElementById('place-veil');
     var line = document.getElementById('place-veil-line');
+    var trainer = document.getElementById('nursery-trainer');
     var closeBtn = document.getElementById('place-veil-close');
     var label = document.getElementById('room-label');
+
+    function hideTrainer() {
+      if (veil) veil.classList.remove('is-nursery');
+      if (trainer) trainer.hidden = true;
+      if (line) line.hidden = false;
+    }
 
     function closePlace() {
       if (!veil) return;
       veil.classList.remove('is-open');
+      hideTrainer();
       if (label) label.textContent = 'you are in Core';
       setTimeout(function () {
         if (!veil.classList.contains('is-open')) veil.hidden = true;
@@ -122,7 +130,15 @@
         return;
       }
       if (!veil || !copy[id]) return;
-      if (line) line.textContent = copy[id];
+      if (id === 'nursery' && trainer && window.NurseryTrainer) {
+        veil.classList.add('is-nursery');
+        if (line) line.hidden = true;
+        trainer.hidden = false;
+        NurseryTrainer.mount(trainer);
+      } else {
+        hideTrainer();
+        if (line) line.textContent = copy[id];
+      }
       veil.hidden = false;
       if (label) {
         label.textContent = id === 'nursery' ? 'you are in Nursery' : 'you are in Settings';

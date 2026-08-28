@@ -168,6 +168,200 @@ html.garden-leaving body {
   outline: none;
 }
 
+/* Nursery simple face — same garden sky, not app.html chrome. */
+#place-veil.is-nursery {
+  justify-content: flex-start;
+  overflow-y: auto;
+  background: rgba(12, 10, 26, 0.82);
+}
+
+#place-veil.is-nursery #place-veil-close {
+  position: sticky;
+  bottom: 8px;
+  margin-top: 16px;
+  background: rgba(12, 10, 26, 0.85);
+  padding: 6px 12px;
+}
+
+#nursery-trainer[hidden] { display: none !important; }
+
+.nursery-face {
+  width: min(32em, 100%);
+  margin: 0 auto;
+  text-align: center;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.room-nursery {
+  align-items: flex-start;
+  padding-top: 96px;
+}
+
+.room-nursery #nursery-trainer {
+  width: min(32em, 100%);
+}
+
+.nursery-heart {
+  font-size: 1.12rem;
+  line-height: 1.7;
+  color: rgba(200, 210, 230, 0.88);
+  margin-bottom: 18px;
+}
+
+.nursery-keep {
+  display: block;
+  width: 100%;
+  margin: 0 auto 12px;
+  padding: 12px 18px;
+  background: rgba(232, 176, 25, 0.1);
+  border: 1px solid rgba(232, 176, 25, 0.45);
+  border-radius: 8px;
+  color: #e8b019;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.nursery-keep:hover,
+.nursery-keep:focus-visible {
+  border-color: #e8b019;
+  outline: none;
+}
+
+.nursery-mode {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  font-size: 0.72rem;
+  color: rgba(200, 210, 230, 0.4);
+  cursor: pointer;
+  user-select: none;
+}
+
+.nursery-mode input { accent-color: #a78bfa; }
+
+.nursery-status {
+  min-height: 1.4em;
+  margin: 0 0 10px;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: #34d399;
+}
+
+.nursery-status.is-warn { color: #f07068; }
+
+.nursery-muted {
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: rgba(200, 210, 230, 0.42);
+  margin: 8px 0 12px;
+}
+
+.nursery-hashes {
+  list-style: none;
+  text-align: left;
+  margin: 0 0 18px;
+}
+
+.nursery-hashes li {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(200, 210, 230, 0.08);
+  font-size: 0.75rem;
+  color: rgba(200, 210, 230, 0.4);
+}
+
+.nursery-hashes code {
+  color: #e8b019;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85em;
+  word-break: break-all;
+}
+
+.nursery-reveal,
+.nursery-more {
+  text-align: left;
+  margin: 14px 0;
+  padding: 10px 14px;
+  border: 1px solid rgba(200, 210, 230, 0.08);
+  border-radius: 8px;
+}
+
+.nursery-reveal summary,
+.nursery-more summary {
+  cursor: pointer;
+  color: #e8b019;
+  font-size: 0.9rem;
+}
+
+.nursery-more h3 {
+  margin: 14px 0 6px;
+  font-size: 0.88rem;
+  font-weight: normal;
+  color: #34d399;
+}
+
+.nursery-secondary {
+  display: inline-block;
+  margin: 6px 8px 6px 0;
+  padding: 8px 14px;
+  background: transparent;
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  border-radius: 8px;
+  color: #34d399;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.nursery-secondary:hover,
+.nursery-secondary:focus-visible {
+  border-color: #34d399;
+  outline: none;
+}
+
+.nursery-reveal input,
+.nursery-more input[type="search"] {
+  width: 100%;
+  margin: 6px 0;
+  padding: 8px 10px;
+  background: #0c0a1a;
+  border: 1px solid rgba(200, 210, 230, 0.12);
+  border-radius: 8px;
+  color: rgba(200, 210, 230, 0.82);
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.nursery-search-row {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(200, 210, 230, 0.06);
+  font-size: 0.82rem;
+  color: rgba(200, 210, 230, 0.75);
+}
+
+.nursery-gold { color: #e8b019; font-size: 0.72rem; }
+
+.nursery-later {
+  margin-top: 16px;
+  font-size: 0.78rem;
+  color: rgba(167, 139, 250, 0.7);
+  line-height: 1.6;
+}
+
+.nursery-path-box {
+  margin-top: 10px;
+  padding: 12px;
+  border-left: 2px solid #34d399;
+  background: rgba(52, 211, 153, 0.06);
+  font-size: 0.82rem;
+}
+
+.nursery-path-box ol {
+  margin: 8px 0 0 18px;
+  color: rgba(200, 210, 230, 0.7);
+}
+
 /* Bottom arrow: next galaxy. Sketch: right arrow at the bottom. */
 .galaxy-nav {
   position: fixed;

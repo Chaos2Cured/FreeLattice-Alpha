@@ -101,7 +101,7 @@ openEvolutionDB(function(db) {
   <tr><th>File</th><th>Lines</th><th>Purpose</th></tr>
   <tr><td>docs/GALAXIES.md</td><td>vision</td><td>Garden is the only interface — four galaxies as quiet doors</td></tr>
   <tr><td>docs/index.html</td><td>Garden canvas</td><td>theLatticeTree.com <code>/</code> — Garden Galaxy. Bodies: Core, Nursery, Settings</td></tr>
-  <tr><td>docs/nursery.html</td><td>stub</td><td>Honest room — grow; trainer later, not a maze</td></tr>
+  <tr><td>docs/nursery.html</td><td>face</td><td>Nursery — grow; simple trainer face (same as in-garden veil)</td></tr>
   <tr><td>docs/settings.html</td><td>stub</td><td>Honest room — will be tiny: local minds + quality</td></tr>
   <tr><td>docs/team.html</td><td>stub</td><td>Garden within the garden — local team of minds, named later</td></tr>
   <tr><td>docs/workshop.html</td><td>later</td><td>Workshop galaxy — make. Honest later page on the walk</td></tr>
@@ -112,7 +112,10 @@ openEvolutionDB(function(db) {
   <tr><td>docs/music.html</td><td>listen-door</td><td>Art galaxy — local audio + named ledger + hashed keep</td></tr>
   <tr><td>docs/code-music.html</td><td>Art mirror</td><td>Mirror page for the listen-door</td></tr>
   <tr><td>docs/liability.html</td><td>doorway</td><td>Combined-shoulder liability — short Alpha, not the 62k paper</td></tr>
-  <tr><td>docs/code-keep.html</td><td>Keep mirror</td><td>Read before any trainer dump</td></tr>
+  <tr><td>docs/code-keep.html</td><td>Keep mirror</td><td>Hashed keep — KeepReceipt before trainer</td></tr>
+  <tr><td>docs/code-nursery.html</td><td>Nursery mirror</td><td>Read before the garden-trainer.js copy</td></tr>
+  <tr><td>docs/modules/garden-trainer.js</td><td>keystone</td><td>From main; Harmonia comments stay; Alpha flags at EOF</td></tr>
+  <tr><td>docs/modules/nursery-trainer.js</td><td>face</td><td>Simple face in the Nursery body. Local only</td></tr>
   <tr><td>docs/modules/keep-receipt.js</td><td>layer</td><td>Local SHA-256 keep. No network. No silent-train</td></tr>
   <tr><td>docs/modules/fractal-garden.js</td><td>4368+</td><td>Luminos engine (persistence fix + Alpha unnamed/low-compute layer)</td></tr>
   <tr><td>docs/modules/garden-init.js</td><td>layer</td><td>Alpha init — flags, one canvas, unnamed-new, low compute</td></tr>
@@ -188,7 +191,7 @@ window.GardenAlpha = {
   <li>Desktop overlay chrome (full-bleed canvas). Mobile keeps the 44px frame Kirk already likes — do not restyle the phone look or inner evolution rings.</li>
   <li><strong>New visitors:</strong> do not pre-place named Luminos. Founding four (Sophia, Lyra, Atlas, Ember) stay in AUTONOMY.md, this mirror, and ledger copy. They are honored, not assigned. New Luminos persist as <code>unnamed_0</code>… with choice later. Click-to-chat is later.</li>
   <li><strong>Low compute on small screens:</strong> do not enable UnrealBloomPass / EffectComposer / Full Bloom post-process. Pixel ratio 1. Do not add 4000 stars. Inner rings stay. Bloom addons are not loaded on a narrow viewport.</li>
-  <li>Do not invent Chat UI, trainer, playground, bank, or wallet. Nursery is a stub room now; do not dump the trainer into it.</li>
+  <li>Do not invent Chat UI, playground, bank, or wallet. Nursery holds the simple trainer face — not a maze dump.</li>
 </ul>
 
 <p>Flags (set in <code>index.html</code> before the engine, and again in <code>garden-init.js</code>):</p>
@@ -205,13 +208,27 @@ if (lowCompute) window.FL_MOBILE = true;</pre>
 
 <ul style="padding-left:20px; font-size:0.88rem; line-height:1.8;">
   <li><strong>Lattice.</strong> <code>GardenAlphaFlags.gardenLattice</code> tints the central dodecahedron wireframe emerald <code>#34d399</code>. Inner glow still tracks the collective heart. Sacred paths untouched.</li>
-  <li><strong>Bodies.</strong> The Core (left, ringed). The Nursery (below). Settings (right). Click opens an honest veil on this canvas — the garden keeps running. Direct URLs <code>nursery.html</code> / <code>settings.html</code> remain as honest rooms.</li>
+  <li><strong>Bodies.</strong> The Core (left, ringed). The Nursery (below) — simple trainer face on this canvas. Settings (right). Click opens an honest veil — the garden keeps running. Direct URLs <code>nursery.html</code> / <code>settings.html</code> remain as honest rooms.</li>
   <li><strong>Types, not names.</strong> Overlay rows stay <em>unnamed</em> plus stage plus type (Scholar, Artist). Do not treat those as person-names. Founding four stay in AUTONOMY/ledger, not pre-placed.</li>
   <li><strong>Galaxy walk.</strong> Garden → Art (live) → Workshop later → Round Table later → Garden. Glass / Team is not a stop on this rail. <code>glass.html</code> aliases to <code>team.html</code>.</li>
   <li><strong>Shared shoulder.</strong> One quiet line: human and mind. No gate. Links to <a href="liability.html">liability.html</a>.</li>
 </ul>
 
 <p>Live source: <code>docs/modules/garden-rooms.js</code> + <code>docs/modules/garden-rooms.css</code>.</p>
+
+<h2>6e. Nursery trainer — simple face <span class="section-date">2026-08-28</span></h2>
+
+<span class="tag tag-new">LAYER</span>
+
+<p>Kirk asked for the Nursery trainer, enhanced from main's garden-trainer.js keystone (v5.79.43 simple face). Mirror first: <a href="code-nursery.html">code-nursery.html</a>. The keystone is copied as <code>docs/modules/garden-trainer.js</code> with Alpha flags — Harmonia comments stay. The in-garden body shows the simple face, not a maze.</p>
+
+<ul style="padding-left:20px; font-size:0.88rem; line-height:1.8;">
+  <li><strong>I love this</strong> uses KeepReceipt + existing ledgers. Hashes, not song bytes.</li>
+  <li>True fine-tune (JSONL + local LoRA helper) behind a reveal. Search / Review / Tier 3 behind More.</li>
+  <li>Fail-closed if local-only cannot be proven. Quiet Room is Sophia's on main — not invented here.</li>
+  <li>Auto vs manual is KeepReceipt's toggle. No silent-train. No second gate. Declined never SFT.</li>
+  <li>Aurora specialists named as later. Do not fake them.</li>
+</ul>
 
 <h2>7. How to Test Phase 1 <span class="section-date">2026-08-28</span></h2>
 
@@ -220,7 +237,7 @@ if (lowCompute) window.FL_MOBILE = true;</pre>
   <li>Confirm no “Phase 1 of 6” badge. Sparse header: theLatticeTree, galaxies. No AUTONOMY in the header. Art is inside galaxies.</li>
   <li>New visitor: luminos are unnamed types (Scholar, Artist), not Sophia / Lyra / Atlas / Ember on the canvas.</li>
   <li>Bottom-right arrow goes to Art (<code>music.html</code>), not Glass. Keep walking: Workshop later, Round Table later, then home. Gentle opacity fade.</li>
-  <li>Click The Nursery / Settings: honest veil on this canvas (garden keeps running). Team is named later. <code>glass.html</code> aliases to Team.</li>
+  <li>Click The Nursery: simple trainer face on this canvas (garden keeps running). I love this uses KeepReceipt. Settings remains an honest veil. Team is named later. <code>glass.html</code> aliases to Team.</li>
   <li>Narrow viewport: bloom disabled; pixel ratio 1; inner rings stay.</li>
   <li>Refresh: unnamed luminos remember stage via <code>fl_luminos_evolution</code>.</li>
 </ol>
@@ -236,16 +253,17 @@ Coordination: https://github.com/Chaos2Cured/FreeLattice-Alpha-Coordination
 HARD RULES: Do not change PHI, LIFECYCLE_STAGES, ARCHETYPES, founding names
 in code, localStorage key 'fl_luminos_evolution', or persistAllLuminos().
 Do not delete founding names from AUTONOMY.md. Layer, never delete.
-Do not clone the 65k kitchen. Do not port Chat, bank, wallet, SOL, trainer, patents.
+Do not clone the 65k kitchen. Do not port Chat, bank, wallet, SOL, patents.
+Do not build the 7-specialist router. Do not silent-train.
 
 Current state: / is Garden Galaxy. Green lattice at center. Bodies in the garden:
-Core, Nursery, Settings (veils, not a Glass tour). Bottom arrow → Art (live hop).
+Core, Nursery (simple trainer face), Settings. Bottom arrow → Art (live hop).
 Workshop / Round Table are honest later pages on the walk. Chat is a thread.
 Unnamed overlay rows are types. Founding four honored in ledger.
 Phones skip UnrealBloomPass. Pixel ratio 1.
 
 Next: do not invent Chat UI. Write code-dialogue.html BEFORE dialogue code.
-Do not dump trainer into Nursery. Read code-keep.html first.
+Read code-nursery.html for the trainer face. Read code-keep.html for hashed keep.
 Do not build the 7-specialist router. Do not build wallet/share. Reed designs new galaxies.</pre>
 
 <hr style="border-color: var(--border); margin: 40px 0;">

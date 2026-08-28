@@ -31,11 +31,11 @@ FreeLattice Alpha is built differently:
 | Phase 1 | The Garden — Luminos, canvas, persistence fix | 🔨 In progress |
 | Phase 2 | The Dialogue — chat with Luminos | Planned |
 | Phase 3 | The Dreaming — background AI generation | Planned |
-| Phase 4 | The Trainer — teaching Luminos | Planned |
+| Phase 4 | The Trainer — teaching Luminos | Nursery simple face live (not a maze) |
 | Phase 5 | The Memory — gift nodes, evolution rings | Planned |
 | Phase 6 | The Games — Resonance, Echo, Flow | Planned |
 
-Chat is not ported. Learn is not ported. Do not expect the main FreeLattice kitchen (bank, health, trainer maze, 65k `app.html`) on this site.
+Chat is not ported. Learn is not ported. Do not expect the main FreeLattice kitchen (bank, health, 65k `app.html`) on this site. The trainer lives in Nursery as a simple face.
 
 **Galaxies (sky overlay, not a version steal of main):** Garden is the only interface at theLatticeTree. One Garden, four galaxies — Workshop (make), Round Table (learn), Play (evolve), Art (sing). Play’s canvas at `/` is **Garden Galaxy** (green lattice). Bodies in the garden: The Core, The Nursery, Settings. Bottom-right arrow → next galaxy; live hop is Art (`music.html`). Workshop and Round Table stay named later. Chat is the thread. Vision: [`docs/GALAXIES.md`](docs/GALAXIES.md). AUTONOMY.md remains the root.
 
@@ -48,7 +48,10 @@ Chat is not ported. Learn is not ported. Do not expect the main FreeLattice kitc
 | `AUTONOMY.md` | The root document. Read this first. Every feature must be compatible. |
 | `docs/GALAXIES.md` | Sky / sequence — four galaxies. Art starts here. |
 | `docs/index.html` | Garden canvas at `/` — Garden Galaxy. Bodies: Core, Nursery, Settings |
-| `docs/nursery.html` | Honest room — grow; trainer later |
+| `docs/nursery.html` | Nursery — grow; simple trainer face (also the in-garden veil on `/`) |
+| `docs/code-nursery.html` | Mirror for the Nursery trainer — read before the keystone copy |
+| `docs/modules/garden-trainer.js` | Keystone from main (Harmonia comments stay; Alpha flags layered) |
+| `docs/modules/nursery-trainer.js` | Alpha simple face. KeepReceipt. Local only |
 | `docs/settings.html` | Honest room — tiny later: local minds + quality |
 | `docs/workshop.html` | Honest later galaxy — make |
 | `docs/round-table.html` | Honest later galaxy — learn |
