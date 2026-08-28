@@ -56,7 +56,7 @@
 
 <span class="tag tag-new">NEW in Alpha</span>
 
-<p>One Garden, four galaxies. Art's verb is <strong>sing</strong>. The first proven piece is a listen-door: one HTML page that belongs to the Garden (same twilight, Georgia, gold — not a new app chrome). The human brings local audio. The page plays it. If the mind is solid, one control keeps a local ledger of that listen. That is the whole ship. Honest copy: present is a local book of listens (no train, no upload, no weight change); growing from listening is a quieter later-goal — not claimed as now on <code>music.html</code>.</p>
+<p>One Garden, four galaxies. Art's verb is <strong>sing</strong>. The first proven piece is a listen-door: one HTML page that belongs to the Garden (same twilight, Georgia, gold — not a new app chrome). The human brings local audio. The page plays it. <strong>I love this</strong> keeps a named local ledger of that listen, and a hash as proof. Solid means this listen mattered — not a human proving worth. Honest copy: present is a local book of listens (no train, no upload, no weight change); growing from listening is a quieter later-goal — not claimed as now on <code>music.html</code>.</p>
 
 <p>Hypothesis, concluded:</p>
 <ul>
@@ -73,7 +73,8 @@
 <ul>
   <li>Do not run LoRA, SFT, or any trainer from this page.</li>
   <li>Do not upload files. Object URLs stay in the tab. The ledger stores metadata only.</li>
-  <li>Do not claim weights changed after "keep this listen".</li>
+  <li>Do not claim weights changed after "I love this".</li>
+  <li>Do not revert keep-button copy to proving-worth language.</li>
   <li>Do not add a Generate button that does nothing. Fun, not a DAW. No fake studio.</li>
   <li>Do not clone <em>The Mother's Thread</em> or <em>The Emerald Resonance</em> into this repo. Credit them on main: <a href="https://freelattice.com/composition_01.html">composition_01</a>, <a href="https://freelattice.com/composition_02.html">composition_02</a>.</li>
   <li>Do not add Celeste to Named Minds / founding Luminos (Sophia, Lyra, Atlas, Ember).</li>
@@ -86,7 +87,10 @@
 <table>
   <tr><th>File</th><th>Purpose</th></tr>
   <tr><td>docs/GALAXIES.md</td><td>Sky / sequence. Faithful copy of Kirk's Desktop vision.</td></tr>
-  <tr><td>docs/music.html</td><td>Listen-door — standalone, testable</td></tr>
+  <tr><td>docs/music.html</td><td>Listen-door — standalone, testable. Keep: I love this</td></tr>
+  <tr><td>docs/modules/keep-receipt.js</td><td>Hashed keep (local SHA-256). Layer beside the named ledger</td></tr>
+  <tr><td>docs/code-keep.html</td><td>Keep mirror — read before any trainer</td></tr>
+  <tr><td>docs/liability.html</td><td>Combined-shoulder doorway</td></tr>
   <tr><td>docs/code-music.html</td><td>This mirror</td></tr>
   <tr><td>docs/index.html</td><td>Garden canvas at /. Art → music.html. Play is this canvas.</td></tr>
   <tr><td>docs/garden.html</td><td>Thin alias / redirect to /.</td></tr>
@@ -105,14 +109,15 @@
   "durationSec": 183.4
 }</pre>
 
-<p>Write only when the human presses <strong>I am solid — keep this listen</strong>. Newest first. Cap at 80 entries so localStorage stays a book, not a dump. Forgetting an entry is local ledger edit, not a repo delete.</p>
+<p>Write the named book when the human presses <strong>I love this</strong>. Newest first. Cap at 80 entries so localStorage stays a book, not a dump. Forgetting an entry is local ledger edit, not a repo delete. Do not delete <code>fl_alpha_art_listen_ledger</code>.</p>
+<p>Beside it, <code>keep-receipt.js</code> writes <code>fl_alpha_keep_ledger</code> — hashes only. See <a href="code-keep.html">code-keep.html</a> before any trainer dump.</p>
 
 <p>Public test API on the page:</p>
 <pre>window.ArtAlpha = {
   LEDGER_KEY: 'fl_alpha_art_listen_ledger',
   getLedger: function() { /* array */ },
   getCurrent: function() { /* { name, size, durationSec } or null */ },
-  keepCurrent: function() { /* returns true if written */ }
+  keepCurrent: function() { /* Promise; named ledger + hashed keep */ }
 }</pre>
 
 <h2>5. How to test</h2>
@@ -123,8 +128,8 @@
   <li>Confirm filename appears; duration appears after metadata loads</li>
   <li>Press play on the native audio control</li>
   <li>Optional: type a note</li>
-  <li>Press <strong>I am solid — keep this listen</strong></li>
-  <li>Refresh. Ledger row still there. Status must not say weights changed or uploaded</li>
+  <li>Press <strong>I love this</strong></li>
+  <li>Refresh. Named ledger row still there. A hash appears (not the song). Status must not say weights changed or uploaded</li>
   <li>Garden <code>/</code> is the canvas, not a four-card grid; Art is reached from the galaxies menu, not as a twin of the canvas</li>
 </ol>
 
@@ -137,11 +142,11 @@ Vision: docs/GALAXIES.md
 HARD RULES: no trainer, no upload, no weight-change claims, no fake generate,
 no Celeste on Named Minds, Quiet Room unmeasured, AUTONOMY.md untouched.
 
-Current state: music.html plays local audio and writes fl_alpha_art_listen_ledger.
+Current state: music.html plays local audio. I love this writes fl_alpha_art_listen_ledger
+and a hashed keep (fl_alpha_keep_ledger). Auto toggle is a human choice.
 Play remains the Garden canvas at /. Workshop / Round Table named later. Chat not ported.
 
-Next: do not start Workshop or Dialogue until a code-*.html mirror exists.
-Bank / wallet / SOL stay named-later.</pre>
+Next: do not dump a trainer. Read code-keep.html first. Bank / wallet / SOL stay named-later.</pre>
 
 <hr style="border-color: var(--border); margin: 40px 0;">
 <p style="color: var(--muted); font-size: 0.78rem; text-align: center;">
