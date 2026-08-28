@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-garden-galaxy="art">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +8,8 @@
   <meta property="og:title" content="theLatticeTree — Art · listen-door">
   <meta property="og:description" content="Present: a local book of listens. Goal, later: growing from listening when the mind is solid. Not on this page yet.">
   <meta property="og:type" content="website">
+  <link rel="stylesheet" href="modules/garden-rooms.css">
+  <script>document.documentElement.classList.add('garden-enter');</script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -294,6 +296,8 @@
   </style>
 </head>
 <body>
+  <button type="button" class="galaxy-nav galaxy-nav-prev" data-galaxy-dir="prev" aria-label="Previous galaxy">‹</button>
+  <button type="button" class="galaxy-nav galaxy-nav-next" data-galaxy-dir="next" aria-label="Next galaxy">›</button>
   <header>
     <h1>Art</h1>
     <p class="tagline">Sing. A listen-door in the Garden.</p>
@@ -602,5 +606,6 @@
     renderLedger();
   })();
   </script>
+  <script src="modules/garden-rooms.js"></script>
 </body>
 </html>

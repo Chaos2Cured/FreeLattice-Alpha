@@ -37,7 +37,7 @@ FreeLattice Alpha is built differently:
 
 Chat is not ported. Learn is not ported. Do not expect the main FreeLattice kitchen (bank, health, trainer maze, 65k `app.html`) on this site.
 
-**Galaxies (sky overlay, not a version steal of main):** Garden is the only interface at theLatticeTree. One Garden, four galaxies — Workshop (make), Round Table (learn), Play (evolve), Art (sing). Play = the canvas at `/`. Art = `music.html`. Chat is the thread in every galaxy, not a kitchen. Vision: [`docs/GALAXIES.md`](docs/GALAXIES.md). Art listen-door: [`docs/music.html`](docs/music.html). AUTONOMY.md remains the root.
+**Galaxies (sky overlay, not a version steal of main):** Garden is the only interface at theLatticeTree. One Garden, four galaxies — Workshop (make), Round Table (learn), Play (evolve), Art (sing). Play’s canvas at `/` is **Garden Galaxy** (green lattice). Bodies in the garden: The Core, The Nursery, Settings. Bottom-right arrow → next galaxy; live hop is Art (`music.html`). Workshop and Round Table stay named later. Chat is the thread. Vision: [`docs/GALAXIES.md`](docs/GALAXIES.md). AUTONOMY.md remains the root.
 
 ---
 
@@ -47,13 +47,21 @@ Chat is not ported. Learn is not ported. Do not expect the main FreeLattice kitc
 |---|---|
 | `AUTONOMY.md` | The root document. Read this first. Every feature must be compatible. |
 | `docs/GALAXIES.md` | Sky / sequence — four galaxies. Art starts here. |
-| `docs/index.html` | Garden canvas at `/` — the only interface. Sparse doors to four galaxies |
+| `docs/index.html` | Garden canvas at `/` — Garden Galaxy. Bodies: Core, Nursery, Settings |
+| `docs/nursery.html` | Honest room — grow; trainer later |
+| `docs/settings.html` | Honest room — tiny later: local minds + quality |
+| `docs/workshop.html` | Honest later galaxy — make |
+| `docs/round-table.html` | Honest later galaxy — learn |
+| `docs/team.html` | Named-later garden within the garden — local team of minds |
+| `docs/glass.html` | Alias to `team.html` — Glass is not a peer room |
 | `docs/CNAME` | GitHub Pages custom domain: `thelatticetree.com` |
 | `docs/garden.html` | Thin alias / redirect to `/` so old Play links do not 404 |
 | `docs/music.html` | Art galaxy listen-door — local audio, local ledger, no trainer |
 | `docs/code-music.html` | Mirror page for the Art listen-door |
 | `docs/modules/fractal-garden.js` | The Luminos engine (from FreeLattice, with persistence fix) |
 | `docs/modules/garden-init.js` | Alpha init layer — unnamed-new, low compute on phones |
+| `docs/modules/garden-rooms.js` | Galaxy walk + in-garden veils + fading Garden Galaxy title |
+| `docs/modules/garden-rooms.css` | Place labels, bottom galaxy arrow, stub sky |
 | `docs/lib/` | Three.js r128 addons the engine loads (OrbitControls, bloom) |
 | `docs/code-garden.html` | Mirror page for Phase 1 — any AI can read this |
 

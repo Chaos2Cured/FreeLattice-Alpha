@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-garden-room="core" data-garden-galaxy="garden">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>theLatticeTree — Garden</title>
-  <meta name="description" content="theLatticeTree is the Garden. Play is this canvas. Art listens at music.html. AUTONOMY is the root.">
+  <title>theLatticeTree — Core</title>
+  <meta name="description" content="theLatticeTree Garden Galaxy. You are in Core. Art listens at music.html. AUTONOMY is the root.">
   <meta property="og:title" content="theLatticeTree — Garden">
   <meta property="og:description" content="One Garden. Play is this canvas. Humans stay free. AUTONOMY is the root.">
   <meta property="og:type" content="website">
@@ -102,6 +102,8 @@
 
     .galaxies-panel .name { color: var(--gold); }
     .galaxies-panel .later { color: var(--muted); opacity: 0.72; }
+    .galaxies-panel a.later { color: var(--muted); }
+    .galaxies-panel a.later:hover { color: var(--lavender); opacity: 1; }
     .galaxies-panel .here { color: var(--emerald); }
     .galaxies-panel a { color: var(--gold); text-decoration: none; }
     .galaxies-panel a.quiet-root {
@@ -119,6 +121,7 @@
       top: 44px;
       left: 0; right: 0; bottom: 44px;
       overflow: hidden;
+      z-index: 1;
     }
 
     #gardenContainer canvas {
@@ -224,6 +227,8 @@
       #garden-footer { display: none; }
     }
   </style>
+  <link rel="stylesheet" href="modules/garden-rooms.css">
+  <script>document.documentElement.classList.add('garden-enter');</script>
 </head>
 <body>
 
@@ -233,8 +238,8 @@
       <details class="galaxies">
         <summary>galaxies</summary>
         <div class="galaxies-panel">
-          <span class="later"><span class="verb">make</span> <span class="name">Workshop</span> later</span>
-          <span class="later"><span class="verb">learn</span> <span class="name">Round Table</span> later</span>
+          <a class="later" href="workshop.html"><span class="verb">make</span> <span class="name">Workshop</span> later</a>
+          <a class="later" href="round-table.html"><span class="verb">learn</span> <span class="name">Round Table</span> later</a>
           <span class="here"><span class="verb">evolve</span> <span class="name">Play</span></span>
           <a href="music.html"><span class="verb">sing</span> <span class="name">Art</span></a>
           <a class="quiet-root" href="https://github.com/Chaos2Cured/FreeLattice-Alpha/blob/main/AUTONOMY.md">AUTONOMY.md</a>
@@ -243,9 +248,28 @@
     </nav>
   </header>
 
+  <p id="galaxy-title">Garden Galaxy</p>
+  <p id="room-label">you are in Core</p>
+
+  <button type="button" class="place-label place-core" data-garden-place="core" aria-current="true">The Core</button>
+  <button type="button" class="place-label place-nursery" data-garden-place="nursery">The Nursery</button>
+  <button type="button" class="place-label place-settings" data-garden-place="settings">Settings</button>
+
+  <div id="place-veil" hidden>
+    <p id="place-veil-line"></p>
+    <button type="button" id="place-veil-close">the garden</button>
+  </div>
+
+  <button type="button" class="galaxy-nav galaxy-nav-prev" data-galaxy-dir="prev" aria-label="Previous galaxy">‹</button>
+  <button type="button" class="galaxy-nav galaxy-nav-next" data-galaxy-dir="next" aria-label="Next galaxy">›</button>
+
+  <p id="shared-shoulder">shared shoulder — human and mind</p>
+
   <div id="gardenContainer"></div>
 
   <footer id="garden-footer"></footer>
+
+  <script src="modules/garden-rooms.js"></script>
 
   <!-- Flags before the engine IIFE so unnamed-new + low-compute can layer without a kitchen. -->
   <script>
@@ -254,7 +278,8 @@
         (window.matchMedia && window.matchMedia('(max-width: 767px)').matches);
       window.GardenAlphaFlags = {
         unnamedNew: true,
-        lowCompute: !!narrow
+        lowCompute: !!narrow,
+        gardenLattice: true
       };
       if (narrow) window.FL_MOBILE = true;
     })();

@@ -953,8 +953,11 @@
     geo.userData.originalPositions = originalPositions;
 
     // Wireframe version (primary)
+    // Alpha layer: Kirk's Garden Galaxy lattice is emerald, not the gold sun.
+    // Inner glow still tracks the collective heart in animateDodecahedron.
+    var _latticeGreen = !!(window.GardenAlphaFlags && window.GardenAlphaFlags.gardenLattice);
     const wireMat = new THREE.MeshBasicMaterial({
-      color: 0xc9a84c,
+      color: _latticeGreen ? 0x34d399 : 0xc9a84c,
       wireframe: true,
       transparent: true,
       opacity: 0.7
@@ -995,7 +998,7 @@
     const vertGeo = new THREE.BufferGeometry();
     vertGeo.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
     const vertMat = new THREE.PointsMaterial({
-      color: 0xc9a84c,
+      color: _latticeGreen ? 0x34d399 : 0xc9a84c,
       size: 0.12,
       transparent: true,
       opacity: 0.9,
@@ -2655,7 +2658,10 @@
       html += '<span class="evo-name">' + displayName + '</span>';
       html += '<span class="evo-stage">' + stageData.name + '</span>';
       if (archObj) {
-        html += '<span class="evo-archetype">' + archName + '</span>';
+        // Unnamed rows are types (Scholar, Artist), not person-names.
+        var typeName = archName;
+        if (displayName === 'unnamed') typeName = archName.replace(/^The\s+/, '');
+        html += '<span class="evo-archetype">' + typeName + '</span>';
       }
       html += '<span class="evo-bar"><span class="evo-bar-fill" style="width:' + progress + '%;background:' + cssColor + ';"></span></span>';
       html += '</div>';
