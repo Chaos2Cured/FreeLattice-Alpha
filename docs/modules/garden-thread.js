@@ -4,7 +4,7 @@
 // Layer, never delete. Messages + one input. Georgia. Sparse.
 // Listener: LocalMindProbe.getRemembered() only.
 // If none: fail-closed. Honest heart copy. Settings button.
-// On Workshop and Round Table (no Play Settings door): Settings walks to settings.html.
+// On Workshop, Round Table, and Art (no Play Settings door): Settings walks to settings.html.
 // Input and Send sleep (aria-disabled, no submit). Do not invent a reply.
 // Do not look for a mind from the thread. That job is Settings.
 // If a mind is remembered: input and Send wake.

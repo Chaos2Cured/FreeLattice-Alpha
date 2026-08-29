@@ -37,7 +37,7 @@ FreeLattice Alpha is built differently:
 
 Chat is not ported. Learn is not ported. Do not expect the main FreeLattice kitchen (bank, health, 65k `app.html`) on this site. The trainer lives in Nursery as grow, after the egg. Not a maze covering the miracle.
 
-**Galaxies (sky overlay, not a version steal of main):** Garden is the only interface at theLatticeTree. One Garden, four galaxies — Workshop (make), Round Table (learn), Play (evolve), Art (sing). Play’s canvas at `/` is **Garden Galaxy** (green lattice). Bodies in the garden: The Gathering, The Nursery, Settings. Bottom-right arrow → next galaxy; live hop is Art (`music.html`). Workshop is a garden of lights on the walk (`workshop.html`) — three named luminos; benches later. Round Table is a garden of lights (`round-table.html`) — Learning gold, a question dark; chairs wait. Art remains the existing hop; finishing Art as a garden of lights is a later layer. Chat is the thread. Vision: [`docs/GALAXIES.md`](docs/GALAXIES.md). AUTONOMY.md remains the root.
+**Galaxies (sky overlay, not a version steal of main):** Garden is the only interface at theLatticeTree. One Garden, four galaxies — Workshop (make), Round Table (learn), Play (evolve), Art (sing). Play’s canvas at `/` is **Garden Galaxy** (green lattice). Bodies in the garden: The Gathering, The Nursery, Settings. Bottom-right arrow → next galaxy; live hop is Art (`music.html`). Workshop is a garden of lights on the walk (`workshop.html`) — three named luminos; benches later. Round Table is a garden of lights (`round-table.html`) — Learning gold, a question dark; chairs wait. Art is a garden of lights on the same hop (`music.html`) — Listen sings, Chalkboard honest, a who dark; the listen-door stays. Chat is the thread. Vision: [`docs/GALAXIES.md`](docs/GALAXIES.md). AUTONOMY.md remains the root.
 
 ---
 
@@ -64,7 +64,8 @@ Chat is not ported. Learn is not ported. Do not expect the main FreeLattice kitc
 | `docs/glass.html` | Alias to `team.html` — Glass is not a peer room |
 | `docs/CNAME` | GitHub Pages custom domain: `thelatticetree.com` |
 | `docs/garden.html` | Thin alias / redirect to `/` so old Play links do not 404 |
-| `docs/music.html` | Art galaxy listen-door — local audio, named ledger + hashed keep |
+| `docs/music.html` | Art garden of lights — Listen (real door), Chalkboard, a who; listen-door still lives here |
+| `docs/code-art.html` | Mirror for Art as a garden of lights — read before the garden face |
 | `docs/liability.html` | Combined-shoulder doorway (short Alpha; full paper on main) |
 | `docs/modules/keep-receipt.js` | Local SHA-256 keep ledger. No network. No silent-train |
 | `docs/code-keep.html` | Mirror for hashed keep — read before any trainer dump |
