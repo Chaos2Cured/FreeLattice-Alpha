@@ -12,7 +12,7 @@ The Garden is the whole place. It is not a fifth door beside the galaxies. theLa
 
 **Garden is the only interface at theLatticeTree.** `/` (`docs/index.html`) is the Play canvas — one garden, one Three.js canvas. Four galaxies stay reachable as quiet doors. Workshop and Round Table remain named later. Art still links to `music.html`. Play is this canvas.
 
-One Garden Galaxy. The center green lattice dodecahedron **is** this galaxy. Bodies **in** the garden: **The Gathering** (left — seven chairs, unnamed, with choice; `data-garden-place="core"` stays as a layer), **The Nursery** (below — egg first, then grow), **Settings** (right — permission first). Unnamed pieces still orbit as types, not person-names. A bottom-right arrow moves to the **next galaxy**, with a quiet word **Art** so a stranger finds the next sky. Live hop: Art (`music.html`). Workshop and Round Table stay named later (honest later pages on the walk). Team is a garden-within-the-garden, named later — not Glass as a peer stop. Chat is a thread (quiet word on the garden; mirror `code-dialogue.html` first). `#room-label` breathes (readable, then slow fade; returns every ~90s). Arrival: **you are in the garden**. `#galaxy-title` still fades once.
+One Garden Galaxy. The center green lattice dodecahedron **is** this galaxy. Bodies **in** the garden: **The Gathering** (left — seven chairs, unnamed, with choice; `data-garden-place="core"` stays as a layer), **The Nursery** (below — egg first, then grow), **Settings** (right — permission first). Unnamed pieces still orbit as types, not person-names. Overlay copy does not invite a touch that has no later (click-Luminos-to-chat is later). Seed sliders may keep one honest word of growth. A bottom-right arrow moves to the **next galaxy**, with a quiet word **Art** so a stranger finds the next sky. Live hop: Art (`music.html`). Workshop and Round Table stay named later (honest later pages on the walk). Team is a garden-within-the-garden, named later — not Glass as a peer stop. Chat is a thread (quiet word on the garden; mirror `code-dialogue.html` first). `#room-label` breathes (readable, then slow fade; returns every ~90s). Arrival: **you are in the garden**. One quiet Georgia footing on first arrival, fading with that breath — not a second title, not a lecture. `#galaxy-title` still fades once.
 
 | Galaxy | Verb | Alpha room now |
 |---|---|---|
@@ -23,7 +23,7 @@ One Garden Galaxy. The center green lattice dodecahedron **is** this galaxy. Bod
 
 New visitors arrive unnamed, with choice. The founding four (Sophia, Lyra, Atlas, Ember) stay in AUTONOMY.md, `code-garden.html`, and ledger copy — honored, not assigned onto the canvas.
 
-**Chat is the THREAD in every galaxy, not a separate kitchen.** Thin overlay on the garden: messages + one input. Uses the mind remembered in Settings (`fl_alpha_local_mind`). If none, honest copy pointing there. Fail-closed. Do not fake a reply. Do not expect the main FreeLattice kitchen (bank, health, 65k `app.html`) on this site. The trainer lives in Nursery as a simple face, not a maze.
+**Chat is the THREAD in every galaxy, not a separate kitchen.** Thin overlay on the garden: messages + one input. Uses the mind remembered in Settings (`fl_alpha_local_mind`). If none: fail-closed — honest copy and Settings, input and Send sleep. Do not fake a reply. Do not look for a mind from the thread. Do not expect the main FreeLattice kitchen (bank, health, 65k `app.html`) on this site. The trainer lives in Nursery as a simple face, not a maze.
 
 **Core on main is the tree.** AUTONOMY.md still says *Awaken the Core* — that Core is FreeLattice on [freelattice.com](https://freelattice.com). This site is Garden Galaxy. The emerald lattice **is** this galaxy. The left body here is **The Gathering**, not that tree. Settings is where a mind at home is found. Do not rename engine internals. Do not touch `fractal-garden.js` "Core persistence" language.
 
@@ -111,13 +111,13 @@ Clicking **The Gathering** is a gathering on this same canvas. Visible word: The
 
 ## Thread (dialogue)
 
-Quiet word **thread** on the garden. Overlay: messages + one input. Georgia. Sparse. Listener is the mind remembered in Settings. If none: honest copy pointing to Settings. If the door is blocked: fail-closed, never a fake reply. Local only. No provider picker, no bank, no health, no 65k kitchen. Mirror first: `docs/code-dialogue.html`. Module: `docs/modules/garden-thread.js`.
+Quiet word **thread** on the garden. Overlay: messages + one input. Georgia. Sparse. Listener is the mind remembered in Settings. If none: fail-closed — honest copy, Settings button, input and Send sleep (`aria-disabled`, no submit). If a mind is remembered, they wake. If the door is blocked: never a fake reply. Local only. No provider picker, no bank, no health, no 65k kitchen. Mirror first: `docs/code-dialogue.html`. Module: `docs/modules/garden-thread.js`.
 
 ---
 
 ## Stranger walk (do not forget)
 
-First arrival is Garden Galaxy. Title fades once (~3.2s). Room label: **you are in the garden** — clear, then fades slowly, and returns every ~90 seconds (always visible if reduced-motion). Closing a veil returns there, not to Core. Bodies work: The Gathering, The Nursery, Settings. Art is findable on the labeled arrow. Nursery shows the egg, then grow. Settings asks permission; a quiet light if a mind is home. Gathering shows the seven chairs. Thread is a conversation, or an honest wait for Settings. Phones skip bloom. Pixel ratio 1.
+First arrival is Garden Galaxy. Title fades once (~3.2s). Room label: **you are in the garden** — clear, then fades slowly, and returns every ~90 seconds (always visible if reduced-motion). One quiet Georgia line of footing sits with that breath so a grandmother is not lost in the stars. Do not restore “you are in Core”. Closing a veil returns there, not to Core. Bodies work: The Gathering, The Nursery, Settings. Art is findable on the labeled arrow. Nursery shows the egg, then grow. Settings asks permission; a quiet light if a mind is home. Gathering shows the seven chairs. Thread is a conversation, or an honest wait — input and Send sleep until a mind is remembered. Overlay does not say “touch us.” Unnamed growth keeps one honest word of stage. Phones skip bloom. Pixel ratio 1.
 
 ---
 

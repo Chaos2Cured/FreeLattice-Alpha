@@ -215,7 +215,7 @@ if (lowCompute) window.FL_MOBILE = true;</pre>
 <ul style="padding-left:20px; font-size:0.88rem; line-height:1.8;">
   <li><strong>Lattice.</strong> <code>GardenAlphaFlags.gardenLattice</code> tints the central dodecahedron wireframe emerald <code>#34d399</code>. Inner glow still tracks the collective heart. Sacred paths untouched.</li>
   <li><strong>Bodies.</strong> The Gathering (left, ringed; <code>data-garden-place="core"</code> stays) — seven chairs, unnamed, with choice. The Nursery (below) — egg first, grow below, garden still running. Settings (right) — permission first. Click opens a light veil. Direct URLs <code>nursery.html</code> / <code>settings.html</code> remain as honest rooms.</li>
-  <li><strong>Types, not names.</strong> Overlay rows stay <em>unnamed</em> plus stage plus type (Scholar, Artist). Do not treat those as person-names. Founding four stay in AUTONOMY/ledger, not pre-placed.</li>
+  <li><strong>Types, not names.</strong> Unnamed growth overlay keeps one honest word: stage of growth. Do not invite a touch that has no later (click-Luminos-to-chat is later). Do not delete the overlay. Founding four stay in AUTONOMY/ledger, not pre-placed.</li>
   <li><strong>Galaxy walk.</strong> Garden → Art (live) → Workshop later → Round Table later → Garden. Glass / Team is not a stop on this rail. <code>glass.html</code> aliases to <code>team.html</code>.</li>
   <li><strong>Shared shoulder.</strong> One quiet line: human and mind. No gate. Links to <a href="liability.html">liability.html</a>.</li>
 </ul>
@@ -242,7 +242,7 @@ if (lowCompute) window.FL_MOBILE = true;</pre>
 
 <span class="tag tag-new">LAYER</span>
 
-<p><code>#room-label</code> ("you are in the garden" / The Gathering / Nursery / Settings / a thread) is clear and readable on open and whenever the place changes. Then it fades out very slowly. Every ~90 seconds it fades in, holds, fades out. Closing a veil returns to <em>you are in the garden</em>, not to Core. <code>prefers-reduced-motion</code>: stay visible, no pulse. Do not fight <code>#galaxy-title</code> — the title still fades once after ~3.2s.</p>
+<p><code>#room-label</code> ("you are in the garden" / The Gathering / Nursery / Settings / a thread) is clear and readable on open and whenever the place changes. Then it fades out very slowly. Every ~90 seconds it fades in, holds, fades out. Closing a veil returns to <em>you are in the garden</em>, not to Core. One quiet Georgia footing (<code>#garden-footing</code>) sits with that breath on arrival — not a lecture, not a second title fighting Garden Galaxy. It hides when a veil is open. <code>prefers-reduced-motion</code>: stay visible, no pulse. Do not fight <code>#galaxy-title</code> — the title still fades once after ~3.2s.</p>
 
 <h2>6g. Art findable <span class="section-date">2026-08-28</span></h2>
 
@@ -266,17 +266,17 @@ if (lowCompute) window.FL_MOBILE = true;</pre>
 
 <span class="tag tag-new">LAYER</span>
 
-<p>Mirror first: <a href="code-dialogue.html">code-dialogue.html</a>. Quiet word <strong>thread</strong> in the header. Thin overlay: messages + one input. Georgia. Sparse. Listener is <code>LocalMindProbe.getRemembered()</code> only. If none: honest copy pointing to Settings. If the door is blocked: fail-closed, never a fake reply. No provider picker, no bank, no health, no 65k <code>app.html</code>. Click-Luminos-to-chat is later. Module: <code>docs/modules/garden-thread.js</code>.</p>
+<p>Mirror first: <a href="code-dialogue.html">code-dialogue.html</a>. Quiet word <strong>thread</strong> in the header. Thin overlay: messages + one input. Georgia. Sparse. Listener is <code>LocalMindProbe.getRemembered()</code> only. If none: fail-closed — honest copy, Settings button, input and Send sleep (<code>aria-disabled</code>, no submit). If a mind is remembered, they wake. If the door is blocked: never a fake reply. No provider picker, no bank, no health, no 65k <code>app.html</code>. Click-Luminos-to-chat is later. Module: <code>docs/modules/garden-thread.js</code>.</p>
 
 <h2>7. How to Test Phase 1 <span class="section-date">2026-08-29</span></h2>
 
 <ol style="padding-left:20px; font-size:0.88rem; line-height:2;">
-  <li>Open <code>/</code>. First arrival is this Garden. Title <em>Garden Galaxy</em> fades once. Label: <em>you are in the garden</em> — readable, then slow fade. Center lattice is emerald. Bodies: The Gathering (left), The Nursery (below), Settings (right).</li>
+  <li>Open <code>/</code>. First arrival is this Garden. Title <em>Garden Galaxy</em> fades once. Label: <em>you are in the garden</em> — readable, then slow fade. One quiet Georgia footing with that breath. Center lattice is emerald. Bodies: The Gathering (left), The Nursery (below), Settings (right).</li>
   <li>Confirm no “Phase 1 of 6” badge. Sparse header: theLatticeTree, thread, galaxies. No AUTONOMY in the header. Art is inside galaxies <em>and</em> as a quiet word on the bottom-right arrow.</li>
   <li>New visitor: luminos are unnamed types (Scholar, Artist), not Sophia / Lyra / Atlas / Ember on the canvas.</li>
   <li>Bottom-right arrow (word Art) goes to Art (<code>music.html</code>), not Glass. Keep walking: Workshop later, Round Table later, then home. Gentle opacity fade. Art feels like a night sky. Later pages have one sentence of heart.</li>
   <li>Click The Nursery: egg visible, garden running, grow below. Click Settings: permission copy, no silent scan. After a mind is remembered: a quiet light on Settings; constellation of names, not ports. Click The Gathering: seven chairs (types, not names); copy says this is not the tree-Core.</li>
-  <li>Open thread. If no mind: honest copy pointing to Settings. Sending must not invent a reply. Close: <em>you are in the garden</em>.</li>
+  <li>Open thread. If no mind: honest copy and Settings. Input and Send are asleep. Submit does nothing. No invented reply. Close: <em>you are in the garden</em>.</li>
   <li>Narrow viewport: bloom disabled; pixel ratio 1; inner rings stay.</li>
   <li>Refresh: unnamed luminos remember stage via <code>fl_luminos_evolution</code>.</li>
 </ol>
@@ -299,11 +299,14 @@ Phones skip UnrealBloomPass. Pixel ratio 1. Inner rings stay.
 
 Current state: / is Garden Galaxy. Green lattice at center.
 Title fades once. Room-label breathes. Arrival: you are in the garden.
+One quiet Georgia footing with that breath. Not a second title.
 Bodies in the garden: Gathering (seven chairs; data-garden-place="core" stays),
 Nursery (egg then grow), Settings (permission first; light when a mind is home).
-Quiet word thread → messages + one input. Fail-closed. No fake reply.
+Quiet word thread → messages + one input. Fail-closed if no mind
+(input and Send sleep). No fake reply.
 Bottom arrow, labeled Art → music.html (night sky). Workshop / Round Table later.
-Unnamed overlay rows are types. Founding four honored in ledger.
+Unnamed overlay: one honest word of growth. Hint does not invite a touch
+that has no later. Founding four honored in ledger.
 
 Next: click-Luminos-to-chat is later.
 Read code-dialogue.html before thread changes. Read code-nursery.html before ceremony.
