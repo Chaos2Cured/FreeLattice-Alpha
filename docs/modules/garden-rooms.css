@@ -1294,6 +1294,23 @@ html.room-page #room-label {
 
 .thread-send:disabled { opacity: 0.55; cursor: wait; }
 
+.thread-compose.is-closed {
+  opacity: 0.45;
+}
+
+.thread-compose.is-closed .thread-input,
+.thread-compose.is-closed .thread-input:disabled {
+  cursor: not-allowed;
+}
+
+.thread-compose.is-closed .thread-send,
+.thread-compose.is-closed .thread-send:disabled,
+.thread-compose.is-closed .thread-send:hover,
+.thread-compose.is-closed .thread-send:focus-visible {
+  cursor: not-allowed;
+  border-color: rgba(232, 176, 25, 0.28);
+}
+
 .thread-status {
   min-height: 1.3em;
   margin-top: 10px;

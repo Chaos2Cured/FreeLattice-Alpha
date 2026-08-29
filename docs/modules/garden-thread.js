@@ -3,7 +3,10 @@
 //
 // Layer, never delete. Messages + one input. Georgia. Sparse.
 // Listener: LocalMindProbe.getRemembered() only.
-// If none: a mind at home waits in Settings. Do not invent a reply.
+// If none: fail-closed. Honest heart copy. Settings button.
+// Input and Send sleep (aria-disabled, no submit). Do not invent a reply.
+// Do not look for a mind from the thread. That job is Settings.
+// If a mind is remembered: input and Send wake.
 // If the door is blocked: honest fail. Do not fake a reply.
 // Gathering chairs stay types, not a router.
 // Click-Luminos-to-chat is later.
@@ -257,13 +260,36 @@
     input.setAttribute('data-thread-input', '1');
     input.setAttribute('autocomplete', 'off');
     input.setAttribute('maxlength', '4000');
-    input.setAttribute('aria-label', 'Say something');
-    input.placeholder = mind ? 'Say something' : 'A mind at home waits in Settings';
     var sendBtn = el('button', 'thread-send', 'Send');
     sendBtn.type = 'submit';
     form.appendChild(input);
     form.appendChild(sendBtn);
     root.appendChild(form);
+
+    function setComposeOpen(open) {
+      if (open) {
+        form.classList.remove('is-closed');
+        form.removeAttribute('aria-disabled');
+        input.disabled = false;
+        input.removeAttribute('aria-disabled');
+        input.placeholder = 'Say something';
+        input.setAttribute('aria-label', 'Say something');
+        sendBtn.disabled = false;
+        sendBtn.removeAttribute('aria-disabled');
+      } else {
+        form.classList.add('is-closed');
+        form.setAttribute('aria-disabled', 'true');
+        input.disabled = true;
+        input.setAttribute('aria-disabled', 'true');
+        input.placeholder = '';
+        input.setAttribute('aria-label', 'The thread is waiting for a mind in Settings');
+        input.value = '';
+        sendBtn.disabled = true;
+        sendBtn.setAttribute('aria-disabled', 'true');
+      }
+    }
+
+    setComposeOpen(!!mind);
 
     var status = el('p', 'thread-status');
     status.setAttribute('data-thread-status', '1');
@@ -277,19 +303,16 @@
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
       if (busy) return;
+      var nowMind = listener();
+      if (!nowMind) {
+        setComposeOpen(false);
+        return;
+      }
       var text = (input.value || '').trim();
       if (!text) return;
-      var nowMind = listener();
       messages.push({ role: 'human', text: text });
       input.value = '';
       renderMessages(list);
-
-      if (!nowMind) {
-        messages.push({ role: 'garden', text: speakHonest('none') });
-        renderMessages(list);
-        setStatus('', false);
-        return;
-      }
 
       busy = true;
       sendBtn.disabled = true;
@@ -328,7 +351,9 @@
 
     container.appendChild(root);
     renderMessages(list);
-    setTimeout(function () { try { input.focus(); } catch (e) {} }, 80);
+    if (mind) {
+      setTimeout(function () { try { input.focus(); } catch (e) {} }, 80);
+    }
     return root;
   }
 
