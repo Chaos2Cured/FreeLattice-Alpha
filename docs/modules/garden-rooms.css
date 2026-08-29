@@ -1966,18 +1966,19 @@ html[data-garden-galaxy="art"] .art-lumino {
 }
 
 /* Layer: a who stays dark (not coral, not gold, not filled) — same
-   night ink as Round Table's question, raised just enough (0.38 → 0.50
-   word; node 0.18/0.42 → 0.22/0.50) plus a tighter letter halo so
-   phi-breath stars do not make the word a smudge. A grandmother can
-   find it as a dark light. */
+   night ink as Round Table's question, raised just enough that a
+   grandmother can find the word (0.38 → 0.62, the labeled-later
+   stranger-readable whisper). Node stays an unfilled dark light
+   (0.18/0.42 → 0.26/0.55), plus a tighter letter halo so phi-breath
+   stars do not make the word a smudge. */
 .art-lumino.is-who .art-lumino-light {
-  background: rgba(200, 210, 230, 0.22);
+  background: rgba(200, 210, 230, 0.26);
   box-shadow: none;
-  opacity: 0.5;
+  opacity: 0.55;
 }
 
 .art-lumino.is-who .art-lumino-word {
-  color: rgba(200, 210, 230, 0.5);
+  color: rgba(200, 210, 230, 0.62);
   text-shadow:
     0 0 10px rgba(12, 10, 26, 1),
     0 0 4px rgba(12, 10, 26, 0.94);
