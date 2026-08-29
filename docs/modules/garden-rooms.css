@@ -534,6 +534,19 @@ html.thread-open #place-veil-close {
   opacity: 0.4;
 }
 
+.galaxy-nav-prev:has(.galaxy-nav-word) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  width: auto;
+  min-width: 56px;
+  height: auto;
+  line-height: 1.15;
+  padding: 6px 10px 4px;
+  opacity: 0.78;
+}
+
 html[data-garden-galaxy="art"] .galaxy-nav-prev { opacity: 0.82; }
 html[data-garden-galaxy="art"] .galaxy-nav-next { opacity: 0.4; }
 
@@ -583,6 +596,7 @@ html[data-garden-galaxy="art"] .galaxy-nav-next { opacity: 0.4; }
 
   .galaxy-nav-next { opacity: 0.88; }
   .galaxy-nav-prev { opacity: 0.28; }
+  .galaxy-nav-prev:has(.galaxy-nav-word) { opacity: 0.72; }
 
   html[data-garden-galaxy="art"] .galaxy-nav-prev { opacity: 0.7; }
   html[data-garden-galaxy="art"] .galaxy-nav-next { opacity: 0.45; }
@@ -1592,8 +1606,18 @@ html[data-garden-galaxy="workshop"] .room-stub { display: none; }
   text-shadow: 0 0 10px rgba(12, 10, 26, 0.95);
 }
 
-#place-veil.is-workshop-later {
+#place-veil.is-workshop-later,
+#place-veil.is-open.is-workshop-later {
+  opacity: 1;
+  pointer-events: auto;
+  transition: none;
   background: rgba(12, 10, 26, 0.22);
+}
+
+#place-veil.is-workshop-later #place-veil-line {
+  text-shadow:
+    0 0 18px rgba(12, 10, 26, 0.98),
+    0 0 8px rgba(12, 10, 26, 0.95);
 }
 
 html.thread-open .workshop-lumino,
@@ -1601,9 +1625,8 @@ html.thread-open .workshop-lumino:hover,
 html.thread-open .workshop-heart,
 html.workshop-later-open .workshop-lumino,
 html.workshop-later-open .workshop-lumino:hover,
-html.workshop-later-open .workshop-heart,
-html:has(#place-veil.is-open.is-workshop-later) .workshop-lumino,
-html:has(#place-veil.is-open.is-workshop-later) .workshop-heart {
+html.workshop-later-open .workshop-heart {
+  display: none !important;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
