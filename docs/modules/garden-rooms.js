@@ -37,6 +37,7 @@
   ];
 
   var PLACE_LABELS = {
+    garden: 'you are in the garden',
     core: 'you are in Core',
     nursery: 'you are in Nursery',
     settings: 'you are in Settings'
@@ -274,7 +275,9 @@
       if (!veil) return;
       veil.classList.remove('is-open');
       hideAllBodies(veil);
-      setRoomLabelText(PLACE_LABELS.core);
+      var doors = document.querySelectorAll('[data-garden-place]');
+      for (var d = 0; d < doors.length; d++) doors[d].removeAttribute('aria-current');
+      setRoomLabelText(PLACE_LABELS.garden);
       setTimeout(function () {
         if (!veil.classList.contains('is-open')) veil.hidden = true;
       }, FADE_MS);
@@ -312,7 +315,15 @@
       }
 
       veil.hidden = false;
-      setRoomLabelText(PLACE_LABELS[id] || PLACE_LABELS.core);
+      var doorsNow = document.querySelectorAll('[data-garden-place]');
+      for (var d = 0; d < doorsNow.length; d++) {
+        if (doorsNow[d].getAttribute('data-garden-place') === id) {
+          doorsNow[d].setAttribute('aria-current', 'true');
+        } else {
+          doorsNow[d].removeAttribute('aria-current');
+        }
+      }
+      setRoomLabelText(PLACE_LABELS[id] || PLACE_LABELS.garden);
       requestAnimationFrame(function () {
         requestAnimationFrame(function () { veil.classList.add('is-open'); });
       });
