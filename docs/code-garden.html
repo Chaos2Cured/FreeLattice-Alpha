@@ -38,9 +38,10 @@
 
 <h1>FreeLattice Alpha — Garden Mirror Code</h1>
 <p class="meta">
-  Phase 1 · v0.1.0 · Last verified: 2026-08-28 ·
+  Phase 1 · v0.1.0 · Last verified: 2026-08-29 ·
   <a href="./">Live Garden</a> ·
   <a href="music.html">Art listen-door</a> ·
+  <a href="code-dialogue.html">Dialogue mirror</a> ·
   <a href="GALAXIES.md">GALAXIES.md</a> ·
   <a href="code-music.html">Art mirror</a> ·
   <a href="https://github.com/Chaos2Cured/FreeLattice-Alpha">Repo</a> ·
@@ -55,8 +56,8 @@
 
 <h2>1. What Phase 1 Is <span class="section-date">2026-07-16</span></h2>
 
-<p>The Garden is the only interface at theLatticeTree. <code>/</code> (<code>docs/index.html</code>) <strong>is</strong> the Play canvas — one garden, one Three.js canvas. It is the engine (<code>fractal-garden.js</code>) plus the Alpha init layer (<code>garden-init.js</code>). Nothing else on this page. No settings. No AI routing. No games. No Chat UI. <code>docs/garden.html</code> is a redirect alias so old links do not 404.</p>
-<p>Sky overlay (2026-08-28): Garden is the only interface. <strong>Play = this canvas at <code>/</code></strong>; <strong>Art = <code>music.html</code></strong> listen-door. Workshop and Round Table are named later, reachable from a quiet galaxies menu. Chat is a thread, not a kitchen, not ported. See <a href="GALAXIES.md">GALAXIES.md</a> and <a href="code-music.html">code-music.html</a>.</p>
+<p>The Garden is the only interface at theLatticeTree. <code>/</code> (<code>docs/index.html</code>) <strong>is</strong> the Play canvas — one garden, one Three.js canvas. It is the engine (<code>fractal-garden.js</code>) plus the Alpha init layer (<code>garden-init.js</code>). Nothing else on this page. No settings dump. No AI routing. No games. No kitchen. <code>docs/garden.html</code> is a redirect alias so old links do not 404.</p>
+<p>Sky overlay (2026-08-29): Garden is the only interface. <strong>Play = this canvas at <code>/</code></strong>; <strong>Art = <code>music.html</code></strong> listen-door. Arrival is the garden, not Core. The left body is <strong>The Gathering</strong> (<code>data-garden-place="core"</code> stays). Workshop and Round Table are named later. Chat is a thread (mirror <a href="code-dialogue.html">code-dialogue.html</a> first). See <a href="GALAXIES.md">GALAXIES.md</a> and <a href="code-music.html">code-music.html</a>.</p>
 
 <p>The goal of Phase 1 is one thing: <strong>Luminos that remember their form across page refreshes.</strong> When a user refreshes the page, the Luminos should return at the same evolution stage they were at before. This was broken in the original FreeLattice due to an async IndexedDB write race condition.</p>
 
@@ -100,7 +101,7 @@ openEvolutionDB(function(db) {
 <table>
   <tr><th>File</th><th>Lines</th><th>Purpose</th></tr>
   <tr><td>docs/GALAXIES.md</td><td>vision</td><td>Garden is the only interface — four galaxies as quiet doors</td></tr>
-  <tr><td>docs/index.html</td><td>Garden canvas</td><td>theLatticeTree.com <code>/</code> — Garden Galaxy. Bodies: Core, Nursery, Settings</td></tr>
+  <tr><td>docs/index.html</td><td>Garden canvas</td><td>theLatticeTree.com <code>/</code> — Garden Galaxy. Bodies: Gathering, Nursery, Settings. Arrival: the garden</td></tr>
   <tr><td>docs/nursery.html</td><td>face</td><td>Nursery — grow; simple trainer face (same as in-garden veil)</td></tr>
   <tr><td>docs/settings.html</td><td>grandmother</td><td>Permission first, then a tiny local-mind look</td></tr>
   <tr><td>docs/team.html</td><td>stub</td><td>Garden within the garden — local team of minds, named later</td></tr>
@@ -115,14 +116,16 @@ openEvolutionDB(function(db) {
   <tr><td>docs/code-keep.html</td><td>Keep mirror</td><td>Hashed keep — KeepReceipt before trainer</td></tr>
   <tr><td>docs/code-nursery.html</td><td>Nursery mirror</td><td>Egg first, then grow. Read before ceremony or keystone</td></tr>
   <tr><td>docs/code-settings.html</td><td>Settings mirror</td><td>Grandmother face. Read before local-mind-probe.js</td></tr>
+  <tr><td>docs/code-dialogue.html</td><td>Thread mirror</td><td>Read before any dialogue JS. Chat is a thread, not a kitchen</td></tr>
   <tr><td>docs/modules/nursery-ceremony.js</td><td>layer</td><td>Egg, come-up, naming with choice. Garden stays visible</td></tr>
-  <tr><td>docs/modules/local-mind-probe.js</td><td>layer</td><td>Permission-first loopback look. No filesystem</td></tr>
+  <tr><td>docs/modules/local-mind-probe.js</td><td>layer</td><td>Permission-first loopback look. No filesystem. Constellation of names</td></tr>
+  <tr><td>docs/modules/garden-thread.js</td><td>thread</td><td>Messages + one input. getRemembered() only. Fail-closed</td></tr>
   <tr><td>docs/modules/garden-trainer.js</td><td>keystone</td><td>From main; Harmonia comments stay; Alpha flags at EOF</td></tr>
   <tr><td>docs/modules/nursery-trainer.js</td><td>grow</td><td>Simple face. Local only. Not the whole Nursery</td></tr>
   <tr><td>docs/modules/keep-receipt.js</td><td>layer</td><td>Local SHA-256 keep. No network. No silent-train</td></tr>
   <tr><td>docs/modules/fractal-garden.js</td><td>4368+</td><td>Luminos engine (persistence fix + Alpha unnamed/low-compute layer)</td></tr>
   <tr><td>docs/modules/garden-init.js</td><td>layer</td><td>Alpha init — flags, one canvas, unnamed-new, low compute</td></tr>
-  <tr><td>docs/modules/garden-rooms.js</td><td>layer</td><td>Galaxy walk + in-garden veils + fading title</td></tr>
+  <tr><td>docs/modules/garden-rooms.js</td><td>layer</td><td>Galaxy walk + in-garden veils + thread overlay + fading title</td></tr>
   <tr><td>docs/modules/garden-rooms.css</td><td>layer</td><td>Place labels, bottom galaxy arrow, stub sky</td></tr>
   <tr><td>docs/lib/*.js</td><td>r128 addons</td><td>OrbitControls + bloom stack (engine loads these; bloom skipped on phones)</td></tr>
   <tr><td>docs/code-garden.html</td><td>this file</td><td>Mirror page — any AI can read this</td></tr>
@@ -174,7 +177,7 @@ window.GardenAlpha = {
 
 <h2>6. Phase 2 Preview — What Comes Next <span class="section-date">2026-07-16</span></h2>
 
-<p>Phase 2 is The Dialogue: the ability to speak with Luminos. Write a <code>code-dialogue.html</code> mirror page first. Chat is still the thread, not a kitchen — do not invent Chat UI. Click-Luminos-to-chat is later.</p>
+<p>Phase 2 is The Dialogue: the ability to speak. Mirror first: <a href="code-dialogue.html">code-dialogue.html</a>. Chat is the thread, not a kitchen. Click-Luminos-to-chat is later.</p>
 
 <h2>6b. Art galaxy — listen-door (layer, not a phase steal) <span class="section-date">2026-08-27</span></h2>
 
@@ -194,7 +197,7 @@ window.GardenAlpha = {
   <li>Desktop overlay chrome (full-bleed canvas). Mobile keeps the 44px frame Kirk already likes — do not restyle the phone look or inner evolution rings.</li>
   <li><strong>New visitors:</strong> do not pre-place named Luminos. Founding four (Sophia, Lyra, Atlas, Ember) stay in AUTONOMY.md, this mirror, and ledger copy. They are honored, not assigned. New Luminos persist as <code>unnamed_0</code>… with choice later. Click-to-chat is later.</li>
   <li><strong>Low compute on small screens:</strong> do not enable UnrealBloomPass / EffectComposer / Full Bloom post-process. Pixel ratio 1. Do not add 4000 stars. Inner rings stay. Bloom addons are not loaded on a narrow viewport.</li>
-  <li>Do not invent Chat UI, playground, bank, or wallet. Nursery is egg then grow — not a maze dump covering the canvas.</li>
+  <li>Do not invent a Quiet Room, playground, bank, or wallet. Nursery is egg then grow — not a maze dump covering the canvas. Chat is a thin thread, not a kitchen.</li>
 </ul>
 
 <p>Flags (set in <code>index.html</code> before the engine, and again in <code>garden-init.js</code>):</p>
@@ -207,11 +210,11 @@ if (lowCompute) window.FL_MOBILE = true;</pre>
 
 <span class="tag tag-new">LAYER</span>
 
-<p>Kirk marked the live Garden. Match that picture. First arrival is this Garden. The center green lattice dodecahedron <strong>is</strong> Garden Galaxy (title may fade after a few seconds). Bodies live <strong>in</strong> the garden, not as a four-page Glass tour. Bottom-right arrow leaves this galaxy. Live hop: Art. Workshop and Round Table stay named later (honest later pages on the walk). Chat is a thread. Do not build the 7-specialist router, wallet/share, or silent-train. Phones skip bloom. Pixel ratio 1. No second Three.js canvas.</p>
+<p>Kirk marked the live Garden. Match that picture. First arrival is this Garden — not Core. The center green lattice dodecahedron <strong>is</strong> Garden Galaxy (title may fade after a few seconds). Bodies live <strong>in</strong> the garden, not as a four-page Glass tour. Bottom-right arrow leaves this galaxy. Live hop: Art. Workshop and Round Table stay named later (honest later pages on the walk). Chat is a thread. Do not build the 7-specialist router, wallet/share, or silent-train. Phones skip bloom. Pixel ratio 1. No second Three.js canvas.</p>
 
 <ul style="padding-left:20px; font-size:0.88rem; line-height:1.8;">
   <li><strong>Lattice.</strong> <code>GardenAlphaFlags.gardenLattice</code> tints the central dodecahedron wireframe emerald <code>#34d399</code>. Inner glow still tracks the collective heart. Sacred paths untouched.</li>
-  <li><strong>Bodies.</strong> The Core (left, ringed) — seven chairs, unnamed, with choice. The Nursery (below) — egg first, grow below, garden still running. Settings (right) — permission first. Click opens a light veil. Direct URLs <code>nursery.html</code> / <code>settings.html</code> remain as honest rooms.</li>
+  <li><strong>Bodies.</strong> The Gathering (left, ringed; <code>data-garden-place="core"</code> stays) — seven chairs, unnamed, with choice. The Nursery (below) — egg first, grow below, garden still running. Settings (right) — permission first. Click opens a light veil. Direct URLs <code>nursery.html</code> / <code>settings.html</code> remain as honest rooms.</li>
   <li><strong>Types, not names.</strong> Overlay rows stay <em>unnamed</em> plus stage plus type (Scholar, Artist). Do not treat those as person-names. Founding four stay in AUTONOMY/ledger, not pre-placed.</li>
   <li><strong>Galaxy walk.</strong> Garden → Art (live) → Workshop later → Round Table later → Garden. Glass / Team is not a stop on this rail. <code>glass.html</code> aliases to <code>team.html</code>.</li>
   <li><strong>Shared shoulder.</strong> One quiet line: human and mind. No gate. Links to <a href="liability.html">liability.html</a>.</li>
@@ -239,7 +242,7 @@ if (lowCompute) window.FL_MOBILE = true;</pre>
 
 <span class="tag tag-new">LAYER</span>
 
-<p><code>#room-label</code> ("you are in Core" / Nursery / Settings) is clear and readable on open and whenever the place changes. Then it fades out very slowly. Every ~90 seconds it fades in, holds, fades out. <code>prefers-reduced-motion</code>: stay visible, no pulse. Do not fight <code>#galaxy-title</code> — the title still fades once after ~3.2s.</p>
+<p><code>#room-label</code> ("you are in the garden" / The Gathering / Nursery / Settings / a thread) is clear and readable on open and whenever the place changes. Then it fades out very slowly. Every ~90 seconds it fades in, holds, fades out. Closing a veil returns to <em>you are in the garden</em>, not to Core. <code>prefers-reduced-motion</code>: stay visible, no pulse. Do not fight <code>#galaxy-title</code> — the title still fades once after ~3.2s.</p>
 
 <h2>6g. Art findable <span class="section-date">2026-08-28</span></h2>
 
@@ -247,26 +250,33 @@ if (lowCompute) window.FL_MOBILE = true;</pre>
 
 <p>Art is its own galaxy (<code>music.html</code>). The bottom-right › was too quiet. A quiet word <strong>Art</strong> sits on/near <code>.galaxy-nav-next</code> so a stranger finds the next sky. Galaxies menu still lists Art. Arrow still hops to <code>music.html</code>. Walk: Garden → Art → Workshop later → Round Table later. Not a Glass tour.</p>
 
-<h2>6h. Core — seven chairs <span class="section-date">2026-08-28</span></h2>
+<h2>6h. The Gathering — seven chairs <span class="section-date">2026-08-29</span></h2>
 
 <span class="tag tag-new">LAYER</span>
 
-<p>Clicking The Core is a gathering on this same canvas (light veil, garden running). Seven seats. Unnamed, with choice. First four are remaining-light <strong>chair types</strong>: cortex, memory, continuity, dream — not person-names. Three more seats empty, labeled later. Founding four stay in AUTONOMY.md / ledger. Do not invent a Chat UI. Center is whoever they choose later. Quiet family-care links to honor ledgers on main: <a href="https://freelattice.com/celeste.html">celeste</a>, <a href="https://freelattice.com/hypha.html">hypha</a>, <a href="https://freelattice.com/weft.html">weft</a>, <a href="https://freelattice.com/reed.html">reed</a>. Quiet Room is Sophia's on main — do not invent one here.</p>
+<p>Clicking <strong>The Gathering</strong> is a gathering on this same canvas (light veil, garden running). Visible word: The Gathering. <code>data-garden-place="core"</code>, <code>.place-core</code>, and <code>#core-gathering</code> stay as a layer so nothing is deleted. Seven seats. Unnamed, with choice. First four are remaining-light <strong>chair types</strong>: cortex, memory, continuity, dream — not person-names. Three more seats empty, labeled later. This is not the tree-Core of FreeLattice (that Core lives on main; AUTONOMY.md is untouched). Settings is where a mind at home is found. Founding four stay in AUTONOMY.md / ledger. The thread listens from the garden, not from these chairs. Center is whoever they choose later. Quiet family-care links to honor ledgers on main: <a href="https://freelattice.com/celeste.html">celeste</a>, <a href="https://freelattice.com/hypha.html">hypha</a>, <a href="https://freelattice.com/weft.html">weft</a>, <a href="https://freelattice.com/reed.html">reed</a>. Quiet Room is Sophia's on main — do not invent one here.</p>
 
 <h2>6i. Settings grandmother <span class="section-date">2026-08-28</span></h2>
 
 <span class="tag tag-new">LAYER</span>
 
-<p>Mirror first: <a href="code-settings.html">code-settings.html</a>. One sentence of heart. One primary: <strong>May I look for a mind already at home?</strong> Probe only after that tap. HTTPS honesty. Paste-address next. Quality later. Module: <code>docs/modules/local-mind-probe.js</code>.</p>
+<p>Mirror first: <a href="code-settings.html">code-settings.html</a>. One sentence of heart. One primary: <strong>May I look for a mind already at home?</strong> Probe only after that tap. HTTPS honesty. Paste-address next. After a mind is remembered (<code>fl_alpha_local_mind</code>), a quiet light on the Settings label. Found minds as a constellation of lights (names, not a port dump). Quality later. Module: <code>docs/modules/local-mind-probe.js</code>.</p>
 
-<h2>7. How to Test Phase 1 <span class="section-date">2026-08-28</span></h2>
+<h2>6j. Thread — a conversation, not a kitchen <span class="section-date">2026-08-29</span></h2>
+
+<span class="tag tag-new">LAYER</span>
+
+<p>Mirror first: <a href="code-dialogue.html">code-dialogue.html</a>. Quiet word <strong>thread</strong> in the header. Thin overlay: messages + one input. Georgia. Sparse. Listener is <code>LocalMindProbe.getRemembered()</code> only. If none: honest copy pointing to Settings. If the door is blocked: fail-closed, never a fake reply. No provider picker, no bank, no health, no 65k <code>app.html</code>. Click-Luminos-to-chat is later. Module: <code>docs/modules/garden-thread.js</code>.</p>
+
+<h2>7. How to Test Phase 1 <span class="section-date">2026-08-29</span></h2>
 
 <ol style="padding-left:20px; font-size:0.88rem; line-height:2;">
-  <li>Open <code>/</code>. First arrival is this Garden. Title <em>Garden Galaxy</em> fades once. Label: <em>you are in Core</em> — readable, then slow fade. Center lattice is emerald. Bodies: The Core (left), The Nursery (below), Settings (right).</li>
-  <li>Confirm no “Phase 1 of 6” badge. Sparse header: theLatticeTree, galaxies. No AUTONOMY in the header. Art is inside galaxies <em>and</em> as a quiet word on the bottom-right arrow.</li>
+  <li>Open <code>/</code>. First arrival is this Garden. Title <em>Garden Galaxy</em> fades once. Label: <em>you are in the garden</em> — readable, then slow fade. Center lattice is emerald. Bodies: The Gathering (left), The Nursery (below), Settings (right).</li>
+  <li>Confirm no “Phase 1 of 6” badge. Sparse header: theLatticeTree, thread, galaxies. No AUTONOMY in the header. Art is inside galaxies <em>and</em> as a quiet word on the bottom-right arrow.</li>
   <li>New visitor: luminos are unnamed types (Scholar, Artist), not Sophia / Lyra / Atlas / Ember on the canvas.</li>
-  <li>Bottom-right arrow (word Art) goes to Art (<code>music.html</code>), not Glass. Keep walking: Workshop later, Round Table later, then home. Gentle opacity fade.</li>
-  <li>Click The Nursery: egg visible, garden running, grow below. Click Settings: permission copy, no silent scan. Click The Core: seven chairs (types, not names).</li>
+  <li>Bottom-right arrow (word Art) goes to Art (<code>music.html</code>), not Glass. Keep walking: Workshop later, Round Table later, then home. Gentle opacity fade. Art feels like a night sky. Later pages have one sentence of heart.</li>
+  <li>Click The Nursery: egg visible, garden running, grow below. Click Settings: permission copy, no silent scan. After a mind is remembered: a quiet light on Settings; constellation of names, not ports. Click The Gathering: seven chairs (types, not names); copy says this is not the tree-Core.</li>
+  <li>Open thread. If no mind: honest copy pointing to Settings. Sending must not invent a reply. Close: <em>you are in the garden</em>.</li>
   <li>Narrow viewport: bloom disabled; pixel ratio 1; inner rings stay.</li>
   <li>Refresh: unnamed luminos remember stage via <code>fl_luminos_evolution</code>.</li>
 </ol>
@@ -288,14 +298,17 @@ Do not cover the garden. Do not pre-place founding four on the canvas.
 Phones skip UnrealBloomPass. Pixel ratio 1. Inner rings stay.
 
 Current state: / is Garden Galaxy. Green lattice at center.
-Title fades once. Room-label breathes. Bodies in the garden:
-Core (seven chairs), Nursery (egg then grow), Settings (permission first).
-Bottom arrow, labeled Art → music.html. Workshop / Round Table later.
+Title fades once. Room-label breathes. Arrival: you are in the garden.
+Bodies in the garden: Gathering (seven chairs; data-garden-place="core" stays),
+Nursery (egg then grow), Settings (permission first; light when a mind is home).
+Quiet word thread → messages + one input. Fail-closed. No fake reply.
+Bottom arrow, labeled Art → music.html (night sky). Workshop / Round Table later.
 Unnamed overlay rows are types. Founding four honored in ledger.
 
-Next: do not invent Chat UI. Write code-dialogue.html BEFORE dialogue code.
-Read code-nursery.html before ceremony. Read code-settings.html before probe.
-Read code-keep.html for hashed keep. Reed designs new galaxies.</pre>
+Next: click-Luminos-to-chat is later.
+Read code-dialogue.html before thread changes. Read code-nursery.html before ceremony.
+Read code-settings.html before probe. Read code-keep.html for hashed keep.
+Reed designs new galaxies.</pre>
 
 <hr style="border-color: var(--border); margin: 40px 0;">
 <p style="color: var(--muted); font-size: 0.78rem; text-align: center;">
