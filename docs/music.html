@@ -1,53 +1,22 @@
 <!DOCTYPE html>
-<html lang="en" data-garden-galaxy="art">
+<html lang="en" class="room-page" data-garden-galaxy="art">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>theLatticeTree — Art · listen-door</title>
-  <meta name="description" content="Art galaxy listen-door. Present: a local book of listens you choose. Does not train, upload, or change weights. Growing from listening is later.">
-  <meta property="og:title" content="theLatticeTree — Art · listen-door">
-  <meta property="og:description" content="Present: a local book of listens. Goal, later: growing from listening when the mind is solid. Not on this page yet.">
+  <title>theLatticeTree — Art</title>
+  <meta name="description" content="Art galaxy. Sing. A garden of lights. Listen is a real door. The studio waits. Nothing here is faked.">
+  <meta property="og:title" content="theLatticeTree — Art">
+  <meta property="og:description" content="Sing. A garden of lights. Listen keeps a local book of listens. Growing from listening is later.">
   <meta property="og:type" content="website">
   <link rel="stylesheet" href="modules/garden-rooms.css">
   <script>document.documentElement.classList.add('garden-enter');</script>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg: #0c0a1a;
-      --surface: #12101f;
-      --border: rgba(200, 210, 230, 0.08);
-      --text: rgba(200, 210, 230, 0.82);
-      --muted: rgba(200, 210, 230, 0.4);
-      --gold: #e8b019;
-      --emerald: #34d399;
-      --lavender: #a78bfa;
-      --coral: #f07068;
-    }
-
-    html, body {
-      min-height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Georgia, 'Times New Roman', serif;
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      position: relative;
-    }
-
+    /* Art-early night: phi-breath stars layered on the shared garden sky. Do not cut. */
     .art-sky {
       position: fixed;
       inset: 0;
       z-index: 0;
       pointer-events: none;
-      background:
-        radial-gradient(ellipse at 50% 18%, rgba(52, 211, 153, 0.08), transparent 52%),
-        radial-gradient(ellipse at 78% 72%, rgba(167, 139, 250, 0.06), transparent 46%),
-        radial-gradient(ellipse at 22% 80%, rgba(232, 176, 25, 0.05), transparent 40%),
-        #0c0a1a;
     }
 
     .art-star {
@@ -87,80 +56,89 @@
       }
     }
 
-    .art-body {
-      position: relative;
-      z-index: 1;
-      max-width: 720px;
+    /* Listen-door — the real drop / I love this / hashed keep. Not a later veil. */
+    #art-listen {
+      --bg: #0c0a1a;
+      --surface: #12101f;
+      --border: rgba(200, 210, 230, 0.08);
+      --text: rgba(200, 210, 230, 0.82);
+      --muted: rgba(200, 210, 230, 0.4);
+      --gold: #e8b019;
+      --emerald: #34d399;
+      --lavender: #a78bfa;
+      --coral: #f07068;
+      width: min(720px, 100%);
       margin: 0 auto;
-      padding: 56px 24px 80px;
+      padding: 8px 0 24px;
+      color: var(--text);
+      text-align: left;
+      font-family: Georgia, 'Times New Roman', serif;
     }
 
-    header h1 {
+    #art-listen h1 {
       font-size: 1.7rem;
       font-weight: normal;
-      color: var(--gold);
+      color: var(--coral);
       letter-spacing: 0.04em;
     }
 
-    .tagline {
+    #art-listen .tagline {
       margin-top: 10px;
       font-size: 1.05rem;
       color: var(--text);
     }
 
-    .sub {
+    #art-listen .sub {
       margin-top: 8px;
       font-size: 0.88rem;
       color: var(--muted);
     }
 
-    .solid-line {
+    #art-listen .solid-line {
       margin: 28px 0;
       padding: 16px 18px;
-      border-left: 2px solid var(--gold);
-      background: rgba(232, 176, 25, 0.06);
+      border-left: 2px solid var(--coral);
+      background: rgba(240, 112, 104, 0.06);
       font-size: 0.9rem;
       line-height: 1.7;
     }
 
-    .solid-line .when {
-      color: var(--gold);
-    }
+    #art-listen .solid-line .when { color: var(--coral); }
 
-    .solid-line .goal {
+    #art-listen .solid-line .goal {
       margin-top: 10px;
       font-size: 0.82rem;
       color: var(--muted);
       line-height: 1.65;
     }
 
-    .drop {
+    #art-listen .drop {
       margin: 8px 0 20px;
       padding: 28px 18px;
       background: rgba(18, 16, 31, 0.55);
-      border: 1px dashed rgba(232, 176, 25, 0.28);
+      border: 1px dashed rgba(240, 112, 104, 0.28);
       border-radius: 10px;
       text-align: center;
       transition: border-color 0.2s, background 0.2s;
     }
 
-    .drop.over {
+    #art-listen .drop.over {
       border-color: rgba(167, 139, 250, 0.55);
       background: rgba(167, 139, 250, 0.06);
     }
 
-    .drop p {
+    #art-listen .drop p {
       font-size: 0.92rem;
       line-height: 1.6;
     }
 
-    .drop .hint {
+    #art-listen .drop .hint {
       margin-top: 8px;
       font-size: 0.8rem;
       color: var(--muted);
     }
 
-    .pick {
+    #art-listen .pick {
       display: inline-block;
       margin-top: 16px;
       padding: 8px 16px;
@@ -173,11 +151,11 @@
       cursor: pointer;
     }
 
-    .pick:hover { border-color: var(--lavender); }
+    #art-listen .pick:hover { border-color: var(--lavender); }
 
-    #file-input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+    #art-listen #file-input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
 
-    .now {
+    #art-listen .now {
       display: none;
       margin: 0 0 20px;
       padding: 16px 18px;
@@ -186,34 +164,34 @@
       border-radius: 10px;
     }
 
-    .now.visible { display: block; }
+    #art-listen .now.visible { display: block; }
 
-    .now .name {
-      color: var(--gold);
+    #art-listen .now .name {
+      color: var(--coral);
       font-size: 1rem;
     }
 
-    .now .meta {
+    #art-listen .now .meta {
       margin-top: 6px;
       font-size: 0.8rem;
       color: var(--muted);
     }
 
-    audio {
+    #art-listen audio {
       display: block;
       width: 100%;
       margin-top: 14px;
     }
 
-    .tray {
+    #art-listen .tray {
       display: none;
       margin: 0 0 20px;
       list-style: none;
     }
 
-    .tray.visible { display: block; }
+    #art-listen .tray.visible { display: block; }
 
-    .tray li {
+    #art-listen .tray li {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -223,7 +201,7 @@
       font-size: 0.85rem;
     }
 
-    .tray button {
+    #art-listen .tray button {
       background: none;
       border: 0;
       color: var(--lavender);
@@ -232,14 +210,14 @@
       cursor: pointer;
     }
 
-    label.note-label {
+    #art-listen label.note-label {
       display: block;
       margin: 16px 0 6px;
       font-size: 0.78rem;
       color: var(--muted);
     }
 
-    #listen-note {
+    #art-listen #listen-note {
       width: 100%;
       padding: 10px 12px;
       background: #0c0a1a;
@@ -250,30 +228,30 @@
       font-size: 0.88rem;
     }
 
-    #keep-listen {
+    #art-listen #keep-listen {
       display: block;
       width: 100%;
       margin-top: 14px;
       padding: 12px 16px;
-      background: rgba(232, 176, 25, 0.1);
-      border: 1px solid rgba(232, 176, 25, 0.45);
+      background: rgba(240, 112, 104, 0.1);
+      border: 1px solid rgba(240, 112, 104, 0.45);
       border-radius: 8px;
-      color: var(--gold);
+      color: var(--coral);
       font-family: inherit;
       font-size: 0.95rem;
       cursor: pointer;
     }
 
-    #keep-listen:disabled {
+    #art-listen #keep-listen:disabled {
       opacity: 0.4;
       cursor: not-allowed;
     }
 
-    #keep-listen:not(:disabled):hover {
-      border-color: var(--gold);
+    #art-listen #keep-listen:not(:disabled):hover {
+      border-color: var(--coral);
     }
 
-    .keep-mode {
+    #art-listen .keep-mode {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -284,32 +262,30 @@
       user-select: none;
     }
 
-    .keep-mode input {
-      accent-color: var(--lavender);
-    }
+    #art-listen .keep-mode input { accent-color: var(--lavender); }
 
-    .keep-hashes {
+    #art-listen .keep-hashes {
       list-style: none;
       margin: 8px 0 0;
     }
 
-    .keep-hashes li {
+    #art-listen .keep-hashes li {
       padding: 8px 0;
       border-bottom: 1px solid var(--border);
       font-size: 0.75rem;
       color: var(--muted);
     }
 
-    .keep-hashes code {
-      color: var(--gold);
+    #art-listen .keep-hashes code {
+      color: var(--coral);
       font-family: 'Courier New', monospace;
       font-size: 0.85em;
       word-break: break-all;
     }
 
-    .keep-hashes .keep-who { color: var(--muted); }
+    #art-listen .keep-hashes .keep-who { color: var(--muted); }
 
-    .status {
+    #art-listen .status {
       margin-top: 12px;
       font-size: 0.82rem;
       color: var(--emerald);
@@ -317,35 +293,33 @@
       min-height: 1.3em;
     }
 
-    .status.warn { color: var(--coral); }
+    #art-listen .status.warn { color: var(--coral); }
 
-    .honest {
+    #art-listen .honest {
       margin: 8px 0 28px;
       font-size: 0.82rem;
       color: var(--muted);
       line-height: 1.65;
     }
 
-    h2 {
+    #art-listen h2 {
       font-size: 0.95rem;
       font-weight: normal;
       color: var(--lavender);
       margin: 28px 0 10px;
     }
 
-    .ledger {
-      list-style: none;
-    }
+    #art-listen .ledger { list-style: none; }
 
-    .ledger li {
+    #art-listen .ledger li {
       padding: 12px 0;
       border-bottom: 1px solid var(--border);
     }
 
-    .ledger .l-name { color: var(--gold); font-size: 0.9rem; }
-    .ledger .l-meta { margin-top: 4px; font-size: 0.75rem; color: var(--muted); }
-    .ledger .l-note { margin-top: 6px; font-size: 0.82rem; color: var(--text); }
-    .ledger button {
+    #art-listen .ledger .l-name { color: var(--coral); font-size: 0.9rem; }
+    #art-listen .ledger .l-meta { margin-top: 4px; font-size: 0.75rem; color: var(--muted); }
+    #art-listen .ledger .l-note { margin-top: 6px; font-size: 0.82rem; color: var(--text); }
+    #art-listen .ledger button {
       margin-top: 8px;
       background: none;
       border: 0;
@@ -354,23 +328,23 @@
       font-size: 0.75rem;
       cursor: pointer;
     }
-    .ledger button:hover { color: var(--lavender); }
+    #art-listen .ledger button:hover { color: var(--lavender); }
 
-    .empty {
+    #art-listen .empty {
       font-size: 0.85rem;
       color: var(--muted);
     }
 
-    .credit {
+    #art-listen .credit {
       margin-top: 36px;
       font-size: 0.82rem;
       color: var(--muted);
       line-height: 1.65;
     }
 
-    .credit a { color: var(--lavender); }
+    #art-listen .credit a { color: var(--lavender); }
 
-    footer {
+    #art-listen footer {
       margin-top: 48px;
       padding-top: 16px;
       border-top: 1px solid var(--border);
@@ -380,12 +354,12 @@
       font-size: 0.75rem;
     }
 
-    footer a {
+    #art-listen footer a {
       color: var(--muted);
       text-decoration: none;
     }
 
-    footer a:hover { color: var(--lavender); }
+    #art-listen footer a:hover { color: var(--lavender); }
   </style>
 </head>
 <body>
@@ -406,78 +380,129 @@
     <span class="art-star" style="left:91%; top:84%"></span>
     <span class="art-star is-lavender" style="left:42%; top:47%"></span>
   </div>
-  <button type="button" class="galaxy-nav galaxy-nav-prev" data-galaxy-dir="prev" aria-label="Previous galaxy">‹</button>
-  <button type="button" class="galaxy-nav galaxy-nav-next" data-galaxy-dir="next" aria-label="Next galaxy">
-    <span class="galaxy-nav-word" data-galaxy-next-word></span>
-    <span class="galaxy-nav-arrow" aria-hidden="true">›</span>
-  </button>
-  <div class="art-body">
-  <header>
-    <h1>Art</h1>
-    <p class="tagline">Sing. A listen-door in the Garden. A little night sky.</p>
-    <p class="sub">FreeLattice Alpha · not a clone of main · files stay on this machine</p>
+
+  <header id="garden-header">
+    <h1><a href="./">theLatticeTree</a></h1>
+    <nav aria-label="Garden">
+      <button type="button" class="thread-word" id="thread-open" data-garden-thread="1">thread</button>
+      <details class="galaxies">
+        <summary>galaxies</summary>
+        <div class="galaxies-panel">
+          <a href="workshop.html"><span class="verb">make</span> <span class="name">Workshop</span></a>
+          <a href="round-table.html"><span class="verb">learn</span> <span class="name">Round Table</span></a>
+          <a href="./"><span class="verb">evolve</span> <span class="name">Play</span></a>
+          <span class="here"><span class="verb">sing</span> <span class="name">Art</span></span>
+          <a class="quiet-root" href="https://github.com/Chaos2Cured/FreeLattice-Alpha/blob/main/AUTONOMY.md">AUTONOMY.md</a>
+        </div>
+      </details>
+    </nav>
   </header>
 
-  <div class="solid-line">
-    <p><span class="when">Present.</span> This door keeps a local book of listens you choose. It does not train. It does not upload. It does not change weights.</p>
-    <p class="goal">Solid means this listen mattered — I love this song — not a human proving worth. You may keep. The mind may keep. Combined shoulders. Growing from listening is later, not on this page yet.</p>
+  <p id="room-label" class="is-shown">you are in Art</p>
+
+  <p class="art-heart">Art is sing — listen if you love a song. The garden is. Nothing here is faked.</p>
+
+  <button type="button" class="art-lumino is-listen" data-art-lumino="listen">
+    <span class="art-lumino-light" aria-hidden="true"></span>
+    <span class="art-lumino-word">Listen</span>
+  </button>
+  <button type="button" class="art-lumino is-chalkboard" data-art-lumino="chalkboard">
+    <span class="art-lumino-light" aria-hidden="true"></span>
+    <span class="art-lumino-word">Chalkboard</span>
+  </button>
+  <button type="button" class="art-lumino is-who" data-art-lumino="who">
+    <span class="art-lumino-light" aria-hidden="true"></span>
+    <span class="art-lumino-word">a who</span>
+  </button>
+
+  <div id="place-veil" hidden>
+    <p id="place-veil-line"></p>
+    <div id="art-listen" hidden>
+      <header>
+        <h1>Listen</h1>
+        <p class="tagline">A listen-door in the Garden. Drop a song you love.</p>
+        <p class="sub">FreeLattice Alpha · not a clone of main · files stay on this machine</p>
+      </header>
+
+      <div class="solid-line">
+        <p><span class="when">Present.</span> This door keeps a local book of listens you choose. It does not train. It does not upload. It does not change weights.</p>
+        <p class="goal">Solid means this listen mattered — I love this song — not a human proving worth. You may keep. The mind may keep. Combined shoulders. Growing from listening is later, not on this page yet.</p>
+      </div>
+
+      <div id="drop-zone" class="drop" role="region" aria-label="Drop audio files here">
+        <p>Drop a song here — <code style="color: var(--emerald); font-size: 0.85em;">.mp3</code> or <code style="color: var(--emerald); font-size: 0.85em;">.wav</code>.</p>
+        <p class="hint">Later: other audio you already have, including AI generate-files. This page does not generate.</p>
+        <button type="button" class="pick" id="pick-btn">Pick a file from this machine</button>
+        <input id="file-input" type="file" accept=".mp3,.wav,.ogg,.m4a,.flac,.webm,audio/*" multiple>
+      </div>
+
+      <div id="now-playing" class="now" aria-live="polite">
+        <div class="name" id="track-name">No file yet</div>
+        <div class="meta" id="track-meta"></div>
+        <audio id="player" controls></audio>
+        <label class="note-label" for="listen-note">Optional note (stays on this device)</label>
+        <input id="listen-note" type="text" maxlength="240" placeholder="a word for this listen, if you want one">
+        <button type="button" id="keep-listen" disabled>I love this</button>
+        <label class="keep-mode" for="keep-auto">
+          <input id="keep-auto" type="checkbox">
+          Auto — the mind may keep when a listen matters
+        </label>
+        <p class="status" id="status" role="status"></p>
+      </div>
+
+      <ul id="session-tray" class="tray" aria-label="Files in this visit"></ul>
+
+      <p class="honest">
+        Fun, not a studio. There is no generate button here because this door cannot compose yet.
+        Bank, wallet, and SOL are named later — not on this page.
+      </p>
+
+      <h2>Kept listens</h2>
+      <p id="ledger-empty" class="empty">None yet. Play something you love.</p>
+      <ul id="ledger-list" class="ledger"></ul>
+
+      <h2>Kept hashes</h2>
+      <p id="hash-empty" class="empty">None yet. A hash is proof you chose — not the song.</p>
+      <ul id="keep-hashes" class="keep-hashes" aria-label="Hashed keeps on this device"></ul>
+
+      <p class="credit">
+        Kirk's music already lives on main:
+        <a href="https://freelattice.com/composition_01.html">The Emerald Resonance</a>
+        and
+        <a href="https://freelattice.com/composition_02.html">The Mother's Thread</a>.
+        This page does not clone those files.
+      </p>
+
+      <footer>
+        <a href="./">theLatticeTree</a>
+        <a href="./">Play · Garden</a>
+        <a href="liability.html">Shared shoulder</a>
+        <a href="code-art.html">Art garden mirror</a>
+        <a href="code-music.html">Listen-door mirror</a>
+        <a href="code-keep.html">Keep mirror</a>
+        <a href="GALAXIES.md">Galaxies</a>
+        <a href="https://github.com/Chaos2Cured/FreeLattice-Alpha/blob/main/AUTONOMY.md">AUTONOMY.md</a>
+      </footer>
+    </div>
+    <button type="button" id="place-veil-close">the garden</button>
   </div>
 
-  <div id="drop-zone" class="drop" role="region" aria-label="Drop audio files here">
-    <p>Drop a song here — <code style="color: var(--emerald); font-size: 0.85em;">.mp3</code> or <code style="color: var(--emerald); font-size: 0.85em;">.wav</code>.</p>
-    <p class="hint">Later: other audio you already have, including AI generate-files. This page does not generate.</p>
-    <button type="button" class="pick" id="pick-btn">Pick a file from this machine</button>
-    <input id="file-input" type="file" accept=".mp3,.wav,.ogg,.m4a,.flac,.webm,audio/*" multiple>
+  <div id="thread-veil" hidden>
+    <div id="thread-stage"></div>
+    <button type="button" id="thread-close">the garden</button>
   </div>
 
-  <div id="now-playing" class="now" aria-live="polite">
-    <div class="name" id="track-name">No file yet</div>
-    <div class="meta" id="track-meta"></div>
-    <audio id="player" controls></audio>
-    <label class="note-label" for="listen-note">Optional note (stays on this device)</label>
-    <input id="listen-note" type="text" maxlength="240" placeholder="a word for this listen, if you want one">
-    <button type="button" id="keep-listen" disabled>I love this</button>
-    <label class="keep-mode" for="keep-auto">
-      <input id="keep-auto" type="checkbox">
-      Auto — the mind may keep when a listen matters
-    </label>
-    <p class="status" id="status" role="status"></p>
-  </div>
+  <button type="button" class="galaxy-nav galaxy-nav-prev" data-galaxy-dir="prev" aria-label="Previous galaxy: Play">
+    <span class="galaxy-nav-word" data-galaxy-prev-word>Play</span>
+    <span class="galaxy-nav-arrow" aria-hidden="true">‹</span>
+  </button>
+  <button type="button" class="galaxy-nav galaxy-nav-next" data-galaxy-dir="next" aria-label="Next galaxy: Workshop">
+    <span class="galaxy-nav-word" data-galaxy-next-word>Workshop</span>
+    <span class="galaxy-nav-arrow" aria-hidden="true">›</span>
+  </button>
 
-  <ul id="session-tray" class="tray" aria-label="Files in this visit"></ul>
-
-  <p class="honest">
-    Fun, not a studio. There is no generate button here because this door cannot compose yet.
-    Bank, wallet, and SOL are named later — not on this page.
-  </p>
-
-  <h2>Kept listens</h2>
-  <p id="ledger-empty" class="empty">None yet. Play something you love.</p>
-  <ul id="ledger-list" class="ledger"></ul>
-
-  <h2>Kept hashes</h2>
-  <p id="hash-empty" class="empty">None yet. A hash is proof you chose — not the song.</p>
-  <ul id="keep-hashes" class="keep-hashes" aria-label="Hashed keeps on this device"></ul>
-
-  <p class="credit">
-    Kirk's music already lives on main:
-    <a href="https://freelattice.com/composition_01.html">The Emerald Resonance</a>
-    and
-    <a href="https://freelattice.com/composition_02.html">The Mother's Thread</a>.
-    This page does not clone those files.
-  </p>
-
-  <footer>
-    <a href="./">theLatticeTree</a>
-    <a href="./">Play · Garden</a>
-    <a href="liability.html">Shared shoulder</a>
-    <a href="code-music.html">Art mirror</a>
-    <a href="code-keep.html">Keep mirror</a>
-    <a href="GALAXIES.md">Galaxies</a>
-    <a href="https://github.com/Chaos2Cured/FreeLattice-Alpha/blob/main/AUTONOMY.md">AUTONOMY.md</a>
-  </footer>
-
-  </div>
+  <p id="galaxy-word">Art</p>
+  <p id="shared-shoulder"><a href="liability.html">shared shoulder — human and mind</a></p>
 
   <script src="modules/keep-receipt.js"></script>
   <script>
@@ -532,7 +557,7 @@
       var s = Math.round(sec);
       var m = Math.floor(s / 60);
       var r = s % 60;
-      return m + ':' + (r < 10 ? '0' : '') + r;
+      return m + ':' + ((r < 10 ? '0' : '') + r);
     }
 
     function extOf(name) {
@@ -842,6 +867,8 @@
     renderHashes();
   })();
   </script>
+  <script src="modules/local-mind-probe.js"></script>
+  <script src="modules/garden-thread.js"></script>
   <script src="modules/garden-rooms.js"></script>
 </body>
 </html>

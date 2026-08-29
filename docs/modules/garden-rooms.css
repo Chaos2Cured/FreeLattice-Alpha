@@ -1,6 +1,6 @@
 /* Garden Galaxy chrome — one garden, bodies inside, arrow to the next galaxy.
-   Layer, never delete. Art is a galaxy (music.html). Team is named later.
-   Do not restyle mobile inner rings. Do not enable bloom on phones. */
+   Layer, never delete. Art is a galaxy (music.html) and a garden of lights.
+   Team is named later. Do not restyle mobile inner rings. Do not enable bloom on phones. */
 
 html {
   background: #0c0a1a;
@@ -1852,6 +1852,234 @@ html[data-garden-galaxy="round-table"] .galaxy-nav-prev:has(.galaxy-nav-word) {
 
 @media (prefers-reduced-motion: reduce) {
   .round-table-lumino.is-learning .round-table-lumino-light {
+    box-shadow: none;
+    animation: none;
+    opacity: 0.9;
+  }
+}
+
+/* ── Art garden of lights (Reed)
+   Night sky, same as Workshop and Round Table.
+   Art is the ground — no orb named Art.
+   Listen sings (coral — not Workshop green, not Learning gold,
+   not Skills amber, not Trainer violet). Chalkboard is the studio.
+   A who stays dark until a person making here.
+   No fourth orb. Bloom stays off. Do not restyle Play bodies. */
+html[data-garden-galaxy="art"],
+html[data-garden-galaxy="art"] body {
+  height: 100%;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 42%, rgba(240, 112, 104, 0.07), transparent 46%),
+    radial-gradient(ellipse at 16% 48%, rgba(196, 192, 176, 0.05), transparent 34%),
+    radial-gradient(ellipse at 84% 48%, rgba(200, 210, 230, 0.03), transparent 34%),
+    #0c0a1a;
+}
+
+.art-heart {
+  position: fixed;
+  left: 50%;
+  top: 46%;
+  transform: translate(-50%, -50%);
+  z-index: 11;
+  width: min(28em, 72vw);
+  margin: 0;
+  text-align: center;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: rgba(200, 210, 230, 0.72);
+  pointer-events: none;
+  text-shadow: 0 0 16px rgba(12, 10, 26, 0.95);
+}
+
+.art-lumino {
+  position: fixed;
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.art-lumino-light {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+.art-lumino-word {
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  color: #f5a8a2;
+  text-shadow: 0 0 10px rgba(12, 10, 26, 0.95);
+}
+
+.art-lumino.is-listen {
+  left: 13%;
+  top: 46%;
+  transform: translateY(-50%);
+}
+
+.art-lumino.is-listen .art-lumino-light {
+  background: #f07068;
+  box-shadow: 0 0 16px rgba(240, 112, 104, 0.85), 0 0 2px #f07068;
+  animation: workshop-lumino-breath 2.618s ease-in-out infinite;
+}
+
+.art-lumino.is-listen .art-lumino-word { color: #f5a8a2; }
+
+.art-lumino.is-chalkboard {
+  right: 13%;
+  top: 46%;
+  transform: translateY(-50%);
+}
+
+.art-lumino.is-chalkboard .art-lumino-light {
+  background: #c9c4b5;
+  box-shadow: 0 0 14px rgba(201, 196, 181, 0.55), 0 0 2px #c9c4b5;
+  animation: workshop-lumino-breath 4.236s ease-in-out infinite;
+}
+
+.art-lumino.is-chalkboard .art-lumino-word { color: #e8e4d8; }
+
+.art-lumino.is-who {
+  left: 50%;
+  bottom: 22%;
+  transform: translateX(-50%);
+}
+
+.art-lumino.is-who .art-lumino-light {
+  background: rgba(200, 210, 230, 0.18);
+  box-shadow: none;
+  opacity: 0.42;
+}
+
+.art-lumino.is-who .art-lumino-word {
+  color: rgba(200, 210, 230, 0.38);
+}
+
+.art-lumino:hover .art-lumino-word,
+.art-lumino:focus-visible .art-lumino-word,
+.art-lumino[aria-current="true"] .art-lumino-word {
+  opacity: 1;
+}
+
+.art-lumino:focus-visible {
+  outline: none;
+}
+
+.art-lumino.is-listen:hover .art-lumino-light,
+.art-lumino.is-listen:focus-visible .art-lumino-light,
+.art-lumino.is-chalkboard:hover .art-lumino-light,
+.art-lumino.is-chalkboard:focus-visible .art-lumino-light {
+  transform: scale(1.12);
+}
+
+#place-veil.is-art-later,
+#place-veil.is-open.is-art-later {
+  opacity: 1;
+  pointer-events: auto;
+  transition: none;
+  background: rgba(12, 10, 26, 0.22);
+}
+
+#place-veil.is-art-later #place-veil-line {
+  text-shadow:
+    0 0 18px rgba(12, 10, 26, 0.98),
+    0 0 8px rgba(12, 10, 26, 0.95);
+}
+
+#place-veil.is-art-listen,
+#place-veil.is-open.is-art-listen {
+  justify-content: flex-start;
+  overflow-y: auto;
+  opacity: 1;
+  pointer-events: auto;
+  background: linear-gradient(
+    to bottom,
+    rgba(12, 10, 26, 0.12) 0%,
+    rgba(12, 10, 26, 0.28) 42%,
+    rgba(12, 10, 26, 0.42) 100%
+  );
+}
+
+#place-veil.is-art-listen #place-veil-close {
+  position: sticky;
+  bottom: 8px;
+  margin-top: 16px;
+  background: rgba(12, 10, 26, 0.85);
+  padding: 6px 12px;
+}
+
+#art-listen[hidden] { display: none !important; }
+
+html.thread-open .art-lumino,
+html.thread-open .art-lumino:hover,
+html.thread-open .art-heart,
+html.art-door-open .art-lumino,
+html.art-door-open .art-lumino:hover,
+html.art-door-open .art-heart {
+  display: none !important;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.art-heart[hidden],
+.art-lumino[hidden] { display: none !important; }
+
+html[data-garden-galaxy="art"] .galaxy-nav-prev:has(.galaxy-nav-word) {
+  bottom: 7.25rem;
+}
+
+html[data-garden-galaxy="art"] .galaxy-nav-prev,
+html[data-garden-galaxy="art"] .galaxy-nav-next {
+  opacity: 0.82;
+}
+
+@media (min-width: 800px) {
+  html[data-garden-galaxy="art"] #garden-header {
+    background: linear-gradient(to bottom, rgba(12, 10, 26, 0.78), transparent);
+    border-bottom: none;
+    backdrop-filter: none;
+  }
+
+  html[data-garden-galaxy="art"] .galaxy-nav-prev:has(.galaxy-nav-word) {
+    bottom: 6.5rem;
+  }
+}
+
+@media (max-width: 799px) {
+  html[data-garden-galaxy="art"] #galaxy-word {
+    left: 16px;
+    bottom: 88px;
+  }
+
+  .art-heart {
+    width: min(16em, 54vw);
+    font-size: 0.92rem;
+    top: 50%;
+  }
+
+  .art-lumino.is-listen { left: 8%; top: 26%; }
+  .art-lumino.is-chalkboard { right: 8%; top: 26%; }
+  .art-lumino.is-who { bottom: 30%; }
+
+  html[data-garden-galaxy="art"] .galaxy-nav-prev { opacity: 0.72; }
+  html[data-garden-galaxy="art"] .galaxy-nav-next { opacity: 0.88; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .art-lumino.is-listen .art-lumino-light,
+  .art-lumino.is-chalkboard .art-lumino-light {
     box-shadow: none;
     animation: none;
     opacity: 0.9;

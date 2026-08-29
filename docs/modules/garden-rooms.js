@@ -10,9 +10,11 @@
 // Unnamed pieces still orbit. Title "Garden Galaxy" fades after a few seconds.
 // Room-label breathes (readable, slow fade, returns ~90s).
 // Bottom-right arrow → NEXT GALAXY (Art), with a quiet word so a stranger finds it.
-// Art remains that live hop. Workshop is a garden of three named lights on the walk.
+// Art remains that live hop (music.html) and is now a garden of lights: Listen sings,
+// Chalkboard is the studio (honest later), a who stays dark until a person making here.
+// Art is the ground — not a door named Art. Workshop is three named lights.
 // Round Table is a garden of lights: Learning gold, a question dark. The ground is
-// Round Table — not a door named Round Table. Chalkboard waits for Art.
+// Round Table — not a door named Round Table. Kindling stays the chair.
 // Glass is not a peer room. Team (garden-within-the-garden) is named later.
 // Chat is a thread. Quiet word in the header. When thread is open, garden body words rest.
 // Later seats rest below the emerald lattice, not on it. First four stay the ring.
@@ -21,7 +23,8 @@
 // Light veils — garden keeps running. Never a 0.82 blackout.
 //
 // Mirror: docs/code-garden.html · workshop: docs/code-workshop.html
-// round-table: docs/code-round-table.html · vision: docs/GALAXIES.md
+// round-table: docs/code-round-table.html · art: docs/code-art.html
+// listen-door: docs/code-music.html · vision: docs/GALAXIES.md
 // ═══════════════════════════════════════════════════════════════
 
 (function () {
@@ -36,8 +39,8 @@
   var labelTimer = null;
   var labelCycle = null;
 
-  // Live galaxies only. Art remains the live hop from Garden Galaxy (music.html).
-  // Workshop and Round Table are gardens of lights on this walk.
+  // Live galaxies only. Art remains the live hop from Garden Galaxy (music.html)
+  // and is a garden of lights on this walk. Workshop and Round Table already are.
   // At Play (`/`), prev wraps to Round Table — label that word honestly.
   // Round Table next wraps to this garden — the galaxy name in the menu is Play.
   // Do not put Nursery/Settings/Team on this rail.
@@ -52,6 +55,7 @@
     garden: 'you are in the garden',
     workshop: 'you are in Workshop',
     'round-table': 'you are in Round Table',
+    art: 'you are in Art',
     core: 'you are in The Gathering',
     nursery: 'you are in Nursery',
     settings: 'you are in Settings',
@@ -68,6 +72,13 @@
   var ROUND_TABLE_LATER = {
     learning: 'Learning is joy first. Sitting is a who: a person at this table.',
     question: 'This question stays dark until someone sits. Not a topic. Not a time.'
+  };
+
+  // Reed: Listen already sings. Chalkboard is the studio. A who stays dark until
+  // a person making here. Later sentences stay distinct — no shared second line.
+  var ART_LATER = {
+    chalkboard: 'Chalkboard is Art\'s studio. They are not built yet. The garden is. Nothing here is faked.',
+    who: 'This light stays dark until a who: a person making here. Voice, chalk, or a listen they kept.'
   };
 
   var CORE_CHAIRS = [
@@ -263,20 +274,37 @@
     }
   }
 
+  function setArtSky(show) {
+    var heart = document.querySelector('.art-heart');
+    var lights = document.querySelectorAll('.art-lumino');
+    if (show) {
+      document.documentElement.classList.remove('art-door-open');
+      if (heart) heart.hidden = false;
+      for (var i = 0; i < lights.length; i++) lights[i].hidden = false;
+    } else {
+      document.documentElement.classList.add('art-door-open');
+      if (heart) heart.hidden = true;
+      for (var j = 0; j < lights.length; j++) lights[j].hidden = true;
+    }
+  }
+
   function hideAllBodies(veil, opts) {
-    var ids = ['place-veil-line', 'nursery-stage', 'nursery-ceremony', 'nursery-trainer', 'settings-grandmother', 'core-gathering'];
+    var ids = ['place-veil-line', 'nursery-stage', 'nursery-ceremony', 'nursery-trainer', 'settings-grandmother', 'core-gathering', 'art-listen'];
     for (var i = 0; i < ids.length; i++) {
       var node = document.getElementById(ids[i]);
       if (node) node.hidden = true;
     }
     if (veil) {
-      veil.classList.remove('is-nursery', 'is-settings', 'is-core', 'is-workshop-later', 'is-round-table-later');
+      veil.classList.remove('is-nursery', 'is-settings', 'is-core', 'is-workshop-later', 'is-round-table-later', 'is-art-later', 'is-art-listen');
     }
     if (!opts || opts.restoreWorkshop !== false) {
       setWorkshopSky(true);
     }
     if (!opts || opts.restoreRoundTable !== false) {
       setRoundTableSky(true);
+    }
+    if (!opts || opts.restoreArt !== false) {
+      setArtSky(true);
     }
     if (window.NurseryCeremony && NurseryCeremony.unmount) {
       try { NurseryCeremony.unmount(); } catch (e) {}
@@ -395,7 +423,7 @@
       if (!veil) return;
       veil.classList.remove('is-open');
       hideAllBodies(veil);
-      var doors = document.querySelectorAll('[data-garden-place], [data-workshop-lumino], [data-round-table-lumino]');
+      var doors = document.querySelectorAll('[data-garden-place], [data-workshop-lumino], [data-round-table-lumino], [data-art-lumino]');
       for (var d = 0; d < doors.length; d++) doors[d].removeAttribute('aria-current');
       if (!opts || !opts.silentLabel) setRoomLabelText(galaxyHomeLabel());
       setTimeout(function () {
@@ -622,6 +650,70 @@
     window.GardenRooms.openRoundTableLater = openRoundTableLater;
   }
 
+  function bindArtLuminos() {
+    var veil = document.getElementById('place-veil');
+    var line = document.getElementById('place-veil-line');
+    var listenDoor = document.getElementById('art-listen');
+    var doors = document.querySelectorAll('[data-art-lumino]');
+    if (!doors.length) return;
+
+    function markArtDoor(id) {
+      for (var d = 0; d < doors.length; d++) {
+        if (doors[d].getAttribute('data-art-lumino') === id) {
+          doors[d].setAttribute('aria-current', 'true');
+        } else {
+          doors[d].removeAttribute('aria-current');
+        }
+      }
+    }
+
+    function openArtListen() {
+      if (!veil || !listenDoor) return;
+      if (window.GardenRooms && GardenRooms.closeThread) {
+        GardenRooms.closeThread({ silentLabel: true });
+      }
+      setArtSky(false);
+      hideAllBodies(veil, { restoreArt: false });
+      veil.classList.add('is-art-listen');
+      listenDoor.hidden = false;
+      veil.hidden = false;
+      veil.classList.add('is-open');
+      markArtDoor('listen');
+    }
+
+    function openArtLater(id) {
+      if (!veil) return;
+      if (window.GardenRooms && GardenRooms.closeThread) {
+        GardenRooms.closeThread({ silentLabel: true });
+      }
+      setArtSky(false);
+      hideAllBodies(veil, { restoreArt: false });
+      veil.classList.add('is-art-later');
+      if (line) {
+        line.hidden = false;
+        line.textContent = ART_LATER[id] || ART_LATER.chalkboard;
+      }
+      veil.hidden = false;
+      veil.classList.add('is-open');
+      markArtDoor(id);
+    }
+
+    for (var i = 0; i < doors.length; i++) {
+      (function (el) {
+        el.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var id = el.getAttribute('data-art-lumino');
+          if (id === 'listen') openArtListen();
+          else openArtLater(id);
+        });
+      })(doors[i]);
+    }
+
+    window.GardenRooms.openArtListen = openArtListen;
+    window.GardenRooms.openArtLater = openArtLater;
+  }
+
   function fadeGalaxyTitle() {
     var title = document.getElementById('galaxy-title');
     if (!title) return;
@@ -642,6 +734,7 @@
     bindThreadDoor();
     bindWorkshopLuminos();
     bindRoundTableLuminos();
+    bindArtLuminos();
     fadeGalaxyTitle();
     startLabelCycle();
     lightSettingsHome();
@@ -673,7 +766,7 @@
     lightSettingsHome: lightSettingsHome
   };
 
-  if (document.querySelector('[data-galaxy-dir], [data-garden-go], [data-garden-place], [data-garden-thread], [data-workshop-lumino], [data-round-table-lumino], #thread-open, #galaxy-title, #room-label')) {
+  if (document.querySelector('[data-galaxy-dir], [data-garden-go], [data-garden-place], [data-garden-thread], [data-workshop-lumino], [data-round-table-lumino], [data-art-lumino], #thread-open, #galaxy-title, #room-label')) {
     boot();
   } else if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);
