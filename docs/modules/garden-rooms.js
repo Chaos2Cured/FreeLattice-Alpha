@@ -267,6 +267,19 @@
     host.hidden = false;
   }
 
+  function lightSettingsHome() {
+    var btn = document.querySelector('[data-garden-place="settings"]');
+    if (!btn) return;
+    var remembered = window.LocalMindProbe && LocalMindProbe.getRemembered && LocalMindProbe.getRemembered();
+    if (remembered && (remembered.url || remembered.name)) {
+      btn.classList.add('has-home');
+      btn.setAttribute('title', 'A light is home');
+    } else {
+      btn.classList.remove('has-home');
+      btn.removeAttribute('title');
+    }
+  }
+
   function bindPlaceDoors() {
     var veil = document.getElementById('place-veil');
     var line = document.getElementById('place-veil-line');
@@ -384,6 +397,7 @@
     bindPlaceDoors();
     fadeGalaxyTitle();
     startLabelCycle();
+    lightSettingsHome();
     if (reduceMotion()) {
       showRoom();
       return;
@@ -397,7 +411,10 @@
   window.addEventListener('pageshow', function () {
     leaving = false;
     showRoom();
+    lightSettingsHome();
   });
+
+  window.addEventListener('fl-alpha-mind-remembered', lightSettingsHome);
 
   window.GardenRooms = {
     galaxies: GALAXIES,
@@ -405,7 +422,8 @@
     go: go,
     fadeMs: FADE_MS,
     breatheLabel: breatheLabel,
-    setRoomLabelText: setRoomLabelText
+    setRoomLabelText: setRoomLabelText,
+    lightSettingsHome: lightSettingsHome
   };
 
   if (document.querySelector('[data-galaxy-dir], [data-garden-go], [data-garden-place], #galaxy-title, #room-label')) {

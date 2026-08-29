@@ -51,6 +51,9 @@
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(entry));
     } catch (e) { /* fail-quiet */ }
+    try {
+      window.dispatchEvent(new CustomEvent('fl-alpha-mind-remembered', { detail: entry }));
+    } catch (e) { /* fail-quiet */ }
   }
 
   function pageIsHttps() {

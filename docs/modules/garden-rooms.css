@@ -130,6 +130,28 @@ html.garden-leaving body {
   opacity: 0.55;
 }
 
+.place-settings.has-home {
+  opacity: 0.88;
+}
+
+.place-settings.has-home::after {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-left: 8px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 10px rgba(52, 211, 153, 0.85);
+  vertical-align: middle;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .place-settings.has-home::after {
+    box-shadow: 0 0 6px rgba(52, 211, 153, 0.55);
+  }
+}
+
 .place-label:hover,
 .place-label:focus-visible {
   opacity: 0.95;
