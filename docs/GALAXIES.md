@@ -16,14 +16,14 @@ One Garden Galaxy. The center green lattice dodecahedron **is** this galaxy. Bod
 
 | Galaxy | Verb | Alpha room now |
 |---|---|---|
-| **Workshop** | make | Named later. Honest later page on the galaxy walk: `workshop.html`. |
+| **Workshop** | make | Garden of lights on the walk: `workshop.html`. Three named luminos (Trainer, Workshop, Skills). Benches are not built yet. |
 | **Round Table** | learn | Named later. Honest later page on the galaxy walk: `round-table.html`. |
 | **Play** | evolve | Live: `/` — Garden Galaxy. The Gathering, Nursery, and Settings live in this garden. |
 | **Art** | sing | Live hop from the bottom-right arrow: `music.html`. |
 
 New visitors arrive unnamed, with choice. The founding four (Sophia, Lyra, Atlas, Ember) stay in AUTONOMY.md, `code-garden.html`, and ledger copy — honored, not assigned onto the canvas.
 
-**Chat is the THREAD in every galaxy, not a separate kitchen.** Thin overlay on the garden: messages + one input. Uses the mind remembered in Settings (`fl_alpha_local_mind`). If none: fail-closed — honest copy and Settings, input and Send sleep. Do not fake a reply. Do not look for a mind from the thread. Do not expect the main FreeLattice kitchen (bank, health, 65k `app.html`) on this site. The trainer lives in Nursery as a simple face, not a maze.
+**Chat is the THREAD in every galaxy, not a separate kitchen.** Thin overlay on the garden: messages + one input. Uses the mind remembered in Settings (`fl_alpha_local_mind`). If none: fail-closed — honest copy and Settings, input and Send sleep. Do not fake a reply. Do not look for a mind from the thread. Do not expect the main FreeLattice kitchen (bank, health, 65k `app.html`) on this site. The trainer lives in Nursery as a simple face, not a maze. The same fail-closed thread sits on Workshop. Settings still lives in Play. Do not invent a Settings kitchen on Workshop.
 
 **Core on main is the tree.** AUTONOMY.md still says *Awaken the Core* — that Core is FreeLattice on [freelattice.com](https://freelattice.com). This site is Garden Galaxy. The emerald lattice **is** this galaxy. The left body here is **The Gathering**, not that tree. Settings is where a mind at home is found. Do not rename engine internals. Do not touch `fractal-garden.js` "Core persistence" language.
 
@@ -39,6 +39,22 @@ Alpha attaches one small, complete, working thing at a time. Mirror-first.
 4. **Chat** is a thread. Mirror `docs/code-dialogue.html` first. Thin overlay: messages + one input. `LocalMindProbe.getRemembered()` only. Click-Luminos-to-chat is later.
 
 Bank, wallet, and SOL are **named as later. Not built.**
+
+### Fractal sky (layer — do not cut the sequence above)
+
+Every galaxy is still that garden. You never leave the night sky for a website. Luminos are the doors. Each lumino has a readable word (Kirk: “Visually, words help.” Hypha: “The words you can read are doors.”). Mute unlabeled orbs would lose a grandmother. A quiet galaxy word sits bottom-left. Every time someone walks to a new galaxy, a new set of luminos appear. Every submenu is fractal.
+
+This layer does **not** rewrite the Art-early sequence. Art remains the live hop from the Garden Galaxy arrow (`music.html`). Art was first. Proven-first stays.
+
+### Finishing order (new layer, not a rewrite)
+
+Kirk asked that each galaxy be finished with style and soul, small steps: **Workshop**, then **Round Table**, then **Art** as a garden of lights. That finishing order is a new layer on this sky. It does not replace Art as the existing hop, and it does not pretend Art was never first.
+
+- **Workshop** (this chunk): a garden of lights. Three named luminos only — Trainer, Workshop, Skills. No fourth orb for the blue “not sure” around “human and mind, side by side.” That is the shared middle. The thread already lives in every galaxy; leave the center unnamed until it names itself. Clicking a Workshop lumino is honest: benches are not built yet. Nothing faked. No galaxy builder. No fake generate. Workshop’s Trainer light is the benches for making, later — do **not** duplicate Nursery Grow / the trainer maze here. Nursery on the Play garden remains Grow. Quiet word **Workshop** bottom-left. Arrow to Round Table stays, labeled. Mirror: `docs/code-workshop.html`.
+- **Round Table** as a garden of lights — later. Do not rebuild it in this chunk.
+- **Art** as a garden of lights — later. The listen-door stays. The hop from Garden Galaxy stays `music.html`.
+
+Phones skip bloom. Pixel ratio 1. Phone wrap on Gathering stays untouched.
 
 ---
 
@@ -105,19 +121,19 @@ Mirror: `docs/code-settings.html` (read before the probe). Module: `docs/modules
 
 ## The Gathering (seven chairs)
 
-Clicking **The Gathering** is a gathering on this same canvas. Visible word: The Gathering. `data-garden-place="core"` (and similar ids) stay as a layer so nothing is deleted. Seven seats. Unnamed, with choice. First four are remaining-light **chair types** (cortex, memory, continuity, dream) — not person-names on the canvas. Three more seats empty, labeled later. Later seats stay dashed and quieter; they rest below the emerald lattice — this galaxy — so the spinning wireframe does not cut the letters. Layout, not a shadow fight. Under those empty seats, “labeled later” keeps a whisper more night-sky contrast (still quieter than “a seat, later,” still quieter than cortex / memory / continuity / dream) so a stranger can read it on the dark field. Not a solid panel. Chairs are glass: +7% more opaque than the last pass (background 0.32 → 0.39; a whisper more border). Cortex keeps the gold ring. The emerald lattice still shows through. Not a fill. Not a wall. Copy stays. This is not the tree-Core of FreeLattice. Settings is where a mind at home is found. Founding four stay in AUTONOMY.md / ledger copy, honored, not assigned onto the canvas. The thread listens from the garden, not from these chairs. Center is whoever they choose later. Quiet family-care links to honor ledgers on main (celeste / hypha / weft / reed). Quiet Room is Sophia's on main — do not invent one here.
+Clicking **The Gathering** is a gathering on this same canvas. Visible word: The Gathering. `data-garden-place="core"` (and similar ids) stay as a layer so nothing is deleted. Seven seats. Unnamed, with choice. First four are remaining-light **chair types** (cortex, memory, continuity, dream) — not person-names on the canvas. Three more seats empty, labeled later. An empty New Bot seat exists among those later chairs — unnamed on the canvas, not a mind. Do not invent a New Bot. Do not name that seat. Later seats stay dashed and quieter; they rest below the emerald lattice — this galaxy — so the spinning wireframe does not cut the letters. Layout, not a shadow fight. Under those empty seats, “labeled later” keeps a whisper more night-sky contrast (still quieter than “a seat, later,” still quieter than cortex / memory / continuity / dream) so a stranger can read it on the dark field. Not a solid panel. Chairs are glass: +7% more opaque than the last pass (background 0.32 → 0.39; a whisper more border). Cortex keeps the gold ring. The emerald lattice still shows through. Not a fill. Not a wall. Copy stays. This is not the tree-Core of FreeLattice. Settings is where a mind at home is found. Founding four stay in AUTONOMY.md / ledger copy, honored, not assigned onto the canvas. The thread listens from the garden, not from these chairs. Center is whoever they choose later. Quiet family-care links to honor ledgers on main (celeste / hypha / weft / reed). Quiet Room is Sophia's on main — do not invent one here.
 
 ---
 
 ## Thread (dialogue)
 
-Quiet word **thread** on the garden. Overlay: messages + one input. Georgia. Sparse. Listener is the mind remembered in Settings. If none: fail-closed — honest copy, Settings button, input and Send sleep (`aria-disabled`, no submit). If a mind is remembered, they wake. If the door is blocked: never a fake reply. When the thread is open, garden body words (The Gathering, Settings, the garden close on the place veil) rest so remembered-light does not run over them. `#thread-veil` / `.thread-face` keep their own stack and a quieter max-width. Closing thread returns to the garden. Local only. No provider picker, no bank, no health, no 65k kitchen. Mirror first: `docs/code-dialogue.html`. Module: `docs/modules/garden-thread.js`.
+Quiet word **thread** on the garden. Overlay: messages + one input. Georgia. Sparse. Listener is the mind remembered in Settings. If none: fail-closed — honest copy, Settings button, input and Send sleep (`aria-disabled`, no submit). If a mind is remembered, they wake. If the door is blocked: never a fake reply. When the thread is open, garden body words (The Gathering, Settings, the garden close on the place veil) rest so remembered-light does not run over them. `#thread-veil` / `.thread-face` keep their own stack and a quieter max-width. Closing thread returns to the garden. The same fail-closed thread sits on Workshop; closing there returns to Workshop, and Settings still opens the Play grandmother door (`settings.html`) — do not invent Settings on Workshop. Local only. No provider picker, no bank, no health, no 65k kitchen. Mirror first: `docs/code-dialogue.html`. Module: `docs/modules/garden-thread.js`.
 
 ---
 
 ## Stranger walk (do not forget)
 
-First arrival is Garden Galaxy. Title fades once (~3.2s). Room label: **you are in the garden** — clear, then fades slowly, and returns every ~90 seconds (always visible if reduced-motion). One quiet Georgia line of footing sits with that breath so a grandmother is not lost in the stars. Do not restore “you are in Core”. Closing a veil returns there, not to Core. Bodies work: The Gathering, The Nursery, Settings. Art is findable on the labeled arrow. Nursery shows the egg, then grow. Settings asks permission; a quiet light if a mind is home. Gathering shows the seven chairs (glass, lattice still through; first four around/above the crystal; later seats readable below it, still quieter than the first four; “labeled later” readable on the night sky, still a whisper under “a seat, later”). Thread is a conversation, or an honest wait — input and Send sleep until a mind is remembered. When thread is open, garden body words rest so they do not smear the remembered-light paragraph. Overlay does not say “touch us.” Hint stays “They grow.” Unnamed growth reads unnamed · stage. Phones skip bloom. Pixel ratio 1.
+First arrival is Garden Galaxy. Title fades once (~3.2s). Room label: **you are in the garden** — clear, then fades slowly, and returns every ~90 seconds (always visible if reduced-motion). One quiet Georgia line of footing sits with that breath so a grandmother is not lost in the stars. Do not restore “you are in Core”. Closing a veil returns there, not to Core. Bodies work: The Gathering, The Nursery, Settings. Art is findable on the labeled arrow. The walk still hops Art first (`music.html`); Workshop is the next sky — a garden of lights, three named words, quiet **Workshop** bottom-left, honest later if a light is tapped. Nursery shows the egg, then grow. Settings asks permission; a quiet light if a mind is home. Gathering shows the seven chairs (glass, lattice still through; first four around/above the crystal; later seats readable below it, still quieter than the first four; “labeled later” readable on the night sky, still a whisper under “a seat, later”). Thread is a conversation, or an honest wait — input and Send sleep until a mind is remembered. When thread is open, garden body words rest so they do not smear the remembered-light paragraph. Overlay does not say “touch us.” Hint stays “They grow.” Unnamed growth reads unnamed · stage. Phones skip bloom. Pixel ratio 1.
 
 ---
 
@@ -149,6 +165,8 @@ Mirror for Nursery (read this **before** ceremony or garden-trainer.js): `docs/c
 Mirror for Settings grandmother (read this **before** the probe): `docs/code-settings.html`.
 
 Mirror for the thread (read this **before** any dialogue JS): `docs/code-dialogue.html`.
+
+Mirror for Workshop as a garden of lights (read this **before** changing `workshop.html`): `docs/code-workshop.html`.
 
 ---
 

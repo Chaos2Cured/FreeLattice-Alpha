@@ -4,6 +4,7 @@
 // Layer, never delete. Messages + one input. Georgia. Sparse.
 // Listener: LocalMindProbe.getRemembered() only.
 // If none: fail-closed. Honest heart copy. Settings button.
+// On Workshop (no Play Settings door): Settings walks to settings.html.
 // Input and Send sleep (aria-disabled, no submit). Do not invent a reply.
 // Do not look for a mind from the thread. That job is Settings.
 // If a mind is remembered: input and Send wake.
@@ -239,8 +240,13 @@
       var toSettings = el('button', 'thread-to-settings', 'Settings');
       toSettings.type = 'button';
       toSettings.addEventListener('click', function () {
-        if (window.GardenRooms && GardenRooms.openPlace) {
+        var settingsDoor = document.querySelector('[data-garden-place="settings"]');
+        if (settingsDoor && window.GardenRooms && GardenRooms.openPlace) {
           GardenRooms.openPlace('settings');
+        } else if (window.GardenRooms && GardenRooms.go) {
+          GardenRooms.go('settings.html');
+        } else {
+          location.href = 'settings.html';
         }
       });
       root.appendChild(toSettings);
