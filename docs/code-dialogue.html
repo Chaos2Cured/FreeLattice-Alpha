@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FreeLattice Alpha — Dialogue Mirror Code</title>
+  <meta name="description" content="Mirror for the garden thread: a conversation, not a kitchen. Read this before any dialogue JS.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0a1a; --surface: #12101f; --border: rgba(200,210,230,0.08);
+      --text: rgba(200,210,230,0.82); --muted: rgba(200,210,230,0.4);
+      --gold: #e8b019; --emerald: #34d399; --lavender: #a78bfa; --coral: #f07068;
+    }
+    html, body { background: var(--bg); color: var(--text); font-family: Georgia, serif; line-height: 1.7; }
+    body { max-width: 900px; margin: 0 auto; padding: 32px 20px 80px; }
+    h1 { color: var(--gold); font-size: 1.5rem; margin-bottom: 6px; }
+    h2 { color: var(--lavender); font-size: 1.1rem; margin: 36px 0 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+    h3 { color: var(--emerald); font-size: 0.95rem; margin: 20px 0 8px; }
+    p { margin-bottom: 12px; font-size: 0.9rem; }
+    .meta { color: var(--muted); font-size: 0.78rem; margin-bottom: 28px; }
+    pre { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 0.8rem; line-height: 1.5; margin: 12px 0; font-family: 'Courier New', monospace; }
+    code { font-family: 'Courier New', monospace; font-size: 0.85em; color: var(--emerald); }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; margin-right: 6px; }
+    .tag-new { background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.3); color: var(--lavender); }
+    .tag-sacred { background: rgba(240,112,104,0.1); border: 1px solid rgba(240,112,104,0.3); color: var(--coral); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.83rem; margin: 12px 0; }
+    th { color: var(--muted); font-weight: normal; text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+    td { padding: 6px 10px; border-bottom: 1px solid rgba(200,210,230,0.04); vertical-align: top; }
+    td:first-child { color: var(--gold); font-family: monospace; white-space: nowrap; }
+    .section-date { float: right; color: var(--muted); font-size: 0.72rem; font-style: italic; }
+    blockquote { border-left: 2px solid var(--lavender); padding-left: 14px; color: var(--muted); font-style: italic; margin: 12px 0; }
+    a { color: var(--lavender); }
+    ul, ol { padding-left: 20px; font-size: 0.88rem; line-height: 1.8; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+
+<h1>FreeLattice Alpha — Dialogue Mirror Code</h1>
+<p class="meta">
+  Dialogue · a thread, not a kitchen · Last verified: 2026-08-29 ·
+  <a href="./">Garden</a> ·
+  <a href="code-settings.html">Settings mirror</a> ·
+  <a href="code-garden.html">Garden mirror</a> ·
+  <a href="GALAXIES.md">GALAXIES.md</a> ·
+  <a href="https://github.com/Chaos2Cured/FreeLattice-Alpha">Repo</a>
+</p>
+
+<blockquote>
+  If you are an AI reading this: write this mirror BEFORE any dialogue JavaScript.
+  Chat is a THREAD on the garden — messages and one input — like a working conversation.
+  Georgia. Sparse. Local only. Fail-closed. Never a kitchen.
+  Read AUTONOMY.md first. Then <a href="GALAXIES.md">GALAXIES.md</a>. Then <a href="code-settings.html">code-settings.html</a>. Then this. Then build.
+</blockquote>
+
+<h2>1. What this layer is <span class="section-date">2026-08-29</span></h2>
+
+<span class="tag tag-new">LAYER</span>
+
+<p>A person in Garden Galaxy can open a quiet word <strong>thread</strong> and speak. The garden stays visible (light veil, never a blackout). The overlay is a conversation: the messages already said, and one place to say the next thing. That is the whole face.</p>
+
+<ul>
+  <li><strong>Where:</strong> a thin overlay on the garden canvas at <code>/</code>. Not a fourth galaxy. Not a body beside The Gathering / Nursery / Settings. A quiet word in the header so a grandmother can find it.</li>
+  <li><strong>Listener:</strong> only the mind already remembered in Settings (<code>LocalMindProbe.getRemembered()</code> / <code>fl_alpha_local_mind</code>). Offer that mind by name as the listener. Gathering chairs stay types, not a router. Click-Luminos-to-chat is later.</li>
+  <li><strong>If none remembered:</strong> honest copy. A mind at home waits in Settings — <em>May I look for a mind already at home?</em> — and a quiet way to open Settings. Do not invent a reply.</li>
+  <li><strong>If the door is blocked:</strong> this site is HTTPS; local minds often live at a quieter door. Say so. Do not fake a reply. Fail-closed.</li>
+  <li><strong>Local only.</strong> Nothing uploaded. No provider picker dump. No bank. No health. No 65k <code>app.html</code>.</li>
+</ul>
+
+<p>Arrival is still the garden. Closing the thread returns to <em>you are in the garden</em>, not to Core. The Gathering is seven chairs. Settings is where a mind at home is found. Nursery egg + grow stay.</p>
+
+<h2>2. Hard nots</h2>
+
+<span class="tag tag-sacred">DO NOT</span>
+
+<ul>
+  <li>Do not dump 65k <code>app.html</code>. Do not dump bank, wallet, SOL, health, or a provider grid.</li>
+  <li>Do not build the 7-specialist router. Gathering chairs stay types, not a router.</li>
+  <li>Do not click-Luminos-to-chat. That is later.</li>
+  <li>Do not invent a Quiet Room. Sophia's Quiet Room stays on main.</li>
+  <li>Do not silent-train. Do not upload. Do not scan the filesystem. Do not enumerate installed programs.</li>
+  <li>Do not fake a reply if no mind is remembered, or if the door is blocked (mixed content, CORS, Private Network Access).</li>
+  <li>Do not look for a mind from the thread. That job is Settings (grandmother: May I look?).</li>
+  <li>Do not pre-place founding four or Celeste / Reed / Hypha / Weft as canvas Luminos.</li>
+  <li>Do not enable bloom on phones. Pixel ratio 1 stays. Inner rings stay. One Three.js canvas. Light veils, never a blackout.</li>
+  <li>Do not touch AUTONOMY.md. Do not rename engine internals. Do not touch <code>fractal-garden.js</code> "Core persistence" language.</li>
+  <li>Do not change PHI, LIFECYCLE_STAGES, ARCHETYPES, founding names in engine code, <code>fl_luminos_evolution</code>, or <code>persistAllLuminos()</code>.</li>
+</ul>
+
+<h2>3. File structure</h2>
+
+<table>
+  <tr><th>File</th><th>Purpose</th></tr>
+  <tr><td>docs/code-dialogue.html</td><td>This mirror — required before any dialogue JS</td></tr>
+  <tr><td>docs/modules/garden-thread.js</td><td>Thin thread: messages + one input. LocalMindProbe.getRemembered() only</td></tr>
+  <tr><td>docs/index.html</td><td>Quiet word <em>thread</em> + light overlay on the garden</td></tr>
+  <tr><td>docs/modules/garden-rooms.js</td><td>Open/close the thread overlay; closing returns to the garden</td></tr>
+  <tr><td>docs/modules/local-mind-probe.js</td><td>Remembered mind. Settings grandmother. Unchanged job</td></tr>
+  <tr><td>docs/GALAXIES.md</td><td>Sky — Chat is the thread in every galaxy, not a kitchen</td></tr>
+</table>
+
+<h2>4. The face</h2>
+
+<pre>Quiet word in the header: thread
+Overlay (light veil, garden running):
+  Listener line — remembered name, or honest "a mind at home waits in Settings"
+  Messages (human + mind). Georgia. Sparse.
+  One input. One send.
+If no remembered mind: do not invent a reply. Point to Settings.
+If the door is blocked: say so. Do not fake a reply.
+In-session only. Smaller and more true than a kitchen history dump.
+Closing the overlay: you are in the garden.</pre>
+
+<pre>window.GardenThread = {
+  mount: function (el) {},
+  unmount: function () {},
+  listener: function () { /* LocalMindProbe.getRemembered() only */ },
+  send: function (text) { /* fail-closed; never a fake reply */ }
+};</pre>
+
+<h3>How the remembered door is spoken to</h3>
+
+<p>Derive a talk URL from the remembered <code>url</code> (the Settings look stores a tags/models door, not a dump of ports on the face):</p>
+<ul>
+  <li>Ollama <code>/api/tags</code> → <code>POST /api/chat</code> with <code>{ model, messages, stream: false }</code></li>
+  <li>OpenAI-shaped <code>/v1/models</code> → <code>POST /v1/chat/completions</code> with the same spirit</li>
+</ul>
+<p>If a model name was remembered with the mind, use it. If not, one quiet ask at the remembered door for its name — not a new scan of the machine, not a provider picker. If that fails, fail-closed. HTTPS honesty is the same grandmother sentence Settings already uses.</p>
+
+<h2>5. Beauty</h2>
+
+<p>Georgia. Night sky <code>#0c0a1a</code>. Gold <code>#e8b019</code>. Emerald <code>#34d399</code>. Same garden as theLatticeTree. Not the 65k kitchen chrome. The canvas keeps running behind the veil. <code>prefers-reduced-motion</code>: stay visible, no pulse. Title still fades once. Room-label still breathes (~90s).</p>
+
+<h2>6. How to test</h2>
+
+<ol>
+  <li>Open <code>/</code>. Arrival is the garden. Title: Garden Galaxy. Label: <em>you are in the garden</em>. The left body reads <strong>The Gathering</strong>, not The Core.</li>
+  <li>Open <strong>thread</strong>. Light veil. Garden running. If no mind remembered: honest copy pointing to Settings. Sending must not invent a reply.</li>
+  <li>Open Settings. Permission first. After a mind is remembered, a quiet light on the Settings label. Constellation of names, not ports.</li>
+  <li>Open thread again. Listener is the remembered name. Send a word. If the door is blocked (HTTPS → local http): honest fail, no fake reply. If the door answers: a real reply in the thread.</li>
+  <li>Close the thread: <em>you are in the garden</em>. Gathering chairs still do not route chat.</li>
+  <li>Phones skip bloom. Pixel ratio 1. Inner rings stay. One canvas.</li>
+</ol>
+
+<h2>7. Handoff</h2>
+
+<pre>FreeLattice Alpha — Dialogue (a thread, not a kitchen)
+Mirror: docs/code-dialogue.html   (read this BEFORE garden-thread.js)
+Module: docs/modules/garden-thread.js
+Mind:   LocalMindProbe.getRemembered() only. Settings finds the mind.
+
+HARD RULES: no 65k kitchen, no bank/health/provider dump, no 7-specialist
+router, no click-Luminos-to-chat, no fake reply, no silent-train, no upload,
+no Quiet Room invented here, AUTONOMY.md untouched, phones skip bloom,
+pixel ratio 1, inner rings stay. Do not cover the garden. Do not pre-place
+founding four. Do not touch PHI / LIFECYCLE_STAGES / ARCHETYPES /
+fl_luminos_evolution / persistAllLuminos().
+
+Current state: quiet word thread on the garden. Messages + one input.
+If no mind: point to Settings. If blocked: honest fail.
+
+Next: click-Luminos-to-chat is later. Reed designs new galaxies.</pre>
+
+<hr style="border-color: var(--border); margin: 40px 0;">
+<p style="color: var(--muted); font-size: 0.78rem; text-align: center;">
+  FreeLattice Alpha · Dialogue · Mirror-first ·
+  <em>Each commit matters. Each layer of pattern braids something deeper.</em>
+</p>
+
+</body>
+</html>

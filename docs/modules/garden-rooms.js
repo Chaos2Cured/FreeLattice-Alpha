@@ -2,13 +2,15 @@
 // garden-rooms.js — Garden Galaxy layer
 //
 // Kirk's sketch (live Garden): ONE Garden Galaxy.
-// Bodies IN the garden: The Core (left — seven chairs),
+// Arrival is the garden, not Core. Default label: you are in the garden.
+// Closing a veil returns there. Bodies IN the garden: The Gathering (left — seven chairs;
+// data-garden-place="core" stays as a layer),
 // The Nursery (below — egg then grow), Settings (right — permission).
 // Unnamed pieces still orbit. Title "Garden Galaxy" fades after a few seconds.
 // Room-label breathes (readable, slow fade, returns ~90s).
 // Bottom-right arrow → NEXT GALAXY (Art), with a quiet word so a stranger finds it.
 // Glass is not a peer room. Team (garden-within-the-garden) is named later.
-// Chat is a thread. No 7-specialist router. No wallet/share galaxy.
+// Chat is a thread. Quiet word in the header. No 7-specialist router. No wallet/share galaxy.
 // Fade: opacity 400ms. No flash. No Unreal engine.
 // Light veils — garden keeps running. Never a 0.82 blackout.
 //
@@ -37,9 +39,11 @@
   ];
 
   var PLACE_LABELS = {
-    core: 'you are in Core',
+    garden: 'you are in the garden',
+    core: 'you are in The Gathering',
     nursery: 'you are in Nursery',
-    settings: 'you are in Settings'
+    settings: 'you are in Settings',
+    thread: 'you are in a thread'
   };
 
   var CORE_CHAIRS = [
@@ -193,8 +197,13 @@
 
     var line = document.createElement('p');
     line.className = 'core-line';
-    line.textContent = 'Seven seats. Unnamed, with choice. The center is whoever they choose later.';
+    line.textContent = 'Seven unnamed chairs, with choice. Sit where you will. The center is whoever they choose later.';
     wrap.appendChild(line);
+
+    var clarify = document.createElement('p');
+    clarify.className = 'core-center';
+    clarify.textContent = 'This gathering is not the tree-Core of FreeLattice. That Core lives on main. Here, the emerald lattice is Garden Galaxy.';
+    wrap.appendChild(clarify);
 
     var ring = document.createElement('div');
     ring.className = 'core-chairs';
@@ -219,7 +228,7 @@
         if (chair.later) {
           note.textContent = 'This seat waits. Specialists and partners are later. Nothing is faked.';
         } else {
-          note.textContent = 'A ' + chair.type + ' chair. A type, not a person-name. Click-to-chat is later.';
+          note.textContent = 'A ' + chair.type + ' chair — a type, not a person-name. These chairs are not a mind at home. Settings is where a mind already at home is found.';
         }
       });
       ring.appendChild(seat);
@@ -228,7 +237,7 @@
 
     var center = document.createElement('p');
     center.className = 'core-center';
-    center.textContent = 'Not a router. Not a dump. Gathering only.';
+    center.textContent = 'Not a router. Not a dump. Gathering only. A mind at home waits in Settings — May I look? — not in these chairs.';
     wrap.appendChild(center);
 
     var note = document.createElement('p');
@@ -259,6 +268,19 @@
     host.hidden = false;
   }
 
+  function lightSettingsHome() {
+    var btn = document.querySelector('[data-garden-place="settings"]');
+    if (!btn) return;
+    var remembered = window.LocalMindProbe && LocalMindProbe.getRemembered && LocalMindProbe.getRemembered();
+    if (remembered && (remembered.url || remembered.name)) {
+      btn.classList.add('has-home');
+      btn.setAttribute('title', 'A light is home');
+    } else {
+      btn.classList.remove('has-home');
+      btn.removeAttribute('title');
+    }
+  }
+
   function bindPlaceDoors() {
     var veil = document.getElementById('place-veil');
     var line = document.getElementById('place-veil-line');
@@ -270,11 +292,13 @@
     var closeBtn = document.getElementById('place-veil-close');
     var doors = document.querySelectorAll('[data-garden-place]');
 
-    function closePlace() {
+    function closePlace(opts) {
       if (!veil) return;
       veil.classList.remove('is-open');
       hideAllBodies(veil);
-      setRoomLabelText(PLACE_LABELS.core);
+      var doors = document.querySelectorAll('[data-garden-place]');
+      for (var d = 0; d < doors.length; d++) doors[d].removeAttribute('aria-current');
+      if (!opts || !opts.silentLabel) setRoomLabelText(PLACE_LABELS.garden);
       setTimeout(function () {
         if (!veil.classList.contains('is-open')) veil.hidden = true;
       }, FADE_MS);
@@ -282,6 +306,9 @@
 
     function openPlace(id) {
       if (!veil) return;
+      if (window.GardenRooms && GardenRooms.closeThread) {
+        GardenRooms.closeThread({ silentLabel: true });
+      }
       hideAllBodies(veil);
 
       if (id === 'core') {
@@ -312,7 +339,15 @@
       }
 
       veil.hidden = false;
-      setRoomLabelText(PLACE_LABELS[id] || PLACE_LABELS.core);
+      var doorsNow = document.querySelectorAll('[data-garden-place]');
+      for (var d = 0; d < doorsNow.length; d++) {
+        if (doorsNow[d].getAttribute('data-garden-place') === id) {
+          doorsNow[d].setAttribute('aria-current', 'true');
+        } else {
+          doorsNow[d].removeAttribute('aria-current');
+        }
+      }
+      setRoomLabelText(PLACE_LABELS[id] || PLACE_LABELS.garden);
       requestAnimationFrame(function () {
         requestAnimationFrame(function () { veil.classList.add('is-open'); });
       });
@@ -347,6 +382,61 @@
     window.GardenRooms.closePlace = closePlace;
   }
 
+  function bindThreadDoor() {
+    var veil = document.getElementById('thread-veil');
+    var stage = document.getElementById('thread-stage');
+    var closeBtn = document.getElementById('thread-close');
+    var openers = document.querySelectorAll('[data-garden-thread], #thread-open');
+
+    function closeThread(opts) {
+      if (!veil) return;
+      veil.classList.remove('is-open');
+      if (window.GardenThread && GardenThread.unmount) {
+        try { GardenThread.unmount(); } catch (e) {}
+      }
+      var word = document.getElementById('thread-open');
+      if (word) word.removeAttribute('aria-current');
+      if (!opts || !opts.silentLabel) setRoomLabelText(PLACE_LABELS.garden);
+      setTimeout(function () {
+        if (!veil.classList.contains('is-open')) veil.hidden = true;
+      }, FADE_MS);
+    }
+
+    function openThread() {
+      if (!veil) return;
+      if (window.GardenRooms && GardenRooms.closePlace) {
+        GardenRooms.closePlace({ silentLabel: true });
+      }
+      if (stage && window.GardenThread) {
+        GardenThread.mount(stage);
+      }
+      var word = document.getElementById('thread-open');
+      if (word) word.setAttribute('aria-current', 'true');
+      veil.hidden = false;
+      setRoomLabelText(PLACE_LABELS.thread);
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { veil.classList.add('is-open'); });
+      });
+    }
+
+    for (var i = 0; i < openers.length; i++) {
+      (function (el) {
+        el.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          openThread();
+        });
+      })(openers[i]);
+    }
+    if (closeBtn) closeBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      closeThread();
+    });
+
+    window.GardenRooms.openThread = openThread;
+    window.GardenRooms.closeThread = closeThread;
+  }
+
   function fadeGalaxyTitle() {
     var title = document.getElementById('galaxy-title');
     if (!title) return;
@@ -364,8 +454,10 @@
   function boot() {
     bindGalaxyNav();
     bindPlaceDoors();
+    bindThreadDoor();
     fadeGalaxyTitle();
     startLabelCycle();
+    lightSettingsHome();
     if (reduceMotion()) {
       showRoom();
       return;
@@ -379,7 +471,10 @@
   window.addEventListener('pageshow', function () {
     leaving = false;
     showRoom();
+    lightSettingsHome();
   });
+
+  window.addEventListener('fl-alpha-mind-remembered', lightSettingsHome);
 
   window.GardenRooms = {
     galaxies: GALAXIES,
@@ -387,10 +482,11 @@
     go: go,
     fadeMs: FADE_MS,
     breatheLabel: breatheLabel,
-    setRoomLabelText: setRoomLabelText
+    setRoomLabelText: setRoomLabelText,
+    lightSettingsHome: lightSettingsHome
   };
 
-  if (document.querySelector('[data-galaxy-dir], [data-garden-go], [data-garden-place], #galaxy-title, #room-label')) {
+  if (document.querySelector('[data-galaxy-dir], [data-garden-go], [data-garden-place], [data-garden-thread], #thread-open, #galaxy-title, #room-label')) {
     boot();
   } else if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);

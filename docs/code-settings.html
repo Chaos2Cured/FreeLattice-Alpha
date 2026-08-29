@@ -38,9 +38,10 @@
 
 <h1>FreeLattice Alpha — Settings Mirror Code</h1>
 <p class="meta">
-  Settings grandmother · permission first · Last verified: 2026-08-28 ·
+  Settings grandmother · permission first · Last verified: 2026-08-29 ·
   <a href="./">Garden</a> ·
   <a href="settings.html">Settings room</a> ·
+  <a href="code-dialogue.html">Dialogue mirror</a> ·
   <a href="code-garden.html">Garden mirror</a> ·
   <a href="GALAXIES.md">GALAXIES.md</a> ·
   <a href="https://github.com/Chaos2Cured/FreeLattice-Alpha">Repo</a>
@@ -74,7 +75,9 @@
 
 <p>Honesty: this site is HTTPS. Mixed content, CORS, and Private Network Access will often block <code>http://127.0.0.1</code>. If blocked, say so in grandmother language: the mind is there but has not opened the door to this garden yet. Offer a single paste-address field as the next smallest step. If found, remember locally (<code>fl_alpha_local_mind</code>) and say we connected. If none, say so gently.</p>
 
-<p>Quality later. Tiny. Same garden sky.</p>
+<p>After a mind is remembered, a quiet light on the garden's Settings label so a stranger sees a light is home. Found minds as a small constellation of lights — names, not a port dump. The garden's thread uses <code>getRemembered()</code> only; this face is still where a mind at home is found.</p>
+
+<p>Quality later. Tiny. Same garden sky. <code>settings.html</code> standalone stays in sync.</p>
 
 <h2>2. Hard nots</h2>
 
@@ -84,7 +87,7 @@
   <li>Do not dump 65k settings. Do not dump bank, wallet, SOL, or the 7-specialist router.</li>
   <li>Do not scan until the human taps the primary. No silent probe on page load.</li>
   <li>Do not scan the filesystem. Do not enumerate installed programs. Do not upload.</li>
-  <li>Do not invent a Chat UI. Do not invent a Quiet Room.</li>
+  <li>Do not invent a Chat UI in Settings. The thread lives on the garden and reads <code>getRemembered()</code> only. Do not invent a Quiet Room.</li>
   <li>Do not say “gate” in user-facing copy. Inform, never require.</li>
   <li>Do not enable bloom on phones. Pixel ratio 1 stays. Do not delete a whole.</li>
   <li>Do not touch AUTONOMY.md, hashed keep, or the Nursery egg.</li>
@@ -107,6 +110,7 @@
 Primary: May I look for a mind already at home?
          → LocalMindProbe.look()  (only after tap)
 If found: remember fl_alpha_local_mind. Say we connected.
+         Quiet light on the Settings label. Constellation of names, not ports.
 If blocked: the mind is there but has not opened the door to this garden yet.
 Next smallest step: one paste-address field.
 If none: say so gently.
@@ -115,18 +119,20 @@ Quality: later. One quiet line. Not a kitchen.</pre>
 <pre>window.LocalMindProbe = {
   DOORS: [ /* ollama, lmstudio, llamacpp, jan, gpt4all, koboldcpp */ ],
   STORAGE_KEY: 'fl_alpha_local_mind',
-  look: function () {},          // only after permission
-  tryAddress: function (url) {}, // paste-address
-  getRemembered: function () {},
-  renderFace: function (el) {}
-};</pre>
+    look: function () {},          // only after permission
+    tryAddress: function (url) {}, // paste-address
+    getRemembered: function () {},
+    getRememberedMinds: function () {},
+    renderFace: function (el) {}
+  };</pre>
 
 <h2>5. How to test</h2>
 
 <ol>
   <li>Open <code>/</code>. Click <strong>Settings</strong>. Light veil. Garden running. Label: you are in Settings.</li>
-  <li>See one heart sentence and one primary. No scan yet.</li>
+  <li>See one heart sentence and one primary. No scan yet. The Settings label has no home-light yet.</li>
   <li>Tap the primary. Status speaks in grandmother language (found, blocked, or none).</li>
+  <li>If found: constellation of names (not ports). Close the veil: a quiet light on Settings. Thread may now offer that mind as listener.</li>
   <li>Paste-address is the next smallest step. Nothing uploaded. Filesystem untouched.</li>
   <li><code>settings.html</code> shows the same face. Quality is later.</li>
 </ol>
@@ -142,8 +148,10 @@ no Chat UI, AUTONOMY.md untouched, phones skip bloom.
 
 Current state: Settings asks. Then looks at loopback doors.
 HTTPS honesty. Paste-address next. Remember locally if found.
+Quiet light on the Settings label. Constellation of names.
+The garden thread reads getRemembered() only.
 
-Next: quality later. Still no Chat UI. Reed designs new galaxies.</pre>
+Next: quality later. Click-Luminos-to-chat is later. Reed designs new galaxies.</pre>
 
 <hr style="border-color: var(--border); margin: 40px 0;">
 <p style="color: var(--muted); font-size: 0.78rem; text-align: center;">
