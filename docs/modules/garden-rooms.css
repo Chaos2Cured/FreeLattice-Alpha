@@ -967,7 +967,7 @@ html.room-page #room-label {
 .core-chair.is-later {
   border-style: dashed;
   border-color: rgba(200, 210, 230, 0.22);
-  color: rgba(200, 210, 230, 0.62);
+  color: rgba(200, 210, 230, 0.68);
 }
 
 .core-chair-type,
@@ -977,12 +977,17 @@ html.room-page #room-label {
 }
 
 .core-chair.is-later .core-chair-type {
-  text-shadow: 0 0 8px rgba(12, 10, 26, 0.95), 0 1px 2px rgba(12, 10, 26, 0.88);
+  text-shadow:
+    0 0 12px rgba(12, 10, 26, 1),
+    0 0 5px rgba(12, 10, 26, 0.96),
+    0 1px 2px rgba(12, 10, 26, 0.9);
 }
 
 .core-chair.is-later .core-chair-unnamed {
-  color: rgba(200, 210, 230, 0.5);
-  text-shadow: 0 0 7px rgba(12, 10, 26, 0.92);
+  color: rgba(200, 210, 230, 0.54);
+  text-shadow:
+    0 0 10px rgba(12, 10, 26, 1),
+    0 0 4px rgba(12, 10, 26, 0.94);
 }
 
 .core-chair:hover,
