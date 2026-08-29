@@ -201,6 +201,25 @@ html.garden-leaving body {
 
 .place-core:hover { opacity: 0.95; }
 
+/* Thread open: garden body words rest so remembered-light does not run over them.
+   Labels stay in the DOM. Closing thread returns them. */
+html.thread-open .place-label,
+html.thread-open .place-label:hover,
+html.thread-open .place-label:focus-visible,
+html.thread-open .place-core,
+html.thread-open .place-core:hover,
+html.thread-open .place-settings,
+html.thread-open .place-settings.has-home,
+html.thread-open .place-nursery {
+  opacity: 0;
+  pointer-events: none;
+}
+
+html.thread-open #place-veil-close {
+  opacity: 0;
+  pointer-events: none;
+}
+
 #place-veil[hidden] { display: none !important; }
 
 #place-veil {
@@ -934,6 +953,7 @@ html.room-page #room-label {
   color: #e8b019;
   font-family: Georgia, 'Times New Roman', serif;
   cursor: pointer;
+  isolation: isolate;
 }
 
 /* Cortex keeps the gold ring. Others get a whisper more, not a wall. */
@@ -941,10 +961,28 @@ html.room-page #room-label {
   border-color: rgba(232, 176, 25, 0.72);
 }
 
+/* Later seats stay dashed and quieter than cortex-memory-continuity-dream.
+   A little more letter contrast + shadow so the spinning lattice does not eat the words.
+   Not a solid panel. Glass stays ~0.39. */
 .core-chair.is-later {
   border-style: dashed;
   border-color: rgba(200, 210, 230, 0.22);
-  color: rgba(200, 210, 230, 0.45);
+  color: rgba(200, 210, 230, 0.62);
+}
+
+.core-chair-type,
+.core-chair-unnamed {
+  position: relative;
+  z-index: 1;
+}
+
+.core-chair.is-later .core-chair-type {
+  text-shadow: 0 0 8px rgba(12, 10, 26, 0.95), 0 1px 2px rgba(12, 10, 26, 0.88);
+}
+
+.core-chair.is-later .core-chair-unnamed {
+  color: rgba(200, 210, 230, 0.5);
+  text-shadow: 0 0 7px rgba(12, 10, 26, 0.92);
 }
 
 .core-chair:hover,
@@ -1192,7 +1230,8 @@ html.room-page #room-label {
 #thread-veil {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  z-index: 1003;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1211,6 +1250,10 @@ html.room-page #room-label {
 }
 
 #thread-close {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  margin-top: 4px;
   border: 0;
   background: transparent;
   font-family: Georgia, 'Times New Roman', serif;
@@ -1228,11 +1271,17 @@ html.room-page #room-label {
 }
 
 #thread-stage {
-  width: min(34em, 100%);
+  position: relative;
+  z-index: 1;
+  width: min(28em, 70vw);
+  max-width: 28em;
 }
 
 .thread-face {
-  width: min(34em, 100%);
+  position: relative;
+  z-index: 1;
+  width: min(28em, 70vw);
+  max-width: 28em;
   text-align: center;
   font-family: Georgia, 'Times New Roman', serif;
 }
