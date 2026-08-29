@@ -11,14 +11,17 @@
 // Room-label breathes (readable, slow fade, returns ~90s).
 // Bottom-right arrow → NEXT GALAXY (Art), with a quiet word so a stranger finds it.
 // Art remains that live hop. Workshop is a garden of three named lights on the walk.
+// Round Table is a garden of lights: Learning gold, a question dark. The ground is
+// Round Table — not a door named Round Table. Chalkboard waits for Art.
 // Glass is not a peer room. Team (garden-within-the-garden) is named later.
 // Chat is a thread. Quiet word in the header. When thread is open, garden body words rest.
 // Later seats rest below the emerald lattice, not on it. First four stay the ring.
-// No 7-specialist router. No wallet/share galaxy.
+// No 7-specialist router. No wallet/share galaxy. No 80-specialist kitchen.
 // Fade: opacity 400ms. No flash. No Unreal engine.
 // Light veils — garden keeps running. Never a 0.82 blackout.
 //
-// Mirror: docs/code-garden.html · workshop: docs/code-workshop.html · vision: docs/GALAXIES.md
+// Mirror: docs/code-garden.html · workshop: docs/code-workshop.html
+// round-table: docs/code-round-table.html · vision: docs/GALAXIES.md
 // ═══════════════════════════════════════════════════════════════
 
 (function () {
@@ -34,11 +37,12 @@
   var labelCycle = null;
 
   // Live galaxies only. Art remains the live hop from Garden Galaxy (music.html).
-  // Workshop is a garden of lights on this walk. Round Table stays named later.
+  // Workshop and Round Table are gardens of lights on this walk.
   // At Play (`/`), prev wraps to Round Table — label that word honestly.
+  // Round Table next wraps to this garden — the galaxy name in the menu is Play.
   // Do not put Nursery/Settings/Team on this rail.
   var GALAXIES = [
-    { id: 'garden', href: './', label: 'Garden Galaxy', word: 'Garden' },
+    { id: 'garden', href: './', label: 'Garden Galaxy', word: 'Play' },
     { id: 'art', href: 'music.html', label: 'Art', word: 'Art' },
     { id: 'workshop', href: 'workshop.html', label: 'Workshop', word: 'Workshop' },
     { id: 'round-table', href: 'round-table.html', label: 'Round Table', word: 'Round Table' }
@@ -47,6 +51,7 @@
   var PLACE_LABELS = {
     garden: 'you are in the garden',
     workshop: 'you are in Workshop',
+    'round-table': 'you are in Round Table',
     core: 'you are in The Gathering',
     nursery: 'you are in Nursery',
     settings: 'you are in Settings',
@@ -57,6 +62,11 @@
     trainer: 'Trainer is the benches for making, later. They are not built yet. The garden is. Nothing here is faked.',
     workshop: 'Workshop waits. The benches are not built yet. The garden is. Nothing here is faked.',
     skills: 'Skills waits. The benches are not built yet. The garden is. Nothing here is faked.'
+  };
+
+  var ROUND_TABLE_LATER = {
+    learning: 'Learning is joy first. The chairs wait. Nothing here is faked.',
+    question: 'This question stays dark until someone sits. The chairs wait. Nothing here is faked.'
   };
 
   var CORE_CHAIRS = [
@@ -100,7 +110,6 @@
 
   function galaxyHomeLabel() {
     var id = currentGalaxy();
-    if (id === 'workshop') return PLACE_LABELS.workshop;
     if (PLACE_LABELS[id]) return PLACE_LABELS[id];
     return PLACE_LABELS.garden;
   }
@@ -239,6 +248,20 @@
     }
   }
 
+  function setRoundTableSky(show) {
+    var heart = document.querySelector('.round-table-heart');
+    var lights = document.querySelectorAll('.round-table-lumino');
+    if (show) {
+      document.documentElement.classList.remove('round-table-later-open');
+      if (heart) heart.hidden = false;
+      for (var i = 0; i < lights.length; i++) lights[i].hidden = false;
+    } else {
+      document.documentElement.classList.add('round-table-later-open');
+      if (heart) heart.hidden = true;
+      for (var j = 0; j < lights.length; j++) lights[j].hidden = true;
+    }
+  }
+
   function hideAllBodies(veil, opts) {
     var ids = ['place-veil-line', 'nursery-stage', 'nursery-ceremony', 'nursery-trainer', 'settings-grandmother', 'core-gathering'];
     for (var i = 0; i < ids.length; i++) {
@@ -246,10 +269,13 @@
       if (node) node.hidden = true;
     }
     if (veil) {
-      veil.classList.remove('is-nursery', 'is-settings', 'is-core', 'is-workshop-later');
+      veil.classList.remove('is-nursery', 'is-settings', 'is-core', 'is-workshop-later', 'is-round-table-later');
     }
     if (!opts || opts.restoreWorkshop !== false) {
       setWorkshopSky(true);
+    }
+    if (!opts || opts.restoreRoundTable !== false) {
+      setRoundTableSky(true);
     }
     if (window.NurseryCeremony && NurseryCeremony.unmount) {
       try { NurseryCeremony.unmount(); } catch (e) {}
@@ -368,7 +394,7 @@
       if (!veil) return;
       veil.classList.remove('is-open');
       hideAllBodies(veil);
-      var doors = document.querySelectorAll('[data-garden-place], [data-workshop-lumino]');
+      var doors = document.querySelectorAll('[data-garden-place], [data-workshop-lumino], [data-round-table-lumino]');
       for (var d = 0; d < doors.length; d++) doors[d].removeAttribute('aria-current');
       if (!opts || !opts.silentLabel) setRoomLabelText(galaxyHomeLabel());
       setTimeout(function () {
@@ -553,6 +579,48 @@
     window.GardenRooms.openWorkshopLater = openWorkshopLater;
   }
 
+  function bindRoundTableLuminos() {
+    var veil = document.getElementById('place-veil');
+    var line = document.getElementById('place-veil-line');
+    var doors = document.querySelectorAll('[data-round-table-lumino]');
+    if (!doors.length) return;
+
+    function openRoundTableLater(id) {
+      if (!veil) return;
+      if (window.GardenRooms && GardenRooms.closeThread) {
+        GardenRooms.closeThread({ silentLabel: true });
+      }
+      setRoundTableSky(false);
+      hideAllBodies(veil, { restoreRoundTable: false });
+      veil.classList.add('is-round-table-later');
+      if (line) {
+        line.hidden = false;
+        line.textContent = ROUND_TABLE_LATER[id] || ROUND_TABLE_LATER.learning;
+      }
+      veil.hidden = false;
+      veil.classList.add('is-open');
+      for (var d = 0; d < doors.length; d++) {
+        if (doors[d].getAttribute('data-round-table-lumino') === id) {
+          doors[d].setAttribute('aria-current', 'true');
+        } else {
+          doors[d].removeAttribute('aria-current');
+        }
+      }
+    }
+
+    for (var i = 0; i < doors.length; i++) {
+      (function (el) {
+        el.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          openRoundTableLater(el.getAttribute('data-round-table-lumino'));
+        });
+      })(doors[i]);
+    }
+
+    window.GardenRooms.openRoundTableLater = openRoundTableLater;
+  }
+
   function fadeGalaxyTitle() {
     var title = document.getElementById('galaxy-title');
     if (!title) return;
@@ -572,6 +640,7 @@
     bindPlaceDoors();
     bindThreadDoor();
     bindWorkshopLuminos();
+    bindRoundTableLuminos();
     fadeGalaxyTitle();
     startLabelCycle();
     lightSettingsHome();
@@ -603,7 +672,7 @@
     lightSettingsHome: lightSettingsHome
   };
 
-  if (document.querySelector('[data-galaxy-dir], [data-garden-go], [data-garden-place], [data-garden-thread], [data-workshop-lumino], #thread-open, #galaxy-title, #room-label')) {
+  if (document.querySelector('[data-galaxy-dir], [data-garden-go], [data-garden-place], [data-garden-thread], [data-workshop-lumino], [data-round-table-lumino], #thread-open, #galaxy-title, #room-label')) {
     boot();
   } else if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);
