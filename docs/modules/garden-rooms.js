@@ -11,7 +11,8 @@
 // Room-label breathes (readable, slow fade, returns ~90s).
 // Bottom-right arrow → NEXT GALAXY (Art), with a quiet word so a stranger finds it.
 // Glass is not a peer room. Team (garden-within-the-garden) is named later.
-// Chat is a thread. Quiet word in the header. No 7-specialist router. No wallet/share galaxy.
+// Chat is a thread. Quiet word in the header. When thread is open, garden body words rest.
+// No 7-specialist router. No wallet/share galaxy.
 // Fade: opacity 400ms. No flash. No Unreal engine.
 // Light veils — garden keeps running. Never a 0.82 blackout.
 //
@@ -421,6 +422,7 @@
 
     function closeThread(opts) {
       if (!veil) return;
+      document.documentElement.classList.remove('thread-open');
       veil.classList.remove('is-open');
       if (window.GardenThread && GardenThread.unmount) {
         try { GardenThread.unmount(); } catch (e) {}
@@ -443,6 +445,7 @@
       }
       var word = document.getElementById('thread-open');
       if (word) word.setAttribute('aria-current', 'true');
+      document.documentElement.classList.add('thread-open');
       veil.hidden = false;
       setRoomLabelText(PLACE_LABELS.thread);
       requestAnimationFrame(function () {
