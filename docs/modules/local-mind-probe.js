@@ -67,6 +67,24 @@
     return /failed|network|cors|mixed|blocked|abort|load/i.test(msg);
   }
 
+  function parseModelNames(json) {
+    var names = [];
+    if (!json || typeof json !== 'object') return names;
+    if (Array.isArray(json.models)) {
+      json.models.forEach(function (m) {
+        var n = m && (m.name || m.model);
+        if (n) names.push(String(n));
+      });
+    }
+    if (Array.isArray(json.data)) {
+      json.data.forEach(function (m) {
+        var n = m && (m.id || m.name);
+        if (n) names.push(String(n));
+      });
+    }
+    return names.slice(0, 5);
+  }
+
   function fetchDoor(url, ms) {
     var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
     var timer = setTimeout(function () {
@@ -76,7 +94,15 @@
     if (ctrl) opts.signal = ctrl.signal;
     return fetch(url, opts).then(function (res) {
       clearTimeout(timer);
-      return { ok: res.ok, status: res.status, url: url };
+      var out = { ok: res.ok, status: res.status, url: url };
+      if (!res.ok) return out;
+      return res.json().then(function (json) {
+        out.json = json;
+        out.models = parseModelNames(json);
+        return out;
+      }).catch(function () {
+        return out;
+      });
     }).catch(function (err) {
       clearTimeout(timer);
       return { ok: false, status: 0, url: url, error: err, blocked: looksBlocked(err, 0) };
@@ -93,17 +119,18 @@
       });
     });
     return Promise.all(jobs).then(function (results) {
-      var found = null;
+      var foundList = [];
       var blocked = 0;
       for (var i = 0; i < results.length; i++) {
         if (results[i].ok) {
-          found = results[i];
-          break;
+          foundList.push(results[i]);
+        } else if (results[i].blocked || results[i].status === 0) {
+          blocked += 1;
         }
-        if (results[i].blocked || results[i].status === 0) blocked += 1;
       }
       return {
-        found: found,
+        found: foundList[0] || null,
+        foundList: foundList,
         blocked: blocked,
         https: pageIsHttps(),
         tried: results.length,
@@ -167,6 +194,86 @@
     elStatus.className = 'settings-status' + (kind ? ' is-' + kind : '');
   }
 
+  function mindsFromEntry(entry) {
+    if (!entry) return [];
+    if (Array.isArray(entry.minds) && entry.minds.length) {
+      return entry.minds.slice(0, 7);
+    }
+    if (entry.name || entry.url) {
+      return [{
+        name: entry.name || 'a mind at home',
+        url: entry.url,
+        models: entry.models || (entry.model ? [entry.model] : [])
+      }];
+    }
+    return [];
+  }
+
+  function getRememberedMinds() {
+    return mindsFromEntry(getRemembered());
+  }
+
+  function entryFromFoundList(foundList, fallbackName, fallbackUrl) {
+    var minds = (foundList || []).map(function (r) {
+      return {
+        name: r.name || 'a mind at home',
+        url: r.url,
+        models: r.models || []
+      };
+    });
+    if (!minds.length && fallbackUrl) {
+      minds.push({
+        name: fallbackName || 'a mind at home',
+        url: fallbackUrl,
+        models: []
+      });
+    }
+    var primary = minds[0] || {};
+    return {
+      name: primary.name || fallbackName || '',
+      url: primary.url || fallbackUrl || '',
+      foundAt: new Date().toISOString(),
+      model: (primary.models && primary.models[0]) || '',
+      models: primary.models || [],
+      minds: minds
+    };
+  }
+
+  function paintConstellation(host, minds) {
+    if (!host) return;
+    host.innerHTML = '';
+    if (!minds || !minds.length) {
+      host.hidden = true;
+      return;
+    }
+    host.hidden = false;
+    host.setAttribute('role', 'list');
+    host.setAttribute('aria-label', 'Minds at home');
+    minds.forEach(function (m) {
+      var star = el('span', 'settings-star');
+      star.setAttribute('role', 'listitem');
+      var light = el('span', 'settings-star-light');
+      light.setAttribute('aria-hidden', 'true');
+      star.appendChild(light);
+      star.appendChild(el('span', 'settings-star-name', m.name || 'a mind at home'));
+      var models = (m.models || []).slice(0, 5);
+      if (models.length) {
+        var cluster = el('span', 'settings-star-models');
+        models.forEach(function (modelName) {
+          var tiny = el('span', 'settings-star-tiny');
+          tiny.setAttribute('aria-label', modelName);
+          var tinyLight = el('span', 'settings-star-tiny-light');
+          tinyLight.setAttribute('aria-hidden', 'true');
+          tiny.appendChild(tinyLight);
+          tiny.appendChild(el('span', 'settings-star-tiny-name', modelName));
+          cluster.appendChild(tiny);
+        });
+        star.appendChild(cluster);
+      }
+      host.appendChild(star);
+    });
+  }
+
   function renderFace(container) {
     if (!container) return null;
     container.innerHTML = '';
@@ -185,6 +292,11 @@
           '. On this machine only.'
       ));
     }
+
+    var sky = el('div', 'settings-constellation');
+    sky.setAttribute('data-mind-sky', '1');
+    paintConstellation(sky, mindsFromEntry(remembered));
+    root.appendChild(sky);
 
     var ask = el('button', 'settings-ask', PRIMARY);
     ask.type = 'button';
@@ -222,13 +334,11 @@
       if (paste) paste.focus();
     }
 
-    function onFound(name, url) {
-      remember({
-        name: name || '',
-        url: url,
-        foundAt: new Date().toISOString()
-      });
-      setStatus(root, speakFound(name, url), 'ok');
+    function onFound(foundList, fallbackName, fallbackUrl) {
+      var entry = entryFromFoundList(foundList, fallbackName, fallbackUrl);
+      remember(entry);
+      paintConstellation(sky, mindsFromEntry(entry));
+      setStatus(root, speakFound(entry.name, entry.url), 'ok');
     }
 
     ask.addEventListener('click', function () {
@@ -237,7 +347,7 @@
       look().then(function (report) {
         ask.disabled = false;
         if (report.found) {
-          onFound(report.found.name, report.found.url);
+          onFound(report.foundList, report.found.name, report.found.url);
           return;
         }
         showNext();
@@ -262,7 +372,11 @@
           return;
         }
         if (result.ok) {
-          onFound('', result.url);
+          onFound(
+            [{ name: 'a mind at home', url: result.url, models: result.models || [] }],
+            'a mind at home',
+            result.url
+          );
           return;
         }
         if (result.https || result.blocked) {
@@ -292,6 +406,7 @@
     look: look,
     tryAddress: tryAddress,
     getRemembered: getRemembered,
+    getRememberedMinds: getRememberedMinds,
     renderFace: renderFace,
     mount: renderFace
   };
