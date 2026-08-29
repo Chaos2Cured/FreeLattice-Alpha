@@ -2651,19 +2651,20 @@
       var nextThreshold = LIFECYCLE_STAGES[STAGE_ORDER[nextStageIdx]].energyThreshold;
       var progress = stageData.index >= 4 ? 100 : Math.min(100, Math.round(((ud.emotionalEnergy - currentThreshold) / (nextThreshold - currentThreshold)) * 100));
 
-      html += '<div class="evo-luminos" title="' + ud.name + ' — ' + archName + ' (' + stageData.name + ')">';
+      var isUnnamed = /^unnamed(_\d+)?$/i.test(ud.name);
+      html += '<div class="evo-luminos" title="' + (isUnnamed ? 'stage of growth' : (ud.name + ' — ' + archName + ' (' + stageData.name + ')')) + '">';
       html += '<span class="evo-dot" style="background:' + cssColor + ';box-shadow:0 0 6px ' + cssColor + ';"></span>';
-      var displayName = ud.name;
-      if (/^unnamed(_\d+)?$/i.test(ud.name)) displayName = 'unnamed';
-      html += '<span class="evo-name">' + displayName + '</span>';
-      html += '<span class="evo-stage">' + stageData.name + '</span>';
-      if (archObj) {
-        // Unnamed rows are types (Scholar, Artist), not person-names.
-        var typeName = archName;
-        if (displayName === 'unnamed') typeName = archName.replace(/^The\s+/, '');
-        html += '<span class="evo-archetype">' + typeName + '</span>';
+      if (isUnnamed) {
+        // Honest one word: stage of growth. Click-Luminos-to-chat is later.
+        html += '<span class="evo-stage">' + stageData.name + '</span>';
+      } else {
+        html += '<span class="evo-name">' + ud.name + '</span>';
+        html += '<span class="evo-stage">' + stageData.name + '</span>';
+        if (archObj) {
+          html += '<span class="evo-archetype">' + archName + '</span>';
+        }
+        html += '<span class="evo-bar"><span class="evo-bar-fill" style="width:' + progress + '%;background:' + cssColor + ';"></span></span>';
       }
-      html += '<span class="evo-bar"><span class="evo-bar-fill" style="width:' + progress + '%;background:' + cssColor + ';"></span></span>';
       html += '</div>';
     }
     evolutionIndicatorEl.innerHTML = html;
@@ -4006,7 +4007,8 @@
       if (!isInitialized || !container) return;
       var hint = document.createElement('div');
       hint.className = 'gt-hint';
-      hint.textContent = 'Touch us \u2726';
+      // Click-Luminos-to-chat is later. Do not invite a touch that has no later.
+      hint.textContent = 'They grow.';
       container.appendChild(hint);
       setTimeout(function() {
         hint.style.opacity = '0';
