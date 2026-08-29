@@ -3,6 +3,7 @@
 //
 // Kirk's sketch (live Garden): ONE Garden Galaxy.
 // Arrival is the garden, not Core. Default label: you are in the garden.
+// One quiet Georgia footing on first arrival, fading with the room-label breath.
 // Closing a veil returns there. Bodies IN the garden: The Gathering (left — seven chairs;
 // data-garden-place="core" stays as a layer),
 // The Nursery (below — egg then grow), Settings (right — permission).
@@ -135,31 +136,61 @@
     }
   }
 
+  function footingEl() {
+    return document.getElementById('garden-footing');
+  }
+
+  function showFooting(show) {
+    var footing = footingEl();
+    if (!footing) return;
+    footing.hidden = !show;
+    if (!show) {
+      footing.classList.remove('is-shown');
+      footing.classList.add('is-fading');
+    }
+  }
+
+  function breatheNodes() {
+    var nodes = [];
+    var label = document.getElementById('room-label');
+    var footing = footingEl();
+    if (label) nodes.push(label);
+    if (footing && !footing.hidden) nodes.push(footing);
+    return nodes;
+  }
+
   function setRoomLabelText(text) {
     var label = document.getElementById('room-label');
     if (!label || !text) return;
     label.textContent = text;
+    showFooting(text === PLACE_LABELS.garden);
     breatheLabel(true);
   }
 
   function breatheLabel(immediate) {
-    var label = document.getElementById('room-label');
-    if (!label) return;
+    var nodes = breatheNodes();
+    if (!nodes.length) return;
     if (reduceMotion()) {
-      label.classList.add('is-shown');
-      label.classList.remove('is-fading');
+      for (var r = 0; r < nodes.length; r++) {
+        nodes[r].classList.add('is-shown');
+        nodes[r].classList.remove('is-fading');
+      }
       return;
     }
     if (labelTimer) clearTimeout(labelTimer);
-    label.classList.remove('is-fading');
-    if (immediate) {
-      label.classList.remove('is-shown');
-      void label.offsetWidth;
+    for (var i = 0; i < nodes.length; i++) {
+      nodes[i].classList.remove('is-fading');
+      if (immediate) {
+        nodes[i].classList.remove('is-shown');
+        void nodes[i].offsetWidth;
+      }
+      nodes[i].classList.add('is-shown');
     }
-    label.classList.add('is-shown');
     labelTimer = setTimeout(function () {
-      label.classList.remove('is-shown');
-      label.classList.add('is-fading');
+      for (var f = 0; f < nodes.length; f++) {
+        nodes[f].classList.remove('is-shown');
+        nodes[f].classList.add('is-fading');
+      }
     }, LABEL_HOLD_MS);
   }
 

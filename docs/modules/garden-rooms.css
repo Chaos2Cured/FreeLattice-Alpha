@@ -37,6 +37,13 @@ html.garden-leaving body {
     opacity: 0.92 !important;
     transition: none;
   }
+
+  #garden-footing,
+  #garden-footing.is-shown,
+  #garden-footing.is-fading {
+    opacity: 0.72 !important;
+    transition: none;
+  }
 }
 
 #galaxy-title {
@@ -89,6 +96,40 @@ html.garden-leaving body {
 }
 
 #galaxy-title.is-faded + #room-label { top: 52px; }
+
+#garden-footing {
+  position: fixed;
+  top: 98px;
+  left: 0;
+  right: 0;
+  z-index: 12;
+  margin: 0;
+  text-align: center;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.78rem;
+  font-weight: normal;
+  font-style: italic;
+  letter-spacing: 0.03em;
+  color: rgba(200, 210, 230, 0.48);
+  opacity: 0;
+  pointer-events: none;
+  text-shadow: 0 0 12px rgba(12, 10, 26, 0.95);
+  transition: opacity 2.4s ease, top 1.2s ease;
+}
+
+#garden-footing[hidden] { display: none !important; }
+
+#garden-footing.is-shown {
+  opacity: 0.72;
+  transition: opacity 2.4s ease, top 1.2s ease;
+}
+
+#garden-footing.is-fading {
+  opacity: 0;
+  transition: opacity 8s ease, top 1.2s ease;
+}
+
+#galaxy-title.is-faded ~ #garden-footing { top: 76px; }
 
 /* Bodies IN the garden — labels, not a second canvas, not a ring restyle. */
 .place-label {
@@ -513,6 +554,8 @@ html[data-garden-galaxy="art"] .galaxy-nav-next { opacity: 0.4; }
 @media (min-width: 800px) {
   #galaxy-title { top: 44px; }
   #room-label { top: 70px; }
+  #garden-footing { top: 94px; }
+  #galaxy-title.is-faded ~ #garden-footing { top: 74px; }
 
   .galaxy-nav {
     bottom: 22px;
