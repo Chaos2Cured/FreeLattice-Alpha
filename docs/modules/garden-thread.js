@@ -195,11 +195,11 @@
     });
   }
 
-  function speakHonest(reason, https) {
+  function speakHonest(reason) {
     if (reason === 'none') return HEART_NONE;
     if (reason === 'no-model') return HEART_NO_MODEL;
     if (reason === 'quiet') return HEART_QUIET;
-    if (reason === 'blocked' || https) return HEART_BLOCKED;
+    if (reason === 'blocked') return HEART_BLOCKED;
     return HEART_FAIL;
   }
 
@@ -285,7 +285,7 @@
       renderMessages(list);
 
       if (!nowMind) {
-        messages.push({ role: 'garden', text: speakHonest('none', pageIsHttps()) });
+        messages.push({ role: 'garden', text: speakHonest('none') });
         renderMessages(list);
         setStatus('', false);
         return;
@@ -317,8 +317,10 @@
         var reason = 'fail';
         if (err && err.reason === 'no-model') reason = 'no-model';
         else if (err && err.reason === 'quiet') reason = 'quiet';
-        else if (err && (err.blocked || looksBlocked(err))) reason = 'blocked';
-        messages.push({ role: 'garden', text: speakHonest(reason, pageIsHttps()) });
+        else if (err && (err.blocked || looksBlocked(err))) {
+          reason = pageIsHttps() ? 'blocked' : 'fail';
+        }
+        messages.push({ role: 'garden', text: speakHonest(reason) });
         renderMessages(list);
         setStatus('', true);
       });
