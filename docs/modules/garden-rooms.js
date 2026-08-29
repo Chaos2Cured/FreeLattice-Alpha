@@ -64,9 +64,10 @@
     skills: 'Skills waits. The benches are not built yet. The garden is. Nothing here is faked.'
   };
 
+  // Reed: sitting is a who. Later sentences stay distinct — no canned second line.
   var ROUND_TABLE_LATER = {
-    learning: 'Learning is joy first. The chairs wait. Nothing here is faked.',
-    question: 'This question stays dark until someone sits. The chairs wait. Nothing here is faked.'
+    learning: 'Learning is joy first. Sitting is a who: a person at this table.',
+    question: 'This question stays dark until someone sits. Not a topic. Not a time.'
   };
 
   var CORE_CHAIRS = [
