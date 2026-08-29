@@ -1115,3 +1115,190 @@ html.room-page #room-label {
   color: rgba(200, 210, 230, 0.42);
   margin-top: 10px;
 }
+
+/* ── Thread: a conversation, not a kitchen ── */
+.thread-word {
+  background: transparent;
+  border: 0;
+  color: rgba(200, 210, 230, 0.35);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  padding: 0;
+}
+
+.thread-word:hover,
+.thread-word:focus-visible,
+.thread-word[aria-current="true"] {
+  color: #a78bfa;
+  outline: none;
+}
+
+#thread-veil[hidden] { display: none !important; }
+
+#thread-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 88px 28px 72px;
+  background: rgba(12, 10, 26, 0.28);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 400ms ease;
+}
+
+#thread-veil.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#thread-close {
+  border: 0;
+  background: transparent;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: #e8b019;
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+#thread-close:hover,
+#thread-close:focus-visible {
+  opacity: 1;
+  outline: none;
+}
+
+#thread-stage {
+  width: min(34em, 100%);
+}
+
+.thread-face {
+  width: min(34em, 100%);
+  text-align: center;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.thread-heart {
+  font-size: 1.02rem;
+  line-height: 1.7;
+  color: rgba(200, 210, 230, 0.88);
+  margin-bottom: 14px;
+  text-shadow: 0 0 12px rgba(12, 10, 26, 0.8);
+}
+
+.thread-to-settings {
+  display: inline-block;
+  margin: 0 0 16px;
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  border-radius: 8px;
+  color: #34d399;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.thread-to-settings:hover,
+.thread-to-settings:focus-visible {
+  border-color: #34d399;
+  outline: none;
+}
+
+.thread-messages {
+  list-style: none;
+  text-align: left;
+  max-height: min(42vh, 22em);
+  overflow-y: auto;
+  margin: 0 0 14px;
+  padding: 4px 2px;
+}
+
+.thread-line {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0 0 14px;
+}
+
+.thread-who {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  color: rgba(200, 210, 230, 0.4);
+}
+
+.thread-line.is-human .thread-who { color: #e8b019; }
+.thread-line.is-mind .thread-who { color: #34d399; }
+.thread-line.is-garden .thread-who { color: #a78bfa; }
+
+.thread-body {
+  font-size: 0.98rem;
+  line-height: 1.65;
+  color: rgba(200, 210, 230, 0.86);
+  white-space: pre-wrap;
+}
+
+.thread-line.is-garden .thread-body {
+  color: rgba(200, 210, 230, 0.62);
+  font-style: italic;
+}
+
+.thread-compose {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.thread-input {
+  flex: 1;
+  padding: 12px 14px;
+  background: rgba(12, 10, 26, 0.5);
+  border: 1px solid rgba(200, 210, 230, 0.14);
+  border-radius: 8px;
+  color: rgba(200, 210, 230, 0.9);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.95rem;
+}
+
+.thread-input:focus {
+  border-color: #e8b019;
+  outline: none;
+}
+
+.thread-send {
+  padding: 10px 16px;
+  background: rgba(232, 176, 25, 0.1);
+  border: 1px solid rgba(232, 176, 25, 0.45);
+  border-radius: 8px;
+  color: #e8b019;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+.thread-send:hover,
+.thread-send:focus-visible {
+  border-color: #e8b019;
+  outline: none;
+}
+
+.thread-send:disabled { opacity: 0.55; cursor: wait; }
+
+.thread-status {
+  min-height: 1.3em;
+  margin-top: 10px;
+  font-size: 0.78rem;
+  color: rgba(200, 210, 230, 0.45);
+}
+
+.thread-status.is-warn { color: #e8b019; }
