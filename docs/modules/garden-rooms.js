@@ -12,6 +12,7 @@
 // Bottom-right arrow → NEXT GALAXY (Art), with a quiet word so a stranger finds it.
 // Glass is not a peer room. Team (garden-within-the-garden) is named later.
 // Chat is a thread. Quiet word in the header. When thread is open, garden body words rest.
+// Later seats rest below the emerald lattice, not on it. First four stay the ring.
 // No 7-specialist router. No wallet/share galaxy.
 // Fade: opacity 400ms. No flash. No Unreal engine.
 // Light veils — garden keeps running. Never a 0.82 blackout.
@@ -240,6 +241,10 @@
     var ring = document.createElement('div');
     ring.className = 'core-chairs';
     ring.setAttribute('role', 'list');
+    // Later seats leave the crystal. They rest below the emerald lattice, not on it.
+    var laterRing = document.createElement('div');
+    laterRing.className = 'core-chairs core-later-chairs';
+    laterRing.setAttribute('role', 'list');
     CORE_CHAIRS.forEach(function (chair) {
       var seat = document.createElement('button');
       seat.type = 'button';
@@ -263,9 +268,10 @@
           note.textContent = 'A ' + chair.type + ' chair — a type, not a person-name. These chairs are not a mind at home. Settings is where a mind already at home is found.';
         }
       });
-      ring.appendChild(seat);
+      (chair.later ? laterRing : ring).appendChild(seat);
     });
     wrap.appendChild(ring);
+    wrap.appendChild(laterRing);
 
     var center = document.createElement('p');
     center.className = 'core-center';

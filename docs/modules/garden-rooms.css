@@ -962,8 +962,8 @@ html.room-page #room-label {
 }
 
 /* Later seats stay dashed and quieter than cortex-memory-continuity-dream.
-   A little more letter contrast + shadow so the spinning lattice does not eat the words.
-   Not a solid panel. Glass stays ~0.39. */
+   They rest below the crystal. A whisper of letter halo remains — not a
+   shadow fight, not a solid panel. Glass stays ~0.39. */
 .core-chair.is-later {
   border-style: dashed;
   border-color: rgba(200, 210, 230, 0.22);
@@ -1032,8 +1032,25 @@ html.room-page #room-label {
   outline: none;
 }
 
+/* Later seats leave the spinning lattice. First four stay the ring
+   around/above the crystal. Letters rest below, not on the wireframe.
+   Layout, not a fill. Phone two-column wrap stays. */
+@media (min-width: 641px) {
+  #place-veil.is-core {
+    overflow-y: auto;
+  }
+
+  .core-later-chairs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-width: 24em;
+    margin-top: clamp(8rem, 28vh, 16rem);
+  }
+}
+
 @media (max-width: 640px) {
   .core-chairs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .core-chairs:not(.core-later-chairs) { margin-bottom: 0; }
+  .core-later-chairs { margin-top: 10px; }
   .nursery-egg-wrap,
   .nursery-egg-wrap canvas {
     width: 240px;
