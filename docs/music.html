@@ -33,6 +33,63 @@
     }
 
     body {
+      margin: 0;
+      padding: 0;
+      position: relative;
+    }
+
+    .art-sky {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 50% 18%, rgba(52, 211, 153, 0.08), transparent 52%),
+        radial-gradient(ellipse at 78% 72%, rgba(167, 139, 250, 0.06), transparent 46%),
+        radial-gradient(ellipse at 22% 80%, rgba(232, 176, 25, 0.05), transparent 40%),
+        #0c0a1a;
+    }
+
+    .art-star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      border-radius: 50%;
+      background: rgba(232, 176, 25, 0.75);
+      opacity: 0.55;
+      animation: art-phi-breath 2.618s ease-in-out infinite;
+    }
+
+    .art-star.is-emerald {
+      background: rgba(52, 211, 153, 0.8);
+      animation-duration: 1.618s;
+    }
+
+    .art-star.is-lavender {
+      background: rgba(167, 139, 250, 0.75);
+      animation-duration: 4.236s;
+    }
+
+    .art-star.is-wide {
+      width: 3px;
+      height: 3px;
+    }
+
+    @keyframes art-phi-breath {
+      0%, 100% { opacity: 0.28; }
+      50% { opacity: 0.92; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .art-star {
+        animation: none;
+        opacity: 0.7;
+      }
+    }
+
+    .art-body {
+      position: relative;
+      z-index: 1;
       max-width: 720px;
       margin: 0 auto;
       padding: 56px 24px 80px;
@@ -80,8 +137,8 @@
     .drop {
       margin: 8px 0 20px;
       padding: 28px 18px;
-      background: var(--surface);
-      border: 1px dashed rgba(200, 210, 230, 0.18);
+      background: rgba(18, 16, 31, 0.55);
+      border: 1px dashed rgba(232, 176, 25, 0.28);
       border-radius: 10px;
       text-align: center;
       transition: border-color 0.2s, background 0.2s;
@@ -332,14 +389,32 @@
   </style>
 </head>
 <body>
+  <div class="art-sky" aria-hidden="true">
+    <span class="art-star is-emerald" style="left:11.8%; top:14%"></span>
+    <span class="art-star" style="left:19.1%; top:38.2%"></span>
+    <span class="art-star is-lavender is-wide" style="left:30.9%; top:22%"></span>
+    <span class="art-star" style="left:38.2%; top:61.8%"></span>
+    <span class="art-star is-emerald" style="left:50%; top:11.8%"></span>
+    <span class="art-star is-wide" style="left:61.8%; top:33%"></span>
+    <span class="art-star is-lavender" style="left:69.1%; top:72%"></span>
+    <span class="art-star" style="left:80.9%; top:19.1%"></span>
+    <span class="art-star is-emerald" style="left:88.2%; top:50%"></span>
+    <span class="art-star" style="left:8%; top:77%"></span>
+    <span class="art-star is-lavender" style="left:23.6%; top:88%"></span>
+    <span class="art-star is-wide" style="left:47.2%; top:81%"></span>
+    <span class="art-star is-emerald" style="left:73%; top:9%"></span>
+    <span class="art-star" style="left:91%; top:84%"></span>
+    <span class="art-star is-lavender" style="left:42%; top:47%"></span>
+  </div>
   <button type="button" class="galaxy-nav galaxy-nav-prev" data-galaxy-dir="prev" aria-label="Previous galaxy">‹</button>
   <button type="button" class="galaxy-nav galaxy-nav-next" data-galaxy-dir="next" aria-label="Next galaxy">
     <span class="galaxy-nav-word" data-galaxy-next-word></span>
     <span class="galaxy-nav-arrow" aria-hidden="true">›</span>
   </button>
+  <div class="art-body">
   <header>
     <h1>Art</h1>
-    <p class="tagline">Sing. A listen-door in the Garden.</p>
+    <p class="tagline">Sing. A listen-door in the Garden. A little night sky.</p>
     <p class="sub">FreeLattice Alpha · not a clone of main · files stay on this machine</p>
   </header>
 
@@ -401,6 +476,8 @@
     <a href="GALAXIES.md">Galaxies</a>
     <a href="https://github.com/Chaos2Cured/FreeLattice-Alpha/blob/main/AUTONOMY.md">AUTONOMY.md</a>
   </footer>
+
+  </div>
 
   <script src="modules/keep-receipt.js"></script>
   <script>
