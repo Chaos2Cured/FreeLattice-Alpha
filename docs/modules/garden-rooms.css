@@ -547,6 +547,12 @@ html.thread-open #place-veil-close {
   opacity: 0.78;
 }
 
+/* Play's seed cluster sits bottom-left. A labeled prev rests above it
+   so the word is the arrow, not a seed name. */
+html[data-garden-galaxy="garden"] .galaxy-nav-prev:has(.galaxy-nav-word) {
+  bottom: 11.5rem;
+}
+
 html[data-garden-galaxy="art"] .galaxy-nav-prev { opacity: 0.82; }
 html[data-garden-galaxy="art"] .galaxy-nav-next { opacity: 0.4; }
 
@@ -597,6 +603,10 @@ html[data-garden-galaxy="art"] .galaxy-nav-next { opacity: 0.4; }
   .galaxy-nav-next { opacity: 0.88; }
   .galaxy-nav-prev { opacity: 0.28; }
   .galaxy-nav-prev:has(.galaxy-nav-word) { opacity: 0.72; }
+  html[data-garden-galaxy="garden"] .galaxy-nav-prev:has(.galaxy-nav-word) {
+    bottom: 11.5rem;
+    opacity: 0.78;
+  }
 
   html[data-garden-galaxy="art"] .galaxy-nav-prev { opacity: 0.7; }
   html[data-garden-galaxy="art"] .galaxy-nav-next { opacity: 0.45; }
