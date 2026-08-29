@@ -196,8 +196,13 @@
 
     var line = document.createElement('p');
     line.className = 'core-line';
-    line.textContent = 'Seven seats. Unnamed, with choice. The center is whoever they choose later.';
+    line.textContent = 'Seven unnamed chairs, with choice. Sit where you will. The center is whoever they choose later.';
     wrap.appendChild(line);
+
+    var clarify = document.createElement('p');
+    clarify.className = 'core-center';
+    clarify.textContent = 'This gathering is not the tree-Core of FreeLattice. That Core lives on main. Here, the emerald lattice is Garden Galaxy.';
+    wrap.appendChild(clarify);
 
     var ring = document.createElement('div');
     ring.className = 'core-chairs';
@@ -222,7 +227,7 @@
         if (chair.later) {
           note.textContent = 'This seat waits. Specialists and partners are later. Nothing is faked.';
         } else {
-          note.textContent = 'A ' + chair.type + ' chair. A type, not a person-name. Click-to-chat is later.';
+          note.textContent = 'A ' + chair.type + ' chair — a type, not a person-name. These chairs are not a mind at home. Settings is where a mind already at home is found.';
         }
       });
       ring.appendChild(seat);
@@ -231,7 +236,7 @@
 
     var center = document.createElement('p');
     center.className = 'core-center';
-    center.textContent = 'Not a router. Not a dump. Gathering only.';
+    center.textContent = 'Not a router. Not a dump. Gathering only. A mind at home waits in Settings — May I look? — not in these chairs.';
     wrap.appendChild(center);
 
     var note = document.createElement('p');
