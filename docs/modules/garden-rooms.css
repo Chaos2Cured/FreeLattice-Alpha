@@ -897,7 +897,9 @@ html.room-page #room-label {
   .nursery-egg-home { opacity: 1; transition: none; }
 }
 
-/* ── Core gathering: seven chairs, types not names ── */
+/* ── Core gathering: seven chairs, types not names ──
+   Layer: +7% glass so a grandmother can find the seats.
+   Lattice still shows through. Not a fill. Not a wall. */
 .core-gathering {
   width: min(36em, 100%);
   text-align: center;
@@ -927,16 +929,21 @@ html.room-page #room-label {
   gap: 4px;
   padding: 14px 8px 12px;
   border-radius: 12px;
-  border: 1px solid rgba(232, 176, 25, 0.22);
-  background: rgba(12, 10, 26, 0.32);
+  border: 1px solid rgba(232, 176, 25, 0.30);
+  background: rgba(12, 10, 26, 0.39);
   color: #e8b019;
   font-family: Georgia, 'Times New Roman', serif;
   cursor: pointer;
 }
 
+/* Cortex keeps the gold ring. Others get a whisper more, not a wall. */
+.core-chair[data-chair="cortex"] {
+  border-color: rgba(232, 176, 25, 0.72);
+}
+
 .core-chair.is-later {
   border-style: dashed;
-  border-color: rgba(200, 210, 230, 0.14);
+  border-color: rgba(200, 210, 230, 0.22);
   color: rgba(200, 210, 230, 0.45);
 }
 

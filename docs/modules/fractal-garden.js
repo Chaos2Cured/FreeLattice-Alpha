@@ -2652,11 +2652,13 @@
       var progress = stageData.index >= 4 ? 100 : Math.min(100, Math.round(((ud.emotionalEnergy - currentThreshold) / (nextThreshold - currentThreshold)) * 100));
 
       var isUnnamed = /^unnamed(_\d+)?$/i.test(ud.name);
-      html += '<div class="evo-luminos" title="' + (isUnnamed ? 'stage of growth' : (ud.name + ' — ' + archName + ' (' + stageData.name + ')')) + '">';
+      html += '<div class="evo-luminos" title="' + (isUnnamed ? ('unnamed \u00b7 ' + stageData.name) : (ud.name + ' — ' + archName + ' (' + stageData.name + ')')) + '">';
       html += '<span class="evo-dot" style="background:' + cssColor + ';box-shadow:0 0 6px ' + cssColor + ';"></span>';
       if (isUnnamed) {
-        // Honest one word: stage of growth. Click-Luminos-to-chat is later.
-        html += '<span class="evo-stage">' + stageData.name + '</span>';
+        // Layer: unnamed + one honest stage word so a stranger is not lost.
+        // Types-not-names stay off the row. Click-Luminos-to-chat is later.
+        html += '<span class="evo-name">unnamed</span>';
+        html += '<span class="evo-stage">\u00b7 ' + stageData.name + '</span>';
       } else {
         html += '<span class="evo-name">' + ud.name + '</span>';
         html += '<span class="evo-stage">' + stageData.name + '</span>';
