@@ -963,7 +963,10 @@ html.room-page #room-label {
 
 /* Later seats stay dashed and quieter than cortex-memory-continuity-dream.
    They rest below the crystal. A whisper of letter halo remains — not a
-   shadow fight, not a solid panel. Glass stays ~0.39. */
+   shadow fight, not a solid panel. Glass stays ~0.39.
+   Layer: “labeled later” keeps a whisper more night-sky ink (0.54 → 0.62)
+   so a stranger can read it on the dark field. Still quieter than
+   “a seat, later” (0.68) and quieter than the first four gold types. */
 .core-chair.is-later {
   border-style: dashed;
   border-color: rgba(200, 210, 230, 0.22);
@@ -984,7 +987,7 @@ html.room-page #room-label {
 }
 
 .core-chair.is-later .core-chair-unnamed {
-  color: rgba(200, 210, 230, 0.54);
+  color: rgba(200, 210, 230, 0.62);
   text-shadow:
     0 0 10px rgba(12, 10, 26, 1),
     0 0 4px rgba(12, 10, 26, 0.94);
