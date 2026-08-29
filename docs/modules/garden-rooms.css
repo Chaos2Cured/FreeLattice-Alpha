@@ -1601,10 +1601,16 @@ html.thread-open .workshop-lumino:hover,
 html.thread-open .workshop-heart,
 html.workshop-later-open .workshop-lumino,
 html.workshop-later-open .workshop-lumino:hover,
-html.workshop-later-open .workshop-heart {
+html.workshop-later-open .workshop-heart,
+html:has(#place-veil.is-open.is-workshop-later) .workshop-lumino,
+html:has(#place-veil.is-open.is-workshop-later) .workshop-heart {
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
 }
+
+.workshop-heart[hidden],
+.workshop-lumino[hidden] { display: none !important; }
 
 @media (min-width: 800px) {
   html[data-garden-galaxy="workshop"] #garden-header {

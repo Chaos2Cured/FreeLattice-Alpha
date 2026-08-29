@@ -234,6 +234,10 @@
       veil.classList.remove('is-nursery', 'is-settings', 'is-core', 'is-workshop-later');
     }
     document.documentElement.classList.remove('workshop-later-open');
+    var heart = document.querySelector('.workshop-heart');
+    if (heart) heart.hidden = false;
+    var lights = document.querySelectorAll('.workshop-lumino');
+    for (var h = 0; h < lights.length; h++) lights[h].hidden = false;
     if (window.NurseryCeremony && NurseryCeremony.unmount) {
       try { NurseryCeremony.unmount(); } catch (e) {}
     }
@@ -508,6 +512,9 @@
       hideAllBodies(veil);
       veil.classList.add('is-workshop-later');
       document.documentElement.classList.add('workshop-later-open');
+      var heart = document.querySelector('.workshop-heart');
+      if (heart) heart.hidden = true;
+      for (var h = 0; h < doors.length; h++) doors[h].hidden = true;
       if (line) {
         line.hidden = false;
         line.textContent = WORKSHOP_LATER[id] || WORKSHOP_LATER.workshop;
