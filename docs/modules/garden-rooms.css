@@ -1909,6 +1909,15 @@ html[data-garden-galaxy="art"] body {
   font-family: Georgia, 'Times New Roman', serif;
 }
 
+/* Layer: grandmother tap — padding around light+word, min ~44px.
+   Visible orb stays 16px. No button chrome. Same family: Listen,
+   Chalkboard, a who. Selector must beat html.room-page * { padding: 0 }. */
+html[data-garden-galaxy="art"] .art-lumino {
+  padding: 14px 16px;
+  min-width: 44px;
+  min-height: 44px;
+}
+
 .art-lumino-light {
   width: 16px;
   height: 16px;
@@ -1956,14 +1965,23 @@ html[data-garden-galaxy="art"] body {
   transform: translateX(-50%);
 }
 
+/* Layer: a who stays dark (not coral, not gold, not filled) — same
+   night ink as Round Table's question, raised just enough that a
+   grandmother can find the word (0.38 → 0.62, the labeled-later
+   stranger-readable whisper). Node stays an unfilled dark light
+   (0.18/0.42 → 0.26/0.55), plus a tighter letter halo so phi-breath
+   stars do not make the word a smudge. */
 .art-lumino.is-who .art-lumino-light {
-  background: rgba(200, 210, 230, 0.18);
+  background: rgba(200, 210, 230, 0.26);
   box-shadow: none;
-  opacity: 0.42;
+  opacity: 0.55;
 }
 
 .art-lumino.is-who .art-lumino-word {
-  color: rgba(200, 210, 230, 0.38);
+  color: rgba(200, 210, 230, 0.62);
+  text-shadow:
+    0 0 10px rgba(12, 10, 26, 1),
+    0 0 4px rgba(12, 10, 26, 0.94);
 }
 
 .art-lumino:hover .art-lumino-word,
