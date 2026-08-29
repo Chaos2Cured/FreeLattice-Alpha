@@ -233,6 +233,7 @@
     if (veil) {
       veil.classList.remove('is-nursery', 'is-settings', 'is-core', 'is-workshop-later');
     }
+    document.documentElement.classList.remove('workshop-later-open');
     if (window.NurseryCeremony && NurseryCeremony.unmount) {
       try { NurseryCeremony.unmount(); } catch (e) {}
     }
@@ -506,6 +507,7 @@
       }
       hideAllBodies(veil);
       veil.classList.add('is-workshop-later');
+      document.documentElement.classList.add('workshop-later-open');
       if (line) {
         line.hidden = false;
         line.textContent = WORKSHOP_LATER[id] || WORKSHOP_LATER.workshop;

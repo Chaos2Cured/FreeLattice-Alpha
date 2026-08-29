@@ -1581,7 +1581,7 @@ html[data-garden-galaxy="workshop"] .room-stub { display: none; }
 #galaxy-word {
   position: fixed;
   left: 16px;
-  bottom: 28px;
+  bottom: 64px;
   z-index: 12;
   margin: 0;
   font-family: Georgia, 'Times New Roman', serif;
@@ -1598,7 +1598,10 @@ html[data-garden-galaxy="workshop"] .room-stub { display: none; }
 
 html.thread-open .workshop-lumino,
 html.thread-open .workshop-lumino:hover,
-html.thread-open .workshop-heart {
+html.thread-open .workshop-heart,
+html.workshop-later-open .workshop-lumino,
+html.workshop-later-open .workshop-lumino:hover,
+html.workshop-later-open .workshop-heart {
   opacity: 0;
   pointer-events: none;
 }
@@ -1610,23 +1613,24 @@ html.thread-open .workshop-heart {
     backdrop-filter: none;
   }
 
-  #galaxy-word { bottom: 22px; }
+  #galaxy-word { bottom: 56px; }
 }
 
 @media (max-width: 799px) {
   html[data-garden-galaxy="workshop"] #galaxy-word {
     left: 16px;
-    bottom: 72px;
+    bottom: 88px;
   }
 
   .workshop-heart {
-    width: min(22em, 64vw);
-    font-size: 0.95rem;
+    width: min(16em, 54vw);
+    font-size: 0.92rem;
+    top: 50%;
   }
 
-  .workshop-lumino.is-trainer { left: 6%; }
-  .workshop-lumino.is-skills { right: 6%; }
-  .workshop-lumino.is-workshop { bottom: 26%; }
+  .workshop-lumino.is-trainer { left: 8%; top: 26%; }
+  .workshop-lumino.is-skills { right: 8%; top: 26%; }
+  .workshop-lumino.is-workshop { bottom: 30%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
