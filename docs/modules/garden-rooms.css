@@ -114,6 +114,8 @@ html.garden-leaving body {
   opacity: 0.7;
 }
 
+/* Visible word is The Gathering. .place-core stays so the layer is not deleted. */
+
 .place-nursery {
   left: 50%;
   bottom: 96px;

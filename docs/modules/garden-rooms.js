@@ -2,7 +2,9 @@
 // garden-rooms.js — Garden Galaxy layer
 //
 // Kirk's sketch (live Garden): ONE Garden Galaxy.
-// Bodies IN the garden: The Core (left — seven chairs),
+// Arrival is the garden, not Core. Default label: you are in the garden.
+// Closing a veil returns there. Bodies IN the garden: The Gathering (left — seven chairs;
+// data-garden-place="core" stays as a layer),
 // The Nursery (below — egg then grow), Settings (right — permission).
 // Unnamed pieces still orbit. Title "Garden Galaxy" fades after a few seconds.
 // Room-label breathes (readable, slow fade, returns ~90s).
@@ -38,7 +40,7 @@
 
   var PLACE_LABELS = {
     garden: 'you are in the garden',
-    core: 'you are in Core',
+    core: 'you are in The Gathering',
     nursery: 'you are in Nursery',
     settings: 'you are in Settings'
   };
