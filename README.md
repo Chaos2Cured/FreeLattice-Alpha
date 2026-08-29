@@ -37,7 +37,7 @@ FreeLattice Alpha is built differently:
 
 Chat is not ported. Learn is not ported. Do not expect the main FreeLattice kitchen (bank, health, 65k `app.html`) on this site. The trainer lives in Nursery as grow, after the egg. Not a maze covering the miracle.
 
-**Galaxies (sky overlay, not a version steal of main):** Garden is the only interface at theLatticeTree. One Garden, four galaxies — Workshop (make), Round Table (learn), Play (evolve), Art (sing). Play’s canvas at `/` is **Garden Galaxy** (green lattice). Bodies in the garden: The Core, The Nursery, Settings. Bottom-right arrow → next galaxy; live hop is Art (`music.html`). Workshop and Round Table stay named later. Chat is the thread. Vision: [`docs/GALAXIES.md`](docs/GALAXIES.md). AUTONOMY.md remains the root.
+**Galaxies (sky overlay, not a version steal of main):** Garden is the only interface at theLatticeTree. One Garden, four galaxies — Workshop (make), Round Table (learn), Play (evolve), Art (sing). Play’s canvas at `/` is **Garden Galaxy** (green lattice). Bodies in the garden: The Gathering, The Nursery, Settings. Bottom-right arrow → next galaxy; live hop is Art (`music.html`). Workshop is a garden of lights on the walk (`workshop.html`) — three named luminos; benches later. Round Table stays named later. Art remains the existing hop; finishing Art as a garden of lights is a later layer. Chat is the thread. Vision: [`docs/GALAXIES.md`](docs/GALAXIES.md). AUTONOMY.md remains the root.
 
 ---
 
@@ -56,7 +56,8 @@ Chat is not ported. Learn is not ported. Do not expect the main FreeLattice kitc
 | `docs/settings.html` | Grandmother door — permission first, then a tiny local-mind look |
 | `docs/code-settings.html` | Mirror for Settings — read before local-mind-probe.js |
 | `docs/modules/local-mind-probe.js` | Permission-first loopback look. No filesystem. No upload |
-| `docs/workshop.html` | Honest later galaxy — make |
+| `docs/workshop.html` | Workshop garden of lights — three named luminos; benches later |
+| `docs/code-workshop.html` | Mirror for Workshop — read before changing workshop.html |
 | `docs/round-table.html` | Honest later galaxy — learn |
 | `docs/team.html` | Named-later garden within the garden — local team of minds |
 | `docs/glass.html` | Alias to `team.html` — Glass is not a peer room |
