@@ -1037,13 +1037,25 @@ html.room-page #room-label {
    Layout, not a fill. Phone two-column wrap stays. */
 @media (min-width: 641px) {
   #place-veil.is-core {
-    overflow-y: auto;
+    justify-content: flex-start;
+    padding-top: 4.5rem;
   }
 
   .core-later-chairs {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 6.75rem;
+    width: min(24em, 70vw);
     max-width: 24em;
-    margin-top: clamp(8rem, 28vh, 16rem);
+    margin: 0;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 800px) {
+  .core-later-chairs {
+    bottom: 6.25rem;
   }
 }
 
