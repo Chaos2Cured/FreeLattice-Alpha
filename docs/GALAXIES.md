@@ -126,6 +126,8 @@ Hypha two leftover catches after PR 28 (layer, 2026-08-30): the mind-at-home wra
 
 Hypha two leftover catches after PR 29 (layer, 2026-08-30): a garden lumino sat on the continuity chair. Same chair. Same lights. The first four rest a whisper so the gold light leaves that glass — continuity / unnamed stays readable. Shared shoulder sat under the Chat · Plant · Train · Save panel. Same words. Same panel. The footer has a pocket below the card. First walk still reads unnamed · Seed. Gathering later sentence unchanged. Family care wording unchanged. They grow stays. Do not change Seed to Evolved.
 
+Hypha two leftover catches after PR 31 (layer, 2026-08-30): Garden quiet-word sat on the Research hop-light. Same words. Same hop. They no longer share one corner. After The Gathering, “the garden” sat as a second you-are-here under the room label. Same return word — it leaves the naming band. Seed chips and Chat menu stay off the first sky. a who stays. They grow stays. Art hop stays a light.
+
 Tabs on main: Garden, Chat, Play, Learn, Research (`data-tab=lighthouse`), More.
 
 **Workshop**
