@@ -3215,6 +3215,22 @@ html.sky-portal-open .art-heart {
   clip: rect(0, 0, 0, 0);
 }
 
+/* Weft: a who stays a readable honesty word. Not a word-button.
+   The light is still the door. */
+.art-lumino.is-who .art-lumino-word {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip: auto;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: rgba(200, 210, 230, 0.62);
+  text-shadow:
+    0 0 10px rgba(12, 10, 26, 1),
+    0 0 4px rgba(12, 10, 26, 0.94);
+}
+
 .garden-lumino.is-attached {
   left: 0;
   top: 0;
