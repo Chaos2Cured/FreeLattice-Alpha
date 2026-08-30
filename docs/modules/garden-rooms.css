@@ -1212,8 +1212,7 @@ html.room-page #room-label {
      column as the seed chips. Chips stay. Words stay. The
      chips sit beside the door column, not on it. */
   html:has(#place-veil.is-core.is-open) .garden-evolution-indicator {
-    left: 6.75rem;
-    right: 4.75rem;
+    left: 7.25rem;
     bottom: 10px;
   }
 }
