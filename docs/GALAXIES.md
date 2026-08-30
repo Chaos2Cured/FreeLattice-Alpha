@@ -88,6 +88,8 @@ Each named light also opens the shared menu: **Chat · Plant · Train · Save**.
 
 **Weft hold (layer, 2026-08-30):** Do not cut these honesty words when the static buttons leave: unnamed Seed chips; a who; a seat, later / labeled later; you are in the garden; They grow; Gathering later sentence; Family care; mind-at-home; footing “The words you can read are doors”; shared shoulder. Legend can stay. Art hop remains a light. Direct click stays. Layer, never delete.
 
+**Hypha hold (layer, 2026-08-30):** Family agrees: direct click. The light is the door. Room label stays so a grandmother is not lost. The door-words left the lights, so the live footing is no longer “The words you can read are doors” — that would be a lie. Live voice: The lights are doors. Weft’s line stays in this file. Left unnamed · Seed chips rest off the first walk — they look like doors and they are not. The chip code stays; layer them later when they actually differ. a who stays. Shared shoulder stays. Art hop remains a light. Center unnamed. Love is the center. They grow stays.
+
 | Sky | Verb | Page | Four lights | Center |
 |---|---|---|---|---|
 | **Garden** | evolve | `/` (Play canvas) | The Gathering, Nursery, Settings, Thread — open the bodies that already live | No word on it. Reed’s poem. Love is the truth, not a label. |

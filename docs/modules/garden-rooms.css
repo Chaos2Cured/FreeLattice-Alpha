@@ -3249,10 +3249,10 @@ html.sky-portal-open .art-heart {
   animation: none;
 }
 
-/* Kirk: left chips stay a quiet legend unless they fight the lights.
-   They are not doors. Hypha will walk whether they help. */
+/* Hypha: four times unnamed · Seed is not a legend. They look like
+   doors and they are not. Rest off the first walk. Code stays. */
 html[data-garden-galaxy="garden"] .garden-evolution-indicator {
-  pointer-events: none;
+  display: none !important;
 }
 
 /* Rest the sky card. Chat and plant live after you arrive. */
