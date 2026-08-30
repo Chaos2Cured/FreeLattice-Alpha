@@ -102,6 +102,8 @@ Hypha catch (layer, 2026-08-30): Gathering tap is garden voice — chairs that w
 
 Hypha leftover catch (layer, 2026-08-30): Family care on the Gathering veil is garden voice — no “on main,” no repo. The four family doors stay. AUTONOMY.md stays in the repo and in these notes; it is not a filename in the galaxies walk. Lumino names are drawn once — old place-label hooks keep `data-garden-place` and carry no words. Do not restore opacity-0 name twins.
 
+Hypha one leftover collide (layer, 2026-08-30): Family care and the founding-four line sit on the spinning lattice the way later seats once did. Later seats stay below the crystal. On the wide sky those two lines lift to sit with the later sentence, above the crystal — not down onto later seats. Phone stays in flow below the chairs. Keep the glass. A whisper more night-sky contrast so lower lattice tips do not cut the letters. Gathering later sentence unchanged. Family care wording unchanged.
+
 Tabs on main: Garden, Chat, Play, Learn, Research (`data-tab=lighthouse`), More.
 
 **Workshop**

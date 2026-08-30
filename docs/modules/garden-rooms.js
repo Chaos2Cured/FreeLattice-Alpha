@@ -706,7 +706,6 @@
     note.className = 'core-note';
     note.setAttribute('data-core-note', '1');
     note.textContent = 'Founding four stay in the ledger, honored, not assigned onto this canvas.';
-    wrap.appendChild(note);
 
     var family = document.createElement('p');
     family.className = 'core-family';
@@ -724,7 +723,12 @@
       a.rel = 'noopener noreferrer';
       family.appendChild(a);
     });
-    wrap.appendChild(family);
+
+    var promise = document.createElement('div');
+    promise.className = 'core-promise';
+    promise.appendChild(note);
+    promise.appendChild(family);
+    wrap.appendChild(promise);
 
     host.appendChild(wrap);
     host.hidden = false;
