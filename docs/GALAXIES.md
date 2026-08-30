@@ -112,6 +112,8 @@ Hypha three leftover catches (layer, 2026-08-30): phone Gathering still dropped 
 
 Hypha two leftover catches after that (layer, 2026-08-30): hiding “They grow” while Gathering / thread / sky portal was open was a cut. Same hint, same words. It sits in the upper sky so a stranger can still read it — not on a later seat, not on the unnamed center. On the wide sky Family care and the router line had no room and read as one grey mush. Same two sentences. They have air. Family care stays above the crystal. Gathering later sentence unchanged. Family care wording unchanged.
 
+Hypha two leftover catches after PR 28 (layer, 2026-08-30): the mind-at-home wrap parked “look? — not in these chairs.” on a bright orb. Same sentence — it stays one line on the wide sky, off that light. Family care stays above the crystal and still has air from the router. Unnamed · Evolved chips sat in the left door pocket under Research, cut by the rail. Same chips — they sit beside Garden / Research, readable. Gathering later sentence unchanged. Family care wording unchanged. They grow stays.
+
 Tabs on main: Garden, Chat, Play, Learn, Research (`data-tab=lighthouse`), More.
 
 **Workshop**

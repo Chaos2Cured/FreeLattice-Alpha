@@ -1175,6 +1175,20 @@ html.sky-portal-open .gt-hint {
     margin-top: 1.35rem;
   }
 
+  /* Layer: that wrap parked “look? — not in these chairs.” as a
+     short centered second line on a bright orb. Same sentence.
+     The 36em cap (of the 0.82rem router face) is what wrapped it
+     onto the light. Widen the lifted band so the honesty stays
+     one line, above the orb. Air between Family care and the
+     router stays. Family care stays above the crystal. */
+  .core-promise {
+    width: min(48rem, 92vw);
+  }
+
+  .core-promise .core-router {
+    max-width: none;
+  }
+
   .core-chairs:not(.core-later-chairs) {
     margin-top: 7.85rem;
   }
@@ -2704,6 +2718,19 @@ html.sky-portal-open .tend-center {
 
 html[data-garden-galaxy="garden"] #galaxy-word {
   bottom: 14.5rem;
+}
+
+/* Layer: unnamed · Evolved chips sat in the left door pocket
+   under Research, cut by the rail and crowded by a galaxy.
+   Same chips. They leave that column so a grandmother can
+   read them — beside Garden / Research, not under them,
+   not on the rail. Phone Gathering still parks them in the
+   reserved strip pocket (left: 7.25rem). */
+@media (min-width: 641px) {
+  html[data-garden-galaxy="garden"] .garden-evolution-indicator {
+    left: 6.75rem;
+    bottom: 13.25rem;
+  }
 }
 
 html.thread-open .garden-lumino,
