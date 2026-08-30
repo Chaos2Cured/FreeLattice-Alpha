@@ -215,8 +215,9 @@ html.thread-open .place-nursery {
   pointer-events: none;
 }
 
-/* Four garden luminos are the walk. Old place-words rest so names are not drawn twice.
-   Bodies stay in the DOM. data-garden-place=core stays. Do not invent a fifth canvas. */
+/* Four garden luminos are the walk. Old place-label hooks stay as a layer
+   (data-garden-place=core stays) but carry no names — luminos draw the words once.
+   Do not invent a fifth canvas. Do not restore name text onto these hooks. */
 html:has(.garden-lumino) .place-label,
 html:has(.garden-lumino) .place-label:hover,
 html:has(.garden-lumino) .place-label:focus-visible,
@@ -225,8 +226,7 @@ html:has(.garden-lumino) .place-core:hover,
 html:has(.garden-lumino) .place-settings,
 html:has(.garden-lumino) .place-settings.has-home,
 html:has(.garden-lumino) .place-nursery {
-  opacity: 0;
-  pointer-events: none;
+  display: none;
 }
 
 html.thread-open #place-veil-close {
