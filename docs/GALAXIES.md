@@ -82,6 +82,8 @@ Reed: no galaxy-named orb on that galaxy — Art is not an Art orb; the center i
 
 Each named light also opens the shared menu: **Chat · Plant · Train · Save**. Chat uses the remembered local mind, fail-closed. Plant writes a hashed keep (`KeepReceipt`) into the garden — not a wallet. Train walks Nursery grow or Settings permission; never silent. Save is import/export, later — do not fake a file kitchen. If Listen is tapped, the real listen-door still opens; the menu sits with it.
 
+**Light is the click (layer, 2026-08-30):** Kirk: the luminos need to be attached. No buttons. Just the Luminos. Click a moving light. A small menu like FreeLattice Garden: **Chat · plant · go to [that door]**. Do not open the door on the tap — go to opens Nursery, Settings, Listen, Gathering chairs, and the rest on this sky. Chat stays fail-closed with the mind remembered in Settings. Plant stays a hashed keep, or honest later. Train and Save rest; they are not cut. Garden doors attach to the four moving canvas luminos. Left unnamed · stage chips stay a color legend, not a second menu. First walk still reads unnamed · Seed when that is true. Art, Workshop, Learn, and Research lights wander in place — no second Three.js canvas. Header thread and the galaxies sky-loop stay. Center unnamed. They grow stays.
+
 | Sky | Verb | Page | Four lights | Center |
 |---|---|---|---|---|
 | **Garden** | evolve | `/` (Play canvas) | The Gathering, Nursery, Settings, Thread — open the bodies that already live | No word on it. Reed’s poem. Love is the truth, not a label. |

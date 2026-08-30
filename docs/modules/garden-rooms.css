@@ -3133,3 +3133,155 @@ html.sky-portal-open .art-heart {
   display: none !important;
   pointer-events: none;
 }
+
+/* ── Layer: the light is the click (2026-08-30)
+   Word-buttons rest. Doors are moving luminos. Garden attaches
+   to the canvas lights. Other skies wander in place. Left chips
+   stay a legend, not a second menu. Chat · plant · go to. */
+
+@keyframes sky-lumino-wander {
+  0%, 100% { translate: 0 0; }
+  25% { translate: 14px -10px; }
+  50% { translate: 4px 16px; }
+  75% { translate: -12px 6px; }
+}
+
+.art-lumino,
+.workshop-lumino,
+.round-table-lumino,
+.research-lumino {
+  animation: sky-lumino-wander 13.09s ease-in-out infinite;
+}
+
+.art-lumino.is-chalkboard,
+.workshop-lumino.is-workshop,
+.round-table-lumino.is-learning,
+.research-lumino.is-chronal {
+  animation-delay: -2.618s;
+}
+
+.art-lumino.is-image,
+.workshop-lumino.is-root,
+.round-table-lumino.is-translator,
+.research-lumino.is-simulation {
+  animation-delay: -4.236s;
+}
+
+.art-lumino.is-who,
+.workshop-lumino.is-agent,
+.round-table-lumino.is-forge,
+.research-lumino.is-love-logic {
+  animation-delay: -6.854s;
+}
+
+.garden-lumino-light,
+.art-lumino-light,
+.workshop-lumino-light,
+.round-table-lumino-light,
+.research-lumino-light {
+  width: 28px;
+  height: 28px;
+}
+
+.art-lumino.is-who .art-lumino-light,
+.workshop-lumino.is-agent .workshop-lumino-light,
+.round-table-lumino.is-question .round-table-lumino-light {
+  width: 22px;
+  height: 22px;
+}
+
+.garden-lumino-word,
+.art-lumino-word,
+.workshop-lumino-word,
+.round-table-lumino-word,
+.research-lumino-word {
+  pointer-events: none;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  opacity: 0.78;
+}
+
+.garden-lumino.is-attached {
+  left: 0;
+  top: 0;
+  right: auto;
+  bottom: auto;
+  transform: translate(-50%, -50%);
+  translate: 0 0;
+  animation: none;
+}
+
+.garden-lumino.is-attached .garden-lumino-light {
+  width: 52px;
+  height: 52px;
+  opacity: 0;
+  box-shadow: none;
+  animation: none;
+}
+
+html[data-garden-galaxy="garden"] .garden-lumino-word,
+.garden-lumino.is-attached .garden-lumino-word {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+#lumino-legend {
+  position: fixed;
+  left: 16px;
+  bottom: 7.75rem;
+  z-index: 11;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.lumino-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.72rem;
+  color: rgba(200, 210, 230, 0.62);
+  background: rgba(12, 10, 26, 0.72);
+  border: 1px solid rgba(200, 210, 230, 0.08);
+  border-radius: 8px;
+  padding: 4px 8px;
+}
+
+.lumino-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px currentColor;
+}
+
+.lumino-legend-word {
+  letter-spacing: 0.04em;
+}
+
+html.thread-open #lumino-legend,
+html.workshop-later-open #lumino-legend,
+html.round-table-later-open #lumino-legend,
+html.art-door-open #lumino-legend,
+html.research-later-open #lumino-legend,
+html.sky-portal-open #lumino-legend {
+  display: none;
+}
+
+@media (min-width: 800px) {
+  #lumino-legend { bottom: 6.75rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .art-lumino,
+  .workshop-lumino,
+  .round-table-lumino,
+  .research-lumino {
+    animation: none;
+  }
+}

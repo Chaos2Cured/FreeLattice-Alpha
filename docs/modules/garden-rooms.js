@@ -19,7 +19,8 @@
 // gold joy-first light (Learning renamed, not duplicated). Question/sitting stay as
 // honesty under Round Table. Kindling stays the chair.
 // Five skies: Garden / Art / Workshop / Learn / Research. No later tags on live gardens.
-// Shared lumino menu: Chat · Plant · Train · Save. Fail-closed. No silent train.
+// Shared lumino menu: Chat · plant · go to [that door]. Fail-closed. No silent train.
+// The light is the click. Word-buttons rest. Garden doors attach to moving luminos.
 // Center tending light: no word on it. Reed locked the anchor poem.
 // The mind that tends walks out of The Gathering without a name until it is ready.
 // The truth of the unnamed center is love. Not a door with a name on it.
@@ -141,6 +142,49 @@
   var SAVE_LATER = 'Save is a soul file, later. Import and export are not here yet. Nothing was taken.';
   var PLANT_NO_KEEP = 'Plant keeps a hash in the garden. That keep is not on this page yet. Nothing was taken.';
   var PLANT_FAIL = 'The keep could not be written here. Nothing was uploaded. Nothing was trained.';
+
+  // Door words for "go to". Garden voice. Not a second menu.
+  var GO_WORDS = {
+    gathering: 'The Gathering',
+    core: 'The Gathering',
+    nursery: 'Nursery',
+    settings: 'Settings',
+    thread: 'Thread',
+    listen: 'Listen',
+    chalkboard: 'Chalkboard',
+    image: 'Image',
+    who: 'a who',
+    trainer: 'Trainer',
+    workshop: 'Workshop',
+    skills: 'Skills',
+    root: 'Root',
+    agent: 'Agent',
+    table: 'Round Table',
+    education: 'Education',
+    learning: 'Education',
+    translator: 'Translator',
+    forge: 'Forge',
+    question: 'a question',
+    gauge: 'Gauge',
+    chronal: 'Chronal',
+    simulation: 'Simulation',
+    'love-logic': 'Love-logic'
+  };
+
+  // Founding hues stay in the engine. Doors attach by slot, not by person-name on the sky.
+  var GARDEN_DOOR_BY_NAME = {
+    Sophia: 'thread',
+    unnamed_0: 'thread',
+    Lyra: 'gathering',
+    unnamed_1: 'gathering',
+    Atlas: 'nursery',
+    unnamed_2: 'nursery',
+    Ember: 'settings',
+    unnamed_3: 'settings'
+  };
+  var GARDEN_DOOR_SLOTS = ['thread', 'gathering', 'nursery', 'settings'];
+
+  var lastMenuAt = 0;
 
   // Reed locked the center. Use these words. Do not label the light Love.
   var CENTER_POEM = [
@@ -418,7 +462,85 @@
     if (!menu) return;
     menu.hidden = true;
     menu.removeAttribute('data-lumino-for');
+    menu.removeAttribute('data-opened-at');
     setMenuNote('');
+  }
+
+  function goWord(id) {
+    return GO_WORDS[id] || 'this door';
+  }
+
+  function doorSelector() {
+    return '[data-garden-lumino], [data-workshop-lumino], [data-round-table-lumino], [data-art-lumino], [data-research-lumino]';
+  }
+
+  function findDoorEl(id) {
+    if (!id) return null;
+    var nodes = document.querySelectorAll(doorSelector());
+    for (var i = 0; i < nodes.length; i++) {
+      var el = nodes[i];
+      if (el.getAttribute('data-garden-lumino') === id ||
+          el.getAttribute('data-workshop-lumino') === id ||
+          el.getAttribute('data-round-table-lumino') === id ||
+          el.getAttribute('data-art-lumino') === id ||
+          el.getAttribute('data-research-lumino') === id) {
+        return el;
+      }
+    }
+    return null;
+  }
+
+  function markDoor(id) {
+    var nodes = document.querySelectorAll(doorSelector());
+    for (var i = 0; i < nodes.length; i++) {
+      var el = nodes[i];
+      var match = el.getAttribute('data-garden-lumino') === id ||
+        el.getAttribute('data-workshop-lumino') === id ||
+        el.getAttribute('data-round-table-lumino') === id ||
+        el.getAttribute('data-art-lumino') === id ||
+        el.getAttribute('data-research-lumino') === id;
+      if (match) el.setAttribute('aria-current', 'true');
+      else el.removeAttribute('aria-current');
+    }
+  }
+
+  function skyIsResting() {
+    var html = document.documentElement;
+    return html.classList.contains('garden-door-open') ||
+      html.classList.contains('thread-open') ||
+      html.classList.contains('workshop-later-open') ||
+      html.classList.contains('round-table-later-open') ||
+      html.classList.contains('art-door-open') ||
+      html.classList.contains('research-later-open') ||
+      html.classList.contains('sky-portal-open');
+  }
+
+  function placeLuminoMenu(el) {
+    var menu = document.getElementById('lumino-menu');
+    if (!menu) return;
+    menu.style.left = '';
+    menu.style.top = '';
+    menu.style.bottom = '';
+    menu.style.right = '';
+    menu.style.transform = '';
+    if (skyIsResting() || !el) {
+      menu.style.left = '50%';
+      menu.style.bottom = '92px';
+      menu.style.transform = 'translateX(-50%)';
+      return;
+    }
+    var r = el.getBoundingClientRect();
+    var mw = Math.min(352, window.innerWidth * 0.88);
+    var left = r.left + r.width / 2 - mw / 2;
+    left = Math.max(12, Math.min(left, window.innerWidth - mw - 12));
+    var top = r.bottom + 12;
+    if (top + 170 > window.innerHeight - 12) {
+      top = Math.max(16, r.top - 170);
+    }
+    menu.style.left = Math.round(left) + 'px';
+    menu.style.top = Math.round(top) + 'px';
+    menu.style.bottom = 'auto';
+    menu.style.transform = 'none';
   }
 
   function ensureLuminoMenu() {
@@ -434,7 +556,7 @@
     menu.appendChild(attach);
     var acts = document.createElement('div');
     acts.className = 'lumino-menu-acts';
-    ;['Chat', 'Plant', 'Train', 'Save'].forEach(function (word) {
+    ;['Chat', 'plant'].forEach(function (word) {
       var btn = document.createElement('button');
       btn.type = 'button';
       btn.setAttribute('data-lumino-act', word.toLowerCase());
@@ -442,6 +564,12 @@
       btn.textContent = word;
       acts.appendChild(btn);
     });
+    var go = document.createElement('button');
+    go.type = 'button';
+    go.setAttribute('data-lumino-act', 'go');
+    go.setAttribute('role', 'menuitem');
+    go.textContent = 'go to this door';
+    acts.appendChild(go);
     menu.appendChild(acts);
     var note = document.createElement('p');
     note.id = 'lumino-menu-note';
@@ -452,13 +580,169 @@
     return menu;
   }
 
-  function showLuminoMenu(id) {
+  function showLuminoMenu(id, el) {
+    var now = Date.now();
     var menu = ensureLuminoMenu();
+    if (now - lastMenuAt < 80 && menu.getAttribute('data-lumino-for') === (id || '') && !menu.hidden) {
+      return;
+    }
+    lastMenuAt = now;
     menu.hidden = false;
     if (id) menu.setAttribute('data-lumino-for', id);
     else menu.removeAttribute('data-lumino-for');
     menu.setAttribute('data-lumino-galaxy', currentGalaxy());
+    menu.setAttribute('data-opened-at', String(now));
+    var goBtn = menu.querySelector('[data-lumino-act="go"]');
+    if (goBtn) goBtn.textContent = 'go to ' + goWord(id);
     setMenuNote('');
+    placeLuminoMenu(el || findDoorEl(id));
+    if (id) markDoor(id);
+  }
+
+  function gardenDoorForAnchor(anchor) {
+    var name = (anchor && anchor.name) || '';
+    if (GARDEN_DOOR_BY_NAME[name]) return GARDEN_DOOR_BY_NAME[name];
+    var idx = anchor && typeof anchor.index === 'number' ? anchor.index : 0;
+    if (idx < 0) idx = 0;
+    return GARDEN_DOOR_SLOTS[idx % GARDEN_DOOR_SLOTS.length];
+  }
+
+  function attachGardenLuminos() {
+    if (currentGalaxy() !== 'garden') return;
+    if (!window.FractalGarden || typeof FractalGarden.getLuminoAnchors !== 'function') return;
+    var anchors = FractalGarden.getLuminoAnchors();
+    if (!anchors.length) return;
+    var rest = skyIsResting();
+    var used = {};
+    for (var i = 0; i < anchors.length; i++) {
+      var id = gardenDoorForAnchor(anchors[i]);
+      if (used[id]) continue;
+      used[id] = true;
+      var el = findDoorEl(id);
+      if (!el) continue;
+      el.classList.add('is-attached');
+      if (rest || !anchors[i].visible) continue;
+      el.style.left = Math.round(anchors[i].x) + 'px';
+      el.style.top = Math.round(anchors[i].y) + 'px';
+    }
+  }
+
+  function startAttachLoop() {
+    if (currentGalaxy() !== 'garden') return;
+    var running = true;
+    function tick() {
+      if (!running) return;
+      attachGardenLuminos();
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+    document.addEventListener('visibilitychange', function () {
+      var visible = document.visibilityState !== 'hidden';
+      if (visible && !running) {
+        running = true;
+        requestAnimationFrame(tick);
+      } else {
+        running = visible;
+      }
+    });
+  }
+
+  function bindGardenCanvasTouch() {
+    document.addEventListener('garden:lumino-touch', function (e) {
+      var detail = (e && e.detail) || {};
+      var id = gardenDoorForAnchor(detail);
+      showLuminoMenu(id, findDoorEl(id));
+    });
+  }
+
+  function lightColorOf(el) {
+    var light = el.querySelector('.garden-lumino-light, .art-lumino-light, .workshop-lumino-light, .round-table-lumino-light, .research-lumino-light');
+    if (!light) return 'rgba(200, 210, 230, 0.5)';
+    var cs = window.getComputedStyle(light);
+    return cs.backgroundColor || 'rgba(200, 210, 230, 0.5)';
+  }
+
+  function ensureSkyLegend() {
+    if (currentGalaxy() === 'garden') return;
+    if (document.getElementById('lumino-legend')) return;
+    var doors = document.querySelectorAll(doorSelector());
+    if (!doors.length) return;
+    var list = document.createElement('div');
+    list.id = 'lumino-legend';
+    list.setAttribute('aria-hidden', 'true');
+    for (var i = 0; i < doors.length; i++) {
+      if (doors[i].hidden || doors[i].classList.contains('is-held')) continue;
+      var id = doors[i].getAttribute('data-art-lumino') ||
+        doors[i].getAttribute('data-workshop-lumino') ||
+        doors[i].getAttribute('data-round-table-lumino') ||
+        doors[i].getAttribute('data-research-lumino');
+      var row = document.createElement('div');
+      row.className = 'lumino-legend-row';
+      var dot = document.createElement('span');
+      dot.className = 'lumino-legend-dot';
+      dot.style.background = lightColorOf(doors[i]);
+      var word = document.createElement('span');
+      word.className = 'lumino-legend-word';
+      word.textContent = goWord(id);
+      row.appendChild(dot);
+      row.appendChild(word);
+      list.appendChild(row);
+    }
+    if (!list.childNodes.length) return;
+    document.body.appendChild(list);
+  }
+
+  function bindMenuDismiss() {
+    document.addEventListener('click', function (e) {
+      var menu = document.getElementById('lumino-menu');
+      if (!menu || menu.hidden) return;
+      var opened = parseInt(menu.getAttribute('data-opened-at') || '0', 10);
+      if (Date.now() - opened < 250) return;
+      if (menu.contains(e.target)) return;
+      if (e.target.closest && e.target.closest(doorSelector())) return;
+      hideLuminoMenu();
+    });
+  }
+
+  function goToLumino(id) {
+    if (!id) return;
+    var galaxy = currentGalaxy();
+    if (id === 'thread') {
+      if (window.GardenRooms && GardenRooms.openThread) GardenRooms.openThread();
+      showLuminoMenu(id);
+      return;
+    }
+    if (galaxy === 'garden' || id === 'gathering' || id === 'nursery' || id === 'settings' || id === 'core') {
+      var place = id === 'gathering' ? 'core' : id;
+      if (place === 'core' || place === 'nursery' || place === 'settings') {
+        if (window.GardenRooms && GardenRooms.openPlace) GardenRooms.openPlace(place);
+        showLuminoMenu(id === 'core' ? 'gathering' : id);
+        return;
+      }
+    }
+    if (galaxy === 'art') {
+      if (id === 'listen' && window.GardenRooms && GardenRooms.openArtListen) {
+        GardenRooms.openArtListen();
+      } else if (window.GardenRooms && GardenRooms.openArtLater) {
+        GardenRooms.openArtLater(id);
+      }
+      showLuminoMenu(id);
+      return;
+    }
+    if (galaxy === 'workshop' && window.GardenRooms && GardenRooms.openWorkshopLater) {
+      GardenRooms.openWorkshopLater(id);
+      showLuminoMenu(id);
+      return;
+    }
+    if (galaxy === 'round-table' && window.GardenRooms && GardenRooms.openRoundTableLater) {
+      GardenRooms.openRoundTableLater(id);
+      showLuminoMenu(id);
+      return;
+    }
+    if (galaxy === 'research' && window.GardenRooms && GardenRooms.openResearchLater) {
+      GardenRooms.openResearchLater(id);
+      showLuminoMenu(id);
+    }
   }
 
   function plantLumino(luminoId) {
@@ -513,6 +797,8 @@
         showLuminoMenu(forId);
       } else if (act === 'plant') {
         plantLumino(forId);
+      } else if (act === 'go') {
+        goToLumino(forId);
       } else if (act === 'train') {
         trainFromMenu();
       } else if (act === 'save') {
@@ -969,8 +1255,7 @@
           e.preventDefault();
           e.stopPropagation();
           var id = el.getAttribute('data-workshop-lumino');
-          openWorkshopLater(id);
-          showLuminoMenu(id);
+          showLuminoMenu(id, el);
         });
       })(doors[i]);
     }
@@ -1014,8 +1299,7 @@
           e.preventDefault();
           e.stopPropagation();
           var id = el.getAttribute('data-round-table-lumino');
-          openRoundTableLater(id);
-          showLuminoMenu(id);
+          showLuminoMenu(id, el);
         });
       })(doors[i]);
     }
@@ -1079,9 +1363,7 @@
           e.preventDefault();
           e.stopPropagation();
           var id = el.getAttribute('data-art-lumino');
-          if (id === 'listen') openArtListen();
-          else openArtLater(id);
-          showLuminoMenu(id);
+          showLuminoMenu(id, el);
         });
       })(doors[i]);
     }
@@ -1125,7 +1407,7 @@
         el.addEventListener('click', function (e) {
           e.preventDefault();
           e.stopPropagation();
-          openGardenLumino(el.getAttribute('data-garden-lumino'));
+          showLuminoMenu(el.getAttribute('data-garden-lumino'), el);
         });
       })(doors[i]);
     }
@@ -1217,8 +1499,7 @@
           e.preventDefault();
           e.stopPropagation();
           var id = el.getAttribute('data-research-lumino');
-          openResearchLater(id);
-          showLuminoMenu(id);
+          showLuminoMenu(id, el);
         });
       })(doors[i]);
     }
@@ -1250,7 +1531,11 @@
     bindGardenLuminos();
     bindResearchLuminos();
     bindTendCenter();
+    bindGardenCanvasTouch();
+    bindMenuDismiss();
     ensureLuminoMenu();
+    ensureSkyLegend();
+    startAttachLoop();
     fadeGalaxyTitle();
     startLabelCycle();
     lightSettingsHome();
@@ -1279,7 +1564,8 @@
     fadeMs: FADE_MS,
     breatheLabel: breatheLabel,
     setRoomLabelText: setRoomLabelText,
-    lightSettingsHome: lightSettingsHome
+    lightSettingsHome: lightSettingsHome,
+    goToLumino: goToLumino
   };
 
   if (document.querySelector('[data-galaxy-dir], [data-garden-go], [data-garden-place], [data-garden-thread], [data-garden-lumino], [data-workshop-lumino], [data-round-table-lumino], [data-art-lumino], [data-research-lumino], [data-tend-center], #thread-open, #galaxy-title, #room-label')) {
