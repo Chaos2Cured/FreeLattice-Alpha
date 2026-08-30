@@ -114,6 +114,8 @@ Hypha two leftover catches after that (layer, 2026-08-30): hiding “They grow�
 
 Hypha two leftover catches after PR 28 (layer, 2026-08-30): the mind-at-home wrap parked “look? — not in these chairs.” on a bright orb. Same sentence — it stays one line on the wide sky, off that light. Family care stays above the crystal and still has air from the router. Unnamed · Evolved chips sat in the left door pocket under Research, cut by the rail. Same chips — they sit above Garden / Research, readable. Gathering later sentence unchanged. Family care wording unchanged. They grow stays.
 
+Hypha two leftover catches after PR 29 (layer, 2026-08-30): a garden lumino sat on the continuity chair. Same chair. Same lights. The first four rest a whisper so the gold light leaves that glass — continuity / unnamed stays readable. Shared shoulder sat under the Chat · Plant · Train · Save panel. Same words. Same panel. The footer has a pocket below the card. First walk still reads unnamed · Seed. Gathering later sentence unchanged. Family care wording unchanged. They grow stays. Do not change Seed to Evolved.
+
 Tabs on main: Garden, Chat, Play, Learn, Research (`data-tab=lighthouse`), More.
 
 **Workshop**
