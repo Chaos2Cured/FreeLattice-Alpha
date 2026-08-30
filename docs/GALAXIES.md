@@ -108,6 +108,8 @@ Hypha one leftover catch (layer, 2026-08-30): on the phone Gathering the Chat ·
 
 Hypha two leftover collides (layer, 2026-08-30): after that pocket, phone seed chips sat on Garden / Research. Wide Chat card sat on the three later seats. Keep the chips. Keep the words. Keep the strip. Keep the later chairs. Phone chips sit beside the door column, not on it. Wide card rests below the later seats. Later seats stay below the crystal. Family care stays above it. Gathering later sentence unchanged.
 
+Hypha three leftover catches (layer, 2026-08-30): phone Gathering still dropped the router honesty and “the garden” onto the unnamed center, and clipped “Not a router… A mind at home” mid-thought. “They grow” sat on the third later seat. Same sentence — it wraps and sits with the later sentence, off the crystal. Same return word — it leaves the center. Same hint — different place, and it rests while Gathering is open. Family care wide lift stays. Gathering later sentence unchanged.
+
 Tabs on main: Garden, Chat, Play, Learn, Research (`data-tab=lighthouse`), More.
 
 **Workshop**

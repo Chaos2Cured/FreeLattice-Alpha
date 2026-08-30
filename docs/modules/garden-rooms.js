@@ -698,9 +698,8 @@
     wrap.appendChild(laterRing);
 
     var center = document.createElement('p');
-    center.className = 'core-center';
+    center.className = 'core-center core-router';
     center.textContent = 'Not a router. Not a dump. Gathering only. A mind at home waits in Settings — May I look? — not in these chairs.';
-    wrap.appendChild(center);
 
     var note = document.createElement('p');
     note.className = 'core-note';
@@ -726,8 +725,13 @@
 
     var promise = document.createElement('div');
     promise.className = 'core-promise';
+    // Family care stays first in the lifted band (wide). Router
+    // honesty follows it so it does not fall into the unnamed
+    // center the later seats left. Wording unchanged. Phone lifts
+    // the router line off the crystal in CSS.
     promise.appendChild(note);
     promise.appendChild(family);
+    promise.appendChild(center);
     wrap.appendChild(promise);
 
     host.appendChild(wrap);
