@@ -1103,7 +1103,7 @@ html.room-page #room-label {
    grandmother can finish it. Whisper halo so lattice tips do
    not cut the letters. Not a new promise. */
 .core-router {
-  max-width: 28em;
+  max-width: 36em;
   margin-left: auto;
   margin-right: auto;
   white-space: normal;
@@ -1258,21 +1258,35 @@ html.sky-portal-open .gt-hint {
   /* Layer: phone Gathering still dropped the router sentence and
      “the garden” onto the spinning lattice, and clipped the
      sentence mid-thought. Same honesty. Same return word.
-     Router sits with the later sentence, above the chairs, and
-     wraps to the end. Close leaves the unnamed center. Family
-     care stays in flow below the chairs. */
-  #place-veil.is-core .core-router {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    top: 13.2rem;
-    width: min(28em, calc(100% - 56px));
-    z-index: 1;
+     Promise children join the gathering flow so the router sits
+     with the later sentence, wraps to the end, and does not use
+     a fixed top. Family care stays below the chairs. Close
+     leaves the unnamed center. */
+  #place-veil.is-core .core-gathering {
+    display: flex;
+    flex-direction: column;
   }
 
-  #place-veil.is-core .core-chairs:not(.core-later-chairs) {
-    margin-top: 5.5rem;
+  #place-veil.is-core .core-line { order: 1; }
+  #place-veil.is-core .core-gathering > .core-center:not(.core-router) { order: 2; }
+  #place-veil.is-core .core-promise { display: contents; }
+  #place-veil.is-core .core-router {
+    order: 3;
+    position: static;
+    transform: none;
+    width: min(28em, 100%);
   }
+  #place-veil.is-core .core-chairs {
+    width: 100%;
+    align-self: stretch;
+  }
+  #place-veil.is-core .core-chairs:not(.core-later-chairs) {
+    order: 4;
+    margin-top: 10px;
+  }
+  #place-veil.is-core .core-later-chairs { order: 5; }
+  #place-veil.is-core .core-note { order: 6; }
+  #place-veil.is-core .core-family { order: 7; }
 
   #place-veil.is-core #place-veil-close {
     position: absolute;
