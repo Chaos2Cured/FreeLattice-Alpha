@@ -1518,7 +1518,6 @@
     bindTendCenter();
     bindGardenCanvasTouch();
     bindMenuDismiss();
-    ensureLuminoMenu();
     ensureSkyLegend();
     startAttachLoop();
     fadeGalaxyTitle();

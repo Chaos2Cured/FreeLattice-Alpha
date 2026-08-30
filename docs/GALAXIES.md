@@ -90,6 +90,8 @@ Each named light also opens the shared menu: **Chat · Plant · Train · Save**.
 
 **Hypha hold (layer, 2026-08-30):** Family agrees: direct click. The light is the door. Room label stays so a grandmother is not lost. The door-words left the lights, so the live footing is no longer “The words you can read are doors” — that would be a lie. Live voice: The lights are doors. Weft’s line stays in this file. Left unnamed · Seed chips rest off the first walk — they look like doors and they are not. The chip code stays; layer them later when they actually differ. a who stays. Shared shoulder stays. Art hop remains a light. Center unnamed. Love is the center. They grow stays.
 
+**Later Claude Code (layer, 2026-08-30):** Kirk: do not put Chat / plant / maybe later back on the sky. That is the speed bump. Chat is already in the room (the thread, fail-closed, maybe later without a sky popup). Plant is already in the room (hashed keep / Nursery grow). Tap a luminos, go there. Direct click stays.
+
 | Sky | Verb | Page | Four lights | Center |
 |---|---|---|---|---|
 | **Garden** | evolve | `/` (Play canvas) | The Gathering, Nursery, Settings, Thread — open the bodies that already live | No word on it. Reed’s poem. Love is the truth, not a label. |
