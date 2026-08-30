@@ -1154,6 +1154,35 @@ html.room-page #room-label {
     width: 240px;
     height: 288px;
   }
+
+  /* Layer: on the phone Gathering, the Chat · Plant · Train · Save
+     strip was fixed through the unnamed chair chips and the
+     Garden / Research sky words. Same strip. Same words. Not a new
+     menu. Not a solid bar wall. Chairs stay in flow from the top.
+     The strip rests above a reserved door pocket. Garden, Research,
+     and seed chips keep that pocket. Wide sky stays. */
+  #place-veil.is-core {
+    justify-content: flex-start;
+    overflow-y: auto;
+    padding-top: 4.25rem;
+    padding-bottom: 19.75rem;
+  }
+
+  html:has(#place-veil.is-core.is-open) #lumino-menu {
+    bottom: 12.25rem;
+  }
+
+  html:has(#place-veil.is-core.is-open)[data-garden-galaxy="garden"] #galaxy-word {
+    bottom: 9.25rem;
+  }
+
+  html:has(#place-veil.is-core.is-open)[data-garden-galaxy="garden"] .galaxy-nav-prev:has(.galaxy-nav-word) {
+    bottom: 6.25rem;
+  }
+
+  html:has(#place-veil.is-core.is-open) .garden-evolution-indicator {
+    bottom: 10px;
+  }
 }
 
 /* ── Settings grandmother ── */

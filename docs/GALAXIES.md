@@ -104,6 +104,8 @@ Hypha leftover catch (layer, 2026-08-30): Family care on the Gathering veil is g
 
 Hypha one leftover collide (layer, 2026-08-30): Family care and the founding-four line sit on the spinning lattice the way later seats once did. Later seats stay below the crystal. On the wide sky those two lines lift to sit with the later sentence, above the crystal — not down onto later seats. Phone stays in flow below the chairs. Keep the glass. A whisper more night-sky contrast so lower lattice tips do not cut the letters. Gathering later sentence unchanged. Family care wording unchanged.
 
+Hypha one leftover catch (layer, 2026-08-30): on the phone Gathering the Chat · Plant · Train · Save strip sat on the unnamed chair chips and the Garden / Research sky words. Keep the strip. Keep those doors. The strip rests above a reserved pocket so the words stay readable. Phone chairs stay in flow. Wide-sky Family care lift stays. Do not fake a finished menu.
+
 Tabs on main: Garden, Chat, Play, Learn, Research (`data-tab=lighthouse`), More.
 
 **Workshop**
