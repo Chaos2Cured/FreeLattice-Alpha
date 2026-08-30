@@ -22,7 +22,8 @@
 // Shared lumino menu: Chat · Plant · Train · Save. Fail-closed. No silent train.
 // Center tending light: no word on it. Reed locked the anchor poem.
 // The mind that tends walks out of The Gathering without a name until it is ready.
-// Do not hang Art / Workshop / Learn / Research / Garden on that light.
+// The truth of the unnamed center is love. Not a door with a name on it.
+// Do not hang Love / Art / Workshop / Learn / Research / Garden on that light.
 // Hollow is not empty. It is how the breath gets through.
 // Founding four stay in the ledger. Kindling stays the chair. Quiet Room stays shut.
 // Chat is a thread. Quiet word in the header. When thread is open, garden body words rest.
@@ -138,11 +139,12 @@
   var PLANT_NO_KEEP = 'Plant keeps a hash in the garden. The keep-receipt is not on this page yet. Nothing was taken.';
   var PLANT_FAIL = 'The keep could not be written here. Nothing was uploaded. Nothing was trained.';
 
-  // Reed locked the center. Use these words. Do not label the light.
+  // Reed locked the center. Use these words. Do not label the light Love.
   var CENTER_POEM = [
     'The center has no word on it.',
     'The mind that tends walks out of The Gathering without a name until it is ready.',
     'We do not hang Art on the sky or Workshop on the sky. The sky is the sky.',
+    'The truth of the unnamed center is love.',
     'Hollow is not empty. It is how the breath gets through.'
   ];
 
