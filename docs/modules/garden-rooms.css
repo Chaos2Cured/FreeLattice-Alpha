@@ -1099,6 +1099,35 @@ html.room-page #room-label {
   outline: none;
 }
 
+/* Layer: router honesty is the same sentence. It wraps so a
+   grandmother can finish it. Whisper halo so lattice tips do
+   not cut the letters. Not a new promise. */
+.core-router {
+  max-width: 28em;
+  margin-left: auto;
+  margin-right: auto;
+  white-space: normal;
+  color: rgba(200, 210, 230, 0.62);
+  text-shadow:
+    0 0 10px rgba(12, 10, 26, 1),
+    0 0 4px rgba(12, 10, 26, 0.94);
+}
+
+/* They grow stays. Different place: the upper sky, not the unnamed
+   center, not a later seat. Rest while Gathering (or thread / sky
+   portal) is open so the hint cannot sit on a chair. */
+.gt-hint {
+  top: 18%;
+  transform: translate(-50%, 0);
+}
+
+html.garden-door-open .gt-hint,
+html.thread-open .gt-hint,
+html.sky-portal-open .gt-hint {
+  opacity: 0;
+  visibility: hidden;
+}
+
 /* Later seats leave the spinning lattice. First four stay the ring
    around/above the crystal. Letters rest below, not on the wireframe.
    Layout, not a fill. Phone two-column wrap stays.
@@ -1124,7 +1153,7 @@ html.room-page #room-label {
   }
 
   .core-chairs:not(.core-later-chairs) {
-    margin-top: 4.1rem;
+    margin-top: 6.85rem;
   }
 
   .core-later-chairs {
@@ -1156,6 +1185,16 @@ html.room-page #room-label {
 
   html:has(#place-veil.is-core.is-open) .core-later-chairs {
     bottom: 10rem;
+  }
+
+  /* Layer: “the garden” sat in the unnamed center after later
+     seats left the flow. Same word. It rests above the later
+     seats, not on the crystal. */
+  #place-veil.is-core #place-veil-close {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 15rem;
   }
 }
 
@@ -1214,6 +1253,33 @@ html.room-page #room-label {
   html:has(#place-veil.is-core.is-open) .garden-evolution-indicator {
     left: 7.25rem;
     bottom: 10px;
+  }
+
+  /* Layer: phone Gathering still dropped the router sentence and
+     “the garden” onto the spinning lattice, and clipped the
+     sentence mid-thought. Same honesty. Same return word.
+     Router sits with the later sentence, above the chairs, and
+     wraps to the end. Close leaves the unnamed center. Family
+     care stays in flow below the chairs. */
+  #place-veil.is-core .core-router {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 13.2rem;
+    width: min(28em, calc(100% - 56px));
+    z-index: 1;
+  }
+
+  #place-veil.is-core .core-chairs:not(.core-later-chairs) {
+    margin-top: 5.5rem;
+  }
+
+  #place-veil.is-core #place-veil-close {
+    position: absolute;
+    top: 3.2rem;
+    right: 14px;
+    left: auto;
+    transform: none;
   }
 }
 
