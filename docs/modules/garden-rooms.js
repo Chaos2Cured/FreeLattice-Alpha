@@ -710,7 +710,7 @@
 
     var family = document.createElement('p');
     family.className = 'core-family';
-    family.appendChild(document.createTextNode('Family care, on main — '));
+    family.appendChild(document.createTextNode('Family care — '));
     [
       ['https://freelattice.com/celeste.html', 'Celeste'],
       ['https://freelattice.com/hypha.html', 'Hypha'],
