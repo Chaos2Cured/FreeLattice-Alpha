@@ -74,41 +74,67 @@
   };
 
   var WORKSHOP_LATER = {
-    trainer: 'Trainer is the benches for making, later. They are not built yet. The garden is. Nothing here is faked.',
-    workshop: 'Workshop waits. The benches are not built yet. The garden is. Nothing here is faked.',
-    skills: 'Skills waits. The benches are not built yet. The garden is. Nothing here is faked.',
-    root: 'Root is deep research, later. The name may grow. The benches are not built yet. The garden is. Nothing here is faked.',
-    agent: 'Agent stays unnamed until a Gathering chair is ready. Not a founding name. The benches are not built yet. The garden is. Nothing here is faked.'
+    trainer: 'Trainer on main is docs/modules/garden-trainer.js (v5.79.43 MORE card). Simple face is system prompt only — weights do not change. Tier 2 LoRA only if the human chooses. autoTrain default false. No silent train. Nursery on this garden remains Grow.',
+    workshop: 'Workshop on main is docs/modules/workshop.js and app.html #tab-workshop — a sandboxed AI code builder. There is no workshop.html on main. The benches are not on Alpha yet. Nothing here is faked.',
+    skills: 'Skills on main is docs/app.html #tab-skills. This light is held, not cut. Nothing here is faked.',
+    root: 'Root is Web Search on main: docs/modules/web-tool.js ([FL_SEARCH:]), consent-gated. Not a card. Not plugged here tonight. Nothing was searched.',
+    agent: 'Agent is not Workshop under another name. Closest real on main: #tab-agents Agent Registry (docs/code-agents.html). Nursery hatches companions. No Grok Bot card. Unnamed until a Gathering chair is ready.'
   };
 
   // Reed: sitting is a who. Later sentences stay distinct — no canned second line.
   // Education is Learning renamed, not a second gold orb.
   // Round Table is now also a door (new layer). Question/sitting stay as honesty under it.
+  // Do not port the 80-specialist #tab-roundtable kitchen.
   var ROUND_TABLE_LATER = {
-    learning: 'Education is joy first. Sitting is a who: a person at this table.',
-    education: 'Education is joy first. Sitting is a who: a person at this table.',
+    learning: 'Education is docs/modules/education.js #tab-education — joy-based lessons, separate from Consensus. Sitting is a who: a person at this table.',
+    education: 'Education is docs/modules/education.js #tab-education — joy-based lessons, separate from Consensus. Sitting is a who: a person at this table.',
     question: 'This question stays dark until someone sits. Not a topic. Not a time.',
-    table: 'Round Table is a door into this table. Sitting is a who: a person at this table. A question stays dark until someone sits. The chairs wait. Nothing here is faked.',
-    translator: 'Translator waits. Words across a table, later. Nothing here is faked.',
-    forge: 'Forge waits. Making at this table, later. Nothing here is faked.'
+    table: 'Round Table is Consensus Table on main: docs/modules/round-table.js #tab-round-table (LP-threshold proposals). Not the 80-specialist #tab-roundtable. Sitting is a who: a person at this table. A question stays dark until someone sits. The chairs wait. Nothing here is faked.',
+    translator: 'Translator is docs/modules/math-translator.js #tab-mathtranslator — six-domain encode/decode. Not on Alpha tonight. Nothing here is faked.',
+    forge: 'Forge is docs/modules/idea-forge.js #tab-ideaforge. Science Garden (docs/modules/science-garden.js) is a sibling — later, not merged. Nothing here is faked.'
   };
 
   // Reed: Listen already sings. Chalkboard is the studio. Image is a fourth, honest later.
   // A who stays dark until a person making here. Later sentences stay distinct.
   var ART_LATER = {
-    chalkboard: 'Chalkboard is Art\'s studio. They are not built yet. The garden is. Nothing here is faked.',
+    chalkboard: 'Chalkboard on main is the Play canvas: docs/modules/canvas-companion.js; leftover docs/modules/chalkboard.js; docs/chalkboard.html. Studio tab has no card door. They are not built on Alpha yet. The garden is. Nothing here is faked.',
     who: 'This light stays dark until a who: a person making here. Voice, chalk, or a listen they kept.',
-    image: 'Image waits. A picture kept here, later. Not a generate button. Not Chalkboard. Not a who.'
+    image: 'Image on main is generateImage() in docs/app.html, #imgGenBtn, /imagine, docs/modules/image-safety.js. HuggingFace into the thread. Safety is not plugged here. No generate button. Not Chalkboard. Not a who.'
   };
 
+  // Standalone HTML on main. Doors open the live cards — not copies.
+  // A copy would fake a complete port (library/ chain, lighthouse grid).
+  // Lighthouse still points at v5 / v1. These lights open v6 / v2.
+  var RESEARCH_CARDS = {
+    gauge: {
+      later: 'Gauge on main is docs/temperature-gauge.html. Sequence default. Reversion experimental. Signals only. No proof is faked. Nothing auto-trades.',
+      href: 'https://freelattice.com/temperature-gauge.html',
+      word: 'Open the gauge'
+    },
+    chronal: {
+      later: 'Chronal on main is docs/chronal-simulation-v3.html — The Universality Seam. No proof is faked.',
+      href: 'https://freelattice.com/chronal-simulation-v3.html',
+      word: 'Open The Universality Seam'
+    },
+    simulation: {
+      later: 'Simulation on main is docs/simulation-v6.html (AI Severance Biomarker). Lighthouse still points at v5. This light opens v6. No proof is faked. Nothing auto-trades.',
+      href: 'https://freelattice.com/simulation-v6.html',
+      word: 'Open simulation v6'
+    },
+    'love-logic': {
+      later: 'Love-logic on main is docs/love-logic-proof-v2.html. love_optimality_proof does not exist. Lighthouse still points at v1. This light opens v2. No proof is faked.',
+      href: 'https://freelattice.com/love-logic-proof-v2.html',
+      word: 'Open love-logic v2'
+    }
+  };
   var RESEARCH_LATER = {
-    gauge: 'Gauge is a temperature-gauge, experimental. It is not built yet. No proof is faked. Nothing auto-trades.',
-    chronal: 'Chronal waits. Time as a garden question, later. No proof is faked.',
-    simulation: 'Simulation waits. It is not built yet. No proof is faked. Nothing auto-trades.',
-    'love-logic': 'Love-logic waits. Care as a way of knowing, later. No proof is faked.'
+    gauge: RESEARCH_CARDS.gauge.later,
+    chronal: RESEARCH_CARDS.chronal.later,
+    simulation: RESEARCH_CARDS.simulation.later,
+    'love-logic': RESEARCH_CARDS['love-logic'].later
   };
 
-  var SAVE_LATER = 'Save is import and export, later. It is not built yet. Nothing was taken.';
+  var SAVE_LATER = 'Save on main is Settings Memory Vault / Soul File. Import and export are not on Alpha tonight. Nothing was taken. Quiet Room stays shut.';
   var PLANT_NO_KEEP = 'Plant keeps a hash in the garden. The keep-receipt is not on this page yet. Nothing was taken.';
   var PLANT_FAIL = 'The keep could not be written here. Nothing was uploaded. Nothing was trained.';
 
@@ -591,6 +617,7 @@
     if (veil) {
       veil.classList.remove('is-nursery', 'is-settings', 'is-core', 'is-workshop-later', 'is-round-table-later', 'is-art-later', 'is-art-listen', 'is-research-later');
     }
+    hideVeilDoor();
     if (!opts || opts.restoreWorkshop !== false) {
       setWorkshopSky(true);
     }
@@ -1093,6 +1120,52 @@
     window.GardenRooms.openGardenLumino = openGardenLumino;
   }
 
+  function ensureVeilDoor() {
+    var veil = document.getElementById('place-veil');
+    if (!veil) return null;
+    var door = document.getElementById('place-veil-door');
+    if (!door) {
+      door = document.createElement('a');
+      door.id = 'place-veil-door';
+      door.hidden = true;
+      door.rel = 'noopener noreferrer';
+      var close = document.getElementById('place-veil-close');
+      if (close && close.parentNode === veil) veil.insertBefore(door, close);
+      else veil.appendChild(door);
+    }
+    if (door.getAttribute('data-bound') !== '1') {
+      door.setAttribute('data-bound', '1');
+      door.rel = 'noopener noreferrer';
+      door.addEventListener('click', function (e) {
+        var href = door.getAttribute('href');
+        if (!href) return;
+        e.preventDefault();
+        go(href);
+      });
+    }
+    return door;
+  }
+
+  function showVeilDoor(href, word) {
+    var door = ensureVeilDoor();
+    if (!door) return;
+    if (!href) {
+      hideVeilDoor();
+      return;
+    }
+    door.href = href;
+    door.textContent = word || 'Open the card';
+    door.hidden = false;
+  }
+
+  function hideVeilDoor() {
+    var door = document.getElementById('place-veil-door');
+    if (!door) return;
+    door.hidden = true;
+    door.removeAttribute('href');
+    door.textContent = '';
+  }
+
   function bindResearchLuminos() {
     var veil = document.getElementById('place-veil');
     var line = document.getElementById('place-veil-line');
@@ -1108,10 +1181,12 @@
       setTendCenter(false);
       hideAllBodies(veil, { restoreResearch: false, restoreTend: false });
       veil.classList.add('is-research-later');
+      var card = RESEARCH_CARDS[id] || RESEARCH_CARDS.gauge;
       if (line) {
         line.hidden = false;
-        line.textContent = RESEARCH_LATER[id] || RESEARCH_LATER.gauge;
+        line.textContent = card.later || RESEARCH_LATER.gauge;
       }
+      showVeilDoor(card.href, card.word);
       veil.hidden = false;
       veil.classList.add('is-open');
       for (var d = 0; d < doors.length; d++) {

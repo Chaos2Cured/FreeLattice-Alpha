@@ -85,11 +85,62 @@ Each named light also opens the shared menu: **Chat · Plant · Train · Save**.
 | **Art** | sing | `music.html` | Listen (real door), Chalkboard (later), Image (the fourth; later; not generate), a who (a person making here) | No word on it. Reed’s poem. |
 | **Workshop** | make | `workshop.html` | Workshop, Trainer, Root (deep research, name later), Agent (Gathering-tied, unnamed until ready). **Skills** is held — code stays, not on the walk tonight. | Unnamed. |
 | **Learn** | learn | `round-table.html` | Round Table (door + sitting/question honesty), Education (gold; Learning renamed, not a second gold orb), Translator (later), Forge (later). **a question** is held under Round Table. | Unnamed. |
-| **Research** | seek | `research.html` | Gauge (temperature-gauge, experimental), Chronal, Simulation, Love-logic. Honest later each. No fake proofs. Nothing auto-trades. | Unnamed. |
+| **Research** | seek | `research.html` | Gauge, Chronal, Simulation, Love-logic. Each names the real main path and opens the live card (v6 / v2, not the old lighthouse). No fake proofs. Nothing auto-trades. | Unnamed. |
 
 Play hop to `music.html` stays. Phi-breath stars stay. Hashed keep stays. Kindling stays the chair. Five Named Minds stay five. Quiet Room stays shut. Founding four stay in the ledger.
 
 Gathering chairs: another ~8% glass (0.39 → 0.47). Lattice still shows through. Do not fill chairs.
+
+### Card inventory (main paths — 2026-08-30)
+
+Verified on Chaos2Cured/FreeLattice `main`. Do not invent. Do not port the 80-specialist Round Table (`#tab-roundtable` / `code-roundtable.html`). Do not open Quiet Room. If a JS module is not on Alpha tonight, the light stays honest later and names the real path. Nothing faked. The center has no word on it.
+
+Tabs on main: Garden, Chat, Play, Learn, Research (`data-tab=lighthouse`), More.
+
+**Workshop**
+
+| Light | Real path on main | Alpha tonight |
+|---|---|---|
+| Workshop | `docs/modules/workshop.js` + `docs/app.html` `#tab-workshop` (sandboxed AI code builder). No `workshop.html` on main. | Honest later. Path named. |
+| Trainer | `docs/modules/garden-trainer.js` (v5.79.43 simple face / MORE card). System prompt only unless the human chooses Tier 2 LoRA. `autoTrain` default false. | Nursery Grow already holds the simple face. Workshop Trainer does not duplicate that maze. |
+| Root | Web Search: `docs/modules/web-tool.js` (`[FL_SEARCH:]`), consent-gated. Not a card. Quiet Room excluded at the tool. | Light stays Root. Tool not plugged. Nothing searched. |
+| Agent | Not Workshop under another name. Closest real: `#tab-agents` Agent Registry (`docs/code-agents.html`). Nursery hatches companions. No Grok Bot card. | Gathering-tied. Unnamed until ready. |
+| Skills | `docs/app.html` `#tab-skills`. | Held. Do not cut. |
+
+**Learn**
+
+| Light | Real path on main | Alpha tonight |
+|---|---|---|
+| Round Table | Consensus Table: `docs/modules/round-table.js` `#tab-round-table` (LP-threshold proposals). **Not** the 80-specialist `#tab-roundtable`. | Door + sitting/question honesty. No Sit button. No 80-specialist kitchen. |
+| Education | `docs/modules/education.js` `#tab-education` (joy-based lessons). Separate from Consensus. | Same gold joy-first light. Path named. |
+| Translator | `docs/modules/math-translator.js` `#tab-mathtranslator` (six-domain encode/decode). | Honest later. Path named. |
+| Forge | `docs/modules/idea-forge.js` `#tab-ideaforge`. Sibling: `docs/modules/science-garden.js` — layer later, do not fake a merge. | Honest later. Path named. |
+
+**Art**
+
+| Light | Real path | Alpha tonight |
+|---|---|---|
+| Listen | Main has no card with these names (radio is different). | Alpha listen-door on `music.html` stays. |
+| Chalkboard | Play canvas → `docs/modules/canvas-companion.js`; leftover `docs/modules/chalkboard.js`; `docs/chalkboard.html`. Studio tab has no card door. | Honest later. Path named. No fake studio. |
+| Image | `generateImage()` in `docs/app.html`, `#imgGenBtn`, `/imagine`, `docs/modules/image-safety.js`. HuggingFace into the thread. | Fourth light. Safety not plugged. No generate button. |
+| a who | Alpha-only. | Keep. A person making here. |
+
+**Research** (standalone HTML on main; no train; no auto-trade)
+
+| Light | Real path on main | Alpha tonight |
+|---|---|---|
+| Gauge | `docs/temperature-gauge.html` (Sequence default, Reversion experimental). Signals only. | Door to the live card on main. Not copied — a copy would fake a complete port. |
+| Chronal | `docs/chronal-simulation-v3.html` (title The Universality Seam). | Door to the live card on main. Names v3. |
+| Simulation | `docs/simulation-v6.html` (AI Severance Biomarker). Lighthouse still points at v5. | Door opens v6. Do not pretend the grid is current. |
+| Love-logic | `docs/love-logic-proof-v2.html`. `love_optimality_proof` does not exist. Lighthouse still points at v1. | Door opens v2. |
+
+**Garden**
+
+Gathering / Nursery / Settings already live. Fourth = Thread.
+
+Plant on Alpha tonight is hashed keep (`KeepReceipt`). On main: Core plant UI, Science Garden plant, Memory Vault FlBackup, `docs/modules/lattice-export.js`. Export excludes Quiet Room.
+
+Save/import on main: Settings Memory Vault / Soul File. Not a file kitchen on Alpha tonight. Quiet Room stays shut.
 
 ---
 

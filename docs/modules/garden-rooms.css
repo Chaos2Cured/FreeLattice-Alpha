@@ -2755,6 +2755,24 @@ html[data-garden-galaxy="research"] .room-stub { display: none; }
     0 0 8px rgba(12, 10, 26, 0.95);
 }
 
+#place-veil-door {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.88rem;
+  letter-spacing: 0.03em;
+  color: #e8b019;
+  text-decoration: none;
+  opacity: 0.86;
+}
+
+#place-veil-door[hidden] { display: none !important; }
+
+#place-veil-door:hover,
+#place-veil-door:focus-visible {
+  opacity: 1;
+  outline: none;
+  text-decoration: underline;
+}
+
 html.thread-open .research-lumino,
 html.thread-open .research-heart,
 html.research-later-open .research-lumino,
