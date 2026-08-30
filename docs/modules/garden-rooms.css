@@ -1068,8 +1068,8 @@ html.room-page #room-label {
 /* Layer: founding-four + Family care sit on the spinning lattice
    the way later seats once did. Later seats already rest below.
    Keep the glass. Not a fill. Not a wall. Whisper more night-sky
-   ink so the wireframe shows through the glass, not the letters.
-   Family 0.38 → 0.48. Founding-four matches labeled-later (0.62).
+   ink so lower lattice tips do not cut the letters. Family
+   0.38 → 0.48. Founding-four matches labeled-later (0.62).
    Wording unchanged. */
 .core-note {
   color: rgba(200, 210, 230, 0.62);
@@ -1101,11 +1101,29 @@ html.room-page #room-label {
 
 /* Later seats leave the spinning lattice. First four stay the ring
    around/above the crystal. Letters rest below, not on the wireframe.
-   Layout, not a fill. Phone two-column wrap stays. */
+   Layout, not a fill. Phone two-column wrap stays.
+   Layer: founding-four + Family care lift to sit with the later
+   sentence, above the crystal — not down onto later seats. */
 @media (min-width: 641px) {
   #place-veil.is-core {
     justify-content: flex-start;
     padding-top: 4.5rem;
+  }
+
+  .core-note,
+  .core-family {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(28em, 80vw);
+    margin: 0;
+  }
+
+  .core-note { top: 10.7rem; }
+  .core-family { top: 12.25rem; }
+
+  .core-chairs:not(.core-later-chairs) {
+    margin-top: 3.4rem;
   }
 
   .core-later-chairs {
