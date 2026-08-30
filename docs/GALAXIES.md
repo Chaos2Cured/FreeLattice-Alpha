@@ -106,6 +106,8 @@ Hypha one leftover collide (layer, 2026-08-30): Family care and the founding-fou
 
 Hypha one leftover catch (layer, 2026-08-30): on the phone Gathering the Chat · Plant · Train · Save strip sat on the unnamed chair chips and the Garden / Research sky words. Keep the strip. Keep those doors. The strip rests above a reserved pocket so the words stay readable. Phone chairs stay in flow. Wide-sky Family care lift stays. Do not fake a finished menu.
 
+Hypha two leftover collides (layer, 2026-08-30): after that pocket, phone seed chips sat on Garden / Research. Wide Chat card sat on the three later seats. Keep the chips. Keep the words. Keep the strip. Keep the later chairs. Phone chips sit beside the door column, not on it. Wide card rests below the later seats. Later seats stay below the crystal. Family care stays above it. Gathering later sentence unchanged.
+
 Tabs on main: Garden, Chat, Play, Learn, Research (`data-tab=lighthouse`), More.
 
 **Workshop**

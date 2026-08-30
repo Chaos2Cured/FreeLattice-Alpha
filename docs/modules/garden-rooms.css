@@ -1145,6 +1145,20 @@ html.room-page #room-label {
   }
 }
 
+/* Layer: on the wide Gathering the Chat card sat in the same
+   band as the three later seats. Same card. Same later chairs.
+   The card rests below the later seats. Later seats stay below
+   the crystal. Family care stays above it. Not a fill. */
+@media (min-width: 641px) {
+  html:has(#place-veil.is-core.is-open) #lumino-menu {
+    bottom: 2rem;
+  }
+
+  html:has(#place-veil.is-core.is-open) .core-later-chairs {
+    bottom: 10rem;
+  }
+}
+
 @media (max-width: 640px) {
   .core-chairs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .core-chairs:not(.core-later-chairs) { margin-bottom: 0; }
@@ -1161,8 +1175,9 @@ html.room-page #room-label {
      menu. Not a solid bar wall. Chairs stay in flow from the top.
      The gathering scrolls in the band above the strip so Family
      care and founding-four do not paint through it. The strip
-     rests above a reserved door pocket. Garden, Research, and
-     seed chips keep that pocket. Wide sky stays. */
+     rests above a reserved door pocket. Garden and Research
+     keep that left door column. Seed chips stay in the pocket
+     but not on those words. Wide sky stays. */
   #place-veil.is-core {
     justify-content: flex-start;
     overflow: hidden;
@@ -1193,7 +1208,12 @@ html.room-page #room-label {
     bottom: 6.25rem;
   }
 
+  /* Layer: PR 25 parked Garden / Research in the same left
+     column as the seed chips. Chips stay. Words stay. The
+     chips sit beside the door column, not on it. */
   html:has(#place-veil.is-core.is-open) .garden-evolution-indicator {
+    left: 6.75rem;
+    right: 4.75rem;
     bottom: 10px;
   }
 }
