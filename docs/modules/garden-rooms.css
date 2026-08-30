@@ -1193,6 +1193,22 @@ html.sky-portal-open .gt-hint {
     margin-top: 7.85rem;
   }
 
+  /* Layer: a garden lumino sat on the continuity chair — same
+     chair, same lights, top-right edge of that glass. Continuity
+     sat on the centerline the lights pass. Same four chairs.
+     They rest a whisper lower and a little wider so the gold
+     light sits in the sky, not on continuity / unnamed.
+     Glass stays glass. Do not delete the orb. */
+  #place-veil.is-core .core-gathering {
+    width: min(40em, 92vw);
+  }
+
+  #place-veil.is-core .core-chairs:not(.core-later-chairs) {
+    margin-top: 9.15rem;
+    max-width: 40em;
+    gap: 2.15rem;
+  }
+
   .core-later-chairs {
     position: absolute;
     left: 50%;
@@ -1217,7 +1233,16 @@ html.sky-portal-open .gt-hint {
    the crystal. Family care stays above it. Not a fill. */
 @media (min-width: 641px) {
   html:has(#place-veil.is-core.is-open) #lumino-menu {
-    bottom: 2rem;
+    bottom: 2.5rem;
+  }
+
+  /* Layer: shared shoulder sat under the Chat panel edge.
+     Same words. Same panel. The panel rests a pocket above
+     the footer so a grandmother can read it. The footer
+     stays; it is not behind the card. */
+  html:has(#place-veil.is-core.is-open) #shared-shoulder {
+    z-index: 1006;
+    bottom: 0.5rem;
   }
 
   html:has(#place-veil.is-core.is-open) .core-later-chairs {
