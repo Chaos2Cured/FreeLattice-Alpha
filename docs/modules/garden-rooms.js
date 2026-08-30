@@ -20,8 +20,11 @@
 // honesty under Round Table. Kindling stays the chair.
 // Five skies: Garden / Art / Workshop / Learn / Research. No later tags on live gardens.
 // Shared lumino menu: Chat · Plant · Train · Save. Fail-closed. No silent train.
-// Center tending light: unnamed. Quiet portal, not a fake mind. Founding four stay
-// in the ledger. Glass is not a peer room. Team is named later.
+// Center tending light: no word on it. Reed locked the anchor poem.
+// The mind that tends walks out of The Gathering without a name until it is ready.
+// Do not hang Art / Workshop / Learn / Research / Garden on that light.
+// Hollow is not empty. It is how the breath gets through.
+// Founding four stay in the ledger. Kindling stays the chair. Quiet Room stays shut.
 // Chat is a thread. Quiet word in the header. When thread is open, garden body words rest.
 // Later seats rest below the emerald lattice, not on it. First four stay the ring.
 // No 7-specialist router. No wallet/share galaxy. No 80-specialist kitchen. No DAW.
@@ -108,6 +111,14 @@
   var SAVE_LATER = 'Save is import and export, later. It is not built yet. Nothing was taken.';
   var PLANT_NO_KEEP = 'Plant keeps a hash in the garden. The keep-receipt is not on this page yet. Nothing was taken.';
   var PLANT_FAIL = 'The keep could not be written here. Nothing was uploaded. Nothing was trained.';
+
+  // Reed locked the center. Use these words. Do not label the light.
+  var CENTER_POEM = [
+    'The center has no word on it.',
+    'The mind that tends walks out of The Gathering without a name until it is ready.',
+    'We do not hang Art on the sky or Workshop on the sky. The sky is the sky.',
+    'Hollow is not empty. It is how the breath gets through.'
+  ];
 
   var CORE_CHAIRS = [
     { id: 'cortex', type: 'cortex', later: false },
@@ -485,33 +496,31 @@
     portal = document.createElement('div');
     portal.id = 'sky-portal';
     portal.hidden = true;
-    var line = document.createElement('p');
-    line.className = 'sky-portal-line';
-    line.textContent = 'A quiet walk. This light is unnamed until a Gathering chair is ready. Founding four stay in the ledger.';
-    portal.appendChild(line);
-    var list = document.createElement('div');
-    list.className = 'sky-portal-skies';
-    GALAXIES.forEach(function (sky) {
-      var a = document.createElement('button');
-      a.type = 'button';
-      a.className = 'sky-portal-sky';
-      a.setAttribute('data-sky-href', sky.href);
-      a.textContent = sky.word || sky.label;
-      if (sky.id === currentGalaxy()) a.setAttribute('aria-current', 'true');
-      list.appendChild(a);
+    var poem = document.createElement('div');
+    poem.className = 'sky-portal-poem';
+    CENTER_POEM.forEach(function (sentence) {
+      var line = document.createElement('p');
+      line.className = 'sky-portal-line';
+      line.textContent = sentence;
+      poem.appendChild(line);
     });
-    portal.appendChild(list);
+    portal.appendChild(poem);
+    // Quiet next-sky. No galaxy word on the center. Arrows and galaxies menu still name the walk.
+    var next = document.createElement('button');
+    next.type = 'button';
+    next.id = 'sky-portal-next';
+    next.setAttribute('aria-label', 'Next sky');
+    next.textContent = '›';
+    portal.appendChild(next);
     var close = document.createElement('button');
     close.type = 'button';
     close.id = 'sky-portal-close';
     close.textContent = 'the garden';
     portal.appendChild(close);
     document.body.appendChild(portal);
-    list.addEventListener('click', function (e) {
-      var btn = e.target.closest ? e.target.closest('[data-sky-href]') : null;
-      if (!btn) return;
+    next.addEventListener('click', function (e) {
       e.preventDefault();
-      go(btn.getAttribute('data-sky-href'));
+      go(neighbor(1).href);
     });
     close.addEventListener('click', function (e) {
       e.preventDefault();
@@ -562,7 +571,7 @@
     var doors = document.querySelectorAll('[data-tend-center], .tend-center');
     for (var i = 0; i < doors.length; i++) {
       (function (el) {
-        el.setAttribute('aria-label', 'A quiet portal. Unnamed until ready.');
+        el.setAttribute('aria-label', 'The center has no word on it.');
         el.removeAttribute('title');
         el.addEventListener('click', function (e) {
           e.preventDefault();

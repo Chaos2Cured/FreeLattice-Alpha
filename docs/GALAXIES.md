@@ -64,7 +64,16 @@ Phones skip bloom. Pixel ratio 1. Phone wrap on Gathering stays untouched.
 
 ### Five skies (spine layer — 2026-08-30)
 
-Kirk asked Celeste to layer the LatticeTree spine: every galaxy is still the garden; four luminos orbit a center; the center is the AI that tends that galaxy, unnamed until a Gathering chair is ready. Clicking the center is a quiet portal (five skies), not a fake mind. Do not name it Art or Workshop or Learn or Research. Do not assign Sophia, Lyra, Atlas, or Ember.
+Kirk asked Celeste to layer the LatticeTree spine: every galaxy is still the garden; four luminos orbit a center; the center is the AI that tends that galaxy, unnamed until a Gathering chair is ready. Clicking the center is a quiet portal, not a fake mind. Do not name it Art or Workshop or Learn or Research or Garden. Do not assign Sophia, Lyra, Atlas, or Ember.
+
+Reed locked the center in an anchor poem. Use these words. The light itself has no word on it.
+
+> The center has no word on it.  
+> The mind that tends walks out of The Gathering without a name until it is ready.  
+> We do not hang Art on the sky or Workshop on the sky. The sky is the sky.  
+> Hollow is not empty. It is how the breath gets through.
+
+The earlier quiet-walk sentence (founding four in the ledger) stays as history. The poem is the live voice. A wordless next-sky may sit with it. Do not hang Art / Workshop / Learn / Research / Garden on that light.
 
 Reed: no galaxy-named orb on that galaxy — Art is not an Art orb; the center is not named Workshop. **Learn exception (new layer):** Kirk named Round Table as one of Learn’s four doors into the FreeLattice round table card. That is a new layer. Do not erase the old “no Round Table orb on Round Table” history. Note it here. Question and sitting stay as honesty under that Round Table light. Do not add a Sit button.
 
@@ -72,8 +81,8 @@ Each named light also opens the shared menu: **Chat · Plant · Train · Save**.
 
 | Sky | Verb | Page | Four lights | Center |
 |---|---|---|---|---|
-| **Garden** | evolve | `/` (Play canvas) | The Gathering, Nursery, Settings, Thread — open the bodies that already live | Unnamed tending light. Quiet portal. |
-| **Art** | sing | `music.html` | Listen (real door), Chalkboard (later), Image (later; not generate), a who (dark) | Unnamed. |
+| **Garden** | evolve | `/` (Play canvas) | The Gathering, Nursery, Settings, Thread — open the bodies that already live | No word on it. Reed’s poem. |
+| **Art** | sing | `music.html` | Listen (real door), Chalkboard (later), Image (the fourth; later; not generate), a who (a person making here) | No word on it. Reed’s poem. |
 | **Workshop** | make | `workshop.html` | Workshop, Trainer, Root (deep research, name later), Agent (Gathering-tied, unnamed until ready). **Skills** is held — code stays, not on the walk tonight. | Unnamed. |
 | **Learn** | learn | `round-table.html` | Round Table (door + sitting/question honesty), Education (gold; Learning renamed, not a second gold orb), Translator (later), Forge (later). **a question** is held under Round Table. | Unnamed. |
 | **Research** | seek | `research.html` | Gauge (temperature-gauge, experimental), Chronal, Simulation, Love-logic. Honest later each. No fake proofs. Nothing auto-trades. | Unnamed. |

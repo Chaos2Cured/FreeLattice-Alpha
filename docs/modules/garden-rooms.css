@@ -2279,14 +2279,42 @@ html.sky-portal-open .tend-center {
   pointer-events: auto;
 }
 
+.sky-portal-poem {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15em;
+  max-width: 28em;
+}
+
 .sky-portal-line {
   max-width: 28em;
+  margin: 0;
   text-align: center;
   font-family: Georgia, 'Times New Roman', serif;
   font-size: 1.02rem;
   line-height: 1.7;
   color: rgba(200, 210, 230, 0.82);
   text-shadow: 0 0 16px rgba(12, 10, 26, 0.95);
+}
+
+#sky-portal-next {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #e8b019;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.55rem;
+  line-height: 48px;
+  cursor: pointer;
+  opacity: 0.78;
+}
+
+#sky-portal-next:hover,
+#sky-portal-next:focus-visible {
+  opacity: 1;
+  outline: none;
 }
 
 .sky-portal-skies {
