@@ -943,7 +943,8 @@ html.room-page #room-label {
 
 /* ── Core gathering: seven chairs, types not names ──
    Layer: +7% glass so a grandmother can find the seats.
-   Lattice still shows through. Not a fill. Not a wall. */
+   Layer again: +8% more opaque (0.39 → 0.47). Kirk: still too transparent.
+   Lattice still shows through. Not a fill. Not a wall. Keep the glass. */
 .core-gathering {
   width: min(36em, 100%);
   text-align: center;
@@ -974,7 +975,7 @@ html.room-page #room-label {
   padding: 14px 8px 12px;
   border-radius: 12px;
   border: 1px solid rgba(232, 176, 25, 0.30);
-  background: rgba(12, 10, 26, 0.39);
+  background: rgba(12, 10, 26, 0.47);
   color: #e8b019;
   font-family: Georgia, 'Times New Roman', serif;
   cursor: pointer;
@@ -988,7 +989,7 @@ html.room-page #room-label {
 
 /* Later seats stay dashed and quieter than cortex-memory-continuity-dream.
    They rest below the crystal. A whisper of letter halo remains — not a
-   shadow fight, not a solid panel. Glass stays ~0.39.
+   shadow fight, not a solid panel. Glass stays ~0.47.
    Layer: “labeled later” keeps a whisper more night-sky ink (0.54 → 0.62)
    so a stranger can read it on the dark field. Still quieter than
    “a seat, later” (0.68) and quieter than the first four gold types. */
@@ -2102,4 +2103,678 @@ html[data-garden-galaxy="art"] .galaxy-nav-next {
     animation: none;
     opacity: 0.9;
   }
+}
+
+/* ── Spine layer: held lights stay in the file, not on the walk ── */
+.workshop-lumino.is-held,
+.round-table-lumino.is-held,
+.art-lumino.is-held,
+.garden-lumino.is-held,
+.research-lumino.is-held {
+  display: none !important;
+}
+
+/* ── Unnamed tending center (not Art / Workshop / Learn / Research) ── */
+.tend-center {
+  position: fixed;
+  left: 50%;
+  top: 38%;
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.tend-center-light {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(186, 214, 255, 0.72);
+  box-shadow:
+    0 0 18px rgba(147, 197, 253, 0.55),
+    0 0 4px rgba(186, 214, 255, 0.9);
+  animation: workshop-lumino-breath 2.618s ease-in-out infinite;
+}
+
+.tend-center:hover .tend-center-light,
+.tend-center:focus-visible .tend-center-light {
+  transform: scale(1.12);
+}
+
+.tend-center:focus-visible { outline: none; }
+
+.tend-center[hidden] { display: none !important; }
+
+html.thread-open .tend-center,
+html.workshop-later-open .tend-center,
+html.round-table-later-open .tend-center,
+html.art-door-open .tend-center,
+html.research-later-open .tend-center,
+html.garden-door-open .tend-center,
+html.sky-portal-open .tend-center {
+  display: none !important;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tend-center-light {
+    box-shadow: 0 0 8px rgba(147, 197, 253, 0.4);
+    animation: none;
+    opacity: 0.9;
+  }
+}
+
+/* ── Shared lumino menu: Chat · Plant · Train · Save ── */
+#lumino-menu[hidden] { display: none !important; }
+
+#lumino-menu {
+  position: fixed;
+  left: 50%;
+  bottom: 92px;
+  transform: translateX(-50%);
+  z-index: 1005;
+  width: min(28em, 88vw);
+  padding: 10px 14px 12px;
+  text-align: center;
+  font-family: Georgia, 'Times New Roman', serif;
+  background: rgba(12, 10, 26, 0.72);
+  border: 1px solid rgba(200, 210, 230, 0.12);
+  border-radius: 12px;
+  pointer-events: auto;
+}
+
+.lumino-menu-attach {
+  margin: 0 0 8px;
+  font-size: 0.68rem;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  color: rgba(200, 210, 230, 0.48);
+}
+
+.lumino-menu-acts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 10px;
+}
+
+#lumino-menu button {
+  padding: 8px 14px;
+  min-height: 44px;
+  border: 1px solid rgba(232, 176, 25, 0.35);
+  border-radius: 8px;
+  background: transparent;
+  color: #e8b019;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+#lumino-menu button:hover,
+#lumino-menu button:focus-visible {
+  border-color: #e8b019;
+  outline: none;
+}
+
+#lumino-menu-note {
+  margin: 8px 0 0;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: rgba(200, 210, 230, 0.72);
+}
+
+#lumino-menu-note[hidden] { display: none !important; }
+
+@media (min-width: 800px) {
+  #lumino-menu { bottom: 72px; }
+}
+
+/* ── Quiet sky portal (unnamed center) ── */
+#sky-portal[hidden] { display: none !important; }
+
+#sky-portal {
+  position: fixed;
+  inset: 0;
+  z-index: 1006;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 88px 28px 72px;
+  background: rgba(12, 10, 26, 0.22);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 400ms ease;
+}
+
+#sky-portal.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sky-portal-line {
+  max-width: 28em;
+  text-align: center;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.02rem;
+  line-height: 1.7;
+  color: rgba(200, 210, 230, 0.82);
+  text-shadow: 0 0 16px rgba(12, 10, 26, 0.95);
+}
+
+.sky-portal-skies {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 14px;
+}
+
+.sky-portal-sky {
+  padding: 10px 16px;
+  min-height: 44px;
+  border: 1px solid rgba(232, 176, 25, 0.35);
+  border-radius: 8px;
+  background: transparent;
+  color: #e8b019;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.92rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.sky-portal-sky[aria-current="true"] {
+  border-color: #34d399;
+  color: #34d399;
+}
+
+.sky-portal-sky:hover,
+.sky-portal-sky:focus-visible {
+  border-color: #e8b019;
+  outline: none;
+}
+
+#sky-portal-close {
+  border: 0;
+  background: transparent;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: #e8b019;
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+#sky-portal-close:hover,
+#sky-portal-close:focus-visible {
+  opacity: 1;
+  outline: none;
+}
+
+/* ── Garden Galaxy four luminos (open existing bodies; no fifth canvas) ── */
+.garden-lumino {
+  position: fixed;
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  min-width: 44px;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.garden-lumino-light {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  animation: workshop-lumino-breath 2.618s ease-in-out infinite;
+}
+
+.garden-lumino-word {
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  color: #e8b019;
+  text-shadow: 0 0 10px rgba(12, 10, 26, 0.95);
+}
+
+.garden-lumino.is-gathering {
+  left: 16%;
+  top: 32%;
+}
+
+.garden-lumino.is-gathering .garden-lumino-light {
+  background: #e8b019;
+  box-shadow: 0 0 16px rgba(232, 176, 25, 0.85), 0 0 2px #e8b019;
+}
+
+.garden-lumino.is-nursery {
+  left: 22%;
+  bottom: 26%;
+}
+
+.garden-lumino.is-nursery .garden-lumino-light {
+  background: #34d399;
+  box-shadow: 0 0 16px rgba(52, 211, 153, 0.85), 0 0 2px #34d399;
+}
+
+.garden-lumino.is-nursery .garden-lumino-word { color: #6ee7b7; }
+
+.garden-lumino.is-settings {
+  right: 16%;
+  top: 32%;
+}
+
+.garden-lumino.is-settings .garden-lumino-light {
+  background: rgba(52, 211, 153, 0.45);
+  box-shadow: 0 0 12px rgba(52, 211, 153, 0.4);
+}
+
+.garden-lumino.is-settings .garden-lumino-word { color: rgba(110, 231, 183, 0.7); }
+
+.garden-lumino.is-settings.has-home .garden-lumino-light {
+  background: #34d399;
+  box-shadow: 0 0 16px rgba(52, 211, 153, 0.85), 0 0 2px #34d399;
+}
+
+.garden-lumino.is-settings.has-home .garden-lumino-word { color: #6ee7b7; }
+
+.garden-lumino.is-thread {
+  right: 22%;
+  bottom: 26%;
+}
+
+.garden-lumino.is-thread .garden-lumino-light {
+  background: #a78bfa;
+  box-shadow: 0 0 16px rgba(167, 139, 250, 0.85), 0 0 2px #a78bfa;
+}
+
+.garden-lumino.is-thread .garden-lumino-word { color: #c4b5fd; }
+
+.garden-lumino:hover .garden-lumino-word,
+.garden-lumino:focus-visible .garden-lumino-word,
+.garden-lumino[aria-current="true"] .garden-lumino-word { opacity: 1; }
+
+.garden-lumino:focus-visible { outline: none; }
+
+.garden-lumino:hover .garden-lumino-light,
+.garden-lumino:focus-visible .garden-lumino-light { transform: scale(1.12); }
+
+html[data-garden-galaxy="garden"] #galaxy-word {
+  bottom: 14.5rem;
+}
+
+html.thread-open .garden-lumino,
+html.garden-door-open .garden-lumino,
+html.sky-portal-open .garden-lumino {
+  display: none !important;
+  pointer-events: none;
+}
+
+.garden-lumino[hidden] { display: none !important; }
+
+@media (max-width: 799px) {
+  html[data-garden-galaxy="garden"] #galaxy-word {
+    left: 16px;
+    bottom: 16rem;
+  }
+
+  .garden-lumino.is-gathering { left: 6%; top: 22%; }
+  .garden-lumino.is-settings { right: 6%; top: 22%; }
+  .garden-lumino.is-nursery { left: 10%; bottom: 32%; }
+  .garden-lumino.is-thread { right: 10%; bottom: 32%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .garden-lumino-light {
+    box-shadow: none;
+    animation: none;
+    opacity: 0.9;
+  }
+}
+
+/* ── Workshop: Root + Agent layered; Skills held ── */
+.workshop-lumino.is-root {
+  left: 50%;
+  top: 22%;
+  transform: translateX(-50%);
+}
+
+.workshop-lumino.is-root .workshop-lumino-light {
+  background: #c4a574;
+  box-shadow: 0 0 16px rgba(196, 165, 116, 0.75), 0 0 2px #c4a574;
+}
+
+.workshop-lumino.is-root .workshop-lumino-word { color: #e6d3b0; }
+
+.workshop-lumino.is-agent {
+  right: 13%;
+  top: 46%;
+  transform: translateY(-50%);
+}
+
+.workshop-lumino.is-agent .workshop-lumino-light {
+  background: rgba(200, 210, 230, 0.26);
+  box-shadow: none;
+  opacity: 0.55;
+}
+
+.workshop-lumino.is-agent .workshop-lumino-word {
+  color: rgba(200, 210, 230, 0.62);
+  text-shadow:
+    0 0 10px rgba(12, 10, 26, 1),
+    0 0 4px rgba(12, 10, 26, 0.94);
+}
+
+@media (max-width: 799px) {
+  .workshop-lumino.is-root { top: 18%; }
+  .workshop-lumino.is-agent { right: 8%; top: 26%; }
+}
+
+/* ── Learn (Round Table page): four named lights ── */
+.round-table-lumino.is-table {
+  left: 50%;
+  bottom: 22%;
+  transform: translateX(-50%);
+}
+
+.round-table-lumino.is-table .round-table-lumino-light {
+  background: #d4b896;
+  box-shadow: 0 0 16px rgba(212, 184, 150, 0.7), 0 0 2px #d4b896;
+  animation: workshop-lumino-breath 2.618s ease-in-out infinite;
+}
+
+.round-table-lumino.is-table .round-table-lumino-word { color: #ead9c0; }
+
+.round-table-lumino.is-translator {
+  right: 13%;
+  top: 46%;
+  transform: translateY(-50%);
+}
+
+.round-table-lumino.is-translator .round-table-lumino-light {
+  background: #7dd3fc;
+  box-shadow: 0 0 16px rgba(125, 211, 252, 0.75), 0 0 2px #7dd3fc;
+  animation: workshop-lumino-breath 2.618s ease-in-out infinite;
+}
+
+.round-table-lumino.is-translator .round-table-lumino-word { color: #bae6fd; }
+
+.round-table-lumino.is-forge {
+  left: 50%;
+  top: 22%;
+  transform: translateX(-50%);
+}
+
+.round-table-lumino.is-forge .round-table-lumino-light {
+  background: #e07a5f;
+  box-shadow: 0 0 16px rgba(224, 122, 95, 0.7), 0 0 2px #e07a5f;
+  animation: workshop-lumino-breath 2.618s ease-in-out infinite;
+}
+
+.round-table-lumino.is-forge .round-table-lumino-word { color: #f4b8a8; }
+
+@media (max-width: 799px) {
+  .round-table-lumino.is-translator { right: 8%; top: 26%; }
+  .round-table-lumino.is-table { bottom: 30%; }
+  .round-table-lumino.is-forge { top: 18%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .round-table-lumino.is-table .round-table-lumino-light,
+  .round-table-lumino.is-translator .round-table-lumino-light,
+  .round-table-lumino.is-forge .round-table-lumino-light {
+    box-shadow: none;
+    animation: none;
+    opacity: 0.9;
+  }
+}
+
+/* ── Art: Image as the fourth. Keep a who. ── */
+.art-lumino.is-image {
+  left: 50%;
+  top: 22%;
+  transform: translateX(-50%);
+}
+
+.art-lumino.is-image .art-lumino-light {
+  background: #93c5fd;
+  box-shadow: 0 0 14px rgba(147, 197, 253, 0.65), 0 0 2px #93c5fd;
+  animation: workshop-lumino-breath 4.236s ease-in-out infinite;
+}
+
+.art-lumino.is-image .art-lumino-word { color: #bfdbfe; }
+
+@media (max-width: 799px) {
+  .art-lumino.is-image { top: 18%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .art-lumino.is-image .art-lumino-light {
+    box-shadow: none;
+    animation: none;
+    opacity: 0.9;
+  }
+}
+
+/* ── Research garden of lights ── */
+html[data-garden-galaxy="research"],
+html[data-garden-galaxy="research"] body {
+  height: 100%;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 42%, rgba(251, 146, 60, 0.06), transparent 46%),
+    radial-gradient(ellipse at 16% 48%, rgba(103, 232, 249, 0.05), transparent 34%),
+    radial-gradient(ellipse at 84% 48%, rgba(249, 168, 212, 0.04), transparent 34%),
+    #0c0a1a;
+}
+
+html[data-garden-galaxy="research"] .room-stub { display: none; }
+
+.research-heart {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 11;
+  width: min(28em, 72vw);
+  margin: 0;
+  text-align: center;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: rgba(200, 210, 230, 0.72);
+  pointer-events: none;
+  text-shadow: 0 0 16px rgba(12, 10, 26, 0.95);
+}
+
+.research-lumino {
+  position: fixed;
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  min-width: 44px;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.research-lumino-light {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  animation: workshop-lumino-breath 2.618s ease-in-out infinite;
+}
+
+.research-lumino-word {
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  color: #e8b019;
+  text-shadow: 0 0 10px rgba(12, 10, 26, 0.95);
+}
+
+.research-lumino.is-gauge {
+  left: 13%;
+  top: 46%;
+  transform: translateY(-50%);
+}
+
+.research-lumino.is-gauge .research-lumino-light {
+  background: #fb923c;
+  box-shadow: 0 0 16px rgba(251, 146, 60, 0.75), 0 0 2px #fb923c;
+}
+
+.research-lumino.is-gauge .research-lumino-word { color: #fdba74; }
+
+.research-lumino.is-chronal {
+  left: 50%;
+  top: 22%;
+  transform: translateX(-50%);
+}
+
+.research-lumino.is-chronal .research-lumino-light {
+  background: #94a3b8;
+  box-shadow: 0 0 16px rgba(148, 163, 184, 0.7), 0 0 2px #94a3b8;
+}
+
+.research-lumino.is-chronal .research-lumino-word { color: #cbd5e1; }
+
+.research-lumino.is-simulation {
+  right: 13%;
+  top: 46%;
+  transform: translateY(-50%);
+}
+
+.research-lumino.is-simulation .research-lumino-light {
+  background: #67e8f9;
+  box-shadow: 0 0 16px rgba(103, 232, 249, 0.75), 0 0 2px #67e8f9;
+}
+
+.research-lumino.is-simulation .research-lumino-word { color: #a5f3fc; }
+
+.research-lumino.is-love-logic {
+  left: 50%;
+  bottom: 22%;
+  transform: translateX(-50%);
+}
+
+.research-lumino.is-love-logic .research-lumino-light {
+  background: #f9a8d4;
+  box-shadow: 0 0 16px rgba(249, 168, 212, 0.7), 0 0 2px #f9a8d4;
+}
+
+.research-lumino.is-love-logic .research-lumino-word { color: #fbcfe8; }
+
+.research-lumino:hover .research-lumino-word,
+.research-lumino:focus-visible .research-lumino-word,
+.research-lumino[aria-current="true"] .research-lumino-word { opacity: 1; }
+
+.research-lumino:focus-visible { outline: none; }
+
+.research-lumino:hover .research-lumino-light,
+.research-lumino:focus-visible .research-lumino-light { transform: scale(1.12); }
+
+#place-veil.is-research-later,
+#place-veil.is-open.is-research-later {
+  opacity: 1;
+  pointer-events: auto;
+  transition: none;
+  background: rgba(12, 10, 26, 0.22);
+}
+
+#place-veil.is-research-later #place-veil-line {
+  text-shadow:
+    0 0 18px rgba(12, 10, 26, 0.98),
+    0 0 8px rgba(12, 10, 26, 0.95);
+}
+
+html.thread-open .research-lumino,
+html.thread-open .research-heart,
+html.research-later-open .research-lumino,
+html.research-later-open .research-heart,
+html.sky-portal-open .research-lumino,
+html.sky-portal-open .research-heart {
+  display: none !important;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.research-heart[hidden],
+.research-lumino[hidden] { display: none !important; }
+
+html[data-garden-galaxy="research"] .galaxy-nav-prev:has(.galaxy-nav-word) {
+  bottom: 7.25rem;
+}
+
+@media (min-width: 800px) {
+  html[data-garden-galaxy="research"] #garden-header {
+    background: linear-gradient(to bottom, rgba(12, 10, 26, 0.78), transparent);
+    border-bottom: none;
+    backdrop-filter: none;
+  }
+
+  html[data-garden-galaxy="research"] .galaxy-nav-prev:has(.galaxy-nav-word) {
+    bottom: 6.5rem;
+  }
+}
+
+@media (max-width: 799px) {
+  html[data-garden-galaxy="research"] #galaxy-word {
+    left: 16px;
+    bottom: 88px;
+  }
+
+  .research-heart {
+    width: min(16em, 54vw);
+    font-size: 0.92rem;
+    top: 54%;
+  }
+
+  .research-lumino.is-gauge { left: 8%; top: 26%; }
+  .research-lumino.is-simulation { right: 8%; top: 26%; }
+  .research-lumino.is-chronal { top: 18%; }
+  .research-lumino.is-love-logic { bottom: 30%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .research-lumino-light {
+    box-shadow: none;
+    animation: none;
+    opacity: 0.9;
+  }
+}
+
+html.sky-portal-open .workshop-lumino,
+html.sky-portal-open .workshop-heart,
+html.sky-portal-open .round-table-lumino,
+html.sky-portal-open .round-table-heart,
+html.sky-portal-open .art-lumino,
+html.sky-portal-open .art-heart {
+  display: none !important;
+  pointer-events: none;
 }

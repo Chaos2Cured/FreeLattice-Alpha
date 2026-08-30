@@ -37,7 +37,7 @@ FreeLattice Alpha is built differently:
 
 Chat is not ported. Learn is not ported. Do not expect the main FreeLattice kitchen (bank, health, 65k `app.html`) on this site. The trainer lives in Nursery as grow, after the egg. Not a maze covering the miracle.
 
-**Galaxies (sky overlay, not a version steal of main):** Garden is the only interface at theLatticeTree. One Garden, four galaxies — Workshop (make), Round Table (learn), Play (evolve), Art (sing). Play’s canvas at `/` is **Garden Galaxy** (green lattice). Bodies in the garden: The Gathering, The Nursery, Settings. Bottom-right arrow → next galaxy; live hop is Art (`music.html`). Workshop is a garden of lights on the walk (`workshop.html`) — three named luminos; benches later. Round Table is a garden of lights (`round-table.html`) — Learning gold, a question dark; chairs wait. Art is a garden of lights on the same hop (`music.html`) — Listen sings, Chalkboard honest, a who dark; the listen-door stays. Chat is the thread. Vision: [`docs/GALAXIES.md`](docs/GALAXIES.md). AUTONOMY.md remains the root.
+**Galaxies (sky overlay, not a version steal of main):** Garden is the only interface at theLatticeTree. One Garden, five skies on the same night — Garden / Play (evolve), Art (sing), Workshop (make), Learn (learn), Research (seek). Play’s canvas at `/` is **Garden Galaxy** (green lattice). Four garden luminos open the bodies that already live: The Gathering, Nursery, Settings, Thread. Each sky has four named lights and an unnamed tending center (quiet portal, not a fake mind). Shared lumino menu: Chat · Plant · Train · Save — fail-closed, no silent train, no fake save kitchen. Workshop keeps Trainer + Workshop and layers Root + Agent; Skills is held, not cut. Learn is still `round-table.html` — Round Table, Education, Translator, Forge. Art stays the live hop (`music.html`) — Listen sings; Image is honest later. Research is a new honest-later garden (`research.html`). Chat is the thread. Vision: [`docs/GALAXIES.md`](docs/GALAXIES.md). AUTONOMY.md remains the root. The four-galaxy Art-early sequence stays in that file as a layer.
 
 ---
 
@@ -46,7 +46,7 @@ Chat is not ported. Learn is not ported. Do not expect the main FreeLattice kitc
 | File | Purpose |
 |---|---|
 | `AUTONOMY.md` | The root document. Read this first. Every feature must be compatible. |
-| `docs/GALAXIES.md` | Sky / sequence — four galaxies. Art starts here. |
+| `docs/GALAXIES.md` | Sky / sequence — four galaxies, then five skies layered. Art starts here. |
 | `docs/index.html` | Garden canvas at `/` — Garden Galaxy. Bodies: Core (seven chairs), Nursery (egg then grow), Settings (permission) |
 | `docs/nursery.html` | Nursery — egg first; grow is the simple trainer face |
 | `docs/code-nursery.html` | Mirror for Nursery — egg, ceremony, trainer. Read before ceremony code |
@@ -56,10 +56,12 @@ Chat is not ported. Learn is not ported. Do not expect the main FreeLattice kitc
 | `docs/settings.html` | Grandmother door — permission first, then a tiny local-mind look |
 | `docs/code-settings.html` | Mirror for Settings — read before local-mind-probe.js |
 | `docs/modules/local-mind-probe.js` | Permission-first loopback look. No filesystem. No upload |
-| `docs/workshop.html` | Workshop garden of lights — three named luminos; benches later |
+| `docs/workshop.html` | Workshop garden of lights — Workshop, Trainer, Root, Agent; Skills held |
 | `docs/code-workshop.html` | Mirror for Workshop — read before changing workshop.html |
-| `docs/round-table.html` | Round Table garden of lights — Learning gold; chairs wait |
-| `docs/code-round-table.html` | Mirror for Round Table — read before changing round-table.html |
+| `docs/round-table.html` | Learn garden of lights — Round Table, Education, Translator, Forge |
+| `docs/code-round-table.html` | Mirror for Learn / Round Table — read before changing round-table.html |
+| `docs/research.html` | Research garden of lights — Gauge, Chronal, Simulation, Love-logic; honest later |
+| `docs/code-research.html` | Mirror for Research — read before changing research.html |
 | `docs/team.html` | Named-later garden within the garden — local team of minds |
 | `docs/glass.html` | Alias to `team.html` — Glass is not a peer room |
 | `docs/CNAME` | GitHub Pages custom domain: `thelatticetree.com` |

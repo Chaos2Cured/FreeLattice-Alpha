@@ -4,13 +4,13 @@
 // Layer, never delete. Messages + one input. Georgia. Sparse.
 // Listener: LocalMindProbe.getRemembered() only.
 // If none: fail-closed. Honest heart copy. Settings button.
-// On Workshop, Round Table, and Art (no Play Settings door): Settings walks to settings.html.
+// On Workshop, Round Table, Art, and Research (no Play Settings door): Settings walks to settings.html.
 // Input and Send sleep (aria-disabled, no submit). Do not invent a reply.
 // Do not look for a mind from the thread. That job is Settings.
 // If a mind is remembered: input and Send wake.
 // If the door is blocked: honest fail. Do not fake a reply.
 // Gathering chairs stay types, not a router.
-// Click-Luminos-to-chat is later.
+// Shared lumino menu Chat opens this same fail-closed thread. Not a kitchen.
 //
 // Mirror: docs/code-dialogue.html  (read that FIRST)
 // ═══════════════════════════════════════════════════════════════

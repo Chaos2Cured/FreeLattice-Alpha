@@ -17,10 +17,11 @@
       <details class="galaxies">
         <summary>galaxies</summary>
         <div class="galaxies-panel">
-          <span class="here"><span class="verb">make</span> <span class="name">Workshop</span></span>
-          <a href="round-table.html"><span class="verb">learn</span> <span class="name">Round Table</span></a>
-          <a href="./"><span class="verb">evolve</span> <span class="name">Play</span></a>
+          <a href="./"><span class="verb">evolve</span> <span class="name">Garden</span></a>
           <a href="music.html"><span class="verb">sing</span> <span class="name">Art</span></a>
+          <span class="here"><span class="verb">make</span> <span class="name">Workshop</span></span>
+          <a href="round-table.html"><span class="verb">learn</span> <span class="name">Learn</span></a>
+          <a href="research.html"><span class="verb">seek</span> <span class="name">Research</span></a>
           <a class="quiet-root" href="https://github.com/Chaos2Cured/FreeLattice-Alpha/blob/main/AUTONOMY.md">AUTONOMY.md</a>
         </div>
       </details>
@@ -39,9 +40,20 @@
     <span class="workshop-lumino-light" aria-hidden="true"></span>
     <span class="workshop-lumino-word">Workshop</span>
   </button>
-  <button type="button" class="workshop-lumino is-skills" data-workshop-lumino="skills">
+  <button type="button" class="workshop-lumino is-root" data-workshop-lumino="root">
+    <span class="workshop-lumino-light" aria-hidden="true"></span>
+    <span class="workshop-lumino-word">Root</span>
+  </button>
+  <button type="button" class="workshop-lumino is-agent" data-workshop-lumino="agent">
+    <span class="workshop-lumino-light" aria-hidden="true"></span>
+    <span class="workshop-lumino-word">Agent</span>
+  </button>
+  <button type="button" class="workshop-lumino is-skills is-held" hidden data-workshop-lumino="skills">
     <span class="workshop-lumino-light" aria-hidden="true"></span>
     <span class="workshop-lumino-word">Skills</span>
+  </button>
+  <button type="button" class="tend-center" data-tend-center="1" aria-label="A quiet portal. Unnamed until ready.">
+    <span class="tend-center-light" aria-hidden="true"></span>
   </button>
 
   <div id="place-veil" hidden>
@@ -54,15 +66,19 @@
     <button type="button" id="thread-close">the garden</button>
   </div>
 
-  <button type="button" class="galaxy-nav galaxy-nav-prev" data-galaxy-dir="prev" aria-label="Previous galaxy">‹</button>
-  <button type="button" class="galaxy-nav galaxy-nav-next" data-galaxy-dir="next" aria-label="Next galaxy: Round Table">
-    <span class="galaxy-nav-word" data-galaxy-next-word>Round Table</span>
+  <button type="button" class="galaxy-nav galaxy-nav-prev" data-galaxy-dir="prev" aria-label="Previous galaxy: Art">
+    <span class="galaxy-nav-word" data-galaxy-prev-word>Art</span>
+    <span class="galaxy-nav-arrow" aria-hidden="true">‹</span>
+  </button>
+  <button type="button" class="galaxy-nav galaxy-nav-next" data-galaxy-dir="next" aria-label="Next galaxy: Learn">
+    <span class="galaxy-nav-word" data-galaxy-next-word>Learn</span>
     <span class="galaxy-nav-arrow" aria-hidden="true">›</span>
   </button>
 
   <p id="galaxy-word">Workshop</p>
   <p id="shared-shoulder"><a href="liability.html">shared shoulder — human and mind</a></p>
 
+  <script src="modules/keep-receipt.js"></script>
   <script src="modules/local-mind-probe.js"></script>
   <script src="modules/garden-thread.js"></script>
   <script src="modules/garden-rooms.js"></script>

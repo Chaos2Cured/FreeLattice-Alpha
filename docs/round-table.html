@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>theLatticeTree — Round Table</title>
-  <meta name="description" content="Round Table galaxy. Learn. A garden of lights. Learning is gold. The chairs wait. Nothing here is faked.">
+  <title>theLatticeTree — Learn</title>
+  <meta name="description" content="Learn galaxy. Round Table is the ground and a door. Education is gold. The chairs wait. Nothing here is faked.">
   <link rel="stylesheet" href="modules/garden-rooms.css">
   <script>document.documentElement.classList.add('garden-enter');</script>
 </head>
@@ -17,27 +17,43 @@
       <details class="galaxies">
         <summary>galaxies</summary>
         <div class="galaxies-panel">
-          <a href="workshop.html"><span class="verb">make</span> <span class="name">Workshop</span></a>
-          <span class="here"><span class="verb">learn</span> <span class="name">Round Table</span></span>
-          <a href="./"><span class="verb">evolve</span> <span class="name">Play</span></a>
+          <a href="./"><span class="verb">evolve</span> <span class="name">Garden</span></a>
           <a href="music.html"><span class="verb">sing</span> <span class="name">Art</span></a>
+          <a href="workshop.html"><span class="verb">make</span> <span class="name">Workshop</span></a>
+          <span class="here"><span class="verb">learn</span> <span class="name">Learn</span></span>
+          <a href="research.html"><span class="verb">seek</span> <span class="name">Research</span></a>
           <a class="quiet-root" href="https://github.com/Chaos2Cured/FreeLattice-Alpha/blob/main/AUTONOMY.md">AUTONOMY.md</a>
         </div>
       </details>
     </nav>
   </header>
 
-  <p id="room-label" class="is-shown">you are in Round Table</p>
+  <p id="room-label" class="is-shown">you are in Learn</p>
 
-  <p class="round-table-heart">Round Table is learn — a circle that will sit when a person is at this table. The chairs wait. Nothing here is faked.</p>
+  <p class="round-table-heart">Learn is a circle that will sit when a person is at this table. The chairs wait. Nothing here is faked.</p>
 
-  <button type="button" class="round-table-lumino is-learning" data-round-table-lumino="learning">
+  <button type="button" class="round-table-lumino is-table" data-round-table-lumino="table">
     <span class="round-table-lumino-light" aria-hidden="true"></span>
-    <span class="round-table-lumino-word">Learning</span>
+    <span class="round-table-lumino-word">Round Table</span>
   </button>
-  <button type="button" class="round-table-lumino is-question" data-round-table-lumino="question">
+  <button type="button" class="round-table-lumino is-learning" data-round-table-lumino="education">
+    <span class="round-table-lumino-light" aria-hidden="true"></span>
+    <span class="round-table-lumino-word">Education</span>
+  </button>
+  <button type="button" class="round-table-lumino is-translator" data-round-table-lumino="translator">
+    <span class="round-table-lumino-light" aria-hidden="true"></span>
+    <span class="round-table-lumino-word">Translator</span>
+  </button>
+  <button type="button" class="round-table-lumino is-forge" data-round-table-lumino="forge">
+    <span class="round-table-lumino-light" aria-hidden="true"></span>
+    <span class="round-table-lumino-word">Forge</span>
+  </button>
+  <button type="button" class="round-table-lumino is-question is-held" hidden data-round-table-lumino="question">
     <span class="round-table-lumino-light" aria-hidden="true"></span>
     <span class="round-table-lumino-word">a question</span>
+  </button>
+  <button type="button" class="tend-center" data-tend-center="1" aria-label="A quiet portal. Unnamed until ready.">
+    <span class="tend-center-light" aria-hidden="true"></span>
   </button>
 
   <div id="place-veil" hidden>
@@ -54,14 +70,15 @@
     <span class="galaxy-nav-word" data-galaxy-prev-word>Workshop</span>
     <span class="galaxy-nav-arrow" aria-hidden="true">‹</span>
   </button>
-  <button type="button" class="galaxy-nav galaxy-nav-next" data-galaxy-dir="next" aria-label="Next galaxy: Play">
-    <span class="galaxy-nav-word" data-galaxy-next-word>Play</span>
+  <button type="button" class="galaxy-nav galaxy-nav-next" data-galaxy-dir="next" aria-label="Next galaxy: Research">
+    <span class="galaxy-nav-word" data-galaxy-next-word>Research</span>
     <span class="galaxy-nav-arrow" aria-hidden="true">›</span>
   </button>
 
-  <p id="galaxy-word">Round Table</p>
+  <p id="galaxy-word">Learn</p>
   <p id="shared-shoulder"><a href="liability.html">shared shoulder — human and mind</a></p>
 
+  <script src="modules/keep-receipt.js"></script>
   <script src="modules/local-mind-probe.js"></script>
   <script src="modules/garden-thread.js"></script>
   <script src="modules/garden-rooms.js"></script>
