@@ -385,7 +385,7 @@
 
     if (!proveLocalOnly()) {
       root.appendChild(el('p', 'nursery-heart', 'This Nursery stays silent until it can prove the work stays on this machine.'));
-      root.appendChild(el('p', 'nursery-muted', 'Sophia\'s Quiet Room stays on main. It is not invented here to measure.'));
+      root.appendChild(el('p', 'nursery-muted', 'Nothing was measured. Nothing was taken.'));
       container.appendChild(root);
       return root;
     }

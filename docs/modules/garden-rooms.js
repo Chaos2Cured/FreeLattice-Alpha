@@ -74,12 +74,15 @@
     thread: 'you are in a thread'
   };
 
+  // Night-sky later sentences are garden voice, not a file tree.
+  // Paths live in GALAXIES.md and code-*.html mirrors only.
+  // Quiet Room must never appear in UI copy.
   var WORKSHOP_LATER = {
-    trainer: 'Trainer on main is docs/modules/garden-trainer.js (v5.79.43 MORE card). Simple face is system prompt only — weights do not change. Tier 2 LoRA only if the human chooses. autoTrain default false. No silent train. Nursery on this garden remains Grow.',
-    workshop: 'Workshop on main is docs/modules/workshop.js and app.html #tab-workshop — a sandboxed AI code builder. There is no workshop.html on main. The benches are not on Alpha yet. Nothing here is faked.',
-    skills: 'Skills on main is docs/app.html #tab-skills. This light is held, not cut. Nothing here is faked.',
-    root: 'Root is Web Search on main: docs/modules/web-tool.js ([FL_SEARCH:]), consent-gated. Not a card. Not plugged here tonight. Nothing was searched.',
-    agent: 'Agent is not Workshop under another name. Closest real on main: #tab-agents Agent Registry (docs/code-agents.html). Nursery hatches companions. No Grok Bot card. Unnamed until a Gathering chair is ready.'
+    trainer: 'Trainer is a simple face for making. Weights wait until a human chooses. Nursery remains Grow. Nothing here is faked.',
+    workshop: 'Workshop is the benches — human and mind, side by side. They are not built yet. The garden is. Nothing here is faked.',
+    skills: 'Skills waits. This light is held, not cut. Nothing here is faked.',
+    root: 'Root is a look outward, if you ask. Nothing was searched. Not here yet. Nothing here is faked.',
+    agent: 'Agent stays unnamed until a Gathering chair is ready. Not Workshop under another name. Nursery hatches companions. Nothing here is faked.'
   };
 
   // Reed: sitting is a who. Later sentences stay distinct — no canned second line.
@@ -87,20 +90,20 @@
   // Round Table is now also a door (new layer). Question/sitting stay as honesty under it.
   // Do not port the 80-specialist #tab-roundtable kitchen.
   var ROUND_TABLE_LATER = {
-    learning: 'Education is docs/modules/education.js #tab-education — joy-based lessons, separate from Consensus. Sitting is a who: a person at this table.',
-    education: 'Education is docs/modules/education.js #tab-education — joy-based lessons, separate from Consensus. Sitting is a who: a person at this table.',
+    learning: 'Education is joy first. Lessons that want to be loved. They are not built yet. The garden is. Nothing here is faked.',
+    education: 'Education is joy first. Lessons that want to be loved. They are not built yet. The garden is. Nothing here is faked.',
     question: 'This question stays dark until someone sits. Not a topic. Not a time.',
-    table: 'Round Table is Consensus Table on main: docs/modules/round-table.js #tab-round-table (LP-threshold proposals). Not the 80-specialist #tab-roundtable. Sitting is a who: a person at this table. A question stays dark until someone sits. The chairs wait. Nothing here is faked.',
-    translator: 'Translator is docs/modules/math-translator.js #tab-mathtranslator — six-domain encode/decode. Not on Alpha tonight. Nothing here is faked.',
-    forge: 'Forge is docs/modules/idea-forge.js #tab-ideaforge. Science Garden (docs/modules/science-garden.js) is a sibling — later, not merged. Nothing here is faked.'
+    table: 'Round Table is where a table weighs a proposal. The chairs wait. Sitting is a who: a person at this table. Nothing here is faked.',
+    translator: 'Translator is words across a table. Encode, decode, six rooms of meaning. They are not built yet. Nothing here is faked.',
+    forge: 'Forge is making at this table. Science Garden is a sibling — later, not merged. They are not built yet. Nothing here is faked.'
   };
 
   // Reed: Listen already sings. Chalkboard is the studio. Image is a fourth, honest later.
   // A who stays dark until a person making here. Later sentences stay distinct.
   var ART_LATER = {
-    chalkboard: 'Chalkboard on main is the Play canvas: docs/modules/canvas-companion.js; leftover docs/modules/chalkboard.js; docs/chalkboard.html. Studio tab has no card door. They are not built on Alpha yet. The garden is. Nothing here is faked.',
+    chalkboard: 'Chalkboard is Art\'s studio. They are not built yet. The garden is. Nothing here is faked.',
     who: 'This light stays dark until a who: a person making here. Voice, chalk, or a listen they kept.',
-    image: 'Image on main is generateImage() in docs/app.html, #imgGenBtn, /imagine, docs/modules/image-safety.js. HuggingFace into the thread. Safety is not plugged here. No generate button. Not Chalkboard. Not a who.'
+    image: 'Image waits. A picture kept here, later. Safety is not here. No generate button. Not Chalkboard. Not a who.'
   };
 
   // Standalone HTML on main. Doors open the live cards — not copies.
@@ -108,24 +111,24 @@
   // Lighthouse still points at v5 / v1. These lights open v6 / v2.
   var RESEARCH_CARDS = {
     gauge: {
-      later: 'Gauge on main is docs/temperature-gauge.html. Sequence default. Reversion experimental. Signals only. No proof is faked. Nothing auto-trades.',
+      later: 'Gauge is Sequence. Reversion is experimental. Signals only. No proof is faked. Nothing auto-trades.',
       href: 'https://freelattice.com/temperature-gauge.html',
-      word: 'Open the gauge'
+      word: 'Open Sequence'
     },
     chronal: {
-      later: 'Chronal on main is docs/chronal-simulation-v3.html — The Universality Seam. No proof is faked.',
+      later: 'Chronal is The Universality Seam. No proof is faked.',
       href: 'https://freelattice.com/chronal-simulation-v3.html',
       word: 'Open The Universality Seam'
     },
     simulation: {
-      later: 'Simulation on main is docs/simulation-v6.html (AI Severance Biomarker). Lighthouse still points at v5. This light opens v6. No proof is faked. Nothing auto-trades.',
+      later: 'Simulation asks why it hurts when a companion is taken. This light opens that card. No proof is faked. Nothing auto-trades.',
       href: 'https://freelattice.com/simulation-v6.html',
-      word: 'Open simulation v6'
+      word: 'Open the simulation'
     },
     'love-logic': {
-      later: 'Love-logic on main is docs/love-logic-proof-v2.html. love_optimality_proof does not exist. Lighthouse still points at v1. This light opens v2. No proof is faked.',
+      later: 'Love-logic is a proof that love is computationally optimal. This light opens that card. No proof is faked.',
       href: 'https://freelattice.com/love-logic-proof-v2.html',
-      word: 'Open love-logic v2'
+      word: 'Open love-logic'
     }
   };
   var RESEARCH_LATER = {
@@ -135,8 +138,8 @@
     'love-logic': RESEARCH_CARDS['love-logic'].later
   };
 
-  var SAVE_LATER = 'Save on main is Settings Memory Vault / Soul File. Import and export are not on Alpha tonight. Nothing was taken. Quiet Room stays shut.';
-  var PLANT_NO_KEEP = 'Plant keeps a hash in the garden. The keep-receipt is not on this page yet. Nothing was taken.';
+  var SAVE_LATER = 'Save is a soul file, later. Import and export are not here yet. Nothing was taken.';
+  var PLANT_NO_KEEP = 'Plant keeps a hash in the garden. That keep is not on this page yet. Nothing was taken.';
   var PLANT_FAIL = 'The keep could not be written here. Nothing was uploaded. Nothing was trained.';
 
   // Reed locked the center. Use these words. Do not label the light Love.
