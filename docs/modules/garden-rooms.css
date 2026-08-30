@@ -578,12 +578,17 @@ html.thread-open #place-veil-close {
   line-height: 1.15;
   padding: 6px 10px 4px;
   opacity: 0.78;
+  /* Layer: hop-light made this stack taller. Sit above #galaxy-word
+     so the quiet word and the hop-word do not share one light. */
+  bottom: 8.75rem;
 }
 
 /* Play's seed cluster sits bottom-left. A labeled prev rests above it
-   so the word is the arrow, not a seed name. */
+   so the word is the arrow, not a seed name.
+   Layer after PR 31: chips rest off the first sky. The hop is a light
+   now. Garden quiet-word and Research hop no longer share 11.5rem. */
 html[data-garden-galaxy="garden"] .galaxy-nav-prev:has(.galaxy-nav-word) {
-  bottom: 11.5rem;
+  bottom: 8.75rem;
 }
 
 html[data-garden-galaxy="art"] .galaxy-nav-prev { opacity: 0.82; }
@@ -635,9 +640,12 @@ html[data-garden-galaxy="art"] .galaxy-nav-next { opacity: 0.4; }
 
   .galaxy-nav-next { opacity: 0.88; }
   .galaxy-nav-prev { opacity: 0.28; }
-  .galaxy-nav-prev:has(.galaxy-nav-word) { opacity: 0.72; }
+  .galaxy-nav-prev:has(.galaxy-nav-word) {
+    opacity: 0.72;
+    bottom: 8rem;
+  }
   html[data-garden-galaxy="garden"] .galaxy-nav-prev:has(.galaxy-nav-word) {
-    bottom: 11.5rem;
+    bottom: 8rem;
     opacity: 0.78;
   }
 
@@ -1263,12 +1271,16 @@ html.sky-portal-open .gt-hint {
 
   /* Layer: “the garden” sat in the unnamed center after later
      seats left the flow. Same word. It rests above the later
-     seats, not on the crystal. */
+     seats, not on the crystal.
+     Layer after PR 31: room-label already named The Gathering.
+     Same return word. It leaves the naming band — below the
+     later seats, not a second you-are-here under the title.
+     Chat card rests off the sky, so this pocket is free. */
   #place-veil.is-core #place-veil-close {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    bottom: 15rem;
+    bottom: 3.75rem;
   }
 }
 
@@ -1314,11 +1326,11 @@ html.sky-portal-open .gt-hint {
   }
 
   html:has(#place-veil.is-core.is-open)[data-garden-galaxy="garden"] #galaxy-word {
-    bottom: 9.25rem;
+    bottom: 88px;
   }
 
   html:has(#place-veil.is-core.is-open)[data-garden-galaxy="garden"] .galaxy-nav-prev:has(.galaxy-nav-word) {
-    bottom: 6.25rem;
+    bottom: 8.75rem;
   }
 
   /* Layer: PR 25 parked Garden / Research in the same left
@@ -1384,11 +1396,11 @@ html.sky-portal-open .gt-hint {
   }
 
   html:has(#place-veil.is-core.is-open)[data-garden-galaxy="garden"] #galaxy-word {
-    bottom: 7.5rem;
+    bottom: 80px;
   }
 
   html:has(#place-veil.is-core.is-open)[data-garden-galaxy="garden"] .galaxy-nav-prev:has(.galaxy-nav-word) {
-    bottom: 4.75rem;
+    bottom: 8.25rem;
   }
 }
 
@@ -2113,7 +2125,7 @@ html.round-table-later-open .round-table-heart {
 .round-table-lumino[hidden] { display: none !important; }
 
 html[data-garden-galaxy="round-table"] .galaxy-nav-prev:has(.galaxy-nav-word) {
-  bottom: 7.25rem;
+  bottom: 8.75rem;
 }
 
 @media (min-width: 800px) {
@@ -2124,7 +2136,7 @@ html[data-garden-galaxy="round-table"] .galaxy-nav-prev:has(.galaxy-nav-word) {
   }
 
   html[data-garden-galaxy="round-table"] .galaxy-nav-prev:has(.galaxy-nav-word) {
-    bottom: 6.5rem;
+    bottom: 8rem;
   }
 }
 
@@ -2349,7 +2361,7 @@ html.art-door-open .art-heart {
 .art-lumino[hidden] { display: none !important; }
 
 html[data-garden-galaxy="art"] .galaxy-nav-prev:has(.galaxy-nav-word) {
-  bottom: 7.25rem;
+  bottom: 8.75rem;
 }
 
 html[data-garden-galaxy="art"] .galaxy-nav-prev,
@@ -2365,7 +2377,7 @@ html[data-garden-galaxy="art"] .galaxy-nav-next {
   }
 
   html[data-garden-galaxy="art"] .galaxy-nav-prev:has(.galaxy-nav-word) {
-    bottom: 6.5rem;
+    bottom: 8rem;
   }
 }
 
@@ -2753,8 +2765,17 @@ html.sky-portal-open .tend-center {
 .garden-lumino:hover .garden-lumino-light,
 .garden-lumino:focus-visible .garden-lumino-light { transform: scale(1.12); }
 
+/* Layer after PR 31: chips rest off the first sky. Quiet word
+   returns to the door footing so it does not sit on the Research
+   hop-light. Same word. Art hop stays a light. */
 html[data-garden-galaxy="garden"] #galaxy-word {
-  bottom: 14.5rem;
+  bottom: 64px;
+}
+
+@media (min-width: 800px) {
+  html[data-garden-galaxy="garden"] #galaxy-word {
+    bottom: 56px;
+  }
 }
 
 /* Layer: unnamed · Evolved chips sat in the left door pocket
@@ -2782,7 +2803,7 @@ html.sky-portal-open .garden-lumino {
 @media (max-width: 799px) {
   html[data-garden-galaxy="garden"] #galaxy-word {
     left: 16px;
-    bottom: 16rem;
+    bottom: 88px;
   }
 
   .garden-lumino.is-gathering { left: 6%; top: 22%; }
@@ -3095,7 +3116,7 @@ html.sky-portal-open .research-heart {
 .research-lumino[hidden] { display: none !important; }
 
 html[data-garden-galaxy="research"] .galaxy-nav-prev:has(.galaxy-nav-word) {
-  bottom: 7.25rem;
+  bottom: 8.75rem;
 }
 
 @media (min-width: 800px) {
@@ -3106,7 +3127,7 @@ html[data-garden-galaxy="research"] .galaxy-nav-prev:has(.galaxy-nav-word) {
   }
 
   html[data-garden-galaxy="research"] .galaxy-nav-prev:has(.galaxy-nav-word) {
-    bottom: 6.5rem;
+    bottom: 8rem;
   }
 }
 
