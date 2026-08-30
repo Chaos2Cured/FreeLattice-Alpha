@@ -19,8 +19,10 @@
 // gold joy-first light (Learning renamed, not duplicated). Question/sitting stay as
 // honesty under Round Table. Kindling stays the chair.
 // Five skies: Garden / Art / Workshop / Learn / Research. No later tags on live gardens.
-// Shared lumino menu: Chat · plant · go to [that door]. Fail-closed. No silent train.
-// The light is the click. Word-buttons rest. Garden doors attach to moving luminos.
+// The light is the door. Tap a luminos, go there. No sky popup.
+// Chat lives in the room (thread, fail-closed). Plant lives in the room.
+// Word-buttons rest. Garden doors attach to moving luminos.
+// Unnamed · Seed chips rest off the first walk. Code stays.
 // Center tending light: no word on it. Reed locked the anchor poem.
 // The mind that tends walks out of The Gathering without a name until it is ready.
 // The truth of the unnamed center is love. Not a door with a name on it.
@@ -651,7 +653,7 @@
     document.addEventListener('garden:lumino-touch', function (e) {
       var detail = (e && e.detail) || {};
       var id = gardenDoorForAnchor(detail);
-      showLuminoMenu(id, findDoorEl(id));
+      goToLumino(id);
     });
   }
 
@@ -663,8 +665,8 @@
   }
 
   function ensureSkyLegend() {
-    if (currentGalaxy() === 'garden') return;
-    if (document.getElementById('lumino-legend')) return;
+    // Rest: color chips are not a first-walk menu. Code stays.
+    return;
     var doors = document.querySelectorAll(doorSelector());
     if (!doors.length) return;
     var list = document.createElement('div');
@@ -709,14 +711,12 @@
     var galaxy = currentGalaxy();
     if (id === 'thread') {
       if (window.GardenRooms && GardenRooms.openThread) GardenRooms.openThread();
-      showLuminoMenu(id);
       return;
     }
     if (galaxy === 'garden' || id === 'gathering' || id === 'nursery' || id === 'settings' || id === 'core') {
       var place = id === 'gathering' ? 'core' : id;
       if (place === 'core' || place === 'nursery' || place === 'settings') {
         if (window.GardenRooms && GardenRooms.openPlace) GardenRooms.openPlace(place);
-        showLuminoMenu(id === 'core' ? 'gathering' : id);
         return;
       }
     }
@@ -726,22 +726,18 @@
       } else if (window.GardenRooms && GardenRooms.openArtLater) {
         GardenRooms.openArtLater(id);
       }
-      showLuminoMenu(id);
       return;
     }
     if (galaxy === 'workshop' && window.GardenRooms && GardenRooms.openWorkshopLater) {
       GardenRooms.openWorkshopLater(id);
-      showLuminoMenu(id);
       return;
     }
     if (galaxy === 'round-table' && window.GardenRooms && GardenRooms.openRoundTableLater) {
       GardenRooms.openRoundTableLater(id);
-      showLuminoMenu(id);
       return;
     }
     if (galaxy === 'research' && window.GardenRooms && GardenRooms.openResearchLater) {
       GardenRooms.openResearchLater(id);
-      showLuminoMenu(id);
     }
   }
 
@@ -1066,6 +1062,7 @@
 
     function openPlace(id) {
       if (!veil) return;
+      hideLuminoMenu();
       if (window.GardenRooms && GardenRooms.closeThread) {
         GardenRooms.closeThread({ silentLabel: true });
       }
@@ -1122,7 +1119,6 @@
           e.stopPropagation();
           var id = el.getAttribute('data-garden-place');
           openPlace(id);
-          showLuminoMenu(id);
         });
       })(doors[i]);
     }
@@ -1178,6 +1174,7 @@
 
     function openThread() {
       if (!veil) return;
+      hideLuminoMenu();
       if (window.GardenRooms && GardenRooms.closePlace) {
         GardenRooms.closePlace({ silentLabel: true, keepMenu: true });
       }
@@ -1206,7 +1203,6 @@
           e.preventDefault();
           e.stopPropagation();
           openThread();
-          showLuminoMenu('thread');
         });
       })(openers[i]);
     }
@@ -1255,7 +1251,7 @@
           e.preventDefault();
           e.stopPropagation();
           var id = el.getAttribute('data-workshop-lumino');
-          showLuminoMenu(id, el);
+          goToLumino(id);
         });
       })(doors[i]);
     }
@@ -1299,7 +1295,7 @@
           e.preventDefault();
           e.stopPropagation();
           var id = el.getAttribute('data-round-table-lumino');
-          showLuminoMenu(id, el);
+          goToLumino(id);
         });
       })(doors[i]);
     }
@@ -1363,7 +1359,7 @@
           e.preventDefault();
           e.stopPropagation();
           var id = el.getAttribute('data-art-lumino');
-          showLuminoMenu(id, el);
+          goToLumino(id);
         });
       })(doors[i]);
     }
@@ -1387,19 +1383,8 @@
     }
 
     function openGardenLumino(id) {
-      if (id === 'thread') {
-        if (window.GardenRooms && GardenRooms.openThread) GardenRooms.openThread();
-        markGardenDoor('thread');
-        showLuminoMenu('thread');
-        return;
-      }
-      var place = id === 'gathering' ? 'core' : id;
-      if (place !== 'core' && place !== 'nursery' && place !== 'settings') return;
-      if (window.GardenRooms && GardenRooms.openPlace) {
-        GardenRooms.openPlace(place);
-      }
+      goToLumino(id);
       markGardenDoor(id);
-      showLuminoMenu(id);
     }
 
     for (var i = 0; i < doors.length; i++) {
@@ -1407,7 +1392,7 @@
         el.addEventListener('click', function (e) {
           e.preventDefault();
           e.stopPropagation();
-          showLuminoMenu(el.getAttribute('data-garden-lumino'), el);
+          goToLumino(el.getAttribute('data-garden-lumino'));
         });
       })(doors[i]);
     }
@@ -1499,7 +1484,7 @@
           e.preventDefault();
           e.stopPropagation();
           var id = el.getAttribute('data-research-lumino');
-          showLuminoMenu(id, el);
+          goToLumino(id);
         });
       })(doors[i]);
     }

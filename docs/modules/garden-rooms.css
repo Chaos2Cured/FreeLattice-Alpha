@@ -3196,9 +3196,11 @@ html.sky-portal-open .art-heart {
 .round-table-lumino-word,
 .research-lumino-word {
   pointer-events: none;
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
-  opacity: 0.78;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
 }
 
 .garden-lumino.is-attached {
@@ -3219,13 +3221,17 @@ html.sky-portal-open .art-heart {
   animation: none;
 }
 
-html[data-garden-galaxy="garden"] .garden-lumino-word,
-.garden-lumino.is-attached .garden-lumino-word {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
+/* Layer: unnamed · Seed chips rest off the first walk.
+   Four identical chips look like doors and they are not.
+   fractal-garden.js still writes them. Do not delete that code. */
+html[data-garden-galaxy="garden"] .garden-evolution-indicator {
+  display: none !important;
+}
+
+/* Rest the sky card. Chat and plant live after you arrive. */
+#lumino-menu,
+#lumino-legend {
+  display: none !important;
 }
 
 #lumino-legend {
