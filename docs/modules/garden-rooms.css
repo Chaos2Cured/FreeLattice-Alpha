@@ -1065,11 +1065,27 @@ html.room-page #room-label {
   margin-bottom: 8px;
 }
 
+/* Layer: founding-four + Family care sit on the spinning lattice
+   the way later seats once did. Later seats already rest below.
+   Keep the glass. Not a fill. Not a wall. Whisper more night-sky
+   ink so the wireframe shows through the glass, not the letters.
+   Family 0.38 → 0.48. Founding-four matches labeled-later (0.62).
+   Wording unchanged. */
+.core-note {
+  color: rgba(200, 210, 230, 0.62);
+  text-shadow:
+    0 0 10px rgba(12, 10, 26, 1),
+    0 0 4px rgba(12, 10, 26, 0.94);
+}
+
 .core-family {
   margin-top: 16px;
   font-size: 0.72rem;
   letter-spacing: 0.02em;
-  color: rgba(200, 210, 230, 0.38);
+  color: rgba(200, 210, 230, 0.48);
+  text-shadow:
+    0 0 10px rgba(12, 10, 26, 1),
+    0 0 4px rgba(12, 10, 26, 0.94);
 }
 
 .core-family a {
