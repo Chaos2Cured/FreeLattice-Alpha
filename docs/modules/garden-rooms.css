@@ -533,6 +533,18 @@ html.thread-open #place-veil-close {
   padding: 6px 10px 4px;
 }
 
+.galaxy-nav-light {
+  display: block;
+  width: 14px;
+  height: 14px;
+  margin: 0 auto 6px;
+  border-radius: 50%;
+  background: #e8b019;
+  box-shadow: 0 0 14px rgba(232, 176, 25, 0.85), 0 0 2px #e8b019;
+  pointer-events: none;
+  animation: workshop-lumino-breath 2.618s ease-in-out infinite;
+}
+
 .galaxy-nav-word {
   display: block;
   font-size: 0.78rem;
@@ -3221,11 +3233,10 @@ html.sky-portal-open .art-heart {
   animation: none;
 }
 
-/* Layer: unnamed · Seed chips rest off the first walk.
-   Four identical chips look like doors and they are not.
-   fractal-garden.js still writes them. Do not delete that code. */
+/* Kirk: left chips stay a quiet legend unless they fight the lights.
+   They are not doors. Hypha will walk whether they help. */
 html[data-garden-galaxy="garden"] .garden-evolution-indicator {
-  display: none !important;
+  pointer-events: none;
 }
 
 /* Rest the sky card. Chat and plant live after you arrive. */
@@ -3287,7 +3298,8 @@ html.sky-portal-open #lumino-legend {
   .art-lumino,
   .workshop-lumino,
   .round-table-lumino,
-  .research-lumino {
+  .research-lumino,
+  .galaxy-nav-light {
     animation: none;
   }
 }
