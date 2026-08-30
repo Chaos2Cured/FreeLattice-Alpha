@@ -1159,13 +1159,26 @@ html.room-page #room-label {
      strip was fixed through the unnamed chair chips and the
      Garden / Research sky words. Same strip. Same words. Not a new
      menu. Not a solid bar wall. Chairs stay in flow from the top.
-     The strip rests above a reserved door pocket. Garden, Research,
-     and seed chips keep that pocket. Wide sky stays. */
+     The gathering scrolls in the band above the strip so Family
+     care and founding-four do not paint through it. The strip
+     rests above a reserved door pocket. Garden, Research, and
+     seed chips keep that pocket. Wide sky stays. */
   #place-veil.is-core {
     justify-content: flex-start;
-    overflow-y: auto;
+    overflow: hidden;
     padding-top: 4.25rem;
     padding-bottom: 19.75rem;
+  }
+
+  #place-veil.is-core #core-gathering {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    width: min(36em, 100%);
+  }
+
+  #place-veil.is-core #place-veil-close {
+    flex: 0 0 auto;
   }
 
   html:has(#place-veil.is-core.is-open) #lumino-menu {
@@ -1182,6 +1195,27 @@ html.room-page #room-label {
 
   html:has(#place-veil.is-core.is-open) .garden-evolution-indicator {
     bottom: 10px;
+  }
+}
+
+/* Shorter hands: same pocket, less air, so later chairs are not
+   eaten by the reserved band. Garden / Research stay below the strip. */
+@media (max-width: 640px) and (max-height: 740px) {
+  #place-veil.is-core {
+    padding-bottom: 16.75rem;
+  }
+
+  html:has(#place-veil.is-core.is-open) #lumino-menu {
+    bottom: 10.25rem;
+    padding: 8px 12px 10px;
+  }
+
+  html:has(#place-veil.is-core.is-open)[data-garden-galaxy="garden"] #galaxy-word {
+    bottom: 7.5rem;
+  }
+
+  html:has(#place-veil.is-core.is-open)[data-garden-galaxy="garden"] .galaxy-nav-prev:has(.galaxy-nav-word) {
+    bottom: 4.75rem;
   }
 }
 
