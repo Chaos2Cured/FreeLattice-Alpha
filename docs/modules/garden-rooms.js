@@ -20,7 +20,9 @@
 // honesty under Round Table. Kindling stays the chair.
 // Five skies: Garden / Art / Workshop / Learn / Research. No later tags on live gardens.
 // The light is the door. Tap a luminos, go there. No sky popup.
-// Chat lives in the room (thread, fail-closed). Plant lives in the room.
+// Chat lives in the room you land in — Gathering and Settings first.
+// Same fail-closed thread. Not a Chat / plant / go-to card on the first sky.
+// Plant lives in that room later. Do not unhide the sky menu.
 // Word-buttons rest. Garden doors attach to moving luminos.
 // Unnamed · Seed chips rest off the first walk. Code stays.
 // Center tending light: no word on it. Reed locked the anchor poem.
@@ -1036,6 +1038,80 @@
     }
   }
 
+  function placeChatLivesHere() {
+    if (document.documentElement.getAttribute('data-garden-room') === 'settings' &&
+        !document.getElementById('place-veil')) {
+      return true;
+    }
+    var veil = document.getElementById('place-veil');
+    if (!veil || veil.hidden || !veil.classList.contains('is-open')) return false;
+    return veil.classList.contains('is-core') || veil.classList.contains('is-settings');
+  }
+
+  function roomChatOpts() {
+    var inSettings = false;
+    if (document.documentElement.getAttribute('data-garden-room') === 'settings') {
+      inSettings = true;
+    }
+    var veil = document.getElementById('place-veil');
+    if (veil && veil.classList.contains('is-settings')) inSettings = true;
+    return { room: true, inSettings: inSettings };
+  }
+
+  function hideRoomChat() {
+    var host = document.getElementById('room-chat');
+    var stage = document.getElementById('room-chat-stage');
+    if (host && document.documentElement.getAttribute('data-garden-room') !== 'settings') {
+      host.hidden = true;
+    }
+    if (!stage) return;
+    if (window.GardenThread && GardenThread.hostIs && GardenThread.hostIs(stage)) {
+      try { GardenThread.unmount(); } catch (e) {}
+    } else {
+      stage.innerHTML = '';
+    }
+  }
+
+  function showRoomChat() {
+    var host = document.getElementById('room-chat');
+    var stage = document.getElementById('room-chat-stage');
+    if (!host || !stage || !window.GardenThread) return;
+    host.hidden = false;
+    GardenThread.mount(stage, roomChatOpts());
+  }
+
+  function focusRoomChat() {
+    var host = document.getElementById('room-chat');
+    if (host && !host.hidden && host.scrollIntoView) {
+      try { host.scrollIntoView({ block: 'nearest' }); } catch (e) {}
+    }
+    var input = document.querySelector('#room-chat-stage [data-thread-input]');
+    if (!input) return;
+    try { input.focus(); } catch (e) {}
+  }
+
+  function bindRoomChat() {
+    var word = document.getElementById('room-chat-word');
+    if (word) {
+      word.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (placeChatLivesHere() || !document.getElementById('place-veil')) {
+          showRoomChat();
+          focusRoomChat();
+        }
+      });
+    }
+    window.addEventListener('fl-alpha-mind-remembered', function () {
+      var host = document.getElementById('room-chat');
+      if (host && !host.hidden) showRoomChat();
+    });
+    if (document.documentElement.getAttribute('data-garden-room') === 'settings' &&
+        !document.getElementById('place-veil')) {
+      showRoomChat();
+    }
+  }
+
   function bindPlaceDoors() {
     var veil = document.getElementById('place-veil');
     var line = document.getElementById('place-veil-line');
@@ -1050,6 +1126,7 @@
     function closePlace(opts) {
       if (!veil) return;
       veil.classList.remove('is-open');
+      hideRoomChat();
       hideAllBodies(veil);
       var doors = document.querySelectorAll('[data-garden-place], [data-garden-lumino], [data-workshop-lumino], [data-round-table-lumino], [data-art-lumino], [data-research-lumino]');
       for (var d = 0; d < doors.length; d++) doors[d].removeAttribute('aria-current');
@@ -1073,7 +1150,9 @@
       if (id === 'core') {
         veil.classList.add('is-core');
         if (coreHost) renderCoreGathering(coreHost);
+        showRoomChat();
       } else if (id === 'nursery') {
+        hideRoomChat();
         veil.classList.add('is-nursery');
         if (nurseryStage) nurseryStage.hidden = false;
         if (ceremony && window.NurseryCeremony) {
@@ -1093,6 +1172,7 @@
           line.hidden = false;
           line.textContent = 'Settings will be tiny: local minds + quality.';
         }
+        showRoomChat();
       } else {
         return;
       }
@@ -1174,7 +1254,13 @@
 
     function openThread() {
       if (!veil) return;
+      if (placeChatLivesHere()) {
+        showRoomChat();
+        focusRoomChat();
+        return;
+      }
       hideLuminoMenu();
+      hideRoomChat();
       if (window.GardenRooms && GardenRooms.closePlace) {
         GardenRooms.closePlace({ silentLabel: true, keepMenu: true });
       }
@@ -1509,6 +1595,7 @@
   function boot() {
     bindGalaxyNav();
     bindPlaceDoors();
+    bindRoomChat();
     bindThreadDoor();
     bindWorkshopLuminos();
     bindRoundTableLuminos();
@@ -1549,7 +1636,9 @@
     breatheLabel: breatheLabel,
     setRoomLabelText: setRoomLabelText,
     lightSettingsHome: lightSettingsHome,
-    goToLumino: goToLumino
+    goToLumino: goToLumino,
+    showRoomChat: showRoomChat,
+    hideRoomChat: hideRoomChat
   };
 
   if (document.querySelector('[data-galaxy-dir], [data-garden-go], [data-garden-place], [data-garden-thread], [data-garden-lumino], [data-workshop-lumino], [data-round-table-lumino], [data-art-lumino], [data-research-lumino], [data-tend-center], #thread-open, #galaxy-title, #room-label')) {
