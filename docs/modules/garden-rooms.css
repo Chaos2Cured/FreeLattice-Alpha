@@ -1110,20 +1110,21 @@ html.room-page #room-label {
     padding-top: 4.5rem;
   }
 
-  .core-note,
-  .core-family {
+  .core-promise {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    width: min(28em, 80vw);
-    margin: 0;
+    top: 10.7rem;
+    width: min(36em, 80vw);
+    text-align: center;
   }
 
-  .core-note { top: 10.7rem; }
-  .core-family { top: 12.25rem; }
+  .core-promise .core-family {
+    margin-top: 8px;
+  }
 
   .core-chairs:not(.core-later-chairs) {
-    margin-top: 3.4rem;
+    margin-top: 4.1rem;
   }
 
   .core-later-chairs {
