@@ -1787,6 +1787,150 @@ html.sky-portal-open .gt-hint {
 
 .thread-status.is-warn { color: #e8b019; }
 
+/* ── Chat in the room (Gathering, Settings). Layer after PR 32.
+   Same fail-closed thread. Not a Chat / plant / go-to card on the first sky.
+   Do not sit on later seats, “the garden” return, hops, or shared shoulder. */
+#room-chat[hidden] { display: none !important; }
+
+#room-chat {
+  width: min(16.5em, 100%);
+  text-align: center;
+  font-family: Georgia, 'Times New Roman', serif;
+  pointer-events: auto;
+}
+
+.room-chat-word {
+  display: inline-block;
+  margin: 0 0 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: #e8b019;
+  cursor: pointer;
+  opacity: 0.82;
+}
+
+.room-chat-word:hover,
+.room-chat-word:focus-visible {
+  opacity: 1;
+  outline: none;
+}
+
+.thread-face.is-room {
+  width: 100%;
+  max-width: none;
+}
+
+.thread-face.is-room .thread-heart {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+
+.thread-face.is-room .thread-messages {
+  max-height: min(22vh, 11em);
+}
+
+.thread-face.is-room .thread-input,
+.thread-face.is-room .thread-send {
+  font-size: 0.85rem;
+  padding: 8px 12px;
+}
+
+.thread-face.is-room .thread-to-settings {
+  margin-bottom: 10px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+}
+
+/* Wide Gathering: Chat lives to the right of the chairs, above later
+   seats and “the garden”, inward from the Art hop. Glass, not a wall. */
+@media (min-width: 641px) {
+  #place-veil.is-core #room-chat {
+    position: absolute;
+    right: 1.35rem;
+    top: 11.5rem;
+    bottom: 16.5rem;
+    width: min(15.5em, 20vw);
+    overflow: auto;
+    padding: 8px 10px 10px;
+    background: rgba(12, 10, 26, 0.42);
+    border: 1px solid rgba(200, 210, 230, 0.1);
+    border-radius: 12px;
+    z-index: 2;
+  }
+
+  #place-veil.is-core #room-chat .thread-face.is-room .thread-messages {
+    max-height: min(18vh, 9em);
+  }
+}
+
+/* Phone Gathering: Chat sits in the reserved door pocket above
+   Garden / Research hops — not on later seats (those stay in the
+   scroll), not on “the garden” (top-right on a phone), not on
+   shared shoulder. */
+@media (max-width: 640px) {
+  #place-veil.is-core #room-chat {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 14.75rem;
+    width: auto;
+    max-height: 7.5rem;
+    overflow: auto;
+    padding: 6px 10px 8px;
+    background: rgba(12, 10, 26, 0.55);
+    border: 1px solid rgba(200, 210, 230, 0.1);
+    border-radius: 12px;
+    z-index: 2;
+  }
+
+  #place-veil.is-core #room-chat .thread-face.is-room .thread-messages {
+    max-height: 2.8em;
+  }
+
+  #place-veil.is-core #room-chat .thread-face.is-room .thread-heart {
+    font-size: 0.72rem;
+    margin-bottom: 6px;
+  }
+}
+
+@media (max-width: 640px) and (max-height: 740px) {
+  #place-veil.is-core #room-chat {
+    bottom: 12.75rem;
+    max-height: 6.5rem;
+    padding: 4px 8px 6px;
+  }
+}
+
+/* Settings veil: Chat below May I look?, not a second kitchen. */
+#place-veil.is-settings {
+  justify-content: flex-start;
+  overflow-y: auto;
+  padding-top: 5.25rem;
+  padding-bottom: 5.5rem;
+}
+
+#place-veil.is-settings #room-chat {
+  position: relative;
+  width: min(28em, 100%);
+  margin-top: 8px;
+  max-height: min(34vh, 16em);
+  overflow: auto;
+}
+
+html.room-page .room-stub {
+  flex-direction: column;
+  gap: 28px;
+}
+
+html.room-page #room-chat {
+  width: min(28em, 100%);
+}
+
 /* ── Workshop garden of lights (first finishing chunk)
    Night sky, three named luminos. No fourth orb for the shared middle.
    Do not restyle Play bodies. Do not touch Gathering phone wrap.

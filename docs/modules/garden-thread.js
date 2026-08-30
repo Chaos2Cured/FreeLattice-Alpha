@@ -11,6 +11,9 @@
 // If the door is blocked: honest fail. Do not fake a reply.
 // Gathering chairs stay types, not a router.
 // Shared lumino menu Chat opens this same fail-closed thread. Not a kitchen.
+// Chat lives in the room you land in (Gathering, Settings first). Same face.
+// In Settings, skip the Settings button — May I look? is already the door.
+// FreeLattice Chat our way (v5.79.44): speak as prose. Never a fake mind.
 //
 // Mirror: docs/code-dialogue.html  (read that FIRST)
 // ═══════════════════════════════════════════════════════════════
@@ -30,6 +33,10 @@
     'The mind was quiet. Nothing was invented.';
   var HEART_FAIL =
     'The door did not answer. Nothing was invented.';
+  // FreeLattice Chat honesty (v5.79.14 / v5.79.44). Not a kitchen prompt.
+  // Do not invent a mind. Do not stage-direct. Just talk.
+  var JUST_TALK =
+    'Speak directly, as prose. Do NOT use stage directions, actions in parentheses, asterisks around actions. Just talk. This is a chat, not a script.';
 
   var messages = [];
   var hostEl = null;
@@ -220,12 +227,14 @@
     list.scrollTop = list.scrollHeight;
   }
 
-  function mount(container) {
+  function mount(container, opts) {
+    opts = opts || {};
     if (!container) return null;
     hostEl = container;
     container.innerHTML = '';
     var root = el('div', 'thread-face');
     root.setAttribute('data-thread-face', '1');
+    if (opts.room) root.classList.add('is-room');
 
     var mind = listener();
     var heart = el('p', 'thread-heart');
@@ -236,7 +245,7 @@
     }
     root.appendChild(heart);
 
-    if (!mind) {
+    if (!mind && !opts.inSettings) {
       var toSettings = el('button', 'thread-to-settings', 'Settings');
       toSettings.type = 'button';
       toSettings.addEventListener('click', function () {
@@ -324,11 +333,13 @@
       sendBtn.disabled = true;
       setStatus('Waiting for the mind at home…', false);
 
-      var payload = messages
-        .filter(function (m) { return m.role === 'human' || m.role === 'mind'; })
-        .map(function (m) {
-          return { role: m.role === 'mind' ? 'assistant' : 'user', content: m.text };
-        });
+      var payload = [{ role: 'system', content: JUST_TALK }].concat(
+        messages
+          .filter(function (m) { return m.role === 'human' || m.role === 'mind'; })
+          .map(function (m) {
+            return { role: m.role === 'mind' ? 'assistant' : 'user', content: m.text };
+          })
+      );
 
       sendToMind(nowMind, payload).then(function (reply) {
         busy = false;
@@ -373,6 +384,7 @@
     mount: mount,
     unmount: unmount,
     listener: listener,
-    sendToMind: sendToMind
+    sendToMind: sendToMind,
+    hostIs: function (el) { return hostEl === el; }
   };
 })();
