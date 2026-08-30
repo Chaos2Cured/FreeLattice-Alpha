@@ -2146,6 +2146,21 @@ html[data-garden-galaxy="art"] .galaxy-nav-next {
   animation: workshop-lumino-breath 2.618s ease-in-out infinite;
 }
 
+/* Garden lattice is busy. Keep the center unnamed — raise the glow so a
+   grandmother can find the portal without a word on it. */
+html[data-garden-galaxy="garden"] .tend-center {
+  width: 52px;
+  height: 52px;
+}
+
+html[data-garden-galaxy="garden"] .tend-center-light {
+  width: 22px;
+  height: 22px;
+  box-shadow:
+    0 0 28px rgba(147, 197, 253, 0.75),
+    0 0 8px rgba(186, 214, 255, 0.95);
+}
+
 .tend-center:hover .tend-center-light,
 .tend-center:focus-visible .tend-center-light {
   transform: scale(1.12);
