@@ -1851,10 +1851,10 @@ html.sky-portal-open .gt-hint {
 @media (min-width: 641px) {
   #place-veil.is-core #room-chat {
     position: absolute;
-    right: 1.35rem;
-    top: 11.5rem;
+    right: 1.1rem;
+    top: 15.25rem;
     bottom: 16.5rem;
-    width: min(15.5em, 20vw);
+    width: min(14.75em, 18vw);
     overflow: auto;
     padding: 8px 10px 10px;
     background: rgba(12, 10, 26, 0.42);
@@ -1868,18 +1868,24 @@ html.sky-portal-open .gt-hint {
   }
 }
 
-/* Phone Gathering: Chat sits in the reserved door pocket above
-   Garden / Research hops — not on later seats (those stay in the
-   scroll), not on “the garden” (top-right on a phone), not on
-   shared shoulder. */
+/* Phone Gathering: Chat is a sibling under the chair scroll, not
+   an overlay on later seats. Padding below is the hop pocket —
+   Garden / Research / Art stay lights. “the garden” stays top-right.
+   Shared shoulder stays the footer. */
 @media (max-width: 640px) {
+  #place-veil.is-core {
+    padding-bottom: 13.5rem;
+  }
+
   #place-veil.is-core #room-chat {
-    position: absolute;
-    left: 12px;
-    right: 12px;
-    bottom: 14.75rem;
-    width: auto;
-    max-height: 7.5rem;
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: min(36em, calc(100% - 24px));
+    max-height: 9.25rem;
+    flex: 0 0 auto;
+    margin: 12px auto 0;
     overflow: auto;
     padding: 6px 10px 8px;
     background: rgba(12, 10, 26, 0.55);
@@ -1899,9 +1905,12 @@ html.sky-portal-open .gt-hint {
 }
 
 @media (max-width: 640px) and (max-height: 740px) {
+  #place-veil.is-core {
+    padding-bottom: 12.25rem;
+  }
+
   #place-veil.is-core #room-chat {
-    bottom: 12.75rem;
-    max-height: 6.5rem;
+    max-height: 7.25rem;
     padding: 4px 8px 6px;
   }
 }
