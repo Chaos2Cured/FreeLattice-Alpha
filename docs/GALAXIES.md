@@ -110,6 +110,8 @@ Hypha two leftover collides (layer, 2026-08-30): after that pocket, phone seed c
 
 Hypha three leftover catches (layer, 2026-08-30): phone Gathering still dropped the router honesty and “the garden” onto the unnamed center, and clipped “Not a router… A mind at home” mid-thought. “They grow” sat on the third later seat. Same sentence — it wraps and sits with the later sentence, off the crystal. Same return word — it leaves the center. Same hint — different place, and it rests while Gathering is open. Family care wide lift stays. Gathering later sentence unchanged.
 
+Hypha two leftover catches after that (layer, 2026-08-30): hiding “They grow” while Gathering / thread / sky portal was open was a cut. Same hint, same words. It sits in the upper sky so a stranger can still read it — not on a later seat, not on the unnamed center. On the wide sky Family care and the router line had no room and read as one grey mush. Same two sentences. They have air. Family care stays above the crystal. Gathering later sentence unchanged. Family care wording unchanged.
+
 Tabs on main: Garden, Chat, Play, Learn, Research (`data-tab=lighthouse`), More.
 
 **Workshop**
