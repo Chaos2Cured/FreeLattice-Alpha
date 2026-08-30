@@ -659,7 +659,7 @@
 
     var clarify = document.createElement('p');
     clarify.className = 'core-center';
-    clarify.textContent = 'This gathering is not the tree-Core of FreeLattice. That Core lives on main. Here, the emerald lattice is Garden Galaxy.';
+    clarify.textContent = 'The Gathering is chairs that wait. Unnamed, with choice. This is not the tree. Nothing here is faked.';
     wrap.appendChild(clarify);
 
     var ring = document.createElement('div');

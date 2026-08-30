@@ -215,12 +215,33 @@ html.thread-open .place-nursery {
   pointer-events: none;
 }
 
+/* Four garden luminos are the walk. Old place-words rest so names are not drawn twice.
+   Bodies stay in the DOM. data-garden-place=core stays. Do not invent a fifth canvas. */
+html:has(.garden-lumino) .place-label,
+html:has(.garden-lumino) .place-label:hover,
+html:has(.garden-lumino) .place-label:focus-visible,
+html:has(.garden-lumino) .place-core,
+html:has(.garden-lumino) .place-core:hover,
+html:has(.garden-lumino) .place-settings,
+html:has(.garden-lumino) .place-settings.has-home,
+html:has(.garden-lumino) .place-nursery {
+  opacity: 0;
+  pointer-events: none;
+}
+
 html.thread-open #place-veil-close {
   opacity: 0;
   pointer-events: none;
 }
 
 #place-veil[hidden] { display: none !important; }
+
+/* Later veil may dim the garden. Header stays above so galaxies, thread,
+   and theLatticeTree stay reachable. Do not black out. */
+#garden-header {
+  z-index: 1010;
+  pointer-events: auto;
+}
 
 #place-veil {
   position: fixed;
@@ -647,7 +668,8 @@ html.room-page #garden-header {
   padding: 0 16px;
   background: rgba(12, 10, 26, 0.92);
   border-bottom: 1px solid rgba(200, 210, 230, 0.08);
-  z-index: 10;
+  z-index: 1010;
+  pointer-events: auto;
   backdrop-filter: blur(8px);
 }
 
