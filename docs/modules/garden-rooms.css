@@ -1115,14 +1115,32 @@ html.room-page #room-label {
 
 /* They grow stays. Same words. Upper sky — not the unnamed center,
    not a later seat. The hide that cut it during Gathering / thread
-   / sky portal is lifted: a stranger can still read it. Fixed rem
-   so it does not sit on the later sentence. Layer, never delete. */
+   / sky portal is lifted: a stranger can still read it. On the
+   garden it sits centered in the upper sky. While Gathering is
+   open it leaves the centered stack and rests in a quiet pocket
+   of that same sky. Layer, never delete. */
 .gt-hint {
   position: fixed;
   top: 7.25rem;
   left: 50%;
   transform: translate(-50%, 0);
   z-index: 1001;
+}
+
+html.garden-door-open .gt-hint,
+html.thread-open .gt-hint,
+html.sky-portal-open .gt-hint {
+  left: 1.15rem;
+  transform: none;
+}
+
+@media (max-width: 640px) {
+  html.garden-door-open .gt-hint,
+  html.thread-open .gt-hint,
+  html.sky-portal-open .gt-hint {
+    top: 3.05rem;
+    left: 0.75rem;
+  }
 }
 
 /* Later seats leave the spinning lattice. First four stay the ring
@@ -1154,7 +1172,7 @@ html.room-page #room-label {
      apart. Family care stays above the crystal. First four move a
      whisper so the router does not land on the chair ring. */
   .core-promise .core-router {
-    margin-top: 1rem;
+    margin-top: 1.35rem;
   }
 
   .core-chairs:not(.core-later-chairs) {
