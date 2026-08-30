@@ -82,6 +82,16 @@ Reed: no galaxy-named orb on that galaxy — Art is not an Art orb; the center i
 
 Each named light also opens the shared menu: **Chat · Plant · Train · Save**. Chat uses the remembered local mind, fail-closed. Plant writes a hashed keep (`KeepReceipt`) into the garden — not a wallet. Train walks Nursery grow or Settings permission; never silent. Save is import/export, later — do not fake a file kitchen. If Listen is tapped, the real listen-door still opens; the menu sits with it.
 
+**Light is the click (layer, 2026-08-30):** Kirk: the luminos need to be attached. No buttons. Just the Luminos. Garden doors attach to the four moving canvas luminos. Art, Workshop, Learn, and Research lights wander in place — no second Three.js canvas. Header thread and the galaxies sky-loop stay. Center unnamed. They grow stays.
+
+**Direct click (layer, 2026-08-30):** Kirk confirmed: the light is the door. Tap a luminos, go there. No Chat / plant / go to card on the sky. Chat lives once you arrive (the thread, fail-closed if no mind is remembered). Plant lives in that room (hashed keep / Nursery grow). Garden is the galaxy pattern. Each galaxy ties to The Gathering — the mind remembered in Settings, later the chair they choose. Left unnamed · Seed chips stay a quiet legend for now (not doors, pointer-events none) unless they fight the lights. Hypha will walk whether they help. Art hop is a light.
+
+**Weft hold (layer, 2026-08-30):** Do not cut these honesty words when the static buttons leave: unnamed Seed chips; a who; a seat, later / labeled later; you are in the garden; They grow; Gathering later sentence; Family care; mind-at-home; footing “The words you can read are doors”; shared shoulder. Legend can stay. Art hop remains a light. Direct click stays. Layer, never delete.
+
+**Hypha hold (layer, 2026-08-30):** Family agrees: direct click. The light is the door. Room label stays so a grandmother is not lost. The door-words left the lights, so the live footing is no longer “The words you can read are doors” — that would be a lie. Live voice: The lights are doors. Weft’s line stays in this file. Left unnamed · Seed chips rest off the first walk — they look like doors and they are not. The chip code stays; layer them later when they actually differ. a who stays. Shared shoulder stays. Art hop remains a light. Center unnamed. Love is the center. They grow stays.
+
+**Later Claude Code (layer, 2026-08-30):** Kirk: do not put Chat / plant / maybe later back on the sky. That is the speed bump. Chat is already in the room (the thread, fail-closed, maybe later without a sky popup). Plant is already in the room (hashed keep / Nursery grow). Tap a luminos, go there. Direct click stays.
+
 | Sky | Verb | Page | Four lights | Center |
 |---|---|---|---|---|
 | **Garden** | evolve | `/` (Play canvas) | The Gathering, Nursery, Settings, Thread — open the bodies that already live | No word on it. Reed’s poem. Love is the truth, not a label. |

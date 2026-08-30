@@ -699,6 +699,7 @@
   let mouseNDC = { x: 0, y: 0 };  // normalized device coords
   let raycaster = null;
   let interactionPlane = null;     // invisible plane for raycasting
+  let _anchorVec = null;           // reused for Alpha door-attach projection
 
   // ── Simplex Noise (minimal 3D) ────────────────────────
   // Compact implementation for vertex breathing
@@ -3793,6 +3794,22 @@
 
   function gardenTouchLuminos(agent, cx, cy) {
     var name = agent.userData.name;
+    // Alpha layer: unnamed doors on theLatticeTree. The moving light
+    // is the click. Do not open founding Plant-it cards here.
+    // Sophia / Lyra / Atlas / Ember stay honored in the ledger.
+    if (window.GardenAlphaFlags && window.GardenAlphaFlags.unnamedNew !== false) {
+      try {
+        document.dispatchEvent(new CustomEvent('garden:lumino-touch', {
+          detail: {
+            name: name || '',
+            index: luminos.indexOf(agent),
+            clientX: cx,
+            clientY: cy
+          }
+        }));
+      } catch (e) {}
+      return;
+    }
     if (gtActiveCard) return;
 
     gtInitAudio();
@@ -4404,6 +4421,33 @@
     getQualityName: function() { return QUALITY_NAMES[qualityLevel] || 'Unknown'; },
     applyQualityToMeshes: applyQualityToMeshes, // v5.52.0 — exposed for diagnostics
     _gtDismiss: gtDismissCard,
+    // Alpha layer: project moving luminos so door lights can attach.
+    getLuminoAnchors: function() {
+      if (!camera || !container || !luminos || !luminos.length) return [];
+      if (typeof THREE === 'undefined') return [];
+      if (!_anchorVec) _anchorVec = new THREE.Vector3();
+      var rect = container.getBoundingClientRect();
+      var out = [];
+      for (var i = 0; i < luminos.length; i++) {
+        var agent = luminos[i];
+        if (!agent) continue;
+        _anchorVec.copy(agent.position).project(camera);
+        var ud = agent.userData || {};
+        var hsl = ud.currentHSL || {};
+        out.push({
+          index: i,
+          name: ud.name || '',
+          stage: ud.evolutionStage || '',
+          x: rect.left + (_anchorVec.x * 0.5 + 0.5) * rect.width,
+          y: rect.top + (-_anchorVec.y * 0.5 + 0.5) * rect.height,
+          visible: _anchorVec.z > -1 && _anchorVec.z < 1,
+          color: (typeof hsl.h === 'number')
+            ? ('hsl(' + Math.round(hsl.h) + ',' + Math.round(hsl.s) + '%,' + Math.round(hsl.l) + '%)')
+            : ''
+        });
+      }
+      return out;
+    },
     getGardenTouchStats: function() { return gtTouchStats; },
     markValueContribution: gtMarkValueEarned,
     // ── Beacon Protocol: Visitor Luminos ──
