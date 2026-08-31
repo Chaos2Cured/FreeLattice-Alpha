@@ -1121,13 +1121,20 @@ html.room-page #room-label {
 
 /* Layer: router honesty is the same sentence. It wraps so a
    grandmother can finish it. Whisper halo so lattice tips do
-   not cut the letters. Not a new promise. */
+   not cut the letters. Not a new promise.
+   Layer after PR 35: a bright orbit still walked through
+   “May I look?”. Same words. Same later-glass chip as Settings
+   honesty — around the letters, not through them. Not a wall. */
 .core-router {
   max-width: 36em;
   margin-left: auto;
   margin-right: auto;
   white-space: normal;
-  color: rgba(200, 210, 230, 0.62);
+  box-sizing: border-box;
+  padding: 0.25em 0.65em;
+  background: rgba(12, 10, 26, 0.62);
+  border-radius: 8px;
+  color: rgba(200, 210, 230, 0.72);
   text-shadow:
     0 0 10px rgba(12, 10, 26, 1),
     0 0 4px rgba(12, 10, 26, 0.94);
@@ -1570,6 +1577,28 @@ html.sky-portal-open .gt-hint {
   line-height: 1.65;
   color: rgba(200, 210, 230, 0.42);
   margin-top: 10px;
+}
+
+/* Layer after PR 35: Settings honesty was the thinnest grey, and an
+   orbit walked through the letters. Same words. Later-glass /
+   night-sky contrast so the spinning lattice and orbits may show
+   around the letters, not through them. Same pattern as Family
+   care later-glass: letter halo, not a fill, not a wall. Contrast
+   alone still let a bright orbit write the glyphs — a later-seat
+   glass chip hugs the words (0.62, not Chat-card 0.78). Inline so
+   it is not a sky bar. Not on May I look. Paste-address muted
+   stays quiet. Layer, never delete. */
+.settings-honesty {
+  display: inline-block;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0.35em 0.7em;
+  background: rgba(12, 10, 26, 0.62);
+  border-radius: 8px;
+  color: rgba(200, 210, 230, 0.72);
+  text-shadow:
+    0 0 10px rgba(12, 10, 26, 1),
+    0 0 4px rgba(12, 10, 26, 0.94);
 }
 
 /* ── Thread: a conversation, not a kitchen ── */
