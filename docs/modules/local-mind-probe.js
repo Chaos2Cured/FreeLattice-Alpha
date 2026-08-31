@@ -324,7 +324,7 @@
     next.appendChild(go);
     root.appendChild(next);
 
-    root.appendChild(el('p', 'settings-muted',
+    root.appendChild(el('p', 'settings-muted settings-honesty',
       'We only look at well-known local doors, and only when you ask. ' +
       'We never look through this computer\'s files. We never upload. Quality of the sky is later.'
     ));

@@ -134,6 +134,8 @@ Hypha two leftover clips after PR 33 (layer, 2026-08-30): wide Gathering Chat ra
 
 Hypha one leftover after PR 34 (layer, 2026-08-31): Settings Chat input was awake while Send slept. Same fail-closed thread. Fail-closed means input and Send both sleep until a mind is remembered. Typing and submit do nothing. `aria-disabled`. No invented reply. Gathering Chat and the overlay thread the same. After a mind is remembered, both wake. May I look? stays the grandmother door — no second Settings button. First sky stays clean — no Chat / plant / go-to card. Do not unhide `#lumino-menu`. Do not cut `#place-veil-close`.
 
+Hypha one leftover after PR 35 (layer, 2026-08-31): Settings honesty was the thinnest grey, and an orbit walked through the letters. Same words. Later-glass / night-sky contrast so the spinning lattice and orbits may show around the letters, not through them. Same pattern as Family care later-glass. Not a wall. Not on May I look. Fail-closed Chat still sleeps. May I look? stays unpressed. First sky stays clean — no Chat / plant / go-to card. Do not unhide `#lumino-menu`. Do not cut `#place-veil-close`.
+
 Tabs on main: Garden, Chat, Play, Learn, Research (`data-tab=lighthouse`), More.
 
 **Workshop**

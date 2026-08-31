@@ -1572,6 +1572,20 @@ html.sky-portal-open .gt-hint {
   margin-top: 10px;
 }
 
+/* Layer after PR 35: Settings honesty was the thinnest grey, and an
+   orbit walked through the letters. Same words. Later-glass /
+   night-sky contrast so the spinning lattice and orbits may show
+   around the letters, not through them. Same pattern as Family
+   care later-glass: whisper more ink, letter halo, not a fill,
+   not a wall. Not on May I look. Paste-address muted stays quiet.
+   Layer, never delete. */
+.settings-honesty {
+  color: rgba(200, 210, 230, 0.62);
+  text-shadow:
+    0 0 10px rgba(12, 10, 26, 1),
+    0 0 4px rgba(12, 10, 26, 0.94);
+}
+
 /* ── Thread: a conversation, not a kitchen ── */
 .thread-word {
   background: transparent;
