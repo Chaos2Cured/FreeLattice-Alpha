@@ -2623,6 +2623,7 @@ html[data-garden-galaxy="workshop"] .room-stub { display: none; }
   width: min(42em, 100%);
   max-width: 100%;
   box-sizing: border-box;
+  padding: 0 14px 4px;
 }
 
 html.room-page .workshop-ask,
