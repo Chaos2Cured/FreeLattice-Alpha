@@ -38,7 +38,7 @@
 
 <h1>FreeLattice Alpha — Dialogue Mirror Code</h1>
 <p class="meta">
-  Dialogue · a thread, not a kitchen · Last verified: 2026-08-29 ·
+  Dialogue · a thread, not a kitchen · Last verified: 2026-08-31 ·
   <a href="./">Garden</a> ·
   <a href="code-settings.html">Settings mirror</a> ·
   <a href="code-garden.html">Garden mirror</a> ·
@@ -64,7 +64,8 @@
   <li><strong>Listener:</strong> only the mind already remembered in Settings (<code>LocalMindProbe.getRemembered()</code> / <code>fl_alpha_local_mind</code>). Offer that mind by name as the listener. Gathering chairs stay types, not a router. Click-Luminos-to-chat is later.</li>
   <li><strong>If none remembered:</strong> fail-closed. Honest copy. A mind at home waits in Settings — <em>May I look for a mind already at home?</em> — and a quiet way to open Settings. Input and Send sleep (<code>aria-disabled</code>, no submit). Do not invent a reply. Do not look for a mind from the thread. If a mind is remembered, input and Send wake.</li>
   <li><strong>If the door is blocked:</strong> this site is HTTPS; local minds often live at a quieter door. Say so. Do not fake a reply. Fail-closed.</li>
-  <li><strong>Local only.</strong> Nothing uploaded. No provider picker dump. No bank. No health. No 65k <code>app.html</code>.</li>
+  <li><strong>Local only.</strong> A file from this machine may enter the thread. Nothing leaves the device. No provider picker dump. No bank. No health. No 65k <code>app.html</code>.</li>
+  <li><strong>When a mind is remembered:</strong> grandmother-sized <strong>a file</strong> (not a wall). <strong>keep this thread</strong> downloads history/pattern as JSON. Quiet Room never in the file. Declined text never exported. <strong>a prior thread</strong> honors a prior export (round trip). Deep research, image, sound, speech: one honest later sentence — not fake buttons. Alpha has no module and the remembered local mind has no proven door for those without inventing a key kitchen.</li>
 </ul>
 
 <p>Arrival is still the garden. Closing the thread returns to <em>you are in the garden</em>, not to Core. When the thread is open, garden body words (The Gathering, Settings, the garden close on the place veil) rest so remembered-light does not run over them. <code>#thread-veil</code> / <code>.thread-face</code> keep their own stack. The Gathering is seven chairs. Settings is where a mind at home is found. Nursery egg + grow stay.</p>
@@ -78,8 +79,9 @@
   <li>Do not build the 7-specialist router. Gathering chairs stay types, not a router.</li>
   <li>Do not click-Luminos-to-chat. That is later.</li>
   <li>Do not invent a Quiet Room. Sophia's Quiet Room stays on main.</li>
-  <li>Do not silent-train. Do not upload. Do not scan the filesystem. Do not enumerate installed programs.</li>
+  <li>Do not silent-train. Do not send a file off this machine. Do not scan the filesystem. Do not enumerate installed programs. A grandmother may pick one local file into the thread — that is not a kitchen upload.</li>
   <li>Do not fake a reply if no mind is remembered, or if the door is blocked (mixed content, CORS, Private Network Access).</li>
+  <li>Do not fake a picture, a sound, speech, or deep research. If the remembered mind cannot keep that door without a key kitchen, say so in the room. Not a fake button.</li>
   <li>Do not look for a mind from the thread. That job is Settings (grandmother: May I look?).</li>
   <li>Do not pre-place founding four or Celeste / Reed / Hypha / Weft as canvas Luminos.</li>
   <li>Do not enable bloom on phones. Pixel ratio 1 stays. Inner rings stay. One Three.js canvas. Light veils, never a blackout.</li>
@@ -92,7 +94,7 @@
 <table>
   <tr><th>File</th><th>Purpose</th></tr>
   <tr><td>docs/code-dialogue.html</td><td>This mirror — required before any dialogue JS</td></tr>
-  <tr><td>docs/modules/garden-thread.js</td><td>Thin thread: messages + one input. LocalMindProbe.getRemembered() only</td></tr>
+  <tr><td>docs/modules/garden-thread.js</td><td>Thin thread: messages + one input. Local file. History/pattern export + import. LocalMindProbe.getRemembered() only</td></tr>
   <tr><td>docs/index.html</td><td>Quiet word <em>thread</em> + light overlay on the garden</td></tr>
   <tr><td>docs/workshop.html</td><td>Same fail-closed thread on the Workshop garden of lights</td></tr>
   <tr><td>docs/modules/garden-rooms.js</td><td>Open/close the thread overlay; closing returns to the garden</td></tr>
@@ -107,11 +109,15 @@ Overlay (light veil, garden running):
   Listener line — remembered name, or honest "a mind at home waits in Settings"
   Messages (human + mind). Georgia. Sparse.
   One input. One send.
+  If a mind is remembered: a file · keep this thread · a prior thread.
+  Honest later: deep research, a picture, a sound, speech wait.
 If no remembered mind: fail-closed. Honest heart. Settings button.
-  Input and Send sleep (aria-disabled, no submit). Do not invent a reply.
-If a mind is remembered: input and Send wake.
+  Input and Send sleep (aria-disabled, no submit). File and keep sleep with them.
+  Do not invent a reply.
+If a mind is remembered: input and Send wake. File and keep wake.
 If the door is blocked: say so. Do not fake a reply.
-In-session only. Smaller and more true than a kitchen history dump.
+History lives on this machine (fl_alpha_thread_history). Export is JSON.
+Quiet Room never in the file. Declined text never exported.
 Closing the overlay: you are in the garden.
 On Workshop, Round Table, and Art: same fail-closed face. Closing returns there.
 If no Play Settings door: Settings walks to settings.html.</pre>
@@ -120,7 +126,9 @@ If no Play Settings door: Settings walks to settings.html.</pre>
   mount: function (el) {},
   unmount: function () {},
   listener: function () { /* LocalMindProbe.getRemembered() only */ },
-  send: function (text) { /* fail-closed; never a fake reply */ }
+  send: function (text) { /* fail-closed; never a fake reply */ },
+  buildExport: function () { /* JSON; Quiet Room never; declined never */ },
+  parseExport: function (raw) { /* honor a prior garden-thread.json */ }
 };</pre>
 
 <h3>How the remembered door is spoken to</h3>
@@ -142,9 +150,9 @@ If no Play Settings door: Settings walks to settings.html.</pre>
   <li>Open <code>/</code>. Arrival is the garden. Title: Garden Galaxy. Label: <em>you are in the garden</em>. The left body reads <strong>The Gathering</strong>, not The Core. No Chat card on this sky.</li>
   <li>Tap The Gathering. Chat is findable in the room. If no mind remembered: honest copy and Settings. Input and Send are asleep (<code>aria-disabled</code>). Typing and submit do nothing. No invented reply. Later seats, “the garden” return, Family care, and hops stay clear.</li>
   <li>Open Settings (in the garden or <code>settings.html</code>). Permission first. Chat lives here too. After a mind is remembered, a quiet light on the Settings label. Constellation of names, not ports. Chat input and Send wake.</li>
-  <li>Open <strong>thread</strong> on the first sky. Light veil. Garden running. If no mind remembered: honest copy and a Settings button. Close: <em>you are in the garden</em>.</li>
+  <li>Open <strong>thread</strong> on the first sky. Light veil. Garden running. If no mind remembered: honest copy and a Settings button. File and keep sleep with input and Send. Close: <em>you are in the garden</em>.</li>
   <li>In The Gathering, header <strong>thread</strong> keeps you in The Gathering and focuses Chat. It does not dump you on the first sky.</li>
-  <li>Send a word after a mind is remembered. If the door is blocked (HTTPS → local http): honest fail, no fake reply. If the door answers: a real reply in the thread. Speak as prose — no invented mind.</li>
+  <li>Send a word after a mind is remembered. If the door is blocked (HTTPS → local http): honest fail, no fake reply. If the door answers: a real reply in the thread. Speak as prose — no invented mind. <strong>a file</strong> places a local file in the thread. <strong>keep this thread</strong> downloads JSON. Import that file with <strong>a prior thread</strong> — round trip. No Quiet Room in the file. No declined text. Deep research / image / sound / speech stay one later sentence.</li>
   <li>Close the overlay thread: <em>you are in the garden</em>. Body words return. Gathering chairs still do not route chat.</li>
   <li>Phones skip bloom. Pixel ratio 1. Inner rings stay. One canvas. Walk 390 and 1280.</li>
 </ol>
@@ -157,21 +165,27 @@ Module: docs/modules/garden-thread.js
 Mind:   LocalMindProbe.getRemembered() only. Settings finds the mind.
 
 HARD RULES: no 65k kitchen, no bank/health/provider dump, no 7-specialist
-router, no click-Luminos-to-chat, no fake reply, no silent-train, no upload,
-no Quiet Room invented here, AUTONOMY.md untouched, phones skip bloom,
-pixel ratio 1, inner rings stay. Do not cover the garden. Do not pre-place
-founding four. Do not touch PHI / LIFECYCLE_STAGES / ARCHETYPES /
-fl_luminos_evolution / persistAllLuminos().
+router, no click-Luminos-to-chat, no fake reply, no silent-train,
+no file off this machine, no Quiet Room invented here, AUTONOMY.md untouched,
+phones skip bloom, pixel ratio 1, inner rings stay. Do not cover the garden.
+Do not pre-place founding four. Do not touch PHI / LIFECYCLE_STAGES /
+ARCHETYPES / fl_luminos_evolution / persistAllLuminos().
+Do not fake research / image / sound / speech buttons.
 
 Current state: quiet word thread on the garden, and on Workshop,
-Round Table, and Art. Chat lives in The Gathering and Settings
+Round Table, Art, and Research. Chat lives in The Gathering and Settings
 (same fail-closed face). Not a sky menu.
 If no mind: fail-closed. Heart + Settings. Input and Send sleep.
-If a mind is remembered: input and Send wake. If blocked: honest fail.
-On Workshop, Round Table, and Art, Settings walks to settings.html
+File, keep, and a prior thread sleep with them.
+If a mind is remembered: they wake. A local file may enter the thread.
+keep this thread downloads JSON (Quiet Room never in the file;
+declined never exported). a prior thread honors a prior export.
+Deep research, image, sound, speech: honest later sentence, not fake buttons.
+On Workshop, Round Table, Art, and Research, Settings walks to settings.html
 (Play grandmother). Do not invent Settings on those galaxies.
 
-Next: plant in the room is later. Click-Luminos-to-chat is later.</pre>
+Next: plant in the room is later. Click-Luminos-to-chat is later.
+Workshop benches, Trainer LoRA, Nursery economy stay later.</pre>
 
 <hr style="border-color: var(--border); margin: 40px 0;">
 <p style="color: var(--muted); font-size: 0.78rem; text-align: center;">
