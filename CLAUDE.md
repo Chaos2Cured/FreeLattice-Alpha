@@ -34,13 +34,13 @@ Mirror first: `docs/code-workshop.html`.
 
 ### Round Table
 
-Uses Gathering minds. Sitting is a who: a person at this table — not a topic, not a time.
+The table works so we only polish later. Fail-closed until a mind is remembered. Sitting is a who: a person at this table — not a topic, not a time. Words only. No Sit button. Do not fake chairs filling.
 
 - Not the 80-specialist kitchen (`#tab-roundtable`).
-- No Sit button. Do not fake chairs filling.
 - Kindling stays the chair.
+- Education gold stays joy-first. Translator and Forge stay honest later.
 
-Mirror first: `docs/code-round-table.html`.
+Mirror first: `docs/code-round-table.html`. Module: `docs/modules/round-table-sitting.js`.
 
 ### Trainer
 
