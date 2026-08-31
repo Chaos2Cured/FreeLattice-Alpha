@@ -2609,6 +2609,52 @@ html[data-garden-galaxy="workshop"] .room-stub { display: none; }
   opacity: 0.45;
 }
 
+/* Layer: Hypha one leftover after PR 40 (Workshop benches).
+   Ask and Run sat cramped on the right edge — two smudges, not
+   two words. html.room-page * zeros padding, so the words shrank
+   and wrapped into glyphs. Same words. Same benches. The pad and
+   ask input may shrink; Ask and Run do not. The whole Ask and
+   the whole Run stay on the sky — readable, not clipped, not
+   overlapping each other, not off the right edge. Same pattern
+   as Gathering Chat Send leftover after PR 33. Fail-closed still
+   sleeps. Git toggle stays OFF by default. Do not un-sleep
+   pad/Ask/Run. Layer, never delete. */
+#place-veil.is-workshop-benches #workshop-benches {
+  width: min(42em, 100%);
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0 14px 4px;
+}
+
+html.room-page .workshop-ask,
+#place-veil.is-workshop-benches .workshop-ask {
+  min-width: 0;
+  box-sizing: border-box;
+  align-items: stretch;
+  margin: 0 0 10px;
+}
+
+html.room-page .workshop-ask-input,
+#place-veil.is-workshop-benches .workshop-ask-input {
+  min-width: 0;
+  flex: 1 1 8em;
+  padding: 10px 12px;
+}
+
+html.room-page .workshop-ask .workshop-benches-act,
+#place-veil.is-workshop-benches .workshop-ask .workshop-benches-act {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  padding: 10px 16px;
+  min-height: 44px;
+  overflow: visible;
+}
+
+html.room-page .workshop-pad,
+#place-veil.is-workshop-benches .workshop-pad {
+  margin-bottom: 10px;
+}
+
 @media (max-width: 799px) {
   .workshop-pad { min-height: 7rem; }
   .workshop-preview { min-height: 6rem; }
