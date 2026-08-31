@@ -24,6 +24,9 @@
 // Same fail-closed thread. Not a Chat / plant / go-to card on the first sky.
 // Plant lives in that room later. Do not unhide the sky menu.
 // Word-buttons rest. Garden doors attach to moving luminos.
+// Art / Workshop / Learn / Research doors are living orbs with rings
+// (same night as Garden; no second Three.js canvas). Art hop stays a light.
+// Tiny color chip: which current color links to what. Not a wall.
 // Unnamed · Seed chips rest off the first walk. Code stays.
 // Center tending light: no word on it. Reed locked the anchor poem.
 // The mind that tends walks out of The Gathering without a name until it is ready.
@@ -662,13 +665,67 @@
   function lightColorOf(el) {
     var light = el.querySelector('.garden-lumino-light, .art-lumino-light, .workshop-lumino-light, .round-table-lumino-light, .research-lumino-light');
     if (!light) return 'rgba(200, 210, 230, 0.5)';
+    var custom = light.style.getPropertyValue('--lumino');
+    if (custom) return custom;
     var cs = window.getComputedStyle(light);
     return cs.backgroundColor || 'rgba(200, 210, 230, 0.5)';
   }
 
+  function dressOneLight(light, rings) {
+    if (!light || light.classList.contains('is-living')) return;
+    var cs = window.getComputedStyle(light);
+    var color = cs.backgroundColor || 'rgba(200, 210, 230, 0.5)';
+    light.style.setProperty('--lumino', color);
+    light.classList.add('is-living');
+    var count = rings || 2;
+    for (var r = 0; r < count; r++) {
+      var ring = document.createElement('span');
+      ring.className = 'lumino-ring' + (r ? ' is-far' : '');
+      ring.setAttribute('aria-hidden', 'true');
+      light.appendChild(ring);
+    }
+  }
+
+  function dressLivingLights() {
+    // Garden doors are the canvas luminos (rings already live there).
+    // Art / Workshop / Learn / Research + hop lights are CSS beads until dressed.
+    var lights = document.querySelectorAll(
+      '.art-lumino-light, .workshop-lumino-light, .round-table-lumino-light, .research-lumino-light, .galaxy-nav-light'
+    );
+    for (var i = 0; i < lights.length; i++) dressOneLight(lights[i], 2);
+    if (currentGalaxy() !== 'garden') {
+      var tend = document.querySelectorAll('.tend-center-light');
+      for (var t = 0; t < tend.length; t++) dressOneLight(tend[t], 2);
+    }
+  }
+
+  function ensureSkyField() {
+    var g = currentGalaxy();
+    if (g === 'garden' || g === 'art') return;
+    if (document.querySelector('.sky-field')) return;
+    var field = document.createElement('div');
+    field.className = 'sky-field';
+    field.setAttribute('aria-hidden', 'true');
+    var spots = [
+      [12, 18], [28, 72], [41, 24], [63, 14], [81, 31],
+      [8, 48], [19, 86], [47, 63], [72, 78], [91, 52],
+      [34, 41], [56, 88], [76, 9], [88, 67], [5, 22]
+    ];
+    for (var i = 0; i < spots.length; i++) {
+      var star = document.createElement('span');
+      star.className = 'sky-star' + (i % 3 === 0 ? ' is-gold' : i % 3 === 1 ? ' is-emerald' : '');
+      star.style.left = spots[i][0] + '%';
+      star.style.top = spots[i][1] + '%';
+      star.style.animationDelay = (i * 0.382) + 's';
+      field.appendChild(star);
+    }
+    document.body.insertBefore(field, document.body.firstChild);
+  }
+
   function ensureSkyLegend() {
-    // Rest: color chips are not a first-walk menu. Code stays.
-    return;
+    // Tiny quiet chip: which current color links to what.
+    // Not a wall. Not a second you-are-here. Words help.
+    if (document.getElementById('lumino-legend')) return;
     var doors = document.querySelectorAll(doorSelector());
     if (!doors.length) return;
     var list = document.createElement('div');
@@ -676,7 +733,8 @@
     list.setAttribute('aria-hidden', 'true');
     for (var i = 0; i < doors.length; i++) {
       if (doors[i].hidden || doors[i].classList.contains('is-held')) continue;
-      var id = doors[i].getAttribute('data-art-lumino') ||
+      var id = doors[i].getAttribute('data-garden-lumino') ||
+        doors[i].getAttribute('data-art-lumino') ||
         doors[i].getAttribute('data-workshop-lumino') ||
         doors[i].getAttribute('data-round-table-lumino') ||
         doors[i].getAttribute('data-research-lumino');
@@ -1610,6 +1668,8 @@
     bindTendCenter();
     bindGardenCanvasTouch();
     bindMenuDismiss();
+    dressLivingLights();
+    ensureSkyField();
     ensureSkyLegend();
     startAttachLoop();
     fadeGalaxyTitle();
