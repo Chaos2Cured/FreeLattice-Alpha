@@ -206,6 +206,9 @@
       lastFingerprint = fp;
       setStatus(root, 'The mind kept this. Not training. Nothing uploaded. Weights did not change.');
       renderHashes(root);
+      if (window.NurseryGrowth && typeof window.NurseryGrowth.refresh === 'function') {
+        try { window.NurseryGrowth.refresh(); } catch (e) {}
+      }
     }).catch(function () {
       /* fail-quiet — keep, never gate */
     }).then(function () {
@@ -239,6 +242,9 @@
         lastFingerprint = fingerprintOf(keepRows());
         setStatus(root, 'Kept. A hash is proof you chose. Not training. Nothing uploaded.');
         renderHashes(root);
+        if (window.NurseryGrowth && typeof window.NurseryGrowth.refresh === 'function') {
+          try { window.NurseryGrowth.refresh(); } catch (e) {}
+        }
       }).catch(function (err) {
         setStatus(root, (err && err.message) || 'Could not keep. Nothing was sent.', true);
       });

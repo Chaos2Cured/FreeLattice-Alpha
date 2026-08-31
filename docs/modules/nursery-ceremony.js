@@ -343,6 +343,9 @@
           };
           saveBeing(being);
           try { localStorage.removeItem(DEFER_KEY); } catch (e) {}
+          try {
+            window.dispatchEvent(new CustomEvent('fl-alpha-nursery-born', { detail: being }));
+          } catch (e) { /* growth face is optional */ }
           renderBorn(root, being);
         });
       }, reduceMotion() ? 200 : 1400);
