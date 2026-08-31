@@ -26,9 +26,9 @@ Mirror first: `docs/code-dialogue.html`. Module: `docs/modules/garden-thread.js`
 
 Autonomous coding, side by side, with the Gathering-chosen AI. Git commit / push behind a toggle **DEFAULT OFF**.
 
-- Benches are not built yet. Honest later stays until they are.
+- Benches live in the Workshop light. Fail-closed if no mind. Pad, Ask, and Run sleep.
 - Skills is held — code stays, not on the walk.
-- Do not invent a galaxy builder. Do not fake generate.
+- Do not invent a galaxy builder. Do not fake generate. Do not store tokens.
 
 Mirror first: `docs/code-workshop.html`.
 

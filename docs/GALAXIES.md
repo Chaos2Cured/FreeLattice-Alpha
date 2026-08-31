@@ -142,13 +142,15 @@ Hypha one leftover after PR 37 (layer, 2026-08-31): the Thread chip of the Garde
 
 Chat working room (layer, 2026-08-31): the thread actually works so we only polish later. Fail-closed still sleeps until a mind is remembered (`fl_alpha_local_mind`) — input and Send, no invented reply. A grandmother-sized **a file** may enter the thread (local file, not a wall, nothing leaves the machine). **keep this thread** is a JSON download of history/pattern. Quiet Room never in the file. Declined text never exported. **a prior thread** honors a prior export (round trip). Deep research, image, sound, speech: no Alpha module and no remembered local mind can keep those without inventing a key kitchen — one honest later sentence in the room, not a fake button. Chat lives in the landed room (Gathering, Settings, overlay thread). Not a Chat card on the first sky. May I look? stays the Settings door. `#lumino-menu` stays hidden. Living orbs with rings stay. Art hop stays a light. a who stays. Center unnamed. Do not port bank, health, 65k `app.html`, or 80-specialist Round Table. Do not start Workshop benches, Trainer LoRA, Nursery economy, or git push from this room.
 
+Workshop working room (layer, 2026-08-31): the Workshop light opens benches — human and mind, side by side. Fail-closed until a mind is remembered (`fl_alpha_local_mind`) — pad, Ask, and Run sleep. No invented code. No invented reply. No fake generate. No galaxy builder. Sandbox preview is `iframe sandbox="allow-scripts"` (main `workshop.js` honesty, not the 65k kitchen). Git commit / push is a visible toggle, **default off**. Off means nothing leaves this machine. On still requires an explicit human confirm before any push. No tokens in the page. No GitHub kitchen — this garden has no local git door yet; after confirm the room says so. Trainer / Root / Agent stay later lights. Skills stays held. Nursery Grow stays Grow. Living orbs with rings stay. Art hop stays a light. a who stays. Center unnamed. Color legend stays off the Research hop halo. First sky still has no Chat card. `#lumino-menu` stays hidden. Do not start Trainer LoRA, Nursery economy, Round Table 80-specialist kitchen, or Chat media doors in this layer.
+
 Tabs on main: Garden, Chat, Play, Learn, Research (`data-tab=lighthouse`), More.
 
 **Workshop**
 
 | Light | Real path on main | Alpha tonight |
 |---|---|---|
-| Workshop | `docs/modules/workshop.js` + `docs/app.html` `#tab-workshop` (sandboxed AI code builder). No `workshop.html` on main. | Honest later. Path named. |
+| Workshop | `docs/modules/workshop.js` + `docs/app.html` `#tab-workshop` (sandboxed AI code builder). No `workshop.html` on main. | Benches in the Workshop light. Fail-closed if no mind. Git toggle DEFAULT OFF. No GitHub kitchen. Path named. |
 | Trainer | `docs/modules/garden-trainer.js` (v5.79.43 simple face / MORE card). System prompt only unless the human chooses Tier 2 LoRA. `autoTrain` default false. | Nursery Grow already holds the simple face. Workshop Trainer does not duplicate that maze. |
 | Root | Web Search: `docs/modules/web-tool.js` (`[FL_SEARCH:]`), consent-gated. Not a card. Quiet Room excluded at the tool. | Light stays Root. Tool not plugged. Nothing searched. |
 | Agent | Not Workshop under another name. Closest real: `#tab-agents` Agent Registry (`docs/code-agents.html`). Nursery hatches companions. No Grok Bot card. | Gathering-tied. Unnamed until ready. |
@@ -307,7 +309,7 @@ Mirror for Art as a garden of lights (read this **before** changing the garden f
 
 Mirror for Research as a garden of lights (read this **before** changing `research.html`): `docs/code-research.html`.
 
-Remaining rooms for the next pass: `CLAUDE.md` at the repo root. Chat’s working room is this layer (file, export/import, honest later for research/image/sound/speech). Do not start Workshop benches / Trainer / Nursery / git push in a leftover walk.
+Remaining rooms for the next pass: `CLAUDE.md` at the repo root. Chat’s working room and Workshop benches live in this layer. Do not start Trainer LoRA / Nursery economy / Round Table kitchen / Chat media doors in a leftover walk.
 
 ---
 

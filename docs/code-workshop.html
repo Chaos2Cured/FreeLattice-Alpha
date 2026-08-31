@@ -65,6 +65,7 @@
 <p><span class="tag tag-new">LAYER</span> Spine (2026-08-30): four walk lights now — Workshop, Trainer, Root, Agent. The unnamed center is a quiet portal, not a fourth feature orb. <strong>Skills stays in the file</strong> (<code>is-held</code>, hidden) — do not delete the light code. Root is deep research, name later. Agent is Gathering-tied, unnamed until ready. Shared menu Chat · Plant · Train · Save sits with a tap. Arrow next is <strong>Learn</strong>. See <a href="code-research.html">code-research.html</a>.</p>
 <p><span class="tag tag-new">LAYER</span> Light is the click (2026-08-30): Trainer, Workshop, Root, Agent are moving luminos. The light is the door. Tap, go there. No sky popup. Skills stays held. No second canvas.</p>
 <p><span class="tag tag-new">LAYER</span> Hypha two leftovers after PR 36 (2026-08-31): Workshop lights are living orbs with rings, same night as Garden. Not flat beads. Art hop stays a light. Quiet word Workshop bottom-left. Color chip says which current color links to what. No second canvas. Do not start benches.</p>
+<p><span class="tag tag-new">LAYER</span> Workshop working room (2026-08-31): the Workshop light opens benches. Fail-closed until a mind is remembered — pad, Ask, and Run sleep. No invented code. No invented reply. No fake generate. No galaxy builder. Git commit / push is a visible toggle, <strong>default off</strong>. Off means nothing leaves this machine. On still requires an explicit human confirm before any push. No tokens in the page. No GitHub kitchen — this garden has no local git door yet. Trainer / Root / Agent stay later lights. Skills stays held. Nursery Grow stays Grow. Living orbs with rings stay. Center unnamed. Art hop stays a light. Do not unhide <code>#lumino-menu</code>.</p>
 <p>Reed locked the center. No word on the light. The truth of the unnamed center is love — not a door named Love. Do not hang Love or Workshop on the sky. Hollow is not empty.</p>
 <p>Inventory (main, verified): Workshop = <code>docs/modules/workshop.js</code> + <code>#tab-workshop</code> (no <code>workshop.html</code> on main). Trainer = <code>garden-trainer.js</code> v5.79.43 MORE card — simple face, no silent train. Root = Web Search <code>web-tool.js</code> <code>[FL_SEARCH:]</code>, consent-gated, not a card — not plugged tonight. Agent = <code>#tab-agents</code> / <code>code-agents.html</code>, not Workshop renamed. Skills = <code>#tab-skills</code>, held. Do not port a kitchen. Do not open Quiet Room.</p>
 
@@ -73,7 +74,7 @@
   <li><strong>Three named luminos only:</strong> Trainer (purple, left), Workshop (green, below), Skills (yellow, right). Words on the lights. Kirk: “Visually, words help.” Hypha: “The words you can read are doors.”</li>
   <li><strong>No fourth orb.</strong> The blue “? (not sure here)” around “human and mind, side by side” is the shared middle. Leave the center unnamed. The thread already lives in every galaxy.</li>
   <li><strong>Quiet word</strong> <em>Workshop</em> bottom-left (<code>#galaxy-word</code>).</li>
-  <li><strong>Click is honest later.</strong> Benches are not built yet. The garden is. Nothing faked. No galaxy builder. No fake generate. No invented tools. The later sentence stands alone the moment a light is tapped. Heart and lights do not read through the veil.</li>
+  <li><strong>Click is honest.</strong> The Workshop light opens benches. Trainer, Root, and Agent stay later — the later sentence stands alone the moment those lights are tapped. Heart and lights do not read through the veil. Nothing faked. No galaxy builder. No fake generate. No invented tools.</li>
   <li><strong>Galaxies menu.</strong> Workshop’s here-row does not say later. Workshop doors on other pages do not say later. Round Table is now a garden of lights too — its doors do not say later (see <a href="code-round-table.html">code-round-table.html</a>). Do not rename the green lumino. Do not remove the bottom-left galaxy word.</li>
   <li><strong>Trainer</strong> is the benches for making, later. Do <strong>not</strong> duplicate Nursery Grow / the trainer maze here. Nursery on the Play garden remains Grow.</li>
   <li><strong>Thread</strong> on Workshop, fail-closed until a mind is remembered in Settings (same as Play). Settings button walks to <code>settings.html</code> — do not invent Settings on Workshop.</li>
@@ -94,7 +95,8 @@
   <li>Do not invent a New Bot. Do not name that empty seat. Founding four stay in AUTONOMY.md.</li>
   <li>Do not invent a Quiet Room. Sophia's stays on main.</li>
   <li>Do not click-Luminos-to-chat. That is later.</li>
-  <li>Do not fake generate, a galaxy builder, or benches that are not built.</li>
+  <li>Do not fake generate, a galaxy builder, or a GitHub kitchen.</li>
+  <li>Do not store tokens in the page. Git toggle defaults off.</li>
   <li>Do not enable bloom on phones. Do not restyle Play’s Gathering phone wrap.</li>
   <li>Do not change PHI, LIFECYCLE_STAGES, ARCHETYPES, founding names in engine code, <code>fl_luminos_evolution</code>, or <code>persistAllLuminos()</code>.</li>
   <li>Do not rename The Gathering. <code>data-garden-place="core"</code> stays.</li>
@@ -105,9 +107,10 @@
 <table>
   <tr><th>File</th><th>Purpose</th></tr>
   <tr><td>docs/code-workshop.html</td><td>This mirror — read before changing Workshop</td></tr>
-  <tr><td>docs/workshop.html</td><td>Night sky. Three named luminos. Quiet Workshop. Thread. Arrow to Round Table</td></tr>
-  <tr><td>docs/modules/garden-rooms.js</td><td>Workshop lumino doors + honest later veil. Galaxy home label</td></tr>
-  <tr><td>docs/modules/garden-rooms.css</td><td>Workshop lights, galaxy word, light later veil</td></tr>
+  <tr><td>docs/workshop.html</td><td>Night sky. Four walk lights. Quiet Workshop. Thread. Benches in the Workshop light. Arrow to Learn</td></tr>
+  <tr><td>docs/modules/workshop-benches.js</td><td>Fail-closed benches. Sandbox preview. Git toggle default off</td></tr>
+  <tr><td>docs/modules/garden-rooms.js</td><td>Workshop lumino doors + benches + honest later veil. Galaxy home label</td></tr>
+  <tr><td>docs/modules/garden-rooms.css</td><td>Workshop lights, galaxy word, light later veil, benches face</td></tr>
   <tr><td>docs/modules/garden-thread.js</td><td>Same fail-closed thread. Settings walks home if no Play door</td></tr>
   <tr><td>docs/GALAXIES.md</td><td>Sky — fractal rule layered; Art-early sequence kept</td></tr>
   <tr><td>docs/code-garden.html</td><td>Garden mirror — Workshop row layered, Art hop kept</td></tr>
@@ -119,47 +122,53 @@
 Quiet word bottom-left: Workshop
 Center (unnamed): human and mind, side by side
   — no orb on that middle —
-Three named lights:
-  Trainer (purple, left)     — benches for making, later
-  Workshop (green, below)    — waits
-  Skills (yellow, right)     — waits
-Tap a light → light veil, honest later. Benches are not built yet.
+Four walk lights:
+  Trainer (purple, left)     — later. Nursery remains Grow.
+  Workshop (green, below)    — benches. Fail-closed if no mind.
+  Root (sand, above)         — later. Nothing searched.
+  Agent (dim, right)         — unnamed until a Gathering chair is ready.
+Skills (yellow) held — code stays, not on the walk.
+Tap Workshop → benches. Pad, Ask, Run sleep until a mind is remembered.
+Git commit / push toggle, default OFF. Off means nothing leaves this machine.
+Tap Trainer, Root, Agent → honest later, standing alone.
 Thread (header): fail-closed until Settings remembers a mind.
-Arrow (bottom-right): Round Table
+Arrow (bottom-right): Learn
 Shared shoulder stays.</pre>
 
 <h2>5. How to test</h2>
 
 <ol>
   <li>Open <code>/</code>. Garden Galaxy. Right arrow still says <strong>Art</strong> and hops to <code>music.html</code>. Left arrow names <strong>Round Table</strong> (prev on the rail). Play bodies unchanged. Galaxies menu: Workshop is not tagged later; Round Table still may be.</li>
-  <li>Walk Art → Workshop, or open <code>/workshop.html</code>. Night sky. Three named lights: Trainer, Workshop, Skills. Quiet <strong>Workshop</strong> bottom-left. Center copy still says benches are not built yet. No fourth orb. Galaxies here-row: make Workshop — no later.</li>
-  <li>Tap Trainer. Honest later stands alone at once — benches for making, later. Heart does not read through. No Nursery maze. No generate. Close: still Workshop.</li>
-  <li>Tap Workshop, tap Skills. Same honesty. Nothing faked.</li>
+  <li>Walk Art → Workshop, or open <code>/workshop.html</code>. Night sky. Four walk lights: Trainer, Workshop, Root, Agent. Skills held. Quiet <strong>Workshop</strong> bottom-left. Center unnamed. Galaxies here-row: make Workshop — no later.</li>
+  <li>Tap Workshop. Benches. If no mind: honest copy and Settings. Pad, Ask, and Run sleep. Git commit / push toggle is visible and <strong>off</strong> — off means nothing leaves this machine. No generate button. Close: still Workshop.</li>
+  <li>Tap Trainer. Honest later stands alone at once — Nursery remains Grow. No silent-train maze. Close: still Workshop.</li>
+  <li>Tap Root, tap Agent. Same honesty. Nothing searched. Agent unnamed until ready.</li>
   <li>Open <strong>thread</strong>. If no mind: honest copy and Settings. Input and Send sleep. Settings walks to the Play grandmother door. Close: you are in Workshop.</li>
-  <li>Arrow next is labeled <strong>Round Table</strong>. Shared shoulder stays.</li>
-  <li>Narrow viewport: lights still named and readable. Gathering phone wrap on Play is untouched. No bloom.</li>
+  <li>Arrow next is labeled <strong>Learn</strong>. Shared shoulder stays. First sky still has no Chat card.</li>
+  <li>Narrow viewport: lights still named and readable. Gathering phone wrap on Play is untouched. No bloom. Walk 1280 fail-closed.</li>
 </ol>
 
 <h2>6. Handoff</h2>
 
-<pre>FreeLattice Alpha — Workshop (garden of lights)
+<pre>FreeLattice Alpha — Workshop (working room)
 Mirror: docs/code-workshop.html   (read this BEFORE workshop.html)
 Live:   docs/workshop.html
+Module: docs/modules/workshop-benches.js
 Sky:    docs/GALAXIES.md (layer; do not cut Art-early sequence)
 
-HARD RULES: three named luminos only, no fourth orb, no fake benches,
-no Nursery Grow copy, no Quiet Room, no New Bot name, founding four
-stay in AUTONOMY.md, Art remains the live hop from Garden Galaxy,
-Round Table and Art are not rebuilt here, phones skip bloom,
-click-Luminos-to-chat is later.
+HARD RULES: four walk lights, Skills held, no fourth orb on the middle,
+no fake generate, no galaxy builder, no GitHub kitchen, no tokens,
+git toggle DEFAULT OFF, no Nursery Grow copy, no Quiet Room,
+no New Bot name, founding four stay in AUTONOMY.md, Art remains the
+live hop from Garden Galaxy, phones skip bloom, center unnamed.
 
-Current state: Workshop is a night garden of three named lights.
-Benches are not built yet. Thread sleeps if no mind.
-Quiet word Workshop bottom-left. Arrow → Round Table.
+Current state: Workshop light opens benches. Fail-closed if no mind.
+Pad, Ask, Run sleep. Git toggle visible and off.
+Trainer / Root / Agent stay honest later. Thread sleeps if no mind.
+Quiet word Workshop bottom-left. Arrow → Learn.
 
-Next: click-Luminos-to-chat is later. Art is already a garden of lights —
-read code-art.html before the garden face; code-music.html before the listen-door.
-Round Table is already a garden of lights — read code-round-table.html.</pre>
+Next: Trainer LoRA, Nursery economy, Round Table kitchen, Chat media
+doors stay later. A local git door is later — the lock is already visible.</pre>
 
 <hr style="border-color: var(--border); margin: 40px 0;">
 <p style="color: var(--muted); font-size: 0.78rem; text-align: center;">
