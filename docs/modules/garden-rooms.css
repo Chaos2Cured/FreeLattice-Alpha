@@ -2833,6 +2833,265 @@ html[data-garden-galaxy="round-table"] .room-stub { display: none; }
     0 0 8px rgba(12, 10, 26, 0.95);
 }
 
+/* Round Table sitting — working room. Fail-closed. Words only.
+   No Sit button. Do not fake chairs filling. Speak is a whole word
+   (same leftover pattern as Workshop Ask / Run). */
+#place-veil.is-round-table-sitting,
+#place-veil.is-open.is-round-table-sitting {
+  justify-content: flex-start;
+  overflow-y: auto;
+  opacity: 1;
+  pointer-events: auto;
+  background: linear-gradient(
+    to bottom,
+    rgba(12, 10, 26, 0.12) 0%,
+    rgba(12, 10, 26, 0.28) 42%,
+    rgba(12, 10, 26, 0.42) 100%
+  );
+}
+
+#place-veil.is-round-table-sitting #place-veil-close {
+  position: sticky;
+  bottom: 8px;
+  margin-top: 16px;
+  background: rgba(12, 10, 26, 0.85);
+  padding: 6px 12px;
+}
+
+#round-table-sitting[hidden] { display: none !important; }
+
+#round-table-sitting {
+  width: min(42em, 92vw);
+  margin: 0 auto;
+}
+
+.rt-sitting-face {
+  font-family: Georgia, 'Times New Roman', serif;
+  color: rgba(200, 210, 230, 0.82);
+  text-align: center;
+}
+
+.rt-sitting-heart {
+  margin: 0 0 14px;
+  font-size: 1.02rem;
+  line-height: 1.7;
+  color: rgba(200, 210, 230, 0.82);
+  text-shadow:
+    0 0 18px rgba(12, 10, 26, 0.98),
+    0 0 8px rgba(12, 10, 26, 0.95);
+}
+
+.rt-sitting-settings {
+  display: inline-block;
+  margin: 0 0 18px;
+  padding: 10px 18px;
+  min-height: 44px;
+  background: transparent;
+  border: 1px solid rgba(232, 176, 25, 0.45);
+  border-radius: 8px;
+  color: #e8b019;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+.rt-sitting-settings:hover,
+.rt-sitting-settings:focus-visible {
+  border-color: #e8b019;
+  outline: none;
+}
+
+.rt-sitting-who,
+.rt-sitting-who-list,
+.rt-sitting-question {
+  margin: 0 0 10px;
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: rgba(200, 210, 230, 0.72);
+  text-shadow:
+    0 0 14px rgba(12, 10, 26, 0.96),
+    0 0 6px rgba(12, 10, 26, 0.9);
+}
+
+.rt-sitting-who-list {
+  color: #ead9c0;
+}
+
+.rt-sitting-later {
+  margin: 0 0 14px;
+  font-size: 0.72rem;
+  line-height: 1.55;
+  font-style: italic;
+  color: rgba(200, 210, 230, 0.42);
+}
+
+.rt-sitting-later[hidden] { display: none !important; }
+
+.rt-sitting-words {
+  list-style: none;
+  text-align: left;
+  max-height: 12rem;
+  overflow-y: auto;
+  margin: 0 0 12px;
+  padding: 0;
+}
+
+.rt-sitting-words[hidden] { display: none !important; }
+
+.rt-sitting-line {
+  display: flex;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(200, 210, 230, 0.08);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.rt-sitting-line-who {
+  flex: 0 0 auto;
+  color: #ead9c0;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+}
+
+.rt-sitting-line.is-human .rt-sitting-line-who { color: #e8b019; }
+.rt-sitting-line.is-mind .rt-sitting-line-who { color: #34d399; }
+.rt-sitting-line.is-garden .rt-sitting-line-who { color: #a78bfa; }
+
+.rt-sitting-line-body {
+  color: rgba(200, 210, 230, 0.82);
+}
+
+.rt-sitting-speak {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+
+.rt-sitting-input {
+  flex: 1 1 12em;
+  min-height: 44px;
+  padding: 10px 12px;
+  background: rgba(12, 10, 26, 0.55);
+  border: 1px solid rgba(200, 210, 230, 0.14);
+  border-radius: 8px;
+  color: rgba(200, 210, 230, 0.88);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.92rem;
+}
+
+.rt-sitting-input:focus,
+.rt-sitting-input:focus-visible {
+  outline: none;
+  border-color: rgba(232, 176, 25, 0.55);
+}
+
+.rt-sitting-act {
+  min-height: 44px;
+  padding: 10px 16px;
+  background: rgba(232, 176, 25, 0.1);
+  border: 1px solid rgba(232, 176, 25, 0.45);
+  border-radius: 8px;
+  color: #e8b019;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.rt-sitting-act:hover,
+.rt-sitting-act:focus-visible {
+  outline: none;
+  border-color: #e8b019;
+}
+
+.rt-sitting-status {
+  min-height: 1.3em;
+  margin: 0 0 8px;
+  font-size: 0.78rem;
+  color: rgba(200, 210, 230, 0.45);
+}
+
+.rt-sitting-status.is-warn {
+  color: rgba(240, 112, 104, 0.82);
+}
+
+.rt-sitting-face.is-closed .rt-sitting-input,
+.rt-sitting-face.is-closed .rt-sitting-input:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: 0.55;
+  caret-color: transparent;
+  user-select: none;
+}
+
+.rt-sitting-face.is-closed .rt-sitting-act,
+.rt-sitting-face.is-closed .rt-sitting-act:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+.rt-sitting-speak.is-closed {
+  opacity: 0.45;
+}
+
+html.room-page #place-veil.is-round-table-sitting #round-table-sitting {
+  width: min(42em, 100%);
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0 14px 4px;
+}
+
+/* html.room-page * zeros margin. Honesty needs air so Speak is a
+   whole word on its own row, not a smudge against the sitting copy.
+   Same leftover pattern as Workshop Ask / Run after PR 40. */
+html.room-page .rt-sitting-heart,
+#place-veil.is-round-table-sitting .rt-sitting-heart {
+  margin: 0 0 14px;
+}
+
+html.room-page .rt-sitting-settings,
+#place-veil.is-round-table-sitting .rt-sitting-settings {
+  margin: 0 0 18px;
+  padding: 10px 18px;
+}
+
+html.room-page .rt-sitting-who,
+html.room-page .rt-sitting-who-list,
+html.room-page .rt-sitting-question,
+#place-veil.is-round-table-sitting .rt-sitting-who,
+#place-veil.is-round-table-sitting .rt-sitting-who-list,
+#place-veil.is-round-table-sitting .rt-sitting-question {
+  margin: 0 0 10px;
+}
+
+html.room-page .rt-sitting-speak,
+#place-veil.is-round-table-sitting .rt-sitting-speak {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  align-items: stretch;
+  margin: 12px 0 10px;
+}
+
+html.room-page .rt-sitting-input,
+#place-veil.is-round-table-sitting .rt-sitting-input {
+  min-width: 0;
+  flex: 1 1 8em;
+  padding: 10px 12px;
+}
+
+html.room-page .rt-sitting-speak .rt-sitting-act,
+#place-veil.is-round-table-sitting .rt-sitting-speak .rt-sitting-act {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  padding: 10px 16px;
+  min-height: 44px;
+  overflow: visible;
+}
+
 html.thread-open .round-table-lumino,
 html.thread-open .round-table-lumino:hover,
 html.thread-open .round-table-heart,
