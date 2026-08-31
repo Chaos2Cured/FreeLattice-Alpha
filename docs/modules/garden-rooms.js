@@ -1087,6 +1087,11 @@
     }
     var input = document.querySelector('#room-chat-stage [data-thread-input]');
     if (!input) return;
+    var form = document.querySelector('#room-chat-stage [data-thread-form]');
+    var asleep = input.disabled ||
+      input.getAttribute('aria-disabled') === 'true' ||
+      (form && form.classList.contains('is-closed'));
+    if (asleep) return;
     try { input.focus(); } catch (e) {}
   }
 
