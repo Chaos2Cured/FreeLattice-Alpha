@@ -44,13 +44,14 @@ Mirror first: `docs/code-round-table.html`. Module: `docs/modules/round-table-si
 
 ### Trainer
 
-Updates actual local weights. Never silent. Data never leaves the device. Declined never SFT.
+The simple face works so we only polish later. Fail-closed until a mind is remembered. Fail-closed if local-only cannot be proven. Never silent. Data never leaves the device. Declined never SFT.
 
-- Nursery Grow already holds the simple face. Do not duplicate that maze on Workshop.
+- Nursery Grow already holds the grow ceremony. Do not duplicate that maze on Workshop.
 - Auto vs manual is KeepReceipt's human toggle. Do not invent a second gate.
-- Fail-closed if local-only cannot be proven.
+- One remembered mind is enough. If more later, they may train one at a time — not a kitchen that trains all at once without a who.
+- If a remembered local mind has a real train door the page can keep, wire it and say what it did. If it cannot, one honest sentence. Do not fake a train.
 
-Mirror first: `docs/code-nursery.html`. Keystone: `docs/modules/garden-trainer.js`.
+Mirror first: `docs/code-workshop.html`. Keystone: `docs/modules/garden-trainer.js`. Module: `docs/modules/workshop-trainer.js`. Grow stays: `docs/code-nursery.html`.
 
 ### Nursery
 
