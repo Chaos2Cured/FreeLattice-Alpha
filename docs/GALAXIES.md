@@ -130,6 +130,8 @@ Hypha two leftover catches after PR 31 (layer, 2026-08-30): Garden quiet-word sa
 
 Chat in the room (layer, 2026-08-30): after PR 31, Chat was not a door on the sky. Header **thread** still opened a veil that left The Gathering. A grandmother who tapped into The Gathering could not find Chat in the room. Same fail-closed thread — it now lives in The Gathering and in Settings. Input and Send still sleep until a mind is remembered. Honest copy still points to Settings (`May I look?`). Submit still does nothing if none. No invented reply. Chat / plant / go-to stay off the first sky. Later seats, “the garden” return, Family care, hops, and shared shoulder stay. Plant stays in the room later — this layer does not unhide the sky menu.
 
+Hypha two leftover clips after PR 33 (layer, 2026-08-30): wide Gathering Chat ran off the right edge — Send was clipped. Same card. Same fail-closed. The whole Send stays on the sky; the card does not sit on later seats, “the garden”, Family care, Art hop, or shared shoulder. Settings Chat sat glass over the spinning lattice, so the honesty was hard to read. Same words. Same fail-closed. It leaves the orb. May I look? stays the grandmother door — no second Settings button. Lattice may show through glass around the card, not through the letters. First sky stays clean — no Chat / plant / go-to card. Do not unhide `#lumino-menu`. Do not cut `#place-veil-close`.
+
 Tabs on main: Garden, Chat, Play, Learn, Research (`data-tab=lighthouse`), More.
 
 **Workshop**
