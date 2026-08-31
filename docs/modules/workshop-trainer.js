@@ -56,6 +56,10 @@
     'There is no honest signal to teach yet. Love a keep first. Weights did not change.';
   var HEART_GROW =
     'Nursery remains Grow. This light is Trainer.';
+  // Resting face, fail-closed, no mind: heart waits. This line says
+  // the not-done — once. Not a second heart. Weights did not change.
+  var HEART_RESTING =
+    'Nothing has been trained. Weights did not change.';
   var KEEP_NOTE =
     'Auto vs manual is the same keep as Art and Nursery. That is keep, not train.';
   var VALUES_OUT =
@@ -604,10 +608,16 @@
 
     // Heart already speaks when no mind / not local. Status is for the
     // door, or for a tap. Do not repeat the heart under Train.
+    // Fail-closed with no mind: say the not-done once. Never silent
+    // means the face names what did not happen, not only what it waits
+    // for. HEART_NOT_LOCAL already ends "Weights did not change" —
+    // do not say it twice.
     if (mind && local && !door.ok) {
       setStatus(speakHonest(door.reason), true);
     } else if (mind && local && door.ok) {
       setStatus('A local train door is here. Train when you choose. Nothing runs until you ask.', false);
+    } else if (!mind && local) {
+      setStatus(HEART_RESTING, false);
     } else {
       setStatus('', false);
     }
@@ -692,6 +702,7 @@
     HEART_UNKNOWN: HEART_UNKNOWN,
     HEART_MIXED: HEART_MIXED,
     HEART_GROW: HEART_GROW,
+    HEART_RESTING: HEART_RESTING,
     KEEP_NOTE: KEEP_NOTE,
     hostIs: function (node) { return hostEl === node; }
   };
