@@ -6,6 +6,7 @@
 // If none: fail-closed. Honest heart copy. Settings button.
 // On Workshop, Round Table, Art, and Research (no Play Settings door): Settings walks to settings.html.
 // Input and Send sleep (aria-disabled, no submit). Do not invent a reply.
+// After PR 34: Send slept; the input still looked typeable. Same sleep.
 // Do not look for a mind from the thread. That job is Settings.
 // If a mind is remembered: input and Send wake.
 // If the door is blocked: honest fail. Do not fake a reply.
@@ -285,22 +286,39 @@
       if (open) {
         form.classList.remove('is-closed');
         form.removeAttribute('aria-disabled');
+        form.removeAttribute('inert');
+        form.removeAttribute('data-thread-asleep');
         input.disabled = false;
+        input.readOnly = false;
+        input.removeAttribute('disabled');
+        input.removeAttribute('readonly');
         input.removeAttribute('aria-disabled');
+        input.removeAttribute('tabindex');
         input.placeholder = 'Say something';
         input.setAttribute('aria-label', 'Say something');
         sendBtn.disabled = false;
+        sendBtn.removeAttribute('disabled');
         sendBtn.removeAttribute('aria-disabled');
+        sendBtn.removeAttribute('tabindex');
       } else {
         form.classList.add('is-closed');
         form.setAttribute('aria-disabled', 'true');
+        form.setAttribute('inert', '');
+        form.setAttribute('data-thread-asleep', '1');
         input.disabled = true;
+        input.readOnly = true;
+        input.setAttribute('disabled', '');
+        input.setAttribute('readonly', '');
         input.setAttribute('aria-disabled', 'true');
+        input.tabIndex = -1;
         input.placeholder = '';
         input.setAttribute('aria-label', 'The thread is waiting for a mind in Settings');
         input.value = '';
+        try { input.blur(); } catch (e) {}
         sendBtn.disabled = true;
+        sendBtn.setAttribute('disabled', '');
         sendBtn.setAttribute('aria-disabled', 'true');
+        sendBtn.tabIndex = -1;
       }
     }
 
@@ -315,11 +333,20 @@
       status.className = 'thread-status' + (warn ? ' is-warn' : '');
     }
 
+    function refuseAsleepTyping(ev) {
+      if (!form.classList.contains('is-closed')) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+    }
+    ['keydown', 'keypress', 'beforeinput', 'input', 'paste', 'drop'].forEach(function (type) {
+      input.addEventListener(type, refuseAsleepTyping);
+    });
+
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
       if (busy) return;
       var nowMind = listener();
-      if (!nowMind) {
+      if (!nowMind || form.classList.contains('is-closed')) {
         setComposeOpen(false);
         return;
       }

@@ -1759,22 +1759,45 @@ html.sky-portal-open .gt-hint {
   outline: none;
 }
 
-.thread-send:disabled { opacity: 0.55; cursor: wait; }
+.thread-send:disabled,
+.thread-send[aria-disabled="true"] { opacity: 0.55; cursor: wait; }
 
 .thread-compose.is-closed {
   opacity: 0.45;
 }
 
+/* Fail-closed: input sleeps with Send. A typeable box that cannot
+   send is a grandmother bite. Same honesty. Pointer, caret, and
+   gold focus ring rest until a mind is remembered. */
 .thread-compose.is-closed .thread-input,
-.thread-compose.is-closed .thread-input:disabled {
+.thread-compose.is-closed .thread-input:disabled,
+.thread-compose.is-closed .thread-input[aria-disabled="true"],
+.thread-compose.is-closed .thread-input[readonly] {
   cursor: not-allowed;
+  pointer-events: none;
+  opacity: 0.55;
+  border-color: rgba(200, 210, 230, 0.08);
+  background: rgba(12, 10, 26, 0.28);
+  color: rgba(200, 210, 230, 0.38);
+  caret-color: transparent;
+  user-select: none;
+}
+
+.thread-compose.is-closed .thread-input:focus,
+.thread-compose.is-closed .thread-input:focus-visible {
+  border-color: rgba(200, 210, 230, 0.08);
+  box-shadow: none;
+  outline: none;
+  caret-color: transparent;
 }
 
 .thread-compose.is-closed .thread-send,
 .thread-compose.is-closed .thread-send:disabled,
+.thread-compose.is-closed .thread-send[aria-disabled="true"],
 .thread-compose.is-closed .thread-send:hover,
 .thread-compose.is-closed .thread-send:focus-visible {
   cursor: not-allowed;
+  pointer-events: none;
   border-color: rgba(232, 176, 25, 0.28);
 }
 

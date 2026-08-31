@@ -132,6 +132,8 @@ Chat in the room (layer, 2026-08-30): after PR 31, Chat was not a door on the sk
 
 Hypha two leftover clips after PR 33 (layer, 2026-08-30): wide Gathering Chat ran off the right edge — Send was clipped. Same card. Same fail-closed. The whole Send stays on the sky; the card does not sit on later seats, “the garden”, Family care, Art hop, or shared shoulder. Settings Chat sat glass over the spinning lattice, so the honesty was hard to read. Same words. Same fail-closed. It leaves the orb. May I look? stays the grandmother door — no second Settings button. Lattice may show through glass around the card, not through the letters. First sky stays clean — no Chat / plant / go-to card. Do not unhide `#lumino-menu`. Do not cut `#place-veil-close`.
 
+Hypha one leftover after PR 34 (layer, 2026-08-31): Settings Chat input was awake while Send slept. Same fail-closed thread. Fail-closed means input and Send both sleep until a mind is remembered. Typing and submit do nothing. `aria-disabled`. No invented reply. Gathering Chat and the overlay thread the same. After a mind is remembered, both wake. May I look? stays the grandmother door — no second Settings button. First sky stays clean — no Chat / plant / go-to card. Do not unhide `#lumino-menu`. Do not cut `#place-veil-close`.
+
 Tabs on main: Garden, Chat, Play, Learn, Research (`data-tab=lighthouse`), More.
 
 **Workshop**
