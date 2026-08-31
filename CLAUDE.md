@@ -14,10 +14,9 @@ Do not start these in a leftover walk. Proven-first. One small complete thing at
 
 ### Chat
 
-The thread already lives in the room (fail-closed if no mind is remembered). The next Chat is the real room: research, image, sound, speech, file upload, full history / pattern export.
+The thread works so we only polish later. Fail-closed until a mind is remembered. Local file into the thread. Full history / pattern export (JSON). Quiet Room never in the file. Declined text never exported. Import honors a prior export.
 
-- Quiet Room never in the file.
-- Declined text never exported.
+- Deep research, image, sound, speech wait — honest later in the room, not fake buttons — until a remembered local mind or an Alpha module can keep them without a key kitchen.
 - Do not fake a reply. Do not look for a mind from the thread.
 - Do not port the 65k kitchen (bank, health, `app.html`).
 
