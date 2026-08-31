@@ -106,6 +106,10 @@
       return QUIET_MARK.test(value) ? '' : value;
     }
     if (typeof value !== 'object') return value;
+    if (!Array.isArray(value) && (value.declined || value.source === 'declined' ||
+        Object.keys(value).some(function (k) { return DECLINED_KEY.test(k); }))) {
+      return undefined;
+    }
     if (Array.isArray(value)) {
       var list = [];
       value.forEach(function (item) {
@@ -211,14 +215,23 @@
       try { parsed = JSON.parse(raw); } catch (e) { return { ok: false, reason: 'not-json' }; }
     }
     if (!parsed || typeof parsed !== 'object') return { ok: false, reason: 'empty' };
-    var cleaned = stripForbidden(parsed, 0);
+    if (parsed.kind && parsed.kind !== EXPORT_KIND) return { ok: false, reason: 'not-thread' };
+    var rawRows = [];
+    if (Array.isArray(parsed.messages)) rawRows = parsed.messages;
+    else if (Array.isArray(parsed)) rawRows = parsed;
+    var rows = sanitizeMessages(rawRows);
+    var cleaned = stripForbidden({
+      kind: parsed.kind || EXPORT_KIND,
+      version: parsed.version,
+      messages: rows,
+      pattern: parsed.pattern || null
+    }, 0);
     if (!cleaned || typeof cleaned !== 'object') return { ok: false, reason: 'empty' };
-    if (cleaned.kind && cleaned.kind !== EXPORT_KIND) return { ok: false, reason: 'not-thread' };
-    var rows = [];
-    if (Array.isArray(cleaned.messages)) rows = cleaned.messages;
-    else if (Array.isArray(cleaned)) rows = cleaned;
-    rows = sanitizeMessages(rows);
-    return { ok: true, messages: rows, pattern: cleaned.pattern || null };
+    return {
+      ok: true,
+      messages: Array.isArray(cleaned.messages) ? cleaned.messages : rows,
+      pattern: cleaned.pattern || null
+    };
   }
 
   function saveHistory() {
@@ -491,6 +504,10 @@
     }
     root.appendChild(heart);
 
+    var later = el('p', 'thread-later', HEART_LATER);
+    later.setAttribute('data-thread-later', '1');
+    root.appendChild(later);
+
     if (!mind && !opts.inSettings) {
       var toSettings = el('button', 'thread-to-settings', 'Settings');
       toSettings.type = 'button';
@@ -566,10 +583,6 @@
     tools.appendChild(importInput);
     form.appendChild(tools);
     root.appendChild(form);
-
-    var later = el('p', 'thread-later', HEART_LATER);
-    later.setAttribute('data-thread-later', '1');
-    root.appendChild(later);
 
     function setComposeOpen(open) {
       if (open) {

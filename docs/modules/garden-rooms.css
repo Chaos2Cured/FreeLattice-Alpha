@@ -1894,7 +1894,7 @@ html.sky-portal-open .gt-hint {
 }
 
 .thread-later {
-  margin: 8px 0 0;
+  margin: -4px 0 10px;
   font-size: 0.72rem;
   line-height: 1.55;
   font-style: italic;
@@ -1996,7 +1996,18 @@ html.sky-portal-open .gt-hint {
 
 .thread-face.is-room .thread-later {
   font-size: 0.66rem;
-  margin-top: 6px;
+  margin: -2px 0 8px;
+}
+
+/* Wide room Chat: file / keep stay with Send. Not a wall. */
+@media (min-width: 641px) {
+  #place-veil.is-core #room-chat .thread-compose,
+  #place-veil.is-settings #room-chat .thread-compose {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    background: rgba(12, 10, 26, 0.88);
+  }
 }
 
 /* Wide Gathering: Chat lives to the right of the chairs, above later

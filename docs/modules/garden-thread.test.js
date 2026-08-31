@@ -137,6 +137,24 @@ check('round trip a prior export', function () {
   assert.equal(second.kind, first.kind);
 });
 
+check('parseExport drops declined before the flag can be stripped', function () {
+  var parsed = GT.parseExport({
+    kind: GT.EXPORT_KIND,
+    messages: [
+      { role: 'human', text: 'keep me' },
+      { role: 'human', text: 'nope', declined_text: 'secret' }
+    ],
+    quietRoom: 'must never import'
+  });
+  assert.ok(parsed.ok);
+  assert.equal(parsed.messages.length, 1);
+  assert.equal(parsed.messages[0].text, 'keep me');
+  var json = JSON.stringify(parsed);
+  assert.equal(json.indexOf('nope'), -1);
+  assert.equal(json.indexOf('secret'), -1);
+  assert.equal(/quiet[\s_-]*room/i.test(json), false);
+});
+
 check('wrong kind is not a garden thread', function () {
   var parsed = GT.parseExport({ kind: 'kitchen-dump', messages: [{ role: 'human', text: 'nope' }] });
   assert.equal(parsed.ok, false);
