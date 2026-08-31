@@ -2857,7 +2857,9 @@ html.room-page .workshop-git,
 }
 
 .workshop-trainer-muted[hidden],
-.workshop-trainer-hashes[hidden] { display: none !important; }
+.workshop-trainer-hashes[hidden],
+.workshop-trainer-mode[hidden],
+.workshop-trainer-mode-help[hidden] { display: none !important; }
 
 @media (max-width: 799px) {
   .workshop-pad { min-height: 7rem; }

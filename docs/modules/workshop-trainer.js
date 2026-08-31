@@ -602,19 +602,28 @@
     setKeepOpen(!!(mind && local));
     setTrainOpen(!!(mind && local && door.ok));
 
-    if (!local) {
-      setStatus(HEART_NOT_LOCAL, true);
-    } else if (!mind) {
-      setStatus(HEART_NONE, true);
-    } else if (!door.ok) {
+    // Heart already speaks when no mind / not local. Status is for the
+    // door, or for a tap. Do not repeat the heart under Train.
+    if (mind && local && !door.ok) {
       setStatus(speakHonest(door.reason), true);
-    } else {
+    } else if (mind && local && door.ok) {
       setStatus('A local train door is here. Train when you choose. Nothing runs until you ask.', false);
+    } else {
+      setStatus('', false);
     }
 
     var n = renderHashes(root);
-    hashEmpty.hidden = !!n;
-    hashes.hidden = !n;
+    if (!(mind && local)) {
+      mode.hidden = true;
+      modeHelp.hidden = true;
+      hashEmpty.hidden = true;
+      hashes.hidden = true;
+    } else {
+      mode.hidden = false;
+      modeHelp.hidden = false;
+      hashEmpty.hidden = !!n;
+      hashes.hidden = !n;
+    }
 
     function refuseAsleep(ev) {
       if (!root.classList.contains('is-closed')) return;
