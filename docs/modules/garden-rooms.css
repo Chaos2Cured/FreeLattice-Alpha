@@ -2655,6 +2655,32 @@ html.room-page .workshop-pad,
   margin-bottom: 10px;
 }
 
+/* Layer: Hypha leftover after PR 42 (Workshop benches).
+   Settings grandmother door sat on the Git commit/push card.
+   html.room-page * zeros margin, so the door had no air.
+   Same leftover pattern as Workshop Ask/Run after PR 40 and
+   Gathering Chat Send after PR 33. Same door. Same Git card.
+   Settings sits above the Git card, not on it. Git toggle
+   stays OFF by default. Ask and Run stay whole words.
+   Do not un-sleep pad/Ask/Run. Layer, never delete. */
+html.room-page .workshop-benches-heart,
+#place-veil.is-workshop-benches .workshop-benches-heart {
+  margin: 0 0 14px;
+}
+
+html.room-page .workshop-benches-settings,
+#place-veil.is-workshop-benches .workshop-benches-settings {
+  display: inline-block;
+  margin: 0 0 18px;
+  padding: 10px 18px;
+}
+
+html.room-page .workshop-git,
+#place-veil.is-workshop-benches .workshop-git {
+  margin: 0 auto 16px;
+  padding: 12px 16px;
+}
+
 @media (max-width: 799px) {
   .workshop-pad { min-height: 7rem; }
   .workshop-preview { min-height: 6rem; }

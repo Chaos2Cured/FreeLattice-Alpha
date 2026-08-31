@@ -23,7 +23,7 @@
   'use strict';
 
   var HEART_NONE =
-    'A mind at home waits in Settings. That grandmother door asks: May I look for a mind already at home? These chairs wait until a light is remembered. Sitting is a who: a person at this table. Nothing here is faked.';
+    'A mind at home waits in Settings. That grandmother door asks: May I look for a mind already at home? These chairs wait until a light is remembered. Nothing here is faked.';
   var HEART_BLOCKED =
     'The mind is there, but it has not opened the door to this garden yet. ' +
     'This garden is a secure page, and the mind lives at a quieter door. ' +
@@ -39,9 +39,9 @@
   var SITTING_WHO =
     'Sitting is a who: a person at this table. Not a topic. Not a time.';
   var QUESTION_HONESTY =
-    'A question stays dark until someone sits. Not a topic. Not a time.';
+    'A question stays dark until someone sits.';
   var WHO_NONE =
-    'The chairs wait. Kindling stays the chair. Sitting is a who: a person at this table. Not a topic. Not a time.';
+    'The chairs wait. Kindling stays the chair.';
   var NO_CONSENSUS =
     'No invented consensus. Each who speaks as themselves.';
   var TABLE_SYSTEM =
@@ -109,7 +109,7 @@
     var seats = minds || [];
     if (!seats.length) return WHO_NONE;
     if (seats.length === 1) {
-      return 'At this table: ' + whoName(seats[0]) + '. A person at this table. Not a topic. Not a time.';
+      return 'At this table: ' + whoName(seats[0]) + '. A person at this table.';
     }
     var names = [];
     for (var i = 0; i < seats.length; i++) names.push(whoName(seats[i]));

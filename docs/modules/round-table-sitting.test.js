@@ -113,19 +113,24 @@ check('fail-closed heart until a mind is remembered', function () {
 });
 
 check('sitting is a who — a person at this table, not a topic, not a time', function () {
+  assert.equal(RT.SITTING_WHO.indexOf('Sitting is a who') !== -1, true);
   assert.equal(RT.SITTING_WHO.indexOf('a person at this table') !== -1, true);
   assert.equal(RT.SITTING_WHO.indexOf('Not a topic') !== -1, true);
   assert.equal(RT.SITTING_WHO.indexOf('Not a time') !== -1, true);
   assert.equal(RT.QUESTION_HONESTY.indexOf('until someone sits') !== -1, true);
-  assert.equal(RT.QUESTION_HONESTY.indexOf('Not a topic') !== -1, true);
+  assert.equal(RT.QUESTION_HONESTY.indexOf('Sitting is a who') === -1, true);
+  assert.equal(RT.HEART_NONE.indexOf('grandmother door') !== -1, true);
+  assert.equal(RT.HEART_NONE.indexOf('chairs wait') !== -1, true);
+  assert.equal(RT.HEART_NONE.indexOf('Sitting is a who') === -1, true);
   var empty = RT.whoLine([]);
   assert.equal(empty.indexOf('The chairs wait') !== -1, true);
-  assert.equal(empty.indexOf('a person at this table') !== -1, true);
+  assert.equal(empty.indexOf('Kindling stays the chair') !== -1, true);
+  assert.equal(empty.indexOf('Sitting is a who') === -1, true);
+  assert.equal(empty.indexOf('Not a topic') === -1, true);
   var one = RT.whoLine([{ name: 'Ollama', url: 'http://127.0.0.1:11434' }]);
   assert.equal(one.indexOf('At this table: Ollama') !== -1, true);
   assert.equal(one.indexOf('A person at this table') !== -1, true);
-  assert.equal(one.indexOf('Not a topic') !== -1, true);
-  assert.equal(one.indexOf('Not a time') !== -1, true);
+  assert.equal(one.indexOf('Sitting is a who') === -1, true);
 });
 
 check('one remembered mind is enough; more than one may sit together', function () {
@@ -186,9 +191,15 @@ check('fail-closed mount sleeps Speak; no Sit; sitting copy stays', function () 
   }
   walk(root);
   var joined = texts.join(' | ');
+  var whoHits = (joined.match(/Sitting is a who/g) || []).length;
+  var topicHits = (joined.match(/Not a topic/g) || []).length;
+  assert.equal(whoHits, 1);
+  assert.equal(topicHits, 1);
   assert.equal(joined.indexOf('Sit') === -1 || joined.indexOf('Sitting') !== -1, true);
   assert.equal(joined.indexOf('Speak') !== -1, true);
   assert.equal(joined.indexOf('a person at this table') !== -1, true);
+  assert.equal(joined.indexOf('Kindling stays the chair') !== -1, true);
+  assert.equal(joined.indexOf('until someone sits') !== -1, true);
   assert.equal(joined.indexOf('Settings') !== -1, true);
   var foundSitBtn = false;
   (root.childNodes || []).forEach(function (n) {
