@@ -345,6 +345,8 @@
         runBtn.removeAttribute('aria-disabled');
         later.hidden = false;
         later.removeAttribute('hidden');
+        preview.hidden = false;
+        preview.removeAttribute('hidden');
       } else {
         root.classList.add('is-closed');
         root.setAttribute('data-workshop-asleep', '1');
@@ -378,6 +380,9 @@
         runBtn.setAttribute('aria-disabled', 'true');
         later.hidden = true;
         later.setAttribute('hidden', '');
+        preview.hidden = true;
+        preview.setAttribute('hidden', '');
+        preview.srcdoc = '';
       }
       setGitActs(isGitPushOn());
     }
