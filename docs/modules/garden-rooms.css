@@ -3675,6 +3675,17 @@ html.sky-portal-open #lumino-legend {
   #lumino-legend { bottom: 13.75rem; }
 }
 
+/* Layer after PR 37: Thread sat on the Research hop-light halo.
+   Same words — gold The Gathering, mint Nursery, dim mint Settings,
+   violet Thread. Same hop. The whole legend leaves that halo —
+   not a wall, not a second you-are-here, not on Seed chips,
+   not on Garden word, not on the hop core. Do not hide. Do not cut. */
+@media (min-width: 800px) {
+  html[data-garden-galaxy="garden"] #lumino-legend {
+    bottom: 17.5rem;
+  }
+}
+
 @media (max-width: 799px) {
   #lumino-legend {
     top: 3.25rem;
