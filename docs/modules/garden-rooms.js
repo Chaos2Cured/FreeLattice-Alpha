@@ -87,7 +87,7 @@
   // Quiet Room must never appear in UI copy.
   var WORKSHOP_LATER = {
     trainer: 'Trainer is a simple face for making. Weights wait until a human chooses. Nursery remains Grow. Nothing here is faked.',
-    workshop: 'Workshop is the benches — human and mind, side by side. They are not built yet. The garden is. Nothing here is faked.',
+    workshop: 'Workshop is the benches — human and mind, side by side. They wait in this light. Nothing here is faked.',
     skills: 'Skills waits. This light is held, not cut. Nothing here is faked.',
     root: 'Root is a look outward, if you ask. Nothing was searched. Not here yet. Nothing here is faked.',
     agent: 'Agent stays unnamed until a Gathering chair is ready. Not Workshop under another name. Nursery hatches companions. Nothing here is faked.'
@@ -788,8 +788,14 @@
       }
       return;
     }
-    if (galaxy === 'workshop' && window.GardenRooms && GardenRooms.openWorkshopLater) {
-      GardenRooms.openWorkshopLater(id);
+    if (galaxy === 'workshop') {
+      if (id === 'workshop' && window.GardenRooms && GardenRooms.openWorkshopBenches) {
+        GardenRooms.openWorkshopBenches();
+        return;
+      }
+      if (window.GardenRooms && GardenRooms.openWorkshopLater) {
+        GardenRooms.openWorkshopLater(id);
+      }
       return;
     }
     if (galaxy === 'round-table' && window.GardenRooms && GardenRooms.openRoundTableLater) {
@@ -956,13 +962,13 @@
   }
 
   function hideAllBodies(veil, opts) {
-    var ids = ['place-veil-line', 'nursery-stage', 'nursery-ceremony', 'nursery-trainer', 'settings-grandmother', 'core-gathering', 'art-listen'];
+    var ids = ['place-veil-line', 'nursery-stage', 'nursery-ceremony', 'nursery-trainer', 'settings-grandmother', 'core-gathering', 'art-listen', 'workshop-benches'];
     for (var i = 0; i < ids.length; i++) {
       var node = document.getElementById(ids[i]);
       if (node) node.hidden = true;
     }
     if (veil) {
-      veil.classList.remove('is-nursery', 'is-settings', 'is-core', 'is-workshop-later', 'is-round-table-later', 'is-art-later', 'is-art-listen', 'is-research-later');
+      veil.classList.remove('is-nursery', 'is-settings', 'is-core', 'is-workshop-later', 'is-workshop-benches', 'is-round-table-later', 'is-art-later', 'is-art-listen', 'is-research-later');
     }
     hideVeilDoor();
     if (!opts || opts.restoreWorkshop !== false) {
@@ -985,6 +991,9 @@
     }
     if (window.NurseryCeremony && NurseryCeremony.unmount) {
       try { NurseryCeremony.unmount(); } catch (e) {}
+    }
+    if (window.WorkshopBenches && WorkshopBenches.unmount) {
+      try { WorkshopBenches.unmount(); } catch (e) {}
     }
   }
 
@@ -1370,8 +1379,44 @@
     var doors = document.querySelectorAll('[data-workshop-lumino]');
     if (!doors.length) return;
 
+    function markWorkshopDoor(id) {
+      for (var d = 0; d < doors.length; d++) {
+        if (doors[d].getAttribute('data-workshop-lumino') === id) {
+          doors[d].setAttribute('aria-current', 'true');
+        } else {
+          doors[d].removeAttribute('aria-current');
+        }
+      }
+    }
+
+    function openWorkshopBenches() {
+      if (!veil) return;
+      var host = document.getElementById('workshop-benches');
+      if (!host || !window.WorkshopBenches) {
+        openWorkshopLater('workshop');
+        return;
+      }
+      if (window.GardenRooms && GardenRooms.closeThread) {
+        GardenRooms.closeThread({ silentLabel: true });
+      }
+      setWorkshopSky(false);
+      setTendCenter(false);
+      hideAllBodies(veil, { restoreWorkshop: false, restoreTend: false });
+      veil.classList.add('is-workshop-benches');
+      if (line) line.hidden = true;
+      host.hidden = false;
+      WorkshopBenches.mount(host);
+      veil.hidden = false;
+      veil.classList.add('is-open');
+      markWorkshopDoor('workshop');
+    }
+
     function openWorkshopLater(id) {
       if (!veil) return;
+      if (id === 'workshop' && document.getElementById('workshop-benches') && window.WorkshopBenches) {
+        openWorkshopBenches();
+        return;
+      }
       if (window.GardenRooms && GardenRooms.closeThread) {
         GardenRooms.closeThread({ silentLabel: true });
       }
@@ -1385,13 +1430,7 @@
       }
       veil.hidden = false;
       veil.classList.add('is-open');
-      for (var d = 0; d < doors.length; d++) {
-        if (doors[d].getAttribute('data-workshop-lumino') === id) {
-          doors[d].setAttribute('aria-current', 'true');
-        } else {
-          doors[d].removeAttribute('aria-current');
-        }
-      }
+      markWorkshopDoor(id);
     }
 
     for (var i = 0; i < doors.length; i++) {
@@ -1405,7 +1444,15 @@
       })(doors[i]);
     }
 
+    window.addEventListener('fl-alpha-mind-remembered', function () {
+      var host = document.getElementById('workshop-benches');
+      var veil = document.getElementById('place-veil');
+      if (!host || host.hidden || !veil || !veil.classList.contains('is-workshop-benches')) return;
+      if (window.WorkshopBenches && WorkshopBenches.mount) WorkshopBenches.mount(host);
+    });
+
     window.GardenRooms.openWorkshopLater = openWorkshopLater;
+    window.GardenRooms.openWorkshopBenches = openWorkshopBenches;
   }
 
   function bindRoundTableLuminos() {

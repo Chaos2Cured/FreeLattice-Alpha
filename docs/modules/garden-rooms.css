@@ -2370,6 +2370,250 @@ html[data-garden-galaxy="workshop"] .room-stub { display: none; }
     0 0 8px rgba(12, 10, 26, 0.95);
 }
 
+#place-veil.is-workshop-benches,
+#place-veil.is-open.is-workshop-benches {
+  justify-content: flex-start;
+  overflow-y: auto;
+  opacity: 1;
+  pointer-events: auto;
+  background: linear-gradient(
+    to bottom,
+    rgba(12, 10, 26, 0.12) 0%,
+    rgba(12, 10, 26, 0.28) 42%,
+    rgba(12, 10, 26, 0.42) 100%
+  );
+}
+
+#place-veil.is-workshop-benches #place-veil-close {
+  position: sticky;
+  bottom: 8px;
+  margin-top: 16px;
+  background: rgba(12, 10, 26, 0.85);
+  padding: 6px 12px;
+}
+
+#workshop-benches[hidden] { display: none !important; }
+
+#workshop-benches {
+  width: min(42em, 92vw);
+  margin: 0 auto;
+}
+
+.workshop-benches-face {
+  font-family: Georgia, 'Times New Roman', serif;
+  color: rgba(200, 210, 230, 0.82);
+  text-align: center;
+}
+
+.workshop-benches-heart {
+  margin: 0 0 14px;
+  font-size: 1.02rem;
+  line-height: 1.7;
+  color: rgba(200, 210, 230, 0.82);
+  text-shadow:
+    0 0 18px rgba(12, 10, 26, 0.98),
+    0 0 8px rgba(12, 10, 26, 0.95);
+}
+
+.workshop-benches-settings {
+  display: inline-block;
+  margin: 0 0 18px;
+  padding: 10px 18px;
+  min-height: 44px;
+  background: transparent;
+  border: 1px solid rgba(232, 176, 25, 0.45);
+  border-radius: 8px;
+  color: #e8b019;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+.workshop-benches-settings:hover,
+.workshop-benches-settings:focus-visible {
+  border-color: #e8b019;
+  outline: none;
+}
+
+.workshop-git {
+  margin: 0 auto 16px;
+  padding: 12px 16px;
+  max-width: 28em;
+  border: 1px solid rgba(52, 211, 153, 0.28);
+  border-radius: 10px;
+  background: rgba(12, 10, 26, 0.42);
+  text-align: left;
+}
+
+.workshop-git-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  cursor: pointer;
+  color: #6ee7b7;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+}
+
+.workshop-git-toggle {
+  width: 18px;
+  height: 18px;
+  accent-color: #34d399;
+  flex-shrink: 0;
+}
+
+.workshop-git-help {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: rgba(200, 210, 230, 0.62);
+}
+
+.workshop-git-acts {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.workshop-git-acts[hidden] { display: none !important; }
+
+.workshop-benches-later {
+  margin: 0 0 14px;
+  font-size: 0.72rem;
+  line-height: 1.55;
+  font-style: italic;
+  color: rgba(200, 210, 230, 0.42);
+}
+
+.workshop-benches-later[hidden] { display: none !important; }
+
+.workshop-pad {
+  display: block;
+  width: 100%;
+  min-height: 10rem;
+  margin: 0 0 10px;
+  padding: 12px 14px;
+  resize: vertical;
+  background: rgba(12, 10, 26, 0.55);
+  border: 1px solid rgba(200, 210, 230, 0.14);
+  border-radius: 8px;
+  color: rgba(110, 231, 183, 0.92);
+  font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.workshop-pad:focus,
+.workshop-pad:focus-visible {
+  outline: none;
+  border-color: rgba(52, 211, 153, 0.55);
+}
+
+.workshop-ask {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+
+.workshop-ask-input {
+  flex: 1 1 12em;
+  min-height: 44px;
+  padding: 10px 12px;
+  background: rgba(12, 10, 26, 0.55);
+  border: 1px solid rgba(200, 210, 230, 0.14);
+  border-radius: 8px;
+  color: rgba(200, 210, 230, 0.88);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.92rem;
+}
+
+.workshop-ask-input:focus,
+.workshop-ask-input:focus-visible {
+  outline: none;
+  border-color: rgba(232, 176, 25, 0.55);
+}
+
+.workshop-benches-act {
+  min-height: 44px;
+  padding: 10px 16px;
+  background: rgba(232, 176, 25, 0.1);
+  border: 1px solid rgba(232, 176, 25, 0.45);
+  border-radius: 8px;
+  color: #e8b019;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.workshop-benches-act.is-ask {
+  background: rgba(52, 211, 153, 0.1);
+  border-color: rgba(52, 211, 153, 0.45);
+  color: #6ee7b7;
+}
+
+.workshop-benches-act:hover,
+.workshop-benches-act:focus-visible {
+  outline: none;
+  border-color: #e8b019;
+}
+
+.workshop-benches-act.is-ask:hover,
+.workshop-benches-act.is-ask:focus-visible {
+  border-color: #34d399;
+}
+
+.workshop-preview {
+  display: block;
+  width: 100%;
+  min-height: 8rem;
+  margin: 0 0 8px;
+  border: 1px solid rgba(200, 210, 230, 0.1);
+  border-radius: 8px;
+  background: rgba(10, 10, 20, 0.65);
+}
+
+.workshop-preview[hidden] { display: none !important; }
+
+.workshop-benches-status {
+  min-height: 1.3em;
+  margin: 0 0 8px;
+  font-size: 0.78rem;
+  color: rgba(200, 210, 230, 0.45);
+}
+
+.workshop-benches-status.is-warn {
+  color: rgba(240, 112, 104, 0.82);
+}
+
+.workshop-benches-face.is-closed .workshop-pad,
+.workshop-benches-face.is-closed .workshop-pad:disabled,
+.workshop-benches-face.is-closed .workshop-ask-input,
+.workshop-benches-face.is-closed .workshop-ask-input:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: 0.55;
+  caret-color: transparent;
+  user-select: none;
+}
+
+.workshop-benches-face.is-closed .workshop-ask .workshop-benches-act,
+.workshop-benches-face.is-closed .workshop-ask .workshop-benches-act:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+.workshop-ask.is-closed {
+  opacity: 0.45;
+}
+
+@media (max-width: 799px) {
+  .workshop-pad { min-height: 7rem; }
+  .workshop-preview { min-height: 6rem; }
+}
+
 html.thread-open .workshop-lumino,
 html.thread-open .workshop-lumino:hover,
 html.thread-open .workshop-heart,
