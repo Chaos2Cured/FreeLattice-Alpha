@@ -16,7 +16,8 @@
 //   No tokens in the page. No GitHub kitchen — this garden has no
 //   local git door yet. After confirm, say so. Nothing is sent.
 //
-// Trainer / Root / Agent stay later lights. Nursery Grow stays Grow.
+// Trainer now has its own simple face in that light (workshop-trainer.js).
+// Root / Agent stay later lights. Nursery Grow stays Grow.
 // Quiet Room never in the file. AUTONOMY: local free; external asks.
 //
 // Mirror: docs/code-workshop.html  (read that FIRST)
