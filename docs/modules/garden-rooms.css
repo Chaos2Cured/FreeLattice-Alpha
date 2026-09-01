@@ -5193,3 +5193,92 @@ html.room-page .nursery-egg-later:focus-visible {
   color: #e8b019;
   outline: none;
 }
+
+/* ── Hypha leftover after PR 47 (layer, 2026-09-01)
+   Workshop and Learn room sentences still had a ring through
+   the words — Workshop “human and mind,” Learn “sit when a
+   person.” Same leftover family as orbit-through-words (PR 36
+   honesty line), Thread chip on Research hop halo (PR 37), and
+   Art listen-if-you-love-a-song through the Image ring (PR 47
+   leftover 1). Same words. Same lights. The sentence has air
+   so the ring orbits it, not through it. Later-glass chip hugs
+   the letters — not a wall. Do not cut the sentence. Do not
+   hide the lights. Do not invent a second canvas. Do not
+   change the words. Research already had air on the 1280
+   fail-closed walk — do not invent a Research leftover.
+   Garden first sky is not this leftover. Fail-closed still
+   sleeps. Do not unhide #lumino-menu. First sky still has
+   no Chat card. ── */
+
+/* Workshop: unnamed-center far ring struck through
+   “human and mind.” Measured 1280×800 fail-closed: tend-center
+   sits at 38%; far ring bottoms near 388px; heart was 46%
+   (~350–386px) so the ring wrote the glyphs. Same Art class
+   (top, z-index, later-glass, night-sky contrast). 58% puts
+   a two-line chip below that ring (~430px top) with air,
+   still above the Workshop light. Width 24em so this longer
+   sentence stays two lines — a hug, not a wall. */
+html[data-garden-galaxy="workshop"] .workshop-heart {
+  top: 58%;
+  z-index: 13;
+  width: min(24em, 54vw);
+  padding: 0.35em 0.85em;
+  box-sizing: border-box;
+  background: rgba(12, 10, 26, 0.62);
+  border-radius: 8px;
+  color: rgba(200, 210, 230, 0.82);
+  text-shadow:
+    0 0 10px rgba(12, 10, 26, 1),
+    0 0 4px rgba(12, 10, 26, 0.94);
+}
+
+@media (max-height: 740px) {
+  html[data-garden-galaxy="workshop"] .workshop-heart {
+    top: 56%;
+    width: min(22em, 52vw);
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 799px) {
+  html[data-garden-galaxy="workshop"] .workshop-heart {
+    top: 52%;
+    width: min(18em, 82vw);
+    font-size: 0.9rem;
+  }
+}
+
+/* Learn: unnamed-center far ring struck through
+   “sit when a person.” Galaxy id is round-table.
+   First line is longer — 28em keeps two lines so the chip
+   height matches Art/Workshop; 58% is the same measured air
+   below the ~388px ring. Same later-glass hug. */
+html[data-garden-galaxy="round-table"] .round-table-heart {
+  top: 58%;
+  z-index: 13;
+  width: min(28em, 62vw);
+  padding: 0.35em 0.85em;
+  box-sizing: border-box;
+  background: rgba(12, 10, 26, 0.62);
+  border-radius: 8px;
+  color: rgba(200, 210, 230, 0.82);
+  text-shadow:
+    0 0 10px rgba(12, 10, 26, 1),
+    0 0 4px rgba(12, 10, 26, 0.94);
+}
+
+@media (max-height: 740px) {
+  html[data-garden-galaxy="round-table"] .round-table-heart {
+    top: 56%;
+    width: min(26em, 58vw);
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 799px) {
+  html[data-garden-galaxy="round-table"] .round-table-heart {
+    top: 52%;
+    width: min(18em, 82vw);
+    font-size: 0.9rem;
+  }
+}
