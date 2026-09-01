@@ -188,4 +188,36 @@ check('applyImported writes history and loadHistory honors it', function () {
   assert.equal(JSON.stringify(stored).indexOf('declined'), -1);
 });
 
-console.log('\nGarden thread honesty holds.');
+var posted = [];
+sandbox.fetch = function (url, opts) {
+  if (opts && opts.body) {
+    posted.push({ url: String(url), body: JSON.parse(opts.body) });
+  }
+  return Promise.resolve({
+    ok: true,
+    status: 200,
+    json: function () {
+      return Promise.resolve({ message: { content: 'hello from the door' } });
+    }
+  });
+};
+
+GT.sendToMind(
+  {
+    name: 'Ollama',
+    url: 'http://127.0.0.1:11434/api/tags',
+    model: 'qwen2.5:14b',
+    models: ['deepseek-coder-v2:latest', 'qwen2.5:14b', 'llama3.1:8b']
+  },
+  [{ role: 'user', content: 'hi' }]
+).then(function () {
+  check('sendToMind prefers mind.model over mind.models[0]', function () {
+    assert.ok(posted.length, 'posted to the remembered door');
+    assert.equal(posted[0].body.model, 'qwen2.5:14b');
+    assert.notEqual(posted[0].body.model, 'deepseek-coder-v2:latest');
+  });
+  console.log('\nGarden thread honesty holds.');
+}).catch(function (err) {
+  console.error(err && err.stack ? err.stack : err);
+  process.exit(1);
+});
