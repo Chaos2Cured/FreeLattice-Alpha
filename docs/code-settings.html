@@ -79,6 +79,16 @@
 
 <p>Quality later. Tiny. Same garden sky. <code>settings.html</code> standalone stays in sync.</p>
 
+<h2>1b. Model chooser <span class="section-date">2026-09-01</span></h2>
+
+<span class="tag tag-new">LAYER</span>
+
+<p>Fix 3. The constellation already named the models at a remembered door. Those tiny stars now choose which local model speaks. Tap a star: <code>entry.model</code> is written on the remembered entry and <code>remember()</code> persists it to <code>fl_alpha_local_mind</code> (the same key; no second store). The thread already reads <code>mind.model</code> before <code>mind.models[0]</code>, so the request body follows that choice. Local doors only. No remote list. No keys.</p>
+
+<p>The chosen star is lit (<code>role="radio"</code>, <code>aria-checked="true"</code>, grandmother-sized tap). One line names it, e.g. <em>This mind speaks with qwen2.5:14b, on this machine.</em> If more than one door is remembered, a door can be marked primary on the existing <code>minds</code> array. A later look that still lists the chosen name keeps it. If that name is gone, the face says so and falls back — the line changes; the missing name is not left lit.</p>
+
+<p>May I look? stays the door. Nothing looks, chooses, or persists until that tap has remembered a mind. Chat stays fail-closed until then. Do not un-sleep the thread from this layer.</p>
+
 <h2>2. Hard nots</h2>
 
 <span class="tag tag-sacred">DO NOT</span>
@@ -98,7 +108,8 @@
 <table>
   <tr><th>File</th><th>Purpose</th></tr>
   <tr><td>docs/code-settings.html</td><td>This mirror — required before the probe module</td></tr>
-  <tr><td>docs/modules/local-mind-probe.js</td><td>Permission-first loopback look. Local remember. Honest HTTPS</td></tr>
+  <tr><td>docs/modules/local-mind-probe.js</td><td>Permission-first loopback look. Local remember. Model chooser writes entry.model</td></tr>
+  <tr><td>docs/modules/local-mind-probe.test.js</td><td>Node smokes for the chooser. Stubbed found-list. No network</td></tr>
   <tr><td>docs/index.html</td><td>In-garden Settings veil mounts the grandmother face</td></tr>
   <tr><td>docs/settings.html</td><td>Honest room URL — same face, same sky</td></tr>
   <tr><td>docs/GALAXIES.md</td><td>Sky — Settings asks permission</td></tr>
@@ -111,6 +122,7 @@ Primary: May I look for a mind already at home?
          → LocalMindProbe.look()  (only after tap)
 If found: remember fl_alpha_local_mind. Say we connected.
          Quiet light on the Settings label. Constellation of names, not ports.
+         Model stars choose entry.model. Speaks-with line names the choice.
 If blocked: the mind is there but has not opened the door to this garden yet.
 Next smallest step: one paste-address field.
 If none: say so gently.
@@ -123,6 +135,11 @@ Quality: later. One quiet line. Not a kitchen.</pre>
     tryAddress: function (url) {}, // paste-address
     getRemembered: function () {},
     getRememberedMinds: function () {},
+    remember: function (entry) {},
+    entryFromFoundList: function () {},
+    paintConstellation: function () {},
+    chooseModel: function (doorUrl, modelName) {},
+    choosePrimary: function (doorUrl) {},
     renderFace: function (el) {}
   };</pre>
 
@@ -133,6 +150,7 @@ Quality: later. One quiet line. Not a kitchen.</pre>
   <li>See one heart sentence and one primary. No scan yet. The Settings label has no home-light yet.</li>
   <li>Tap the primary. Status speaks in grandmother language (found, blocked, or none).</li>
   <li>If found: constellation of names (not ports). Close the veil: a quiet light on Settings. Thread may now offer that mind as listener.</li>
+  <li>Pick a named model star. The speaks-with line names that model. Reload: still chosen. Send in the thread: the request body <code>model</code> field is that name.</li>
   <li>Paste-address is the next smallest step. Nothing uploaded. Filesystem untouched.</li>
   <li><code>settings.html</code> shows the same face. Quality is later.</li>
 </ol>
@@ -147,8 +165,11 @@ HARD RULES: no 65k kitchen, no silent scan, no filesystem, no upload,
 no Chat kitchen, AUTONOMY.md untouched, phones skip bloom.
 
 Current state: Settings asks. Then looks at loopback doors.
-HTTPS honesty. Paste-address next. Remember locally if found.
+HTTPS mixed-content note. Paste-address next. Remember locally if found.
 Quiet light on the Settings label. Constellation of names.
+A remembered door can choose which local model speaks
+(entry.model via remember(), one key). Later look keeps a still-present
+choice; a vanished name falls back in the line, not as a ghost.
 Chat lives in this room — same fail-closed thread. May I look?
 is the grandmother door. The garden thread reads getRemembered() only.
 

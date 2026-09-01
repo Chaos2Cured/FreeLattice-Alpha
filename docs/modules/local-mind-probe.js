@@ -10,6 +10,11 @@
 //
 // Mirror: docs/code-settings.html  (read that FIRST)
 // Same garden sky. Quality later. Tiny.
+//
+// Fix 3 layer: constellation model stars choose entry.model.
+// One storage key: fl_alpha_local_mind. remember() persists.
+// Later scans keep a still-present chosen model. A vanished name
+// writes a visible fallback note; it does not stay as a ghost.
 // ═══════════════════════════════════════════════════════════════
 
 (function () {
@@ -203,7 +208,9 @@
       return [{
         name: entry.name || 'a mind at home',
         url: entry.url,
-        models: entry.models || (entry.model ? [entry.model] : [])
+        models: entry.models || (entry.model ? [entry.model] : []),
+        model: entry.model || '',
+        primary: true
       }];
     }
     return [];
@@ -213,30 +220,207 @@
     return mindsFromEntry(getRemembered());
   }
 
-  function entryFromFoundList(foundList, fallbackName, fallbackUrl) {
+  function speakWithLine(modelName) {
+    return 'This mind speaks with ' + modelName + ', on this machine.';
+  }
+
+  function speakModelGone(gone, now) {
+    if (now) {
+      return 'The chosen model ' + gone + ' is no longer at this door. ' +
+        'This mind now speaks with ' + now + ', on this machine.';
+    }
+    return 'The chosen model ' + gone + ' is no longer at this door.';
+  }
+
+  function priorPrimaryUrl(prior) {
+    if (!prior) return '';
+    var list = mindsFromEntry(prior);
+    var i;
+    for (i = 0; i < list.length; i++) {
+      if (list[i].primary) return String(list[i].url || '');
+    }
+    return String(prior.url || '');
+  }
+
+  function priorModelForUrl(prior, url) {
+    if (!prior) return '';
+    var list = mindsFromEntry(prior);
+    var i;
+    for (i = 0; i < list.length; i++) {
+      if (String(list[i].url || '') === String(url || '') && list[i].model) {
+        return String(list[i].model);
+      }
+    }
+    if (prior.model && (!prior.url || String(prior.url) === String(url || ''))) {
+      return String(prior.model);
+    }
+    return '';
+  }
+
+  function modelOnList(models, name) {
+    if (!name) return false;
+    var i;
+    for (i = 0; i < (models || []).length; i++) {
+      if (String(models[i]) === String(name)) return true;
+    }
+    return false;
+  }
+
+  function entryFromFoundList(foundList, fallbackName, fallbackUrl, prior) {
     var minds = (foundList || []).map(function (r) {
+      var url = r.url;
+      var models = r.models || [];
+      var kept = priorModelForUrl(prior, url);
+      var model = '';
+      if (kept && modelOnList(models, kept)) {
+        model = kept;
+      } else if (models.length) {
+        model = models[0];
+      }
       return {
         name: r.name || 'a mind at home',
-        url: r.url,
-        models: r.models || []
+        url: url,
+        models: models,
+        model: model,
+        primary: false
       };
     });
     if (!minds.length && fallbackUrl) {
       minds.push({
         name: fallbackName || 'a mind at home',
         url: fallbackUrl,
-        models: []
+        models: [],
+        model: '',
+        primary: false
       });
     }
-    var primary = minds[0] || {};
-    return {
+    var wantUrl = priorPrimaryUrl(prior);
+    var primaryIndex = 0;
+    var i;
+    if (wantUrl) {
+      for (i = 0; i < minds.length; i++) {
+        if (String(minds[i].url || '') === String(wantUrl)) {
+          primaryIndex = i;
+          break;
+        }
+      }
+    }
+    for (i = 0; i < minds.length; i++) {
+      minds[i].primary = i === primaryIndex;
+    }
+    var primary = minds[primaryIndex] || minds[0] || {};
+    var models = primary.models || [];
+    var priorChosen = priorModelForUrl(prior, primary.url) || (prior && prior.model ? String(prior.model) : '');
+    var model = primary.model || '';
+    var modelNote = '';
+    if (priorChosen && !modelOnList(models, priorChosen)) {
+      modelNote = speakModelGone(priorChosen, model);
+    }
+    var entry = {
       name: primary.name || fallbackName || '',
       url: primary.url || fallbackUrl || '',
       foundAt: new Date().toISOString(),
-      model: (primary.models && primary.models[0]) || '',
-      models: primary.models || [],
+      model: model,
+      models: models,
       minds: minds
     };
+    if (modelNote) entry.modelNote = modelNote;
+    return entry;
+  }
+
+  function syncEntryFromMind(entry, target) {
+    var i;
+    var minds = entry.minds || [];
+    for (i = 0; i < minds.length; i++) {
+      minds[i].primary = minds[i] === target;
+    }
+    entry.name = target.name;
+    entry.url = target.url;
+    entry.models = target.models || [];
+    entry.model = target.model || '';
+    entry.minds = minds;
+    if (entry.modelNote) delete entry.modelNote;
+    return entry;
+  }
+
+  function chooseModel(doorUrl, modelName) {
+    var entry = getRemembered();
+    if (!entry) return null;
+    var minds = mindsFromEntry(entry);
+    if (!minds.length) return null;
+    var i;
+    var target = null;
+    for (i = 0; i < minds.length; i++) {
+      if (String(minds[i].url || '') === String(doorUrl || '')) {
+        target = minds[i];
+        break;
+      }
+    }
+    if (!target && minds.length === 1) target = minds[0];
+    if (!target) return null;
+    if (!modelOnList(target.models || [], modelName)) return null;
+    target.model = String(modelName);
+    entry.minds = minds;
+    syncEntryFromMind(entry, target);
+    remember(entry);
+    return entry;
+  }
+
+  function choosePrimary(doorUrl) {
+    var entry = getRemembered();
+    if (!entry) return null;
+    var minds = mindsFromEntry(entry);
+    if (minds.length < 2) return null;
+    var i;
+    var target = null;
+    for (i = 0; i < minds.length; i++) {
+      if (String(minds[i].url || '') === String(doorUrl || '')) {
+        target = minds[i];
+        break;
+      }
+    }
+    if (!target) return null;
+    if (!target.model && target.models && target.models[0]) {
+      target.model = target.models[0];
+    }
+    entry.minds = minds;
+    syncEntryFromMind(entry, target);
+    remember(entry);
+    return entry;
+  }
+
+  function bindRadioKeys(cluster, radios, onPick) {
+    if (!cluster || !radios || !radios.length) return;
+    cluster.addEventListener('keydown', function (ev) {
+      var t = ev.target;
+      var idx = -1;
+      var i;
+      for (i = 0; i < radios.length; i++) {
+        if (radios[i] === t || (radios[i].contains && radios[i].contains(t))) {
+          idx = i;
+          break;
+        }
+      }
+      if (idx < 0) return;
+      var next = -1;
+      if (ev.key === 'ArrowRight' || ev.key === 'ArrowDown') {
+        next = (idx + 1) % radios.length;
+      } else if (ev.key === 'ArrowLeft' || ev.key === 'ArrowUp') {
+        next = (idx - 1 + radios.length) % radios.length;
+      } else if (ev.key === 'Home') {
+        next = 0;
+      } else if (ev.key === 'End') {
+        next = radios.length - 1;
+      } else if (ev.key === ' ' || ev.key === 'Enter') {
+        ev.preventDefault();
+        onPick(radios[idx]);
+        return;
+      }
+      if (next < 0) return;
+      ev.preventDefault();
+      onPick(radios[next]);
+      try { radios[next].focus(); } catch (e) { /* focus is best-effort */ }
+    });
   }
 
   function paintConstellation(host, minds) {
@@ -246,32 +430,83 @@
       host.hidden = true;
       return;
     }
+    var remembered = getRemembered() || {};
+    var chosen = remembered.model ? String(remembered.model) : '';
+    var primaryUrl = remembered.url ? String(remembered.url) : '';
+    var manyDoors = minds.length > 1;
     host.hidden = false;
     host.setAttribute('role', 'list');
     host.setAttribute('aria-label', 'Minds at home');
     minds.forEach(function (m) {
-      var star = el('span', 'settings-star');
+      var isPrimary = !primaryUrl || String(m.url || '') === primaryUrl || (!manyDoors);
+      var star = el('span', 'settings-star' + (isPrimary ? ' is-primary' : ''));
       star.setAttribute('role', 'listitem');
       var light = el('span', 'settings-star-light');
       light.setAttribute('aria-hidden', 'true');
-      star.appendChild(light);
-      star.appendChild(el('span', 'settings-star-name', m.name || 'a mind at home'));
+      var nameNode = el('span', 'settings-star-name', m.name || 'a mind at home');
+      if (manyDoors) {
+        var pick = el('button', 'settings-star-pick');
+        pick.type = 'button';
+        pick.setAttribute('aria-pressed', isPrimary ? 'true' : 'false');
+        pick.setAttribute('aria-label', 'Use ' + (m.name || 'this door') + ' as the speaking door');
+        pick.setAttribute('data-mind-door', m.url || '');
+        pick.appendChild(light);
+        pick.appendChild(nameNode);
+        pick.addEventListener('click', function () {
+          var next = choosePrimary(m.url);
+          if (next) paintConstellation(host, mindsFromEntry(next));
+        });
+        star.appendChild(pick);
+      } else {
+        star.appendChild(light);
+        star.appendChild(nameNode);
+      }
       var models = (m.models || []).slice(0, 5);
       if (models.length) {
         var cluster = el('span', 'settings-star-models');
+        cluster.setAttribute('role', 'radiogroup');
+        cluster.setAttribute('aria-label', 'Models at ' + (m.name || 'this door'));
+        var radios = [];
         models.forEach(function (modelName) {
-          var tiny = el('span', 'settings-star-tiny');
+          var isChosen = isPrimary && chosen && String(modelName) === chosen;
+          var tiny = el('button', 'settings-star-tiny' + (isChosen ? ' is-chosen' : ''));
+          tiny.type = 'button';
+          tiny.setAttribute('role', 'radio');
+          tiny.setAttribute('aria-checked', isChosen ? 'true' : 'false');
           tiny.setAttribute('aria-label', modelName);
+          tiny.setAttribute('data-mind-model', modelName);
+          tiny.setAttribute('data-mind-door', m.url || '');
+          tiny.tabIndex = 0;
           var tinyLight = el('span', 'settings-star-tiny-light');
           tinyLight.setAttribute('aria-hidden', 'true');
           tiny.appendChild(tinyLight);
           tiny.appendChild(el('span', 'settings-star-tiny-name', modelName));
+          tiny.addEventListener('click', function () {
+            var next = chooseModel(m.url, modelName);
+            if (next) paintConstellation(host, mindsFromEntry(next));
+          });
+          radios.push(tiny);
           cluster.appendChild(tiny);
+        });
+        bindRadioKeys(cluster, radios, function (radio) {
+          var next = chooseModel(
+            radio.getAttribute('data-mind-door'),
+            radio.getAttribute('data-mind-model')
+          );
+          if (next) paintConstellation(host, mindsFromEntry(next));
         });
         star.appendChild(cluster);
       }
       host.appendChild(star);
     });
+    var line = el('p', 'settings-speaks');
+    line.setAttribute('data-mind-speaks', '1');
+    if (remembered.modelNote) {
+      line.textContent = remembered.modelNote;
+    } else if (chosen) {
+      line.textContent = speakWithLine(chosen);
+    }
+    if (line.textContent) host.appendChild(line);
   }
 
   function renderFace(container) {
@@ -335,10 +570,15 @@
     }
 
     function onFound(foundList, fallbackName, fallbackUrl) {
-      var entry = entryFromFoundList(foundList, fallbackName, fallbackUrl);
+      var prior = getRemembered();
+      var entry = entryFromFoundList(foundList, fallbackName, fallbackUrl, prior);
       remember(entry);
       paintConstellation(sky, mindsFromEntry(entry));
-      setStatus(root, speakFound(entry.name, entry.url), 'ok');
+      if (entry.modelNote) {
+        setStatus(root, entry.modelNote, 'warn');
+      } else {
+        setStatus(root, speakFound(entry.name, entry.url), 'ok');
+      }
     }
 
     ask.addEventListener('click', function () {
@@ -407,6 +647,12 @@
     tryAddress: tryAddress,
     getRemembered: getRemembered,
     getRememberedMinds: getRememberedMinds,
+    remember: remember,
+    entryFromFoundList: entryFromFoundList,
+    paintConstellation: paintConstellation,
+    chooseModel: chooseModel,
+    choosePrimary: choosePrimary,
+    speakWithLine: speakWithLine,
     renderFace: renderFace,
     mount: renderFace
   };

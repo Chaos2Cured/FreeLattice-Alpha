@@ -1478,7 +1478,33 @@ html.sky-portal-open .gt-hint {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 3px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px 4px;
+  margin: 0;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: Georgia, 'Times New Roman', serif;
+  color: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+html.room-page .settings-star-tiny,
+.settings-face .settings-star-tiny {
+  padding: 6px 4px;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.settings-star-tiny:focus-visible,
+.settings-star-pick:focus-visible {
+  outline: 2px solid rgba(232, 176, 25, 0.75);
+  outline-offset: 2px;
+  border-radius: 8px;
 }
 
 .settings-star-tiny-light {
@@ -1489,10 +1515,66 @@ html.sky-portal-open .gt-hint {
   box-shadow: 0 0 8px rgba(232, 176, 25, 0.7);
 }
 
+.settings-star-tiny.is-chosen .settings-star-tiny-light,
+.settings-star-tiny[aria-checked="true"] .settings-star-tiny-light {
+  width: 8px;
+  height: 8px;
+  background: #fde68a;
+  box-shadow: 0 0 16px rgba(232, 176, 25, 1), 0 0 4px #34d399;
+}
+
 .settings-star-tiny-name {
   font-size: 0.62rem;
   color: rgba(200, 210, 230, 0.45);
   letter-spacing: 0.02em;
+}
+
+.settings-star-tiny.is-chosen .settings-star-tiny-name,
+.settings-star-tiny[aria-checked="true"] .settings-star-tiny-name {
+  color: rgba(232, 210, 140, 0.95);
+}
+
+.settings-star-pick {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px;
+  margin: 0;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: Georgia, 'Times New Roman', serif;
+  color: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+html.room-page .settings-star-pick,
+.settings-face .settings-star-pick {
+  padding: 6px;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.settings-star.is-primary .settings-star-light,
+.settings-star-pick[aria-pressed="true"] .settings-star-light {
+  width: 11px;
+  height: 11px;
+  box-shadow: 0 0 16px rgba(52, 211, 153, 1), 0 0 4px #e8b019;
+}
+
+.settings-speaks {
+  flex-basis: 100%;
+  width: 100%;
+  margin: 8px 0 0;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: #34d399;
+  text-shadow: 0 0 10px rgba(12, 10, 26, 0.8);
 }
 
 @media (prefers-reduced-motion: reduce) {

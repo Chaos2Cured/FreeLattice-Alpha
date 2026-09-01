@@ -268,7 +268,7 @@ Mirror: `docs/code-nursery.html` (read before ceremony or keystone). Ceremony: `
 
 Anyone who has never used a computer must be able to. One sentence of heart. One primary: **May I look for a mind already at home?** Only after that tap, look at loopback local-AI doors (Ollama 11434, LM Studio 1234, llama.cpp 8080, and a few other well-known ports). Never silently scan the filesystem. Never enumerate installed programs. Never upload. This site is HTTPS — say so honestly if the mind's door is blocked. Paste-address is the next smallest step. Quality later. Tiny.
 
-After a mind is remembered (`fl_alpha_local_mind`), a quiet light on the Settings label so a stranger sees a light is home. Found minds as a small constellation of lights (names, not a port dump).
+After a mind is remembered (`fl_alpha_local_mind`), a quiet light on the Settings label so a stranger sees a light is home. Found minds as a small constellation of lights (names, not a port dump). A remembered door can choose which local model speaks.
 
 Mirror: `docs/code-settings.html` (read before the probe). Module: `docs/modules/local-mind-probe.js`.
 
