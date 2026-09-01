@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>theLatticeTree — Nursery</title>
-  <meta name="description" content="Garden Galaxy, Nursery. Egg first. Grow is the simple trainer face — keep, never a maze.">
+  <meta name="description" content="Garden Galaxy, Nursery. Egg first. Then slow grow — earned on this machine. Grow is the trainer face — keep, never a maze.">
   <link rel="stylesheet" href="modules/garden-rooms.css">
   <script>document.documentElement.classList.add('garden-enter');</script>
 </head>
@@ -37,6 +37,7 @@
   <main class="room-stub room-nursery">
     <div id="nursery-stage">
       <div id="nursery-ceremony"></div>
+      <div id="nursery-growth"></div>
       <details class="nursery-grow">
         <summary>Grow</summary>
         <div id="nursery-trainer"></div>
@@ -50,12 +51,15 @@
   <script src="modules/garden-trainer.js"></script>
   <script src="modules/nursery-trainer.js"></script>
   <script src="modules/nursery-ceremony.js"></script>
+  <script src="modules/nursery-growth.js"></script>
   <script src="modules/garden-rooms.js"></script>
   <script>
     (function () {
       var ceremony = document.getElementById('nursery-ceremony');
+      var growth = document.getElementById('nursery-growth');
       var trainer = document.getElementById('nursery-trainer');
       if (ceremony && window.NurseryCeremony) NurseryCeremony.mount(ceremony);
+      if (growth && window.NurseryGrowth) NurseryGrowth.mount(growth);
       if (trainer && window.NurseryTrainer) NurseryTrainer.mount(trainer);
     })();
   </script>

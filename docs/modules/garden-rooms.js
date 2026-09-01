@@ -6,7 +6,7 @@
 // One quiet Georgia footing on first arrival, fading with the room-label breath.
 // Closing a veil returns there. Bodies IN the garden: The Gathering (left — seven chairs;
 // data-garden-place="core" stays as a layer),
-// The Nursery (below — egg then grow), Settings (right — permission).
+// The Nursery (below — egg then grow; after hatch, slow grow on this machine), Settings (right — permission).
 // Unnamed pieces still orbit. Title "Garden Galaxy" fades after a few seconds.
 // Room-label breathes (readable, slow fade, returns ~90s).
 // Bottom-right arrow → NEXT GALAXY (Art), with a quiet word so a stranger finds it.
@@ -974,7 +974,7 @@
   }
 
   function hideAllBodies(veil, opts) {
-    var ids = ['place-veil-line', 'nursery-stage', 'nursery-ceremony', 'nursery-trainer', 'settings-grandmother', 'core-gathering', 'art-listen', 'workshop-benches', 'workshop-trainer', 'round-table-sitting'];
+    var ids = ['place-veil-line', 'nursery-stage', 'nursery-ceremony', 'nursery-growth', 'nursery-trainer', 'settings-grandmother', 'core-gathering', 'art-listen', 'workshop-benches', 'workshop-trainer', 'round-table-sitting'];
     for (var i = 0; i < ids.length; i++) {
       var node = document.getElementById(ids[i]);
       if (node) node.hidden = true;
@@ -1003,6 +1003,9 @@
     }
     if (window.NurseryCeremony && NurseryCeremony.unmount) {
       try { NurseryCeremony.unmount(); } catch (e) {}
+    }
+    if (window.NurseryGrowth && NurseryGrowth.unmount) {
+      try { NurseryGrowth.unmount(); } catch (e) {}
     }
     if (window.WorkshopBenches && WorkshopBenches.unmount) {
       try { WorkshopBenches.unmount(); } catch (e) {}
@@ -1248,6 +1251,11 @@
         if (ceremony && window.NurseryCeremony) {
           ceremony.hidden = false;
           NurseryCeremony.mount(ceremony);
+        }
+        var growth = document.getElementById('nursery-growth');
+        if (growth && window.NurseryGrowth) {
+          growth.hidden = false;
+          NurseryGrowth.mount(growth);
         }
         if (trainer) {
           trainer.hidden = false;

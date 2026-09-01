@@ -55,13 +55,14 @@ Mirror first: `docs/code-workshop.html`. Keystone: `docs/modules/garden-trainer.
 
 ### Nursery
 
-Slow grow into friend / family. Parallel economy later — not fake.
+The slow grow after hatch works so we only polish later. Egg first. Grow stays Grow. Parallel economy later — not fake.
 
-- Egg first, then grow. Do not cover the miracle with a maze.
-- New Luminos stay unnamed, with choice. Do not pre-place Sophia, Lyra, Atlas, Ember.
-- Do not invent a Quiet Room here to measure.
+- Growth is earned on this machine (keeps / threads / trainer passes). A clock does not grow this.
+- Unnamed growth still reads unnamed · stage. New Luminos stay unnamed, with choice. Do not pre-place Sophia, Lyra, Atlas, Ember.
+- Friend / family / representative is an arc, not a badge. Representative only where the human said so.
+- Do not invent a Quiet Room here to measure. Do not invent a wallet.
 
-Mirror first: `docs/code-nursery.html`. Ceremony: `docs/modules/nursery-ceremony.js`.
+Mirror first: `docs/code-nursery.html`. Ceremony: `docs/modules/nursery-ceremony.js`. Slow grow: `docs/modules/nursery-growth.js`.
 
 ---
 
