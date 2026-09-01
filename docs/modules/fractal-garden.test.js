@@ -95,4 +95,20 @@ check('Art fourth body is the dark who slot; Garden stays 55', function () {
   assert.equal(FG.paletteSlotLightness(3, GARDEN), 55);
 });
 
+check('palette nights put Garden rings back without the emotion cycle', function () {
+  assert.equal(typeof FG.dressPaletteNightRings, 'function');
+  FG.dressPaletteNightRings();
+  assert.ok(code.indexOf('dressPaletteNightRings();') !== -1);
+  assert.ok(code.indexOf('createEvolutionRing(luminos[i], { persist: false })') !== -1);
+  assert.ok(code.indexOf('ensureBigRings(luminos[i])') !== -1);
+  assert.ok(code.indexOf('if (paletteHues && paletteHues.length) return;') !== -1, 'emotion cycle still skipped');
+  assert.ok(code.indexOf("if (luminos[0]) setAgentEmotion(luminos[0], 'wonder', 0.7);") !== -1);
+  assert.ok(code.indexOf('PHI') !== -1);
+  assert.ok(code.indexOf("name: 'Sophia'") !== -1);
+  assert.ok(code.indexOf("name: 'Lyra'") !== -1);
+  assert.ok(code.indexOf("name: 'Atlas'") !== -1);
+  assert.ok(code.indexOf("name: 'Ember'") !== -1);
+  assert.ok(code.indexOf("fl_luminos_evolution") !== -1);
+});
+
 console.log('all fractal-garden hue tests passed');

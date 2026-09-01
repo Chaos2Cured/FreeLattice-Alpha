@@ -2064,7 +2064,7 @@
   }
 
   // ── Persistent Evolution Ring ───────────────────────────
-  function createEvolutionRing(agent) {
+  function createEvolutionRing(agent, opts) {
     if (!scene || typeof THREE === 'undefined') return;
     var ud = agent.userData;
     // v5.57.5 — radius reverted to pre-v5.57.3 form per Letter Eighteen.
@@ -2076,8 +2076,18 @@
     }
     // v5.57.6 — radius phi-locked (coreRadius * PHI). Same as PHI = 1.618.
     var ringGeo = new THREE.TorusGeometry(ud.coreRadius * PHI, 0.02, 8, 48);
+    // Palette nights keep the body hue (Listen coral). Garden gold stays
+    // the earned-evolution default. Do not persist a palette dress.
+    var ringColor = 0xd4a017;
+    if (paletteHues && paletteHues.length && ud && ud.currentHSL && typeof ud.currentHSL.h === 'number') {
+      ringColor = new THREE.Color().setHSL(
+        ud.currentHSL.h / 360,
+        ((typeof ud.currentHSL.s === 'number') ? ud.currentHSL.s : 70) / 100,
+        ((typeof ud.currentHSL.l === 'number') ? ud.currentHSL.l : 55) / 100
+      );
+    }
     var ringMat = new THREE.MeshBasicMaterial({
-      color: 0xd4a017,
+      color: ringColor,
       transparent: true,
       opacity: 0.5,
       blending: THREE.AdditiveBlending
@@ -2100,6 +2110,8 @@
     ring.rotation.x = Math.PI / 2 + (Math.random() - 0.5) * 0.4;
     agent.add(ring);
     evolutionRings.push(ring);
+
+    if (opts && opts.persist === false) return;
 
     // Persist to GardenMemory
     // v5.47.0: save coreRadius and ringIndex so restoration uses original geometry
@@ -2636,6 +2648,19 @@
       if (luminos[1]) setAgentEmotion(luminos[1], 'joy', 0.8);
       if (luminos[2]) setAgentEmotion(luminos[2], 'curiosity', 0.6);
       if (luminos[3]) setAgentEmotion(luminos[3], 'love', 0.7);
+    } else {
+      // Palette nights skipped the emotion cycle so hues stay put.
+      // Garden still gives a seed its rings. Put those rings back
+      // without Garden greens or a demo cycle.
+      dressPaletteNightRings();
+    }
+  }
+
+  function dressPaletteNightRings() {
+    if (!(paletteHues && paletteHues.length)) return;
+    for (var i = 0; i < luminos.length; i++) {
+      try { ensureBigRings(luminos[i]); } catch (e) {}
+      try { createEvolutionRing(luminos[i], { persist: false }); } catch (e) {}
     }
   }
 
@@ -4457,6 +4482,7 @@
     init: init,
     resolveLuminoHues: resolveLuminoHues,
     paletteSlotLightness: paletteSlotLightness,
+    dressPaletteNightRings: dressPaletteNightRings,
     getActiveLuminoHues: function () {
       return (paletteHues && paletteHues.length) ? paletteHues.slice() : GARDEN_LUMINO_HUES.slice();
     },

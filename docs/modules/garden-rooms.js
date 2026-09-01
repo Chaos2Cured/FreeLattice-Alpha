@@ -418,20 +418,20 @@
     var heart = document.querySelector('.art-heart');
     var lights = document.querySelectorAll('.art-lumino:not(.is-held)');
     var keepLights = opts && opts.keepLights;
+    // Heart rests on the Art sky. Same words live in the listen-door.
+    // Leaving the page would be a cut.
+    if (heart) heart.hidden = true;
     if (show) {
       document.documentElement.classList.remove('art-door-open');
       document.documentElement.classList.remove('art-listen-open');
-      if (heart) heart.hidden = false;
       for (var i = 0; i < lights.length; i++) lights[i].hidden = false;
     } else if (keepLights) {
       // Listen-door: chips stay pinned to canvas bodies. Attach keeps running.
       document.documentElement.classList.add('art-listen-open');
       document.documentElement.classList.remove('art-door-open');
-      if (heart) heart.hidden = true;
     } else {
       document.documentElement.classList.add('art-door-open');
       document.documentElement.classList.remove('art-listen-open');
-      if (heart) heart.hidden = true;
       for (var j = 0; j < lights.length; j++) lights[j].hidden = true;
     }
   }
@@ -658,7 +658,9 @@
     if (g === 'garden' && GARDEN_DOOR_BY_NAME[name]) return GARDEN_DOOR_BY_NAME[name];
     var idx = anchor && typeof anchor.index === 'number' ? anchor.index : 0;
     if (idx < 0) idx = 0;
-    return slots[idx % slots.length];
+    // Extra anchors with no door skip — not a fifth chair, not a name.
+    if (idx >= slots.length) return null;
+    return slots[idx];
   }
 
   // A who is dark-but-findable: same hue, lower lightness. Not off, not a second Listen.
@@ -1880,6 +1882,10 @@
     dressLivingLights();
     ensureSkyField();
     ensureSkyLegend();
+    if (currentGalaxy() === 'art') {
+      var skyHeart = document.querySelector('.art-heart');
+      if (skyHeart) skyHeart.hidden = true;
+    }
     startAttachLoop();
     fadeGalaxyTitle();
     startLabelCycle();
