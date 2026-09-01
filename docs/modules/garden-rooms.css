@@ -4965,3 +4965,207 @@ html[data-garden-galaxy="art"] .art-lumino {
 .research-lumino.is-chronal .research-lumino-light { --lumino: #94a3b8; color: #94a3b8; }
 .research-lumino.is-simulation .research-lumino-light { --lumino: #67e8f9; color: #67e8f9; }
 .research-lumino.is-love-logic .research-lumino-light { --lumino: #f9a8d4; color: #f9a8d4; }
+
+/* ── Hypha three leftovers after Nursery PR 45 / Trainer leftover PR 46
+   (layer, 2026-09-01). Whole-site grandmother walk of live Pages.
+   Same leftover family as orbit-through-words (PR 36 honesty line),
+   Thread chip on Research hop halo (PR 37), Gathering Chat Send
+   off the right edge (PR 33), and Chat readable not glass over
+   the orb (PR 34). Layer, never delete. Do not invent a hatch.
+   Do not invent a keep. Do not un-sleep Chat. Do not unhide
+   #lumino-menu. First sky still has no Chat card. ── */
+
+/* Leftover 1 — Art: Image-light ring struck through
+   “listen if you love a song.” Same words. Same light.
+   The sentence has air so the ring orbits it, not through it.
+   Later-glass chip hugs the letters — not a wall. Image stays.
+   Listen still sings. a who stays dark. Art hop stays a light. */
+html[data-garden-galaxy="art"] .art-heart {
+  top: 58%;
+  z-index: 13;
+  width: min(22em, 52vw);
+  padding: 0.35em 0.85em;
+  box-sizing: border-box;
+  background: rgba(12, 10, 26, 0.62);
+  border-radius: 8px;
+  color: rgba(200, 210, 230, 0.82);
+  text-shadow:
+    0 0 10px rgba(12, 10, 26, 1),
+    0 0 4px rgba(12, 10, 26, 0.94);
+}
+
+@media (max-height: 740px) {
+  html[data-garden-galaxy="art"] .art-heart {
+    top: 56%;
+    width: min(20em, 50vw);
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 799px) {
+  html[data-garden-galaxy="art"] .art-heart {
+    top: 58%;
+    width: min(16em, 48vw);
+  }
+}
+
+/* Leftover 2 — Gathering room Chat: last line sat on Send, a bright
+   scrollbar stuck out the right, the card ran off the bottom.
+   Same card. Same fail-closed. Input and Send still sleep.
+   The last spoken line sits above Send. The card stays inside
+   the room. Scroll lives inside the face, night-sky thin — not
+   a bright bar off the right edge. Not a first-sky Chat card. */
+@media (min-width: 641px) {
+  #place-veil.is-core #room-chat {
+    display: flex;
+    flex-direction: column;
+    top: 16rem;
+    bottom: 15.5rem;
+    max-height: min(42vh, calc(100vh - 32rem));
+    overflow: hidden;
+    overflow-x: hidden;
+    padding: 8px 12px 12px;
+    box-sizing: border-box;
+  }
+
+  #place-veil.is-core #room-chat .thread-face.is-room {
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #place-veil.is-core #room-chat .thread-face.is-room .thread-heart {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    margin-bottom: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(200, 210, 230, 0.2) transparent;
+  }
+
+  #place-veil.is-core #room-chat .thread-face.is-room .thread-later,
+  #place-veil.is-core #room-chat .thread-face.is-room .thread-to-settings {
+    flex: 0 0 auto;
+    margin-bottom: 8px;
+  }
+
+  #place-veil.is-core #room-chat .thread-face.is-room .thread-messages {
+    flex: 0 1 auto;
+    min-height: 0;
+    max-height: min(12vh, 6em);
+    overflow-x: hidden;
+    overflow-y: auto;
+    margin: 0 0 10px;
+    padding: 2px 8px 6px 2px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(200, 210, 230, 0.2) transparent;
+  }
+
+  #place-veil.is-core #room-chat .thread-face.is-room .thread-messages:empty {
+    display: none;
+  }
+
+  #place-veil.is-core #room-chat .thread-compose,
+  #place-veil.is-core #room-chat .thread-face.is-room .thread-compose {
+    position: relative;
+    flex: 0 0 auto;
+    margin-top: 4px;
+    padding-top: 8px;
+    z-index: 2;
+    background: rgba(12, 10, 26, 0.88);
+  }
+
+  #place-veil.is-core #room-chat .thread-face.is-room .thread-heart::-webkit-scrollbar,
+  #place-veil.is-core #room-chat .thread-face.is-room .thread-messages::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  #place-veil.is-core #room-chat .thread-face.is-room .thread-heart::-webkit-scrollbar-thumb,
+  #place-veil.is-core #room-chat .thread-face.is-room .thread-messages::-webkit-scrollbar-thumb {
+    background: rgba(200, 210, 230, 0.2);
+    border-radius: 6px;
+  }
+
+  #place-veil.is-core #room-chat .thread-face.is-room .thread-heart::-webkit-scrollbar-track,
+  #place-veil.is-core #room-chat .thread-face.is-room .thread-messages::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+/* Leftover 3 — Nursery: a lumino sat on Begin; Not yet was a
+   washed smudge under the egg glare. Egg first. Grow waits.
+   unnamed · egg. Begin is a clear tap — later-glass, grandmother
+   padding (beats html.room-page *). Not yet has air and contrast
+   so it is a readable word, not a smudge. Do not hatch. Do not
+   invent a keep. Do not cover the miracle with a maze. Grow
+   stays Grow. Economy stays a later sentence. Founding four
+   stay off the canvas. */
+#place-veil.is-nursery .nursery-egg-wrap,
+html.room-page .nursery-egg-wrap {
+  margin: 0 auto 1.35rem;
+}
+
+#place-veil.is-nursery .nursery-egg-home,
+html.room-page .nursery-egg-home {
+  position: relative;
+  z-index: 3;
+}
+
+#place-veil.is-nursery .nursery-egg-text,
+#place-veil.is-nursery .nursery-egg-sub,
+html.room-page .nursery-egg-text,
+html.room-page .nursery-egg-sub {
+  margin-bottom: 10px;
+  text-shadow:
+    0 0 10px rgba(12, 10, 26, 1),
+    0 0 4px rgba(12, 10, 26, 0.94);
+}
+
+#place-veil.is-nursery .nursery-egg-actions,
+html.room-page .nursery-egg-actions {
+  position: relative;
+  z-index: 4;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+#place-veil.is-nursery .nursery-egg-begin,
+html.room-page .nursery-egg-begin {
+  position: relative;
+  z-index: 5;
+  padding: 12px 28px;
+  min-height: 44px;
+  min-width: 7.5em;
+  box-sizing: border-box;
+  background: rgba(12, 10, 26, 0.78);
+  border: 1px solid rgba(232, 176, 25, 0.5);
+  color: #e8b019;
+}
+
+#place-veil.is-nursery .nursery-egg-later,
+html.room-page .nursery-egg-later {
+  position: relative;
+  z-index: 5;
+  margin-top: 4px;
+  padding: 8px 16px;
+  min-height: 36px;
+  box-sizing: border-box;
+  background: rgba(12, 10, 26, 0.72);
+  border-radius: 8px;
+  color: rgba(200, 210, 230, 0.82);
+  text-shadow:
+    0 0 10px rgba(12, 10, 26, 1),
+    0 0 4px rgba(12, 10, 26, 0.94);
+}
+
+#place-veil.is-nursery .nursery-egg-later:hover,
+#place-veil.is-nursery .nursery-egg-later:focus-visible,
+html.room-page .nursery-egg-later:hover,
+html.room-page .nursery-egg-later:focus-visible {
+  color: #e8b019;
+  outline: none;
+}
