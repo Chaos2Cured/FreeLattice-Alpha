@@ -29,6 +29,7 @@
 // Art / Workshop / Learn / Research doors are living orbs with rings
 // (same night as Garden; no second Three.js canvas). Art hop stays a light.
 // Tiny color chip: which current color links to what. Not a wall.
+// Legend dots take live hsl from canvas anchors (throttled).
 // Unnamed · Seed chips rest off the first walk. Code stays.
 // Center tending light: no word on it. Reed locked the anchor poem.
 // The mind that tends walks out of The Gathering without a name until it is ready.
@@ -194,6 +195,8 @@
   var GARDEN_DOOR_SLOTS = ['thread', 'gathering', 'nursery', 'settings'];
 
   var lastMenuAt = 0;
+  var lastColorPaint = 0;
+  var COLOR_PAINT_MS = 140;
 
   // Reed locked the center. Use these words. Do not label the light Love.
   var CENTER_POEM = [
@@ -616,12 +619,27 @@
     return GARDEN_DOOR_SLOTS[idx % GARDEN_DOOR_SLOTS.length];
   }
 
+  function writeLiveLuminoColor(id, doorEl, color) {
+    if (!id || !color) return;
+    var dot = document.querySelector('[data-lumino-dot="' + id + '"]');
+    if (dot) {
+      dot.style.background = color;
+      dot.style.boxShadow = '0 0 8px ' + color;
+    }
+    if (!doorEl) return;
+    var light = doorEl.querySelector('.garden-lumino-light');
+    if (light) light.style.setProperty('--lumino', color);
+  }
+
   function attachGardenLuminos() {
     if (currentGalaxy() !== 'garden') return;
     if (!window.FractalGarden || typeof FractalGarden.getLuminoAnchors !== 'function') return;
     var anchors = FractalGarden.getLuminoAnchors();
     if (!anchors.length) return;
     var rest = skyIsResting();
+    var now = Date.now();
+    var paintColor = !rest && (now - lastColorPaint >= COLOR_PAINT_MS);
+    if (paintColor) lastColorPaint = now;
     var used = {};
     for (var i = 0; i < anchors.length; i++) {
       var id = gardenDoorForAnchor(anchors[i]);
@@ -630,6 +648,7 @@
       var el = findDoorEl(id);
       if (!el) continue;
       el.classList.add('is-attached');
+      if (paintColor && anchors[i].color) writeLiveLuminoColor(id, el, anchors[i].color);
       if (rest || !anchors[i].visible) continue;
       el.style.left = Math.round(anchors[i].x) + 'px';
       el.style.top = Math.round(anchors[i].y) + 'px';
@@ -742,8 +761,10 @@
         doors[i].getAttribute('data-research-lumino');
       var row = document.createElement('div');
       row.className = 'lumino-legend-row';
+      if (id) row.setAttribute('data-lumino-row', id);
       var dot = document.createElement('span');
       dot.className = 'lumino-legend-dot';
+      if (id) dot.setAttribute('data-lumino-dot', id);
       dot.style.background = lightColorOf(doors[i]);
       var word = document.createElement('span');
       word.className = 'lumino-legend-word';
@@ -1846,7 +1867,9 @@
     lightSettingsHome: lightSettingsHome,
     goToLumino: goToLumino,
     showRoomChat: showRoomChat,
-    hideRoomChat: hideRoomChat
+    hideRoomChat: hideRoomChat,
+    ensureSkyLegend: ensureSkyLegend,
+    attachGardenLuminos: attachGardenLuminos
   };
 
   if (document.querySelector('[data-galaxy-dir], [data-garden-go], [data-garden-place], [data-garden-thread], [data-garden-lumino], [data-workshop-lumino], [data-round-table-lumino], [data-art-lumino], [data-research-lumino], [data-tend-center], #thread-open, #galaxy-title, #room-label')) {

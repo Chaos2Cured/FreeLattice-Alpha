@@ -4677,6 +4677,8 @@ html[data-garden-galaxy="garden"] .garden-evolution-indicator {
   height: 7px;
   border-radius: 50%;
   flex-shrink: 0;
+  /* First paint is the static door hue. attachGardenLuminos then writes
+     live hsl onto background + glow so each bead tracks its canvas body. */
   box-shadow: 0 0 8px currentColor;
 }
 
