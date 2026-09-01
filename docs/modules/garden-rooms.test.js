@@ -366,6 +366,7 @@ assert.equal(GR.gardenDoorForAnchor({ name: 'unnamed_0', index: 0 }), 'listen');
 assert.equal(GR.gardenDoorForAnchor({ name: 'unnamed_1', index: 1 }), 'chalkboard');
 assert.equal(GR.gardenDoorForAnchor({ name: 'unnamed_2', index: 2 }), 'image');
 assert.equal(GR.gardenDoorForAnchor({ name: 'unnamed_3', index: 3 }), 'who');
+assert.equal(GR.gardenDoorForAnchor({ name: 'unnamed_4', index: 4 }), null, 'extra anchors skip — not a fifth chair');
 assert.equal(GR.gardenDoorForAnchor({ name: 'Sophia', index: 0 }), 'listen', 'garden name map does not steal Art slots');
 
 function makeArtDoor(id, klass, wordText) {
@@ -482,12 +483,21 @@ check('writeLiveLuminoColor can paint an art id directly', function () {
 
 var heart = new El('p');
 heart.className = 'art-heart';
+heart.textContent = 'Art is sing — listen if you love a song. The garden is. Nothing here is faked.';
 body.appendChild(heart);
 var veil = new El('div');
 veil.setAttribute('id', 'place-veil');
 var listenDoor = new El('div');
 listenDoor.setAttribute('id', 'art-listen');
 listenDoor.hidden = true;
+var listenHeart = new El('p');
+listenHeart.className = 'art-heart-listen';
+listenHeart.textContent = 'Art is sing — listen if you love a song. The garden is. Nothing here is faked.';
+listenDoor.appendChild(listenHeart);
+var fun = new El('p');
+fun.className = 'honest';
+fun.textContent = 'Fun, not a studio. There is no generate button here because this door cannot compose yet.';
+listenDoor.appendChild(fun);
 veil.appendChild(listenDoor);
 body.appendChild(veil);
 
@@ -521,9 +531,12 @@ check('listen-door open still attaches chips to their lights', function () {
 });
 
 GR.setArtSky(true);
-check('close listen returns Art sky words', function () {
+check('close listen returns Art sky; heart still rests; words still live', function () {
   assert.ok(!html.classList.contains('art-listen-open'));
-  assert.equal(heart.hidden, false);
+  assert.equal(heart.hidden, true, 'heart rests on the Art sky');
+  assert.ok(heart.textContent.indexOf('listen if you love a song') !== -1, 'sky heart words stay in the page');
+  assert.ok(listenHeart.textContent.indexOf('listen if you love a song') !== -1, 'same words live in the listen-door');
+  assert.ok(fun.textContent.indexOf('Fun, not a studio') !== -1);
   assert.equal(listen.hidden, false);
 });
 
@@ -535,6 +548,22 @@ check('art-lumino CSS stays; listen-door rests colliding garden words; chips sta
   assert.ok(css.indexOf('html.art-listen-open #shared-shoulder') !== -1);
   assert.ok(css.indexOf('html[data-garden-galaxy="art"] .art-lumino-word') !== -1);
   assert.ok(css.indexOf('html.art-listen-open #lumino-legend') !== -1);
+});
+
+check('Art sky rests the heart; extra bead skipped; Fun sentence padded from the garden close', function () {
+  assert.ok(css.indexOf('html[data-garden-galaxy="art"] .art-heart') !== -1);
+  assert.ok(css.indexOf('html[data-garden-galaxy="art"] .tend-center-light') !== -1);
+  assert.ok(css.indexOf('#art-listen .art-heart-listen') !== -1);
+  assert.ok(css.indexOf('#place-veil.is-art-listen #art-listen .honest') !== -1);
+  assert.ok(css.indexOf('#place-veil.is-art-listen #place-veil-close') !== -1);
+  assert.ok(css.indexOf('position: fixed') !== -1, 'listen close sits in a reserved pocket');
+  assert.ok(css.indexOf('background: rgba(12, 10, 26, 0.62)') !== -1, 'later-glass hugs word chips');
+  var music = fs.readFileSync(path.join(__dirname, '..', 'music.html'), 'utf8');
+  assert.ok(music.indexOf('class="art-heart"') !== -1, 'sky heart stays on the page');
+  assert.ok(music.indexOf('class="art-heart-listen"') !== -1, 'listen-door keeps the heart words');
+  assert.ok(music.indexOf('Art is sing — listen if you love a song. The garden is. Nothing here is faked.') !== -1);
+  assert.ok(music.indexOf('id="place-veil-close"') !== -1);
+  assert.ok(music.indexOf('Fun, not a studio.') !== -1);
 });
 
 console.log('all garden-rooms legend color tests passed');

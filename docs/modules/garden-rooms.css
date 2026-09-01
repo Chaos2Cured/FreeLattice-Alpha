@@ -3920,13 +3920,23 @@ html[data-garden-galaxy="art"] .tend-center {
   height: 52px;
 }
 
-html[data-garden-galaxy="garden"] .tend-center-light,
-html[data-garden-galaxy="art"] .tend-center-light {
+html[data-garden-galaxy="garden"] .tend-center-light {
   width: 22px;
   height: 22px;
   box-shadow:
     0 0 28px rgba(147, 197, 253, 0.75),
     0 0 8px rgba(186, 214, 255, 0.95);
+}
+
+/* Art leftover: extra bead above the lattice was the leftover
+   named-center CSS orb. The unnamed center is the 3D lattice.
+   Skip the visible bead. Keep the hit target. Do not invent a door.
+   Do not hang Art on the center. */
+html[data-garden-galaxy="art"] .tend-center-light {
+  opacity: 0;
+  background: transparent;
+  box-shadow: none;
+  animation: none;
 }
 
 .tend-center:hover .tend-center-light,
@@ -4737,7 +4747,8 @@ html.sky-portal-open .art-heart {
 
 /* Hypha: four times unnamed · Seed is not a legend. They look like
    doors and they are not. Rest off the first walk. Code stays. */
-html[data-garden-galaxy="garden"] .garden-evolution-indicator {
+html[data-garden-galaxy="garden"] .garden-evolution-indicator,
+html[data-garden-galaxy="art"] .garden-evolution-indicator {
   display: none !important;
 }
 
@@ -4898,7 +4909,7 @@ html.sky-portal-open #lumino-legend {
 .round-table-lumino-light,
 .research-lumino-light,
 .galaxy-nav-light,
-html:not([data-garden-galaxy="garden"]) .tend-center-light {
+html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]) .tend-center-light {
   position: relative;
   isolation: isolate;
   overflow: visible;
@@ -4922,7 +4933,7 @@ html:not([data-garden-galaxy="garden"]) .tend-center-light {
 .round-table-lumino-light::before,
 .research-lumino-light::before,
 .galaxy-nav-light::before,
-html:not([data-garden-galaxy="garden"]) .tend-center-light::before,
+html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]) .tend-center-light::before,
 .lumino-ring {
   content: '';
   position: absolute;
@@ -4943,7 +4954,7 @@ html:not([data-garden-galaxy="garden"]) .tend-center-light::before,
 .round-table-lumino-light::after,
 .research-lumino-light::after,
 .galaxy-nav-light::after,
-html:not([data-garden-galaxy="garden"]) .tend-center-light::after,
+html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]) .tend-center-light::after,
 .lumino-ring.is-far {
   content: '';
   position: absolute;
@@ -4998,7 +5009,7 @@ html:not([data-garden-galaxy="garden"]) .tend-center-light::after,
   height: 100px;
 }
 
-html:not([data-garden-galaxy="garden"]) .tend-center-light {
+html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]) .tend-center-light {
   width: 48px;
   height: 48px;
   color: rgba(186, 214, 255, 0.9);
@@ -5407,8 +5418,10 @@ html[data-garden-galaxy="round-table"] .round-table-heart {
    who does. Word is not inside the opacity-0 hit light. Hit
    targets stay. .art-lumino CSS is not deleted. Layer, never delete. */
 
-html[data-garden-galaxy="art"] .art-lumino-word {
-  position: static;
+html[data-garden-galaxy="art"] .art-lumino-word,
+html[data-garden-galaxy="art"] .art-lumino.is-who .art-lumino-word {
+  position: relative;
+  z-index: 14;
   width: auto;
   height: auto;
   overflow: visible;
@@ -5417,6 +5430,10 @@ html[data-garden-galaxy="art"] .art-lumino-word {
   font-size: 0.72rem;
   letter-spacing: 0.08em;
   pointer-events: none;
+  padding: 0.2em 0.55em;
+  box-sizing: border-box;
+  background: rgba(12, 10, 26, 0.62);
+  border-radius: 6px;
   text-shadow:
     0 0 10px rgba(12, 10, 26, 1),
     0 0 4px rgba(12, 10, 26, 0.94);
@@ -5431,4 +5448,64 @@ html.art-listen-open #shared-shoulder {
   opacity: 0 !important;
   visibility: hidden;
   pointer-events: none;
+}
+
+/* ── Marked-walk leftovers after Kirk's screenshot + family
+   (Hypha, Weft, Reed / Kindling). Layer, never delete.
+   Live legend chips take canvas hsl (Fix 1 path). Listen rings
+   live on the canvas bodies. Extra bead above the lattice skips.
+   Heart rests on the Art sky; same words sing in the listen-door.
+   Word chips stay readable. Fun sentence clear of “the garden”. ── */
+
+html[data-garden-galaxy="art"] .art-heart {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+html[data-garden-galaxy="art"] .art-lumino {
+  z-index: 14;
+}
+
+html[data-garden-galaxy="art"] #lumino-legend {
+  z-index: 14;
+}
+
+#place-veil.is-art-listen {
+  padding-bottom: 5.25rem;
+}
+
+#place-veil.is-art-listen #art-listen {
+  padding-bottom: 5.25rem;
+}
+
+#place-veil.is-art-listen #art-listen .honest {
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.35em;
+}
+
+#place-veil.is-art-listen #place-veil-close {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  margin-top: 0;
+  padding: 10px 18px;
+  z-index: 3;
+}
+
+#art-listen .art-heart-listen {
+  margin: 10px 0 18px;
+  padding: 0.35em 0.85em;
+  box-sizing: border-box;
+  max-width: 28em;
+  background: rgba(12, 10, 26, 0.62);
+  border-radius: 8px;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: rgba(200, 210, 230, 0.82);
+  text-shadow:
+    0 0 10px rgba(12, 10, 26, 1),
+    0 0 4px rgba(12, 10, 26, 0.94);
 }
