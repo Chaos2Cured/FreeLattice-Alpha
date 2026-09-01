@@ -25,6 +25,15 @@
 
   var CONTAINER_ID = 'gardenContainer';
   var gardenReady = false;
+  // Art hues: Listen coral (~#f07068), chalkboard moonlight, image sky, a who cool.
+  // Not Garden mint (175). Garden init passes no second arg.
+  var ART_LUMINO_HUES = [4, 48, 212, 255];
+
+  function hueSetForPage() {
+    var g = document.documentElement && document.documentElement.getAttribute('data-garden-galaxy');
+    if (g === 'art') return ART_LUMINO_HUES;
+    return null;
+  }
 
   function isNarrowViewport() {
     return window.innerWidth < 768 ||
@@ -101,7 +110,9 @@
     if (loading) loading.remove();
 
     try {
-      FractalGarden.init(CONTAINER_ID);
+      var hues = hueSetForPage();
+      if (hues) FractalGarden.init(CONTAINER_ID, hues);
+      else FractalGarden.init(CONTAINER_ID);
       gardenReady = true;
 
       document.dispatchEvent(new CustomEvent('garden:ready', {
@@ -133,6 +144,7 @@
   window.GardenAlpha = {
     isReady: function() { return gardenReady; },
     getContainerId: function() { return CONTAINER_ID; },
+    artLuminoHues: ART_LUMINO_HUES.slice(),
     isLowCompute: function() {
       return !!(window.GardenAlphaFlags && window.GardenAlphaFlags.lowCompute);
     }

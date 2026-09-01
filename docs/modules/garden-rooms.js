@@ -193,6 +193,19 @@
     unnamed_3: 'settings'
   };
   var GARDEN_DOOR_SLOTS = ['thread', 'gathering', 'nursery', 'settings'];
+  // Per-galaxy door slots. Garden order stays. Extra anchors skip — no invented door.
+  // Workshop / Learn / Research tables wait; those pages do not mount the engine in this layer.
+  var GALAXY_DOOR_SLOTS = {
+    garden: GARDEN_DOOR_SLOTS,
+    art: ['listen', 'chalkboard', 'image', 'who'],
+    workshop: ['root', 'agent', 'skills'],
+    'round-table': ['education', 'translator', 'forge', 'question'],
+    research: ['gauge', 'chronal', 'simulation', 'love-logic']
+  };
+
+  function doorSlotsForGalaxy(g) {
+    return GALAXY_DOOR_SLOTS[g] || null;
+  }
 
   var lastMenuAt = 0;
   var lastColorPaint = 0;
@@ -612,11 +625,14 @@
   }
 
   function gardenDoorForAnchor(anchor) {
+    var g = currentGalaxy();
+    var slots = doorSlotsForGalaxy(g);
+    if (!slots || !slots.length) return null;
     var name = (anchor && anchor.name) || '';
-    if (GARDEN_DOOR_BY_NAME[name]) return GARDEN_DOOR_BY_NAME[name];
+    if (g === 'garden' && GARDEN_DOOR_BY_NAME[name]) return GARDEN_DOOR_BY_NAME[name];
     var idx = anchor && typeof anchor.index === 'number' ? anchor.index : 0;
     if (idx < 0) idx = 0;
-    return GARDEN_DOOR_SLOTS[idx % GARDEN_DOOR_SLOTS.length];
+    return slots[idx % slots.length];
   }
 
   function writeLiveLuminoColor(id, doorEl, color) {
@@ -627,12 +643,13 @@
       dot.style.boxShadow = '0 0 8px ' + color;
     }
     if (!doorEl) return;
-    var light = doorEl.querySelector('.garden-lumino-light');
+    var light = doorEl.querySelector('.garden-lumino-light, .art-lumino-light, .workshop-lumino-light, .round-table-lumino-light, .research-lumino-light');
     if (light) light.style.setProperty('--lumino', color);
   }
 
   function attachGardenLuminos() {
-    if (currentGalaxy() !== 'garden') return;
+    var slots = doorSlotsForGalaxy(currentGalaxy());
+    if (!slots || !slots.length) return;
     if (!window.FractalGarden || typeof FractalGarden.getLuminoAnchors !== 'function') return;
     var anchors = FractalGarden.getLuminoAnchors();
     if (!anchors.length) return;
@@ -643,7 +660,12 @@
     var used = {};
     for (var i = 0; i < anchors.length; i++) {
       var id = gardenDoorForAnchor(anchors[i]);
-      if (used[id]) continue;
+      if (!id || used[id]) continue;
+      var inSlots = false;
+      for (var s = 0; s < slots.length; s++) {
+        if (slots[s] === id) { inSlots = true; break; }
+      }
+      if (!inSlots) continue;
       used[id] = true;
       var el = findDoorEl(id);
       if (!el) continue;
@@ -656,7 +678,7 @@
   }
 
   function startAttachLoop() {
-    if (currentGalaxy() !== 'garden') return;
+    if (!doorSlotsForGalaxy(currentGalaxy())) return;
     var running = true;
     function tick() {
       if (!running) return;
@@ -710,11 +732,12 @@
   function dressLivingLights() {
     // Garden doors are the canvas luminos (rings already live there).
     // Art / Workshop / Learn / Research + hop lights are CSS beads until dressed.
-    var lights = document.querySelectorAll(
-      '.art-lumino-light, .workshop-lumino-light, .round-table-lumino-light, .research-lumino-light, .galaxy-nav-light'
-    );
+    var engine = document.getElementById('gardenContainer');
+    var lights = document.querySelectorAll(engine
+      ? '.workshop-lumino-light, .round-table-lumino-light, .research-lumino-light, .galaxy-nav-light'
+      : '.art-lumino-light, .workshop-lumino-light, .round-table-lumino-light, .research-lumino-light, .galaxy-nav-light');
     for (var i = 0; i < lights.length; i++) dressOneLight(lights[i], 2);
-    if (currentGalaxy() !== 'garden') {
+    if (!engine) {
       var tend = document.querySelectorAll('.tend-center-light');
       for (var t = 0; t < tend.length; t++) dressOneLight(tend[t], 2);
     }
@@ -1869,7 +1892,10 @@
     showRoomChat: showRoomChat,
     hideRoomChat: hideRoomChat,
     ensureSkyLegend: ensureSkyLegend,
-    attachGardenLuminos: attachGardenLuminos
+    attachGardenLuminos: attachGardenLuminos,
+    gardenDoorForAnchor: gardenDoorForAnchor,
+    writeLiveLuminoColor: writeLiveLuminoColor,
+    doorSlots: GALAXY_DOOR_SLOTS
   };
 
   if (document.querySelector('[data-galaxy-dir], [data-garden-go], [data-garden-place], [data-garden-thread], [data-garden-lumino], [data-workshop-lumino], [data-round-table-lumino], [data-art-lumino], [data-research-lumino], [data-tend-center], #thread-open, #galaxy-title, #room-label')) {

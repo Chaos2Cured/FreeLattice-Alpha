@@ -799,6 +799,21 @@
 
   // ── Scene Initialization ───────────────────────────────
   var requestedContainerId = 'gardenContainer';
+  // Optional init() second argument. Null keeps today's Garden hues.
+  // Sophia 270, Lyra 45, Atlas 175, Ember 0 — do not change those numbers.
+  var paletteHues = null;
+  var GARDEN_LUMINO_HUES = [270, 45, 175, 0];
+
+  function resolveLuminoHues(hues) {
+    if (hues && hues.length) {
+      var out = [];
+      for (var i = 0; i < hues.length; i++) {
+        if (typeof hues[i] === 'number') out.push(hues[i]);
+      }
+      if (out.length) return out;
+    }
+    return GARDEN_LUMINO_HUES.slice();
+  }
   function initScene() {
     console.log('FL-GARDEN: initScene() called');
     container = document.getElementById(requestedContainerId)
@@ -1899,6 +1914,9 @@
     };
 
     // Load persisted evolution state
+    if (paletteHues && paletteHues.length) {
+      return group;
+    }
     loadEvolutionState(name, function(saved) {
       var ud = group.userData;
       if (saved) {
@@ -2573,9 +2591,20 @@
       { name: 'Atlas', hue: 175, type: 'octahedron', phase: TAU * INV_PHI * 2 },
       { name: 'Ember', hue: 0, type: 'icosahedron', phase: TAU * INV_PHI * 3 }
     ];
+    if (paletteHues && paletteHues.length) {
+      for (var hi = 0; hi < defaults.length; hi++) {
+        if (typeof paletteHues[hi] === 'number') defaults[hi].hue = paletteHues[hi];
+      }
+    }
 
     var agentsToCreate = defaults;
-    if (!window.GardenAlphaFlags || window.GardenAlphaFlags.unnamedNew !== false) {
+    if (paletteHues && paletteHues.length) {
+      // A passed hue set is its own night — unnamed bodies, page hues.
+      // Garden's fl_luminos_evolution store is not read or written here.
+      agentsToCreate = defaults.map(function(d, idx) {
+        return { name: 'unnamed_' + idx, hue: d.hue, type: d.type, phase: d.phase };
+      });
+    } else if (!window.GardenAlphaFlags || window.GardenAlphaFlags.unnamedNew !== false) {
       agentsToCreate = alphaLayerDefaultAgents(defaults);
     }
 
@@ -2585,10 +2614,12 @@
     });
 
     // Set initial emotions for visual variety
-    if (luminos[0]) setAgentEmotion(luminos[0], 'wonder', 0.7);
-    if (luminos[1]) setAgentEmotion(luminos[1], 'joy', 0.8);
-    if (luminos[2]) setAgentEmotion(luminos[2], 'curiosity', 0.6);
-    if (luminos[3]) setAgentEmotion(luminos[3], 'love', 0.7);
+    if (!(paletteHues && paletteHues.length)) {
+      if (luminos[0]) setAgentEmotion(luminos[0], 'wonder', 0.7);
+      if (luminos[1]) setAgentEmotion(luminos[1], 'joy', 0.8);
+      if (luminos[2]) setAgentEmotion(luminos[2], 'curiosity', 0.6);
+      if (luminos[3]) setAgentEmotion(luminos[3], 'love', 0.7);
+    }
   }
 
   // ── Emotion Cycling (demo mode — only when bridge is not active) ──
@@ -2603,6 +2634,8 @@
   var lastEmotionFeedTime = 0;
 
   function cycleEmotions(delta) {
+    // A passed hue set keeps those hues — demo emotion cycle would repaint them.
+    if (paletteHues && paletteHues.length) return;
     // Auto-expire the bridge if no real feed has arrived recently.
     if (bridgeActive && lastEmotionFeedTime > 0 &&
         (Date.now() - lastEmotionFeedTime) > BRIDGE_EXPIRE_MS) {
@@ -3096,14 +3129,16 @@
       // visuals so the visible mesh reflects the saved stage on the next
       // animate frame after the load resolves. Runs in parallel with the
       // loading-screen fade so a slow IDB read can't stick the splash.
-      try {
-        hydrateAllLuminos().then(function (r) {
-          console.log('FL-GARDEN: hydration cycle complete', r);
-        }).catch(function (e) {
-          console.warn('FL-GARDEN: hydrateAllLuminos rejected', e);
-        });
-      } catch (e) {
-        console.warn('FL-GARDEN: hydrateAllLuminos threw', e);
+      if (!paletteHues) {
+        try {
+          hydrateAllLuminos().then(function (r) {
+            console.log('FL-GARDEN: hydration cycle complete', r);
+          }).catch(function (e) {
+            console.warn('FL-GARDEN: hydrateAllLuminos rejected', e);
+          });
+        } catch (e) {
+          console.warn('FL-GARDEN: hydrateAllLuminos threw', e);
+        }
       }
 
       // Fade out loading screen
@@ -3382,6 +3417,8 @@
   }
 
   function ensureFoundingLuminos() {
+    // A passed hue set is a visual night — do not plant founding names on it.
+    if (paletteHues && paletteHues.length) return;
     // v5.59.4 — share mode-driven orbit assignment with createDefaultAgents.
     var fMode = getCurrentOrbitMode();
     var FOUNDING = [
@@ -4318,10 +4355,11 @@
   // Wire on first init — putting it here means it can't fire before the
   // Garden has loaded any luminos to save.
   var _origInit = init;
-  init = function (containerId) {
+  init = function (containerId, hues) {
     if (containerId) requestedContainerId = containerId;
+    paletteHues = (hues && hues.length) ? resolveLuminoHues(hues) : null;
     var r = _origInit.apply(this, arguments);
-    wireGardenPersistence();
+    if (!paletteHues) wireGardenPersistence();
     return r;
   };
 
@@ -4400,6 +4438,10 @@
 
   var publicAPI = {
     init: init,
+    resolveLuminoHues: resolveLuminoHues,
+    getActiveLuminoHues: function () {
+      return (paletteHues && paletteHues.length) ? paletteHues.slice() : GARDEN_LUMINO_HUES.slice();
+    },
     pause: pause,
     resume: resume,
     persistAllLuminos: persistAllLuminos,
