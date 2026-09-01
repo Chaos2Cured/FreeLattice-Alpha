@@ -329,4 +329,117 @@ check('after rest, color and position write again', function () {
   assert.equal(gathering.style.left, '999px');
 });
 
+check('garden slot table is thread, gathering, nursery, settings', function () {
+  assert.deepEqual(GR.doorSlots.garden, ['thread', 'gathering', 'nursery', 'settings']);
+  assert.equal(GR.gardenDoorForAnchor({ name: 'Sophia', index: 0 }), 'thread');
+  assert.equal(GR.gardenDoorForAnchor({ name: 'Lyra', index: 1 }), 'gathering');
+  assert.equal(GR.gardenDoorForAnchor({ name: 'Atlas', index: 2 }), 'nursery');
+  assert.equal(GR.gardenDoorForAnchor({ name: 'Ember', index: 3 }), 'settings');
+  assert.equal(GR.gardenDoorForAnchor({ name: 'unnamed_0', index: 0 }), 'thread');
+});
+
+check('art slot table is listen, chalkboard, image, who', function () {
+  assert.deepEqual(GR.doorSlots.art, ['listen', 'chalkboard', 'image', 'who']);
+});
+
+check('later slot tables exist and do not invent a galaxy-named door', function () {
+  assert.deepEqual(GR.doorSlots.workshop, ['root', 'agent', 'skills']);
+  assert.deepEqual(GR.doorSlots['round-table'], ['education', 'translator', 'forge', 'question']);
+  assert.deepEqual(GR.doorSlots.research, ['gauge', 'chronal', 'simulation', 'love-logic']);
+  assert.ok(GR.doorSlots.art.indexOf('art') === -1);
+  assert.ok(GR.doorSlots['round-table'].indexOf('round-table') === -1);
+  assert.ok(GR.doorSlots.workshop.indexOf('workshop') === -1);
+});
+
+html.setAttribute('data-garden-galaxy', 'art');
+html.classList.remove('garden-door-open');
+
+assert.equal(GR.current(), 'art', 'currentGalaxy() === art');
+assert.equal(GR.gardenDoorForAnchor({ name: 'unnamed_0', index: 0 }), 'listen');
+assert.equal(GR.gardenDoorForAnchor({ name: 'unnamed_1', index: 1 }), 'chalkboard');
+assert.equal(GR.gardenDoorForAnchor({ name: 'unnamed_2', index: 2 }), 'image');
+assert.equal(GR.gardenDoorForAnchor({ name: 'unnamed_3', index: 3 }), 'who');
+assert.equal(GR.gardenDoorForAnchor({ name: 'Sophia', index: 0 }), 'listen', 'garden name map does not steal Art slots');
+
+function makeArtDoor(id, klass) {
+  var btn = new El('button');
+  btn.className = 'art-lumino ' + klass;
+  btn.setAttribute('data-art-lumino', id);
+  var light = new El('span');
+  light.className = 'art-lumino-light';
+  light.style.background = '#f07068';
+  btn.appendChild(light);
+  body.appendChild(btn);
+  return btn;
+}
+
+var listen = makeArtDoor('listen', 'is-listen');
+var chalkboard = makeArtDoor('chalkboard', 'is-chalkboard');
+var image = makeArtDoor('image', 'is-image');
+var who = makeArtDoor('who', 'is-who');
+
+var oldLegend = document.getElementById('lumino-legend');
+if (oldLegend && oldLegend.parent) {
+  var kids = oldLegend.parent.children;
+  for (var li = 0; li < kids.length; li++) {
+    if (kids[li] === oldLegend) {
+      kids.splice(li, 1);
+      break;
+    }
+  }
+  oldLegend.id = '';
+  oldLegend.removeAttribute('id');
+}
+
+GR.ensureSkyLegend();
+var artLegend = document.getElementById('lumino-legend');
+assert.ok(artLegend, 'art legend is built');
+function artDot(id) { return queryOne(artLegend, '[data-lumino-dot="' + id + '"]'); }
+assert.ok(artDot('listen') && artDot('chalkboard') && artDot('image') && artDot('who'), 'art dots tagged');
+
+var artAnchors = [
+  { name: 'unnamed_0', index: 0, x: 111, y: 121, visible: true, color: 'hsl(4,82%,67%)' },
+  { name: 'unnamed_1', index: 1, x: 211, y: 221, visible: true, color: 'hsl(48,16%,75%)' },
+  { name: 'unnamed_2', index: 2, x: 311, y: 321, visible: true, color: 'hsl(212,96%,78%)' },
+  { name: 'unnamed_3', index: 3, x: 411, y: 421, visible: true, color: 'hsl(222,20%,70%)' },
+  { name: 'unnamed_4', index: 4, x: 511, y: 521, visible: true, color: 'hsl(90,80%,40%)' }
+];
+windowObj.FractalGarden = {
+  getLuminoAnchors: function () { return artAnchors; }
+};
+sandbox.FractalGarden = windowObj.FractalGarden;
+
+fakeNow += 150;
+GR.attachGardenLuminos();
+
+check('art galaxy still runs attach (old garden-only bail is gone)', function () {
+  assert.ok(listen.classList.contains('is-attached'));
+  assert.ok(chalkboard.classList.contains('is-attached'));
+  assert.ok(image.classList.contains('is-attached'));
+  assert.ok(who.classList.contains('is-attached'));
+  assert.equal(listen.style.left, '111px');
+  assert.equal(listen.style.top, '121px');
+});
+
+check('writeLiveLuminoColor paints data-lumino-dot on art ids', function () {
+  assert.equal(artDot('listen').style.background, 'hsl(4,82%,67%)');
+  assert.equal(artDot('chalkboard').style.background, 'hsl(48,16%,75%)');
+  assert.equal(artDot('image').style.background, 'hsl(212,96%,78%)');
+  assert.equal(artDot('who').style.background, 'hsl(222,20%,70%)');
+  assert.equal(artDot('listen').style.boxShadow, '0 0 8px hsl(4,82%,67%)');
+  assert.equal(listen.querySelector('.art-lumino-light').style.getPropertyValue('--lumino'), 'hsl(4,82%,67%)');
+});
+
+check('extra anchors without a free door are skipped (no invented Art-named door)', function () {
+  assert.equal(queryAll(html, '[data-art-lumino="art"]').length, 0);
+  assert.equal(queryAll(html, '[data-lumino-dot="art"]').length, 0);
+  assert.equal(who.style.left, '411px');
+  assert.notEqual(listen.style.left, '511px');
+});
+
+GR.writeLiveLuminoColor('listen', listen, 'hsl(8,80%,60%)');
+check('writeLiveLuminoColor can paint an art id directly', function () {
+  assert.equal(artDot('listen').style.background, 'hsl(8,80%,60%)');
+});
+
 console.log('all garden-rooms legend color tests passed');
