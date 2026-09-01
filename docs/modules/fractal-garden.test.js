@@ -84,4 +84,15 @@ check('Art palette request is not Garden green; Listen coral is in the Art hue s
   assert.notDeepEqual(art, GARDEN);
 });
 
+check('Art fourth body is the dark who slot; Garden stays 55', function () {
+  assert.equal(typeof FG.paletteSlotLightness, 'function');
+  assert.equal(FG.paletteSlotLightness(0, ART), 55);
+  assert.equal(FG.paletteSlotLightness(1, ART), 55);
+  assert.equal(FG.paletteSlotLightness(2, ART), 55);
+  assert.ok(FG.paletteSlotLightness(3, ART) < 40, 'who slot is the dark one');
+  assert.equal(FG.paletteSlotLightness(0), 55);
+  assert.equal(FG.paletteSlotLightness(3), 55, 'Garden (no hue set) does not dim slot 3');
+  assert.equal(FG.paletteSlotLightness(3, GARDEN), 55);
+});
+
 console.log('all fractal-garden hue tests passed');

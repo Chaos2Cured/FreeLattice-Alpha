@@ -4798,6 +4798,7 @@ html.thread-open #lumino-legend,
 html.workshop-later-open #lumino-legend,
 html.round-table-later-open #lumino-legend,
 html.art-door-open #lumino-legend,
+html.art-listen-open #lumino-legend,
 html.research-later-open #lumino-legend,
 html.sky-portal-open #lumino-legend {
   display: none !important;
@@ -5394,4 +5395,40 @@ html[data-garden-galaxy="round-table"] .round-table-heart {
     width: min(18em, 82vw);
     font-size: 0.9rem;
   }
+}
+
+/* ── Hypha leftovers after PR 50 (layer, 2026-09-01)
+   A who is lit after Art mounted the Garden engine. Dim that one
+   body — same hue, lower lightness — so it reads dark-but-findable.
+   Listen stays coral. Chalkboard and Image stay findable.
+   Listen-door copy sat under garden/sky words. Those words rest
+   while the door is open and return on close. Listen / Chalkboard /
+   Image chips stay pinned to their canvas bodies the same way a
+   who does. Word is not inside the opacity-0 hit light. Hit
+   targets stay. .art-lumino CSS is not deleted. Layer, never delete. */
+
+html[data-garden-galaxy="art"] .art-lumino-word {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip: auto;
+  clip-path: none;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+  text-shadow:
+    0 0 10px rgba(12, 10, 26, 1),
+    0 0 4px rgba(12, 10, 26, 0.94);
+}
+
+html.art-listen-open #room-label,
+html.art-listen-open #room-label.is-shown,
+html.art-listen-open #room-label.is-fading,
+html.art-listen-open #galaxy-word,
+html.art-listen-open .art-heart,
+html.art-listen-open #shared-shoulder {
+  opacity: 0 !important;
+  visibility: hidden;
+  pointer-events: none;
 }

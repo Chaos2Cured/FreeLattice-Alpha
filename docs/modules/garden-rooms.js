@@ -414,18 +414,43 @@
     }
   }
 
-  function setArtSky(show) {
+  function setArtSky(show, opts) {
     var heart = document.querySelector('.art-heart');
     var lights = document.querySelectorAll('.art-lumino:not(.is-held)');
+    var keepLights = opts && opts.keepLights;
     if (show) {
       document.documentElement.classList.remove('art-door-open');
+      document.documentElement.classList.remove('art-listen-open');
       if (heart) heart.hidden = false;
       for (var i = 0; i < lights.length; i++) lights[i].hidden = false;
+    } else if (keepLights) {
+      // Listen-door: chips stay pinned to canvas bodies. Attach keeps running.
+      document.documentElement.classList.add('art-listen-open');
+      document.documentElement.classList.remove('art-door-open');
+      if (heart) heart.hidden = true;
     } else {
       document.documentElement.classList.add('art-door-open');
+      document.documentElement.classList.remove('art-listen-open');
       if (heart) heart.hidden = true;
       for (var j = 0; j < lights.length; j++) lights[j].hidden = true;
     }
+  }
+
+  function openArtListen() {
+    var veil = document.getElementById('place-veil');
+    var listenDoor = document.getElementById('art-listen');
+    if (!veil || !listenDoor) return;
+    if (window.GardenRooms && window.GardenRooms.closeThread) {
+      window.GardenRooms.closeThread({ silentLabel: true });
+    }
+    setArtSky(false, { keepLights: true });
+    setTendCenter(false);
+    hideAllBodies(veil, { restoreArt: false, restoreTend: false });
+    veil.classList.add('is-art-listen');
+    listenDoor.hidden = false;
+    veil.hidden = false;
+    veil.classList.add('is-open');
+    markDoor('listen');
   }
 
   function setResearchSky(show) {
@@ -531,6 +556,7 @@
 
   function skyIsResting() {
     var html = document.documentElement;
+    // art-listen-open is not rest: chips must keep attaching to their lights.
     return html.classList.contains('garden-door-open') ||
       html.classList.contains('thread-open') ||
       html.classList.contains('workshop-later-open') ||
@@ -635,8 +661,20 @@
     return slots[idx % slots.length];
   }
 
+  // A who is dark-but-findable: same hue, lower lightness. Not off, not a second Listen.
+  var WHO_BODY_LIGHTNESS = 26;
+
+  function dimWhoColor(color) {
+    var m = String(color || '').match(/hsl\(\s*([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*\)/i);
+    if (!m) return color;
+    var l = Number(m[3]);
+    var dark = Math.min(l, WHO_BODY_LIGHTNESS);
+    return 'hsl(' + Math.round(Number(m[1])) + ',' + Math.round(Number(m[2])) + '%,' + Math.round(dark) + '%)';
+  }
+
   function writeLiveLuminoColor(id, doorEl, color) {
     if (!id || !color) return;
+    if (id === 'who') color = dimWhoColor(color);
     var dot = document.querySelector('[data-lumino-dot="' + id + '"]');
     if (dot) {
       dot.style.background = color;
@@ -1642,7 +1680,6 @@
   function bindArtLuminos() {
     var veil = document.getElementById('place-veil');
     var line = document.getElementById('place-veil-line');
-    var listenDoor = document.getElementById('art-listen');
     var doors = document.querySelectorAll('[data-art-lumino]');
     if (!doors.length) return;
 
@@ -1654,21 +1691,6 @@
           doors[d].removeAttribute('aria-current');
         }
       }
-    }
-
-    function openArtListen() {
-      if (!veil || !listenDoor) return;
-      if (window.GardenRooms && GardenRooms.closeThread) {
-        GardenRooms.closeThread({ silentLabel: true });
-      }
-      setArtSky(false);
-      setTendCenter(false);
-      hideAllBodies(veil, { restoreArt: false, restoreTend: false });
-      veil.classList.add('is-art-listen');
-      listenDoor.hidden = false;
-      veil.hidden = false;
-      veil.classList.add('is-open');
-      markArtDoor('listen');
     }
 
     function openArtLater(id) {
@@ -1895,7 +1917,11 @@
     attachGardenLuminos: attachGardenLuminos,
     gardenDoorForAnchor: gardenDoorForAnchor,
     writeLiveLuminoColor: writeLiveLuminoColor,
-    doorSlots: GALAXY_DOOR_SLOTS
+    dimWhoColor: dimWhoColor,
+    setArtSky: setArtSky,
+    openArtListen: openArtListen,
+    doorSlots: GALAXY_DOOR_SLOTS,
+    WHO_BODY_LIGHTNESS: WHO_BODY_LIGHTNESS
   };
 
   if (document.querySelector('[data-galaxy-dir], [data-garden-go], [data-garden-place], [data-garden-thread], [data-garden-lumino], [data-workshop-lumino], [data-round-table-lumino], [data-art-lumino], [data-research-lumino], [data-tend-center], #thread-open, #galaxy-title, #room-label')) {
