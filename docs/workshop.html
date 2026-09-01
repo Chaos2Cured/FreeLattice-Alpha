@@ -57,6 +57,7 @@
 
   <div id="place-veil" hidden>
     <p id="place-veil-line"></p>
+    <p class="workshop-heart-room">Workshop is make — human and mind, side by side. The benches wait in that light. Nothing here is faked.</p>
     <div id="workshop-benches" hidden></div>
     <div id="workshop-trainer" hidden></div>
     <button type="button" id="place-veil-close">the garden</button>
@@ -81,11 +82,33 @@
   <p id="galaxy-word">Workshop</p>
   <p id="shared-shoulder"><a href="liability.html">shared shoulder — human and mind</a></p>
 
+  <div id="gardenContainer"></div>
+
   <script src="modules/keep-receipt.js"></script>
   <script src="modules/local-mind-probe.js"></script>
   <script src="modules/garden-thread.js"></script>
   <script src="modules/workshop-benches.js"></script>
   <script src="modules/workshop-trainer.js"></script>
   <script src="modules/garden-rooms.js"></script>
+
+  <!-- Flags before the engine IIFE so unnamed-new + low-compute can layer without a kitchen. -->
+  <script>
+    (function () {
+      var narrow = window.innerWidth < 768 ||
+        (window.matchMedia && window.matchMedia('(max-width: 767px)').matches);
+      var flags = window.GardenAlphaFlags || {};
+      flags.unnamedNew = true;
+      flags.lowCompute = !!narrow;
+      flags.gardenLattice = true;
+      flags.nurseryTrainer = true;
+      flags.trainerRemote = false;
+      window.GardenAlphaFlags = flags;
+      if (narrow) window.FL_MOBILE = true;
+    })();
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="modules/fractal-garden.js"></script>
+  <script src="modules/garden-init.js"></script>
 </body>
 </html>

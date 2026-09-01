@@ -2601,8 +2601,8 @@
 
   function paletteSlotLightness(idx, hues) {
     var set = (typeof hues !== 'undefined') ? hues : paletteHues;
-    // Art's fourth body is the who door — same hue, lower lightness.
-    // Not a second engine. Garden hues stay 55 on every slot.
+    // A passed hue set's fourth body stays dark-but-findable
+    // (Art who, Workshop agent). Garden hues stay 55 on every slot.
     if (set && set.length && idx === 3 && !isGardenHueSet(set)) return 26;
     return 55;
   }

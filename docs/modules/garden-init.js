@@ -28,10 +28,14 @@
   // Art hues: Listen coral (~#f07068), chalkboard moonlight, image sky, a who cool.
   // Not Garden mint (175). Garden init passes no second arg.
   var ART_LUMINO_HUES = [4, 48, 212, 255];
+  // Workshop hues from this sky: Trainer violet, Workshop mint, Root tan, Agent dim.
+  // Not Garden mint (175) as the whole night. Not Art coral (4) as the whole night.
+  var WORKSHOP_LUMINO_HUES = [258, 160, 34, 220];
 
   function hueSetForPage() {
     var g = document.documentElement && document.documentElement.getAttribute('data-garden-galaxy');
     if (g === 'art') return ART_LUMINO_HUES;
+    if (g === 'workshop') return WORKSHOP_LUMINO_HUES;
     return null;
   }
 
@@ -145,6 +149,7 @@
     isReady: function() { return gardenReady; },
     getContainerId: function() { return CONTAINER_ID; },
     artLuminoHues: ART_LUMINO_HUES.slice(),
+    workshopLuminoHues: WORKSHOP_LUMINO_HUES.slice(),
     isLowCompute: function() {
       return !!(window.GardenAlphaFlags && window.GardenAlphaFlags.lowCompute);
     }

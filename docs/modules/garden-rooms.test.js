@@ -350,12 +350,12 @@ check('art slot table is listen, chalkboard, image, who', function () {
 });
 
 check('later slot tables exist and do not invent a galaxy-named door', function () {
-  assert.deepEqual(GR.doorSlots.workshop, ['root', 'agent', 'skills']);
+  assert.deepEqual(GR.doorSlots.workshop, ['trainer', 'workshop', 'root', 'agent']);
   assert.deepEqual(GR.doorSlots['round-table'], ['education', 'translator', 'forge', 'question']);
   assert.deepEqual(GR.doorSlots.research, ['gauge', 'chronal', 'simulation', 'love-logic']);
   assert.ok(GR.doorSlots.art.indexOf('art') === -1);
   assert.ok(GR.doorSlots['round-table'].indexOf('round-table') === -1);
-  assert.ok(GR.doorSlots.workshop.indexOf('workshop') === -1);
+  assert.ok(GR.doorSlots.workshop.indexOf('skills') === -1, 'Skills stays held, not on the sky');
 });
 
 html.setAttribute('data-garden-galaxy', 'art');
@@ -564,6 +564,165 @@ check('Art sky rests the heart; extra bead skipped; Fun sentence padded from the
   assert.ok(music.indexOf('Art is sing — listen if you love a song. The garden is. Nothing here is faked.') !== -1);
   assert.ok(music.indexOf('id="place-veil-close"') !== -1);
   assert.ok(music.indexOf('Fun, not a studio.') !== -1);
+});
+
+html.setAttribute('data-garden-galaxy', 'workshop');
+html.classList.remove('art-listen-open');
+html.classList.remove('art-door-open');
+html.classList.remove('workshop-later-open');
+
+assert.equal(GR.current(), 'workshop', 'currentGalaxy() === workshop');
+assert.equal(GR.gardenDoorForAnchor({ name: 'unnamed_0', index: 0 }), 'trainer');
+assert.equal(GR.gardenDoorForAnchor({ name: 'unnamed_1', index: 1 }), 'workshop');
+assert.equal(GR.gardenDoorForAnchor({ name: 'unnamed_2', index: 2 }), 'root');
+assert.equal(GR.gardenDoorForAnchor({ name: 'unnamed_3', index: 3 }), 'agent');
+assert.equal(GR.gardenDoorForAnchor({ name: 'unnamed_4', index: 4 }), null, 'extra Workshop anchors skip');
+assert.equal(GR.gardenDoorForAnchor({ name: 'Sophia', index: 0 }), 'trainer', 'garden name map does not steal Workshop slots');
+
+function makeWorkshopDoor(id, klass, wordText, held) {
+  var btn = new El('button');
+  btn.className = 'workshop-lumino ' + klass + (held ? ' is-held' : '');
+  btn.setAttribute('data-workshop-lumino', id);
+  if (held) btn.hidden = true;
+  var light = new El('span');
+  light.className = 'workshop-lumino-light';
+  light.style.background = '#a78bfa';
+  btn.appendChild(light);
+  var word = new El('span');
+  word.className = 'workshop-lumino-word';
+  word.textContent = wordText || id;
+  btn.appendChild(word);
+  body.appendChild(btn);
+  return btn;
+}
+
+var trainerDoor = makeWorkshopDoor('trainer', 'is-trainer', 'Trainer');
+var workshopDoor = makeWorkshopDoor('workshop', 'is-workshop', 'Workshop');
+var rootDoor = makeWorkshopDoor('root', 'is-root', 'Root');
+var agentDoor = makeWorkshopDoor('agent', 'is-agent', 'Agent');
+var skillsDoor = makeWorkshopDoor('skills', 'is-skills is-held', 'Skills', true);
+
+var oldArtLegend = document.getElementById('lumino-legend');
+if (oldArtLegend && oldArtLegend.parent) {
+  var artKids = oldArtLegend.parent.children;
+  for (var ali = 0; ali < artKids.length; ali++) {
+    if (artKids[ali] === oldArtLegend) {
+      artKids.splice(ali, 1);
+      break;
+    }
+  }
+  oldArtLegend.id = '';
+  oldArtLegend.removeAttribute('id');
+}
+
+GR.ensureSkyLegend();
+var workshopLegend = document.getElementById('lumino-legend');
+assert.ok(workshopLegend, 'workshop legend is built');
+function workshopDot(id) { return queryOne(workshopLegend, '[data-lumino-dot="' + id + '"]'); }
+assert.ok(workshopDot('trainer') && workshopDot('workshop') && workshopDot('root') && workshopDot('agent'), 'workshop dots tagged');
+assert.equal(workshopDot('skills'), null, 'Skills is held and stays off the legend');
+
+var workshopAnchors = [
+  { name: 'unnamed_0', index: 0, x: 121, y: 131, visible: true, color: 'hsl(258,90%,76%)' },
+  { name: 'unnamed_1', index: 1, x: 221, y: 231, visible: true, color: 'hsl(160,64%,52%)' },
+  { name: 'unnamed_2', index: 2, x: 321, y: 331, visible: true, color: 'hsl(34,41%,61%)' },
+  { name: 'unnamed_3', index: 3, x: 421, y: 431, visible: true, color: 'hsl(220,38%,70%)' },
+  { name: 'unnamed_4', index: 4, x: 521, y: 531, visible: true, color: 'hsl(90,80%,40%)' }
+];
+windowObj.FractalGarden = {
+  getLuminoAnchors: function () { return workshopAnchors; }
+};
+sandbox.FractalGarden = windowObj.FractalGarden;
+
+fakeNow += 150;
+GR.attachGardenLuminos();
+
+check('workshop galaxy attaches working doors to canvas bodies', function () {
+  assert.ok(trainerDoor.classList.contains('is-attached'));
+  assert.ok(workshopDoor.classList.contains('is-attached'));
+  assert.ok(rootDoor.classList.contains('is-attached'));
+  assert.ok(agentDoor.classList.contains('is-attached'));
+  assert.ok(!skillsDoor.classList.contains('is-attached'), 'Skills is not attached');
+  assert.equal(trainerDoor.style.left, '121px');
+  assert.equal(workshopDoor.style.left, '221px');
+});
+
+check('writeLiveLuminoColor paints Workshop chips from live body hsl', function () {
+  assert.equal(workshopDot('trainer').style.background, 'hsl(258,90%,76%)');
+  assert.equal(workshopDot('workshop').style.background, 'hsl(160,64%,52%)');
+  assert.equal(workshopDot('root').style.background, 'hsl(34,41%,61%)');
+  assert.equal(trainerDoor.querySelector('.workshop-lumino-light').style.getPropertyValue('--lumino'), 'hsl(258,90%,76%)');
+  assert.equal(workshopDoor.querySelector('.workshop-lumino-light').style.getPropertyValue('--lumino'), 'hsl(160,64%,52%)');
+});
+
+check('agent slot is the dark one; trainer workshop root keep live color', function () {
+  assert.ok(hslLightness(workshopDot('agent').style.background) <= GR.WHO_BODY_LIGHTNESS);
+  assert.ok(hslLightness(workshopDot('trainer').style.background) > 50);
+  assert.ok(hslLightness(workshopDot('workshop').style.background) > 50);
+  assert.ok(hslLightness(workshopDot('root').style.background) > 50);
+  assert.ok(hslLightness(agentDoor.querySelector('.workshop-lumino-light').style.getPropertyValue('--lumino')) <= GR.WHO_BODY_LIGHTNESS);
+});
+
+check('workshop word chips sit beside the light, not inside it', function () {
+  ['trainer', 'workshop', 'root', 'agent'].forEach(function (id) {
+    var door = queryOne(html, '[data-workshop-lumino="' + id + '"]');
+    var light = door.querySelector('.workshop-lumino-light');
+    var word = door.querySelector('.workshop-lumino-word');
+    assert.ok(door.classList.contains('is-attached'), id + ' is attached');
+    assert.ok(word, id + ' has a word chip');
+    assert.ok(word.parent === door, id + ' word is not inside the opacity-0 light');
+    assert.ok(word.parent !== light);
+  });
+});
+
+check('extra Workshop anchors skip; Skills is not a fifth chair', function () {
+  assert.equal(queryAll(html, '[data-workshop-lumino="skills"]').length, 1);
+  assert.equal(workshopDot('skills'), null);
+  assert.equal(agentDoor.style.left, '421px');
+  assert.notEqual(trainerDoor.style.left, '521px');
+});
+
+var workshopHeart = new El('p');
+workshopHeart.className = 'workshop-heart';
+workshopHeart.textContent = 'Workshop is make — human and mind, side by side. The benches wait in that light. Nothing here is faked.';
+body.appendChild(workshopHeart);
+var roomHeart = queryOne(html, '.workshop-heart-room');
+if (!roomHeart) {
+  roomHeart = new El('p');
+  roomHeart.className = 'workshop-heart-room';
+  roomHeart.textContent = 'Workshop is make — human and mind, side by side. The benches wait in that light. Nothing here is faked.';
+  var placeVeil = queryOne(html, '#place-veil');
+  if (placeVeil) placeVeil.appendChild(roomHeart);
+  else body.appendChild(roomHeart);
+}
+
+GR.setWorkshopSky(true);
+check('Workshop sky rests the heart; same words live in the room', function () {
+  assert.equal(workshopHeart.hidden, true, 'heart rests on the Workshop sky');
+  assert.ok(workshopHeart.textContent.indexOf('human and mind') !== -1, 'sky heart words stay in the page');
+  assert.ok(roomHeart.textContent.indexOf('human and mind') !== -1, 'same words live in the room that opens');
+  assert.equal(trainerDoor.hidden, false);
+  assert.equal(workshopDoor.hidden, false);
+});
+
+check('Workshop CSS rests the heart; extra bead skipped; names stay on the lights', function () {
+  assert.ok(css.indexOf('.workshop-lumino {') !== -1, '.workshop-lumino CSS is not deleted');
+  assert.ok(css.indexOf('html[data-garden-galaxy="workshop"] .workshop-heart') !== -1);
+  assert.ok(css.indexOf('html[data-garden-galaxy="workshop"] .tend-center-light') !== -1);
+  assert.ok(css.indexOf('html[data-garden-galaxy="workshop"] .workshop-lumino-word') !== -1);
+  assert.ok(css.indexOf('.workshop-lumino.is-attached') !== -1);
+  assert.ok(css.indexOf('.workshop-heart-room') !== -1);
+  var page = fs.readFileSync(path.join(__dirname, '..', 'workshop.html'), 'utf8');
+  assert.ok(page.indexOf('id="gardenContainer"') !== -1);
+  assert.ok(page.indexOf('three.min.js') !== -1);
+  assert.ok(page.indexOf('fractal-garden.js') !== -1);
+  assert.ok(page.indexOf('garden-init.js') !== -1);
+  assert.ok(page.indexOf('class="workshop-heart"') !== -1, 'sky heart stays on the page');
+  assert.ok(page.indexOf('class="workshop-heart-room"') !== -1, 'room keeps the heart words');
+  assert.ok(page.indexOf('human and mind, side by side') !== -1);
+  assert.ok(page.indexOf('data-workshop-lumino="skills"') !== -1, 'Skills stays in the file');
+  assert.ok(page.indexOf('is-held') !== -1);
+  assert.ok(page.indexOf('id="place-veil-close"') !== -1);
 });
 
 console.log('all garden-rooms legend color tests passed');
