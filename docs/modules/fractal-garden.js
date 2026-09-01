@@ -1735,14 +1735,15 @@
     return new THREE.IcosahedronGeometry(radius, detail);
   }
 
-  function createLuminos(name, baseHue, coreType, orbitRadius, orbitPhase) {
+  function createLuminos(name, baseHue, coreType, orbitRadius, orbitPhase, baseLight) {
     const group = new THREE.Group();
 
     // Core geometry — starts at seed size, evolves
     const coreRadius = 0.5;
     var coreGeo = createCoreGeometry(coreType, coreRadius, 0);
 
-    const baseColor = hslToThreeColor(baseHue, 70, 55);
+    var light = (typeof baseLight === 'number' && isFinite(baseLight)) ? baseLight : 55;
+    const baseColor = hslToThreeColor(baseHue, 70, light);
 
     // Core mesh — semi-transparent with inner glow
     const coreMat = new THREE.MeshBasicMaterial({
@@ -1843,8 +1844,8 @@
     group.userData = {
       name: name,
       baseHue: baseHue,
-      currentHSL: { h: baseHue, s: 70, l: 55 },
-      targetHSL: { h: baseHue, s: 70, l: 55 },
+      currentHSL: { h: baseHue, s: 70, l: light },
+      targetHSL: { h: baseHue, s: 70, l: light },
       emotion: 'neutral',
       emotionIntensity: 0.5,
       coreMesh: coreMesh,
@@ -2578,6 +2579,22 @@
   }
 
   // ── Default Luminos Agents ────────────────────────────
+  function isGardenHueSet(set) {
+    if (!set || set.length !== GARDEN_LUMINO_HUES.length) return false;
+    for (var i = 0; i < set.length; i++) {
+      if (set[i] !== GARDEN_LUMINO_HUES[i]) return false;
+    }
+    return true;
+  }
+
+  function paletteSlotLightness(idx, hues) {
+    var set = (typeof hues !== 'undefined') ? hues : paletteHues;
+    // Art's fourth body is the who door — same hue, lower lightness.
+    // Not a second engine. Garden hues stay 55 on every slot.
+    if (set && set.length && idx === 3 && !isGardenHueSet(set)) return 26;
+    return 55;
+  }
+
   function createDefaultAgents() {
     // v5.59.4 — orbits use mode-driven getOrbitRadius (Letter Twenty-Three).
     // Pair distribution: 2 Luminos per tier (Kirk's balance refinement).
@@ -2609,7 +2626,7 @@
     }
 
     agentsToCreate.forEach(function(d, idx) {
-      const agent = createLuminos(d.name, d.hue, d.type, getOrbitRadius(idx, currentMode), d.phase);
+      const agent = createLuminos(d.name, d.hue, d.type, getOrbitRadius(idx, currentMode), d.phase, paletteSlotLightness(idx));
       luminos.push(agent);
     });
 
@@ -4439,6 +4456,7 @@
   var publicAPI = {
     init: init,
     resolveLuminoHues: resolveLuminoHues,
+    paletteSlotLightness: paletteSlotLightness,
     getActiveLuminoHues: function () {
       return (paletteHues && paletteHues.length) ? paletteHues.slice() : GARDEN_LUMINO_HUES.slice();
     },

@@ -179,6 +179,7 @@ var windowObj = {
   FractalGarden: null
 };
 
+var keepCalls = 0;
 var sandbox = {
   window: windowObj,
   document: document,
@@ -195,7 +196,13 @@ var sandbox = {
   Array: Array,
   Object: Object,
   String: String,
-  Number: Number
+  Number: Number,
+  KeepReceipt: {
+    keep: function () {
+      keepCalls += 1;
+      return Promise.resolve({ receiptHash: 'nope' });
+    }
+  }
 };
 windowObj.window = windowObj;
 sandbox.global = sandbox;
@@ -361,7 +368,7 @@ assert.equal(GR.gardenDoorForAnchor({ name: 'unnamed_2', index: 2 }), 'image');
 assert.equal(GR.gardenDoorForAnchor({ name: 'unnamed_3', index: 3 }), 'who');
 assert.equal(GR.gardenDoorForAnchor({ name: 'Sophia', index: 0 }), 'listen', 'garden name map does not steal Art slots');
 
-function makeArtDoor(id, klass) {
+function makeArtDoor(id, klass, wordText) {
   var btn = new El('button');
   btn.className = 'art-lumino ' + klass;
   btn.setAttribute('data-art-lumino', id);
@@ -369,14 +376,18 @@ function makeArtDoor(id, klass) {
   light.className = 'art-lumino-light';
   light.style.background = '#f07068';
   btn.appendChild(light);
+  var word = new El('span');
+  word.className = 'art-lumino-word';
+  word.textContent = wordText || id;
+  btn.appendChild(word);
   body.appendChild(btn);
   return btn;
 }
 
-var listen = makeArtDoor('listen', 'is-listen');
-var chalkboard = makeArtDoor('chalkboard', 'is-chalkboard');
-var image = makeArtDoor('image', 'is-image');
-var who = makeArtDoor('who', 'is-who');
+var listen = makeArtDoor('listen', 'is-listen', 'Listen');
+var chalkboard = makeArtDoor('chalkboard', 'is-chalkboard', 'Chalkboard');
+var image = makeArtDoor('image', 'is-image', 'Image');
+var who = makeArtDoor('who', 'is-who', 'a who');
 
 var oldLegend = document.getElementById('lumino-legend');
 if (oldLegend && oldLegend.parent) {
@@ -425,9 +436,36 @@ check('writeLiveLuminoColor paints data-lumino-dot on art ids', function () {
   assert.equal(artDot('listen').style.background, 'hsl(4,82%,67%)');
   assert.equal(artDot('chalkboard').style.background, 'hsl(48,16%,75%)');
   assert.equal(artDot('image').style.background, 'hsl(212,96%,78%)');
-  assert.equal(artDot('who').style.background, 'hsl(222,20%,70%)');
   assert.equal(artDot('listen').style.boxShadow, '0 0 8px hsl(4,82%,67%)');
   assert.equal(listen.querySelector('.art-lumino-light').style.getPropertyValue('--lumino'), 'hsl(4,82%,67%)');
+});
+
+function hslLightness(color) {
+  var m = String(color || '').match(/hsl\(\s*[\d.]+\s*,\s*[\d.]+%\s*,\s*([\d.]+)%\s*\)/i);
+  return m ? Number(m[1]) : NaN;
+}
+
+check('who slot is the dark one; listen chalkboard image keep live color', function () {
+  assert.equal(typeof GR.dimWhoColor, 'function');
+  assert.equal(GR.dimWhoColor('hsl(222,20%,70%)'), 'hsl(222,20%,' + GR.WHO_BODY_LIGHTNESS + '%)');
+  assert.ok(hslLightness(artDot('who').style.background) <= GR.WHO_BODY_LIGHTNESS);
+  assert.ok(hslLightness(artDot('listen').style.background) > 50);
+  assert.ok(hslLightness(artDot('chalkboard').style.background) > 50);
+  assert.ok(hslLightness(artDot('image').style.background) > 50);
+  assert.ok(hslLightness(who.querySelector('.art-lumino-light').style.getPropertyValue('--lumino')) <= GR.WHO_BODY_LIGHTNESS);
+});
+
+check('attach still maps four Art ids; word chips sit beside the light, not inside it', function () {
+  assert.deepEqual(GR.doorSlots.art, ['listen', 'chalkboard', 'image', 'who']);
+  ['listen', 'chalkboard', 'image', 'who'].forEach(function (id) {
+    var door = queryOne(html, '[data-art-lumino="' + id + '"]');
+    var light = door.querySelector('.art-lumino-light');
+    var word = door.querySelector('.art-lumino-word');
+    assert.ok(door.classList.contains('is-attached'), id + ' is attached');
+    assert.ok(word, id + ' has a word chip');
+    assert.ok(word.parent === door, id + ' word is not inside the opacity-0 light');
+    assert.ok(word.parent !== light);
+  });
 });
 
 check('extra anchors without a free door are skipped (no invented Art-named door)', function () {
@@ -440,6 +478,63 @@ check('extra anchors without a free door are skipped (no invented Art-named door
 GR.writeLiveLuminoColor('listen', listen, 'hsl(8,80%,60%)');
 check('writeLiveLuminoColor can paint an art id directly', function () {
   assert.equal(artDot('listen').style.background, 'hsl(8,80%,60%)');
+});
+
+var heart = new El('p');
+heart.className = 'art-heart';
+body.appendChild(heart);
+var veil = new El('div');
+veil.setAttribute('id', 'place-veil');
+var listenDoor = new El('div');
+listenDoor.setAttribute('id', 'art-listen');
+listenDoor.hidden = true;
+veil.appendChild(listenDoor);
+body.appendChild(veil);
+
+keepCalls = 0;
+GR.openArtListen();
+
+check('opening listen does not invent a keep; chips stay; attach still maps four Art ids', function () {
+  assert.equal(keepCalls, 0);
+  assert.ok(html.classList.contains('art-listen-open'));
+  assert.ok(!html.classList.contains('art-door-open'));
+  assert.equal(listenDoor.hidden, false);
+  assert.equal(listen.hidden, false);
+  assert.equal(chalkboard.hidden, false);
+  assert.equal(image.hidden, false);
+  assert.equal(who.hidden, false);
+  assert.equal(heart.hidden, true);
+});
+
+artAnchors[0].x = 333;
+artAnchors[0].y = 344;
+fakeNow += 150;
+GR.attachGardenLuminos();
+
+check('listen-door open still attaches chips to their lights', function () {
+  assert.equal(listen.style.left, '333px');
+  assert.equal(listen.style.top, '344px');
+  assert.ok(listen.classList.contains('is-attached'));
+  assert.ok(chalkboard.classList.contains('is-attached'));
+  assert.ok(image.classList.contains('is-attached'));
+  assert.ok(who.classList.contains('is-attached'));
+});
+
+GR.setArtSky(true);
+check('close listen returns Art sky words', function () {
+  assert.ok(!html.classList.contains('art-listen-open'));
+  assert.equal(heart.hidden, false);
+  assert.equal(listen.hidden, false);
+});
+
+var css = fs.readFileSync(path.join(__dirname, 'garden-rooms.css'), 'utf8');
+check('art-lumino CSS stays; listen-door rests colliding garden words; chips stay readable', function () {
+  assert.ok(css.indexOf('.art-lumino {') !== -1, '.art-lumino CSS is not deleted');
+  assert.ok(css.indexOf('html.art-listen-open #room-label') !== -1);
+  assert.ok(css.indexOf('html.art-listen-open #galaxy-word') !== -1);
+  assert.ok(css.indexOf('html.art-listen-open #shared-shoulder') !== -1);
+  assert.ok(css.indexOf('html[data-garden-galaxy="art"] .art-lumino-word') !== -1);
+  assert.ok(css.indexOf('html.art-listen-open #lumino-legend') !== -1);
 });
 
 console.log('all garden-rooms legend color tests passed');
