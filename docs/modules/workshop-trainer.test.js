@@ -31,15 +31,47 @@ var document = {
       innerHTML: '',
       style: {},
       childNodes: [],
-      setAttribute: function (name, val) { this[name] = val; },
-      getAttribute: function (name) { return this[name] == null ? null : this[name]; },
-      removeAttribute: function (name) { delete this[name]; },
+      classList: {
+        add: function (name) {
+          if ((' ' + node.className + ' ').indexOf(' ' + name + ' ') === -1) {
+            node.className = (node.className ? node.className + ' ' : '') + name;
+          }
+        },
+        remove: function (name) {
+          node.className = String(node.className || '')
+            .split(/\s+/)
+            .filter(function (c) { return c && c !== name; })
+            .join(' ');
+        },
+        contains: function (name) {
+          return (' ' + node.className + ' ').indexOf(' ' + name + ' ') !== -1;
+        }
+      },
+      setAttribute: function (name, val) {
+        this._attrs = this._attrs || {};
+        this._attrs[name] = val;
+        if (name === 'disabled') this.disabled = true;
+      },
+      getAttribute: function (name) {
+        if (this._attrs && Object.prototype.hasOwnProperty.call(this._attrs, name)) {
+          return this._attrs[name];
+        }
+        return this[name] == null ? null : this[name];
+      },
+      removeAttribute: function (name) {
+        if (this._attrs) delete this._attrs[name];
+        delete this[name];
+        if (name === 'disabled') this.disabled = false;
+      },
       appendChild: function (child) { this.childNodes.push(child); return child; },
       addEventListener: function () {},
       click: function () {},
       querySelector: function () { return null; }
     };
     return node;
+  },
+  createTextNode: function (text) {
+    return { tag: '#text', textContent: String(text == null ? '' : text), childNodes: [] };
   }
 };
 
@@ -294,8 +326,55 @@ chain = chain.then(function () {
   return check('no invented LoRA, no invented progress, Grow stays Grow', function () {
     assert.equal(WT.HAS_LORA, false);
     assert.equal(WT.HAS_PROGRESS, false);
+    assert.equal(WT.HAS_SECOND_GATE, false);
     assert.equal(WT.HEART_GROW.indexOf('Nursery remains Grow') !== -1, true);
     assert.equal(WT.HEART_GROW.indexOf('This light is Trainer') !== -1, true);
+  });
+});
+
+chain = chain.then(function () {
+  return check('resting face says weights did not change once; Train sleeps', function () {
+    windowObj.LocalMindProbe.getRemembered = function () { return null; };
+    windowObj.GardenAlphaFlags = { trainerRemote: false };
+    assert.equal(WT.HEART_RESTING.indexOf('Nothing has been trained') !== -1, true);
+    assert.equal(WT.HEART_RESTING.indexOf('Weights did not change') !== -1, true);
+    assert.equal(WT.HEART_NONE.indexOf('Weights did not change'), -1);
+    var host = document.createElement('div');
+    var root = WT.mount(host);
+    assert.ok(root);
+    assert.equal(root.getAttribute('data-workshop-trainer-asleep'), '1');
+    assert.equal(root.getAttribute('aria-disabled'), 'true');
+    var texts = [];
+    var trainBtn = null;
+    function walk(node) {
+      if (!node) return;
+      if (node.textContent) texts.push(node.textContent);
+      if (node.getAttribute && node.getAttribute('data-workshop-trainer-train') === '1') {
+        trainBtn = node;
+      }
+      if (!trainBtn && node.tag === 'button' && node.textContent === 'Train') {
+        trainBtn = node;
+      }
+      (node.childNodes || []).forEach(walk);
+    }
+    walk(root);
+    var joined = texts.join(' | ');
+    var weightHits = (joined.match(/Weights did not change/g) || []).length;
+    var trainedHits = (joined.match(/Nothing has been trained/g) || []).length;
+    assert.equal(weightHits, 1);
+    assert.equal(trainedHits, 1);
+    assert.ok(trainBtn, 'Train stays on the sky');
+    assert.equal(trainBtn.disabled, true);
+    assert.equal(trainBtn.getAttribute('disabled'), '');
+    assert.equal(trainBtn.getAttribute('aria-disabled'), 'true');
+    assert.equal(trainBtn.textContent, 'Train');
+    assert.equal(joined.indexOf('Settings') !== -1, true);
+    assert.equal(joined.indexOf('Nursery remains Grow') !== -1, true);
+    assert.equal(/progress|LoRA|lora|second gate/i.test(joined), false);
+    assert.equal(WT.HAS_PROGRESS, false);
+    assert.equal(WT.HAS_LORA, false);
+    assert.equal(WT.HAS_SECOND_GATE, false);
+    WT.unmount();
   });
 });
 
