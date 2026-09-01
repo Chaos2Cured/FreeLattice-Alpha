@@ -5024,7 +5024,8 @@ html[data-garden-galaxy="art"] .art-heart {
     max-height: min(42vh, calc(100vh - 32rem));
     overflow: hidden;
     overflow-x: hidden;
-    padding: 8px 12px 12px;
+    padding: 8px 14px 12px;
+    scrollbar-width: none;
     box-sizing: border-box;
   }
 
@@ -5104,9 +5105,32 @@ html[data-garden-galaxy="art"] .art-heart {
    invent a keep. Do not cover the miracle with a maze. Grow
    stays Grow. Economy stays a later sentence. Founding four
    stay off the canvas. */
+#place-veil.is-nursery {
+  padding-bottom: 5.25rem;
+}
+
+#place-veil.is-nursery #place-veil-close {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 0.35rem;
+  margin-top: 0;
+  z-index: 6;
+  background: rgba(12, 10, 26, 0.9);
+}
+
+#place-veil.is-nursery #nursery-stage {
+  padding-bottom: 2.75rem;
+}
+
+#place-veil.is-nursery .nursery-growth-face {
+  margin-top: 8px;
+  padding: 8px 12px 10px;
+}
+
 #place-veil.is-nursery .nursery-egg-wrap,
 html.room-page .nursery-egg-wrap {
-  margin: 0 auto 1.35rem;
+  margin: 0 auto 0.4rem;
 }
 
 #place-veil.is-nursery .nursery-egg-home,
