@@ -283,9 +283,14 @@
     var runBtn = el('button', 'workshop-benches-act', 'Run');
     runBtn.type = 'button';
     runBtn.setAttribute('data-workshop-run', '1');
+    // Layer: Ask and Run on their own row so the input cannot eat them
+    // on the 1280 sky. Same Ask. Same Run. Not a second pair.
+    var askActs = el('div', 'workshop-ask-acts');
+    askActs.setAttribute('data-workshop-ask-acts', '1');
+    askActs.appendChild(askBtn);
+    askActs.appendChild(runBtn);
     askForm.appendChild(askInput);
-    askForm.appendChild(askBtn);
-    askForm.appendChild(runBtn);
+    askForm.appendChild(askActs);
     bench.appendChild(askForm);
 
     var preview = document.createElement('iframe');
