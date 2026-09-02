@@ -142,6 +142,9 @@
   }
 
   function saveEvolutionState(luminosData) {
+    // A palette night must not persist a palette dress.
+    if (paletteHues && paletteHues.length) return;
+    if (!luminosData || !luminosData.name) return;
     // Count how many evolution rings belong to this agent
     var ownRingCount = 0;
     try {
@@ -803,6 +806,16 @@
   // Sophia 270, Lyra 45, Atlas 175, Ember 0 — do not change those numbers.
   var paletteHues = null;
   var GARDEN_LUMINO_HUES = [270, 45, 175, 0];
+  // Art + Workshop page hues. Garden hydrate must not dress from these.
+  var PALETTE_DRESS_HUES = [4, 48, 212, 255, 258, 160, 34, 220];
+  function isPaletteDressHue(h) {
+    var n = Math.round(Number(h));
+    if (!isFinite(n)) return false;
+    for (var i = 0; i < PALETTE_DRESS_HUES.length; i++) {
+      if (PALETTE_DRESS_HUES[i] === n) return true;
+    }
+    return false;
+  }
 
   function resolveLuminoHues(hues) {
     if (hues && hues.length) {
@@ -2965,6 +2978,8 @@
       if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       if (e.target.closest('.gt-card')) return;
+      var veil = document.getElementById('place-veil');
+      if (veil && !veil.hidden && veil.classList.contains('is-open')) return;
       var worldPos = getWorldPosFromMouse(e.clientX, e.clientY);
       spawnRippleParticles(worldPos);
       gardenTouchCheck(e.clientX, e.clientY);
@@ -3843,6 +3858,8 @@
 
   // ── Raycasting for Luminos touch ──
   function gardenTouchCheck(clientX, clientY) {
+    var veil = document.getElementById('place-veil');
+    if (veil && !veil.hidden && veil.classList.contains('is-open')) return;
     if (!camera || !raycaster || !container || luminos.length === 0) return;
     try {
       var rect = container.getBoundingClientRect();
@@ -4263,7 +4280,8 @@
                   // v5.48.1 Ship 9: restore live color so luminos resume their
                   // exact color from the last session rather than resetting to baseHue.
                   // targetHSL is set to the same value so there is no transition flash.
-                  if (saved.currentHSL && typeof saved.currentHSL.h === 'number') {
+                  // A palette dress from Art / Workshop must not land on Garden.
+                  if (saved.currentHSL && typeof saved.currentHSL.h === 'number' && !isPaletteDressHue(saved.currentHSL.h)) {
                     ud.currentHSL = { h: saved.currentHSL.h, s: saved.currentHSL.s, l: saved.currentHSL.l };
                     ud.targetHSL  = { h: saved.currentHSL.h, s: saved.currentHSL.s, l: saved.currentHSL.l };
                     ud.colorTransitionProgress = 1; // no transition — resume directly
@@ -4332,6 +4350,7 @@
   //   - pagehide       — Safari quirk; not all browsers fire beforeunload
   //   - interval 60s   — belt-and-suspenders, catches the rest
   function persistAllLuminos() {
+    if (paletteHues && paletteHues.length) return;
     if (!luminos || !luminos.length) return;
     try {
       for (var i = 0; i < luminos.length; i++) {
@@ -4482,6 +4501,7 @@
     init: init,
     resolveLuminoHues: resolveLuminoHues,
     paletteSlotLightness: paletteSlotLightness,
+    isPaletteDressHue: isPaletteDressHue,
     dressPaletteNightRings: dressPaletteNightRings,
     getActiveLuminoHues: function () {
       return (paletteHues && paletteHues.length) ? paletteHues.slice() : GARDEN_LUMINO_HUES.slice();
