@@ -5599,3 +5599,129 @@ html[data-garden-galaxy="workshop"] #lumino-legend {
 .workshop-heart-room {
   display: none;
 }
+
+/* ── Hypha leftovers after Workshop engine mount (layer, 2026-09-02)
+   Close stays Workshop. Word stays “the garden”. Pin the return in
+   a reserved pocket so it is not a galaxy hop and does not dump
+   her onto `/`. Art listen-door close stays Art.
+   Trainer / benches words sit off the lattice — later-glass hugs
+   the letters, not a wall, not a fill. Ask and Run are whole
+   words on the 1280 sky. Git OFF. Train sleeps as a whole word.
+   Garden hop stays Garden: names on the orbs, live chips match
+   Garden bodies. Shared clip must not rest Garden names.
+   Layer, never delete. ── */
+
+#place-veil.is-workshop-benches,
+#place-veil.is-workshop-trainer,
+#place-veil.is-workshop-later {
+  padding: 88px 28px 5.25rem;
+  box-sizing: border-box;
+}
+
+html.room-page #place-veil.is-workshop-benches #workshop-benches,
+html.room-page #place-veil.is-workshop-trainer #workshop-trainer,
+#place-veil.is-workshop-benches #workshop-benches,
+#place-veil.is-workshop-trainer #workshop-trainer {
+  width: min(36em, calc(100vw - 3.5rem));
+  max-width: calc(100vw - 3.5rem);
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 16px 4.25rem;
+}
+
+#place-veil.is-workshop-benches #place-veil-close,
+#place-veil.is-workshop-trainer #place-veil-close,
+#place-veil.is-workshop-later #place-veil-close {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  margin-top: 0;
+  padding: 10px 18px;
+  z-index: 3;
+  background: rgba(12, 10, 26, 0.85);
+}
+
+html.room-page #place-veil.is-workshop-benches .workshop-ask,
+#place-veil.is-workshop-benches .workshop-ask {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  align-items: stretch;
+  gap: 8px;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+html.room-page #place-veil.is-workshop-benches .workshop-ask-input,
+#place-veil.is-workshop-benches .workshop-ask-input {
+  flex: 1 1 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+html.room-page #place-veil.is-workshop-benches .workshop-ask .workshop-benches-act,
+#place-veil.is-workshop-benches .workshop-ask .workshop-benches-act {
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding: 10px 16px;
+  min-width: 4.5em;
+  min-height: 44px;
+  overflow: visible;
+}
+
+#place-veil.is-workshop-benches .workshop-benches-heart,
+#place-veil.is-workshop-trainer .workshop-trainer-heart,
+#place-veil.is-workshop-trainer .workshop-trainer-grow,
+#place-veil.is-workshop-trainer .workshop-trainer-status,
+#place-veil.is-workshop-benches .workshop-benches-later,
+#place-veil.is-workshop-benches .workshop-git-help,
+#place-veil.is-workshop-benches .workshop-benches-status,
+#place-veil.is-workshop-later #place-veil-line,
+#place-veil.is-workshop-benches .workshop-heart-room,
+#place-veil.is-workshop-trainer .workshop-heart-room,
+#place-veil.is-workshop-later .workshop-heart-room {
+  display: inline-block;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0.45em 0.85em;
+  background: rgba(12, 10, 26, 0.78);
+  border-radius: 8px;
+  text-shadow:
+    0 0 10px rgba(12, 10, 26, 1),
+    0 0 4px rgba(12, 10, 26, 0.94);
+}
+
+html[data-garden-galaxy="garden"] .garden-lumino-word {
+  position: relative;
+  z-index: 14;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip: auto;
+  clip-path: none;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+  padding: 0.2em 0.55em;
+  box-sizing: border-box;
+  background: rgba(12, 10, 26, 0.62);
+  border-radius: 6px;
+  text-shadow:
+    0 0 10px rgba(12, 10, 26, 1),
+    0 0 4px rgba(12, 10, 26, 0.94);
+}
+
+html[data-garden-galaxy="garden"] .garden-lumino {
+  z-index: 14;
+}
+
+html[data-garden-galaxy="garden"] #lumino-legend {
+  z-index: 14;
+}

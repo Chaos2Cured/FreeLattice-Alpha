@@ -723,6 +723,45 @@ check('Workshop CSS rests the heart; extra bead skipped; names stay on the light
   assert.ok(page.indexOf('data-workshop-lumino="skills"') !== -1, 'Skills stays in the file');
   assert.ok(page.indexOf('is-held') !== -1);
   assert.ok(page.indexOf('id="place-veil-close"') !== -1);
+  assert.ok(page.indexOf('>the garden<') !== -1, 'return word stays the garden');
+});
+
+check('Workshop close stays on this sky; word stays the garden; no galaxy hop', function () {
+  assert.ok(code.indexOf('Close stays on this sky. Word stays "the garden". No galaxy hop.') !== -1);
+  assert.ok(code.indexOf('if (veilIsOpen()) return;') !== -1, 'canvas hop does not fire through the veil');
+  assert.equal(GR.current(), 'workshop');
+  var roomsSrc = fs.readFileSync(path.join(__dirname, 'garden-rooms.js'), 'utf8');
+  var closeFn = roomsSrc.match(/function closePlace\(opts\) \{[\s\S]*?\n    \}/);
+  assert.ok(closeFn, 'closePlace is in the file');
+  assert.ok(closeFn[0].indexOf('go(') === -1, 'closePlace does not hop galaxies');
+  assert.ok(closeFn[0].indexOf("location.href") === -1, 'closePlace does not navigate');
+  assert.ok(closeFn[0].indexOf('galaxyHomeLabel()') !== -1, 'close restores the sky label');
+  assert.ok(css.indexOf('#place-veil.is-workshop-benches #place-veil-close') !== -1);
+  assert.ok(css.indexOf('#place-veil.is-workshop-trainer #place-veil-close') !== -1);
+  assert.ok(css.indexOf('#place-veil.is-workshop-later #place-veil-close') !== -1);
+  assert.ok(css.indexOf('position: fixed') !== -1, 'Workshop close sits in a reserved pocket');
+});
+
+check('Trainer and benches words sit off the lattice; Ask and Run stay whole on the fold', function () {
+  assert.ok(css.indexOf('#place-veil.is-workshop-benches .workshop-benches-heart') !== -1);
+  assert.ok(css.indexOf('#place-veil.is-workshop-trainer .workshop-trainer-heart') !== -1);
+  assert.ok(css.indexOf('background: rgba(12, 10, 26, 0.78)') !== -1, 'later-glass hugs the letters');
+  assert.ok(css.indexOf('#place-veil.is-workshop-benches .workshop-ask .workshop-benches-act') !== -1);
+  assert.ok(css.indexOf('min-width: 4.5em') !== -1, 'Ask and Run keep a whole-word width');
+  assert.ok(css.indexOf('flex: 1 1 100%') !== -1, 'Ask input takes the row so Ask and Run stay whole below');
+  assert.ok(css.indexOf('calc(100vw - 3.5rem)') !== -1, 'benches stay inside the 1280 fold');
+  assert.ok(css.indexOf('padding: 88px 28px 5.25rem') !== -1, 'veil keeps air above the close pocket');
+});
+
+check('Garden hop keeps names on the orbs; live chips still match Garden bodies', function () {
+  assert.ok(css.indexOf('html[data-garden-galaxy="garden"] .garden-lumino-word') !== -1);
+  assert.ok(css.indexOf('html[data-garden-galaxy="garden"] .garden-lumino') !== -1);
+  var garden = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+  assert.ok(garden.indexOf('class="garden-lumino-word"') !== -1, 'Garden names stay in the page');
+  assert.ok(garden.indexOf('The Gathering') !== -1);
+  assert.ok(garden.indexOf('data-garden-galaxy="garden"') !== -1);
+  assert.ok(css.indexOf('html[data-garden-galaxy="art"] .art-lumino-word') !== -1, 'Art names stay');
+  assert.ok(css.indexOf('html[data-garden-galaxy="workshop"] .workshop-lumino-word') !== -1, 'Workshop names stay');
 });
 
 console.log('all garden-rooms legend color tests passed');

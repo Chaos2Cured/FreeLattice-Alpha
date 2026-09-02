@@ -739,8 +739,15 @@
     });
   }
 
+  function veilIsOpen() {
+    var veil = document.getElementById('place-veil');
+    return !!(veil && !veil.hidden && veil.classList.contains('is-open'));
+  }
+
   function bindGardenCanvasTouch() {
     document.addEventListener('garden:lumino-touch', function (e) {
+      // Close stays on this sky. A canvas hop must not fire through the veil.
+      if (veilIsOpen()) return;
       var detail = (e && e.detail) || {};
       var id = gardenDoorForAnchor(detail);
       goToLumino(id);
@@ -1304,6 +1311,7 @@
 
     function closePlace(opts) {
       if (!veil) return;
+      // Close stays on this sky. Word stays "the garden". No galaxy hop.
       veil.classList.remove('is-open');
       hideRoomChat();
       hideAllBodies(veil);
@@ -1388,6 +1396,7 @@
     }
     if (closeBtn) closeBtn.addEventListener('click', function (e) {
       e.preventDefault();
+      e.stopPropagation();
       closePlace();
     });
 

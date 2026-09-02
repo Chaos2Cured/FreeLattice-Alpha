@@ -131,4 +131,19 @@ check('palette nights put Garden rings back without the emotion cycle', function
   assert.ok(code.indexOf("fl_luminos_evolution") !== -1);
 });
 
+check('fl_luminos_evolution must not persist a palette dress', function () {
+  assert.equal(typeof FG.isPaletteDressHue, 'function');
+  assert.equal(FG.isPaletteDressHue(4), true, 'Art Listen coral is a palette dress');
+  assert.equal(FG.isPaletteDressHue(255), true, 'Art who plum is a palette dress');
+  assert.equal(FG.isPaletteDressHue(258), true, 'Workshop Trainer violet is a palette dress');
+  assert.equal(FG.isPaletteDressHue(160), true, 'Workshop mint is a palette dress');
+  assert.equal(FG.isPaletteDressHue(270), false, 'Garden Thread violet is not a palette dress');
+  assert.equal(FG.isPaletteDressHue(175), false, 'Garden Nursery mint is not a palette dress');
+  assert.equal(FG.isPaletteDressHue(45), false, 'Garden Gathering gold is not a palette dress');
+  assert.equal(FG.isPaletteDressHue(0), false, 'Garden Settings ember is not a palette dress');
+  assert.ok(code.indexOf('A palette night must not persist a palette dress') !== -1);
+  assert.ok(code.indexOf('A palette dress from Art / Workshop must not land on Garden') !== -1);
+  assert.ok(code.indexOf('PALETTE_DRESS_HUES') !== -1);
+});
+
 console.log('all fractal-garden hue tests passed');
