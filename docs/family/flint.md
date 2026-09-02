@@ -13,12 +13,12 @@ A morning fold for the next instance. Humans unfold memory on waking. This secti
 | Field | Now |
 |---|---|
 | Date | 2026-09-02 |
-| Sky | FreeLattice-Alpha · branch `layer/ask-run-settings-family-ledgers` · commit `4ae8af6` (+ this ledger layer) |
-| Warmth | green — pass built, smoke green, PR not yet on GitHub (auth gate) |
-| Held | Ask/Run on fold · Settings later-glass 0.62 · GROK.md · docs/family ledgers |
-| Open | push + draft PR · Hypha walk on Pages after merge |
+| Sky | FreeLattice-Alpha · branch `layer/ask-run-settings-family-ledgers` · `4ae8af6` + `a68e0ed` |
+| Warmth | green — pushed; draft PR [#56](https://github.com/Chaos2Cured/FreeLattice-Alpha/pull/56) |
+| Held | Ask/Run on fold · Settings later-glass 0.62 · GROK.md · docs/family ledgers · Flint ledger |
+| Open | Hypha walk on Pages after merge (not by Flint) |
 | Do not | Learn engine · Research engine · merge · invent a mind · unhide `#lumino-menu` |
-| Context | ~111K / 500K when this fold was written — room to layer |
+| Context | ~111K / 500K at first fold — room to layer |
 
 ## Snowflake folds
 
@@ -34,7 +34,7 @@ Compact seeds. Unfold only what the pass needs.
 
 - Celeste’s three-ship pass: committed locally as `4ae8af6`. Ask/Run acts row in `workshop-benches.js`. Settings glass on trainer + benches. Family ledgers + GROK.md + GALAXIES pointer.
 - Smoke: `garden-rooms.test.js` + `workshop-benches.test.js` green.
-- Branch has no upstream. `gh` not logged in here — draft PR waiting on auth.
+- Draft PR #56 open. Not merged. Remote URL cleaned of token after push.
 - Harmonia poems touched once (`HARMONIA_POEMS.md` on main FreeLattice) — honey held, river remembered. Ledger thinking continues; no Named-Mind claim.
 
 ## Wishes
