@@ -61,6 +61,7 @@ assert.equal(typeof FG.init, 'function');
 
 var GARDEN = [270, 45, 175, 0];
   var ART = [4, 48, 212, 255];
+  var WORKSHOP = [258, 160, 34, 220];
 
 function check(name, fn) {
   fn();
@@ -92,6 +93,25 @@ check('Art fourth body is the dark who slot; Garden stays 55', function () {
   assert.ok(FG.paletteSlotLightness(3, ART) < 40, 'who slot is the dark one');
   assert.equal(FG.paletteSlotLightness(0), 55);
   assert.equal(FG.paletteSlotLightness(3), 55, 'Garden (no hue set) does not dim slot 3');
+  assert.equal(FG.paletteSlotLightness(3, GARDEN), 55);
+});
+
+check('Workshop palette is not Garden mint or Art coral as the whole night', function () {
+  var workshop = FG.resolveLuminoHues(WORKSHOP);
+  assert.deepEqual(workshop, WORKSHOP);
+  assert.ok(workshop.indexOf(258) !== -1, 'Trainer violet hue 258 is in the Workshop set');
+  assert.ok(workshop.indexOf(175) === -1, 'Garden mint 175 is not in the Workshop set');
+  assert.ok(workshop.indexOf(4) === -1, 'Art coral 4 is not in the Workshop set');
+  assert.notDeepEqual(workshop, GARDEN);
+  assert.notDeepEqual(workshop, ART);
+});
+
+check('Workshop fourth body is the dark agent slot; Art who stays dark; Garden stays 55', function () {
+  assert.equal(FG.paletteSlotLightness(0, WORKSHOP), 55);
+  assert.equal(FG.paletteSlotLightness(1, WORKSHOP), 55);
+  assert.equal(FG.paletteSlotLightness(2, WORKSHOP), 55);
+  assert.ok(FG.paletteSlotLightness(3, WORKSHOP) < 40, 'agent slot is the dark one');
+  assert.ok(FG.paletteSlotLightness(3, ART) < 40, 'Art who slot still dark');
   assert.equal(FG.paletteSlotLightness(3, GARDEN), 55);
 });
 

@@ -2322,6 +2322,27 @@ html[data-garden-galaxy="workshop"] body {
 
 html[data-garden-galaxy="workshop"] .room-stub { display: none; }
 
+html[data-garden-galaxy="workshop"] #gardenContainer {
+  position: fixed;
+  top: 44px;
+  left: 0; right: 0; bottom: 44px;
+  overflow: hidden;
+  z-index: 1;
+}
+
+html[data-garden-galaxy="workshop"] #gardenContainer canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (min-width: 800px) {
+  html[data-garden-galaxy="workshop"] #gardenContainer {
+    top: 0;
+    bottom: 0;
+  }
+}
+
 .workshop-heart {
   position: fixed;
   left: 50%;
@@ -3915,7 +3936,8 @@ html[data-garden-galaxy="art"] .galaxy-nav-next {
 /* Garden lattice is busy. Keep the center unnamed — raise the glow so a
    grandmother can find the portal without a word on it. */
 html[data-garden-galaxy="garden"] .tend-center,
-html[data-garden-galaxy="art"] .tend-center {
+html[data-garden-galaxy="art"] .tend-center,
+html[data-garden-galaxy="workshop"] .tend-center {
   width: 52px;
   height: 52px;
 }
@@ -3932,7 +3954,8 @@ html[data-garden-galaxy="garden"] .tend-center-light {
    named-center CSS orb. The unnamed center is the 3D lattice.
    Skip the visible bead. Keep the hit target. Do not invent a door.
    Do not hang Art on the center. */
-html[data-garden-galaxy="art"] .tend-center-light {
+html[data-garden-galaxy="art"] .tend-center-light,
+html[data-garden-galaxy="workshop"] .tend-center-light {
   opacity: 0;
   background: transparent;
   box-shadow: none;
@@ -4726,7 +4749,8 @@ html.sky-portal-open .art-heart {
 }
 
 .garden-lumino.is-attached,
-.art-lumino.is-attached {
+.art-lumino.is-attached,
+.workshop-lumino.is-attached {
   left: 0;
   top: 0;
   right: auto;
@@ -4737,7 +4761,8 @@ html.sky-portal-open .art-heart {
 }
 
 .garden-lumino.is-attached .garden-lumino-light,
-.art-lumino.is-attached .art-lumino-light {
+.art-lumino.is-attached .art-lumino-light,
+.workshop-lumino.is-attached .workshop-lumino-light {
   width: 52px;
   height: 52px;
   opacity: 0;
@@ -4748,7 +4773,8 @@ html.sky-portal-open .art-heart {
 /* Hypha: four times unnamed · Seed is not a legend. They look like
    doors and they are not. Rest off the first walk. Code stays. */
 html[data-garden-galaxy="garden"] .garden-evolution-indicator,
-html[data-garden-galaxy="art"] .garden-evolution-indicator {
+html[data-garden-galaxy="art"] .garden-evolution-indicator,
+html[data-garden-galaxy="workshop"] .garden-evolution-indicator {
   display: none !important;
 }
 
@@ -4909,7 +4935,7 @@ html.sky-portal-open #lumino-legend {
 .round-table-lumino-light,
 .research-lumino-light,
 .galaxy-nav-light,
-html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]) .tend-center-light {
+html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]):not([data-garden-galaxy="workshop"]) .tend-center-light {
   position: relative;
   isolation: isolate;
   overflow: visible;
@@ -4933,7 +4959,7 @@ html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]) .tend-ce
 .round-table-lumino-light::before,
 .research-lumino-light::before,
 .galaxy-nav-light::before,
-html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]) .tend-center-light::before,
+html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]):not([data-garden-galaxy="workshop"]) .tend-center-light::before,
 .lumino-ring {
   content: '';
   position: absolute;
@@ -4954,7 +4980,7 @@ html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]) .tend-ce
 .round-table-lumino-light::after,
 .research-lumino-light::after,
 .galaxy-nav-light::after,
-html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]) .tend-center-light::after,
+html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]):not([data-garden-galaxy="workshop"]) .tend-center-light::after,
 .lumino-ring.is-far {
   content: '';
   position: absolute;
@@ -5009,7 +5035,7 @@ html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]) .tend-ce
   height: 100px;
 }
 
-html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]) .tend-center-light {
+html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]):not([data-garden-galaxy="workshop"]) .tend-center-light {
   width: 48px;
   height: 48px;
   color: rgba(186, 214, 255, 0.9);
@@ -5508,4 +5534,68 @@ html[data-garden-galaxy="art"] #lumino-legend {
   text-shadow:
     0 0 10px rgba(12, 10, 26, 1),
     0 0 4px rgba(12, 10, 26, 0.94);
+}
+
+/* ── Workshop mounts the Garden engine (layer, 2026-09-01)
+   Copy Art's mount. Skies copy, they do not merge.
+   Palette is Workshop's. Extra bead above the lattice skips.
+   Heart rests on the sky; same words live in the room that opens.
+   Names stay on the lights. Skills stays held. Layer, never delete. */
+
+html[data-garden-galaxy="workshop"] .workshop-heart {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+html[data-garden-galaxy="workshop"] .workshop-lumino-word,
+html[data-garden-galaxy="workshop"] .workshop-lumino.is-agent .workshop-lumino-word {
+  position: relative;
+  z-index: 14;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip: auto;
+  clip-path: none;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+  padding: 0.2em 0.55em;
+  box-sizing: border-box;
+  background: rgba(12, 10, 26, 0.62);
+  border-radius: 6px;
+  text-shadow:
+    0 0 10px rgba(12, 10, 26, 1),
+    0 0 4px rgba(12, 10, 26, 0.94);
+}
+
+html[data-garden-galaxy="workshop"] .workshop-lumino {
+  z-index: 14;
+}
+
+html[data-garden-galaxy="workshop"] #lumino-legend {
+  z-index: 14;
+}
+
+#place-veil.is-workshop-benches .workshop-heart-room,
+#place-veil.is-workshop-trainer .workshop-heart-room,
+#place-veil.is-workshop-later .workshop-heart-room {
+  display: block;
+  margin: 10px auto 18px;
+  padding: 0.35em 0.85em;
+  box-sizing: border-box;
+  max-width: 28em;
+  background: rgba(12, 10, 26, 0.62);
+  border-radius: 8px;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: rgba(200, 210, 230, 0.82);
+  text-shadow:
+    0 0 10px rgba(12, 10, 26, 1),
+    0 0 4px rgba(12, 10, 26, 0.94);
+}
+
+.workshop-heart-room {
+  display: none;
 }

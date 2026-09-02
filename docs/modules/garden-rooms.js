@@ -194,11 +194,12 @@
   };
   var GARDEN_DOOR_SLOTS = ['thread', 'gathering', 'nursery', 'settings'];
   // Per-galaxy door slots. Garden order stays. Extra anchors skip — no invented door.
-  // Workshop / Learn / Research tables wait; those pages do not mount the engine in this layer.
+  // Workshop walk lights attach: Trainer, benches, Root, Agent. Skills stays held.
+  // Learn / Research tables wait; those pages do not mount the engine in this layer.
   var GALAXY_DOOR_SLOTS = {
     garden: GARDEN_DOOR_SLOTS,
     art: ['listen', 'chalkboard', 'image', 'who'],
-    workshop: ['root', 'agent', 'skills'],
+    workshop: ['trainer', 'workshop', 'root', 'agent'],
     'round-table': ['education', 'translator', 'forge', 'question'],
     research: ['gauge', 'chronal', 'simulation', 'love-logic']
   };
@@ -389,13 +390,14 @@
   function setWorkshopSky(show) {
     var heart = document.querySelector('.workshop-heart');
     var lights = document.querySelectorAll('.workshop-lumino:not(.is-held)');
+    // Heart rests on the Workshop sky. Same words live in the room that opens.
+    // Leaving the page would be a cut.
+    if (heart) heart.hidden = true;
     if (show) {
       document.documentElement.classList.remove('workshop-later-open');
-      if (heart) heart.hidden = false;
       for (var i = 0; i < lights.length; i++) lights[i].hidden = false;
     } else {
       document.documentElement.classList.add('workshop-later-open');
-      if (heart) heart.hidden = true;
       for (var j = 0; j < lights.length; j++) lights[j].hidden = true;
     }
   }
@@ -676,7 +678,7 @@
 
   function writeLiveLuminoColor(id, doorEl, color) {
     if (!id || !color) return;
-    if (id === 'who') color = dimWhoColor(color);
+    if (id === 'who' || id === 'agent') color = dimWhoColor(color);
     var dot = document.querySelector('[data-lumino-dot="' + id + '"]');
     if (dot) {
       dot.style.background = color;
@@ -774,7 +776,7 @@
     // Art / Workshop / Learn / Research + hop lights are CSS beads until dressed.
     var engine = document.getElementById('gardenContainer');
     var lights = document.querySelectorAll(engine
-      ? '.workshop-lumino-light, .round-table-lumino-light, .research-lumino-light, .galaxy-nav-light'
+      ? '.round-table-lumino-light, .research-lumino-light, .galaxy-nav-light'
       : '.art-lumino-light, .workshop-lumino-light, .round-table-lumino-light, .research-lumino-light, .galaxy-nav-light');
     for (var i = 0; i < lights.length; i++) dressOneLight(lights[i], 2);
     if (!engine) {
@@ -785,7 +787,7 @@
 
   function ensureSkyField() {
     var g = currentGalaxy();
-    if (g === 'garden' || g === 'art') return;
+    if (g === 'garden' || g === 'art' || g === 'workshop') return;
     if (document.querySelector('.sky-field')) return;
     var field = document.createElement('div');
     field.className = 'sky-field';
@@ -1886,6 +1888,10 @@
       var skyHeart = document.querySelector('.art-heart');
       if (skyHeart) skyHeart.hidden = true;
     }
+    if (currentGalaxy() === 'workshop') {
+      var workshopHeart = document.querySelector('.workshop-heart');
+      if (workshopHeart) workshopHeart.hidden = true;
+    }
     startAttachLoop();
     fadeGalaxyTitle();
     startLabelCycle();
@@ -1925,6 +1931,7 @@
     writeLiveLuminoColor: writeLiveLuminoColor,
     dimWhoColor: dimWhoColor,
     setArtSky: setArtSky,
+    setWorkshopSky: setWorkshopSky,
     openArtListen: openArtListen,
     doorSlots: GALAXY_DOOR_SLOTS,
     WHO_BODY_LIGHTNESS: WHO_BODY_LIGHTNESS
