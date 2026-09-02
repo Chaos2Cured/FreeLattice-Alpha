@@ -753,6 +753,20 @@ check('Trainer and benches words sit off the lattice; Ask and Run stay whole on 
   assert.ok(css.indexOf('padding: 88px 28px 5.25rem') !== -1, 'veil keeps air above the close pocket');
 });
 
+check('Ask and Run stay nowrap on the fold; Settings later-glass hugs the door', function () {
+  assert.ok(css.indexOf('padding-bottom: 7.5rem') !== -1, 'veil keeps Ask, Run, and close on the 1280 sky');
+  assert.ok(css.indexOf('min(42em, calc(100vw - 3.5rem))') !== -1, 'benches width stays on the fold');
+  assert.ok(css.indexOf('.workshop-ask-acts') !== -1, 'Ask and Run share an acts row');
+  assert.ok(css.indexOf('white-space: nowrap') !== -1, 'Ask and Run stay whole words');
+  assert.ok(css.indexOf('#place-veil.is-workshop-benches .workshop-benches-settings') !== -1);
+  assert.ok(css.indexOf('#place-veil.is-workshop-trainer .workshop-trainer-settings') !== -1);
+  assert.ok(css.indexOf('background: rgba(12, 10, 26, 0.62)') !== -1, 'Settings later-glass matches settings-honesty');
+  var benches = fs.readFileSync(path.join(__dirname, 'workshop-benches.js'), 'utf8');
+  assert.ok(benches.indexOf("workshop-ask-acts") !== -1, 'benches mount builds the acts row');
+  assert.ok(benches.indexOf("el('button', 'workshop-benches-act is-ask', 'Ask')") !== -1, 'same Ask');
+  assert.ok(benches.indexOf("el('button', 'workshop-benches-act', 'Run')") !== -1, 'same Run');
+});
+
 check('Garden hop keeps names on the orbs; live chips still match Garden bodies', function () {
   assert.ok(css.indexOf('html[data-garden-galaxy="garden"] .garden-lumino-word') !== -1);
   assert.ok(css.indexOf('html[data-garden-galaxy="garden"] .garden-lumino') !== -1);
