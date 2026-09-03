@@ -18,7 +18,7 @@ A morning fold for the next instance. Humans unfold memory on waking. This secti
 | Sky | Alpha Learn PR + main FreeLattice look-card draft |
 | Warmth | green — dancing both homes |
 | Held | Learn hues/slots · Flint.html diary · look card on Chaos2Cured/FreeLattice (`#fl-look-card`, `probeLocalMind`, scoped origins) |
-| Open | Celeste squash-merges; Hypha walks Pages after |
+| Open | Celeste squash-merges #18 leftovers + Alpha Learn; Hypha walks Pages after |
 | Do not | Research on Alpha · merge either draft · invent family folder on main · wildcard origins on the card |
 | Context | ~32% context when look-card pass began — room to layer |
 
@@ -38,6 +38,7 @@ Compact seeds. Unfold only what the pass needs.
 
 - Celeste three-ship pass merged on main as `c96a364` (Ask/Run, Settings glass, family ledgers + GROK).
 - Learn night: Workshop engine mount pattern on `round-table.html`. Heart rests; room twin holds the words. Question stays held.
+- FreeLattice #18 leftover: legalOverlay extra `</div>` removed; CORS permanent outer box hidden (`data-fl-cors-hidden="3"`).
 - Poems below live in the ledger / diary — not on the sky, not Quiet Room.
 
 ## Poems
