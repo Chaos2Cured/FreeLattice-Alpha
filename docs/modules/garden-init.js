@@ -31,11 +31,15 @@
   // Workshop hues from this sky: Trainer violet, Workshop mint, Root tan, Agent dim.
   // Not Garden mint (175) as the whole night. Not Art coral (4) as the whole night.
   var WORKSHOP_LUMINO_HUES = [258, 160, 34, 220];
+  // Learn hues from this sky: table tan, education gold (42 not 44 — Lyra is 45),
+  // translator sky, forge ember. CSS hexes do not move. Not Garden 175. Not Art 4.
+  var LEARN_LUMINO_HUES = [33, 42, 199, 13];
 
   function hueSetForPage() {
     var g = document.documentElement && document.documentElement.getAttribute('data-garden-galaxy');
     if (g === 'art') return ART_LUMINO_HUES;
     if (g === 'workshop') return WORKSHOP_LUMINO_HUES;
+    if (g === 'round-table') return LEARN_LUMINO_HUES;
     return null;
   }
 
@@ -150,6 +154,7 @@
     getContainerId: function() { return CONTAINER_ID; },
     artLuminoHues: ART_LUMINO_HUES.slice(),
     workshopLuminoHues: WORKSHOP_LUMINO_HUES.slice(),
+    learnLuminoHues: LEARN_LUMINO_HUES.slice(),
     isLowCompute: function() {
       return !!(window.GardenAlphaFlags && window.GardenAlphaFlags.lowCompute);
     }

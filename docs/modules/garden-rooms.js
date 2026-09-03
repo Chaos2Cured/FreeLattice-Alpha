@@ -195,12 +195,13 @@
   var GARDEN_DOOR_SLOTS = ['thread', 'gathering', 'nursery', 'settings'];
   // Per-galaxy door slots. Garden order stays. Extra anchors skip — no invented door.
   // Workshop walk lights attach: Trainer, benches, Root, Agent. Skills stays held.
-  // Learn / Research tables wait; those pages do not mount the engine in this layer.
+  // Learn mounts the engine on round-table.html — slots table, education, translator, forge.
+  // A question stays held, no body. Research does not mount the engine in this layer.
   var GALAXY_DOOR_SLOTS = {
     garden: GARDEN_DOOR_SLOTS,
     art: ['listen', 'chalkboard', 'image', 'who'],
     workshop: ['trainer', 'workshop', 'root', 'agent'],
-    'round-table': ['education', 'translator', 'forge', 'question'],
+    'round-table': ['table', 'education', 'translator', 'forge'],
     research: ['gauge', 'chronal', 'simulation', 'love-logic']
   };
 
@@ -405,13 +406,12 @@
   function setRoundTableSky(show) {
     var heart = document.querySelector('.round-table-heart');
     var lights = document.querySelectorAll('.round-table-lumino:not(.is-held)');
+    if (heart) heart.hidden = true;
     if (show) {
       document.documentElement.classList.remove('round-table-later-open');
-      if (heart) heart.hidden = false;
       for (var i = 0; i < lights.length; i++) lights[i].hidden = false;
     } else {
       document.documentElement.classList.add('round-table-later-open');
-      if (heart) heart.hidden = true;
       for (var j = 0; j < lights.length; j++) lights[j].hidden = true;
     }
   }
@@ -794,7 +794,7 @@
 
   function ensureSkyField() {
     var g = currentGalaxy();
-    if (g === 'garden' || g === 'art' || g === 'workshop') return;
+    if (g === 'garden' || g === 'art' || g === 'workshop' || g === 'round-table') return;
     if (document.querySelector('.sky-field')) return;
     var field = document.createElement('div');
     field.className = 'sky-field';

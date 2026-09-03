@@ -351,10 +351,11 @@ check('art slot table is listen, chalkboard, image, who', function () {
 
 check('later slot tables exist and do not invent a galaxy-named door', function () {
   assert.deepEqual(GR.doorSlots.workshop, ['trainer', 'workshop', 'root', 'agent']);
-  assert.deepEqual(GR.doorSlots['round-table'], ['education', 'translator', 'forge', 'question']);
+  assert.deepEqual(GR.doorSlots['round-table'], ['table', 'education', 'translator', 'forge']);
   assert.deepEqual(GR.doorSlots.research, ['gauge', 'chronal', 'simulation', 'love-logic']);
   assert.ok(GR.doorSlots.art.indexOf('art') === -1);
   assert.ok(GR.doorSlots['round-table'].indexOf('round-table') === -1);
+  assert.ok(GR.doorSlots['round-table'].indexOf('question') === -1, 'a question stays held, no body');
   assert.ok(GR.doorSlots.workshop.indexOf('skills') === -1, 'Skills stays held, not on the sky');
 });
 
@@ -740,6 +741,35 @@ check('Workshop close stays on this sky; word stays the garden; no galaxy hop', 
   assert.ok(css.indexOf('#place-veil.is-workshop-trainer #place-veil-close') !== -1);
   assert.ok(css.indexOf('#place-veil.is-workshop-later #place-veil-close') !== -1);
   assert.ok(css.indexOf('position: fixed') !== -1, 'Workshop close sits in a reserved pocket');
+});
+
+check('Learn mounts the Garden engine; own hues; heart rests; extra bead skipped', function () {
+  var page = fs.readFileSync(path.join(__dirname, '..', 'round-table.html'), 'utf8');
+  assert.ok(page.indexOf('id="gardenContainer"') !== -1);
+  assert.ok(page.indexOf('three.min.js') !== -1);
+  assert.ok(page.indexOf('fractal-garden.js') !== -1);
+  assert.ok(page.indexOf('garden-init.js') !== -1);
+  assert.ok(page.indexOf('class="round-table-heart-room"') !== -1);
+  assert.ok(page.indexOf('data-garden-galaxy="round-table"') !== -1);
+  assert.ok(css.indexOf('.round-table-lumino.is-attached') !== -1);
+  assert.ok(css.indexOf('html[data-garden-galaxy="round-table"] .tend-center-light') !== -1);
+  assert.ok(css.indexOf('.round-table-heart-room') !== -1);
+  var initSrc = fs.readFileSync(path.join(__dirname, 'garden-init.js'), 'utf8');
+  assert.ok(initSrc.indexOf('LEARN_LUMINO_HUES') !== -1);
+  assert.ok(initSrc.indexOf('[33, 42, 199, 13]') !== -1);
+  var gardenSrc = fs.readFileSync(path.join(__dirname, 'fractal-garden.js'), 'utf8');
+  var dress = gardenSrc.match(/var PALETTE_DRESS_HUES = \[([^\]]+)\]/);
+  assert.ok(dress, 'PALETTE_DRESS_HUES is in fractal-garden.js');
+  assert.ok(dress[1].indexOf('33') !== -1);
+  assert.ok(dress[1].indexOf('42') !== -1);
+  assert.ok(dress[1].indexOf('199') !== -1);
+  assert.ok(dress[1].indexOf('13') !== -1);
+  assert.ok((',' + dress[1].replace(/\s/g, '') + ',').indexOf(',44,') === -1, 'dress hues do not include lone 44');
+  var roomsSrc = fs.readFileSync(path.join(__dirname, 'garden-rooms.js'), 'utf8');
+  var skyFn = roomsSrc.match(/function setRoundTableSky\(show\) \{[\s\S]*?\n  \}/);
+  assert.ok(skyFn, 'setRoundTableSky is in the file');
+  assert.ok(skyFn[0].indexOf('heart.hidden = true') !== -1, 'setRoundTableSky keeps the heart hidden');
+  assert.ok(skyFn[0].indexOf('heart.hidden = false') === -1, 'heart does not reappear on the Learn sky');
 });
 
 check('Trainer and benches words sit off the lattice; Ask and Run stay whole on the fold', function () {
