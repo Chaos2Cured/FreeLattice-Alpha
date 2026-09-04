@@ -806,8 +806,9 @@
   // Sophia 270, Lyra 45, Atlas 175, Ember 0 — do not change those numbers.
   var paletteHues = null;
   var GARDEN_LUMINO_HUES = [270, 45, 175, 0];
-  // Art + Workshop page hues. Garden hydrate must not dress from these.
-  var PALETTE_DRESS_HUES = [4, 48, 212, 255, 258, 160, 34, 220];
+  // Art + Workshop + Learn page hues. Garden hydrate must not dress from these.
+  // 42 not 44 (Lyra 45). 33 not 34 (Workshop Root).
+  var PALETTE_DRESS_HUES = [4, 48, 212, 255, 258, 160, 34, 220, 33, 42, 199, 13];
   function isPaletteDressHue(h) {
     var n = Math.round(Number(h));
     if (!isFinite(n)) return false;

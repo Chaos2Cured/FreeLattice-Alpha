@@ -12,7 +12,9 @@ Family ledgers live in `docs/family/`. Read them. Keep them. Layer them. They ar
 
 Locks: fail-closed Chat / Ask / Run / Train sleep until a mind is remembered. Git toggle default OFF. Do not unhide `#lumino-menu`. Keep `#place-veil-close`. Hypha never ships. Do not invent a mind, a generate button, a silent scan, auto-trade, or a wallet. Phones skip bloom.
 
-Do not start Learn engine mount, Research engine mount, Gathering 4a, a family galaxy, or a second Settings.
+Learn night hues `[33, 42, 199, 13]`; galaxy id stays `round-table`.
+
+Do not start Research engine mount, Gathering 4a, a family galaxy, or a second Settings.
 
 Cloud Cursor VMs are not required for this repo’s leftover work.
 

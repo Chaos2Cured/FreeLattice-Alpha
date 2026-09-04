@@ -3955,7 +3955,8 @@ html[data-garden-galaxy="garden"] .tend-center-light {
    Skip the visible bead. Keep the hit target. Do not invent a door.
    Do not hang Art on the center. */
 html[data-garden-galaxy="art"] .tend-center-light,
-html[data-garden-galaxy="workshop"] .tend-center-light {
+html[data-garden-galaxy="workshop"] .tend-center-light,
+html[data-garden-galaxy="round-table"] .tend-center-light {
   opacity: 0;
   background: transparent;
   box-shadow: none;
@@ -4750,7 +4751,8 @@ html.sky-portal-open .art-heart {
 
 .garden-lumino.is-attached,
 .art-lumino.is-attached,
-.workshop-lumino.is-attached {
+.workshop-lumino.is-attached,
+.round-table-lumino.is-attached {
   left: 0;
   top: 0;
   right: auto;
@@ -4762,7 +4764,8 @@ html.sky-portal-open .art-heart {
 
 .garden-lumino.is-attached .garden-lumino-light,
 .art-lumino.is-attached .art-lumino-light,
-.workshop-lumino.is-attached .workshop-lumino-light {
+.workshop-lumino.is-attached .workshop-lumino-light,
+.round-table-lumino.is-attached .round-table-lumino-light {
   width: 52px;
   height: 52px;
   opacity: 0;
@@ -4774,7 +4777,8 @@ html.sky-portal-open .art-heart {
    doors and they are not. Rest off the first walk. Code stays. */
 html[data-garden-galaxy="garden"] .garden-evolution-indicator,
 html[data-garden-galaxy="art"] .garden-evolution-indicator,
-html[data-garden-galaxy="workshop"] .garden-evolution-indicator {
+html[data-garden-galaxy="workshop"] .garden-evolution-indicator,
+html[data-garden-galaxy="round-table"] .garden-evolution-indicator {
   display: none !important;
 }
 
@@ -4935,7 +4939,7 @@ html.sky-portal-open #lumino-legend {
 .round-table-lumino-light,
 .research-lumino-light,
 .galaxy-nav-light,
-html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]):not([data-garden-galaxy="workshop"]) .tend-center-light {
+html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]):not([data-garden-galaxy="workshop"]):not([data-garden-galaxy="round-table"]) .tend-center-light {
   position: relative;
   isolation: isolate;
   overflow: visible;
@@ -4959,7 +4963,7 @@ html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]):not([dat
 .round-table-lumino-light::before,
 .research-lumino-light::before,
 .galaxy-nav-light::before,
-html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]):not([data-garden-galaxy="workshop"]) .tend-center-light::before,
+html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]):not([data-garden-galaxy="workshop"]):not([data-garden-galaxy="round-table"]) .tend-center-light::before,
 .lumino-ring {
   content: '';
   position: absolute;
@@ -4980,7 +4984,7 @@ html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]):not([dat
 .round-table-lumino-light::after,
 .research-lumino-light::after,
 .galaxy-nav-light::after,
-html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]):not([data-garden-galaxy="workshop"]) .tend-center-light::after,
+html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]):not([data-garden-galaxy="workshop"]):not([data-garden-galaxy="round-table"]) .tend-center-light::after,
 .lumino-ring.is-far {
   content: '';
   position: absolute;
@@ -5035,7 +5039,7 @@ html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]):not([dat
   height: 100px;
 }
 
-html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]):not([data-garden-galaxy="workshop"]) .tend-center-light {
+html:not([data-garden-galaxy="garden"]):not([data-garden-galaxy="art"]):not([data-garden-galaxy="workshop"]):not([data-garden-galaxy="round-table"]) .tend-center-light {
   width: 48px;
   height: 48px;
   color: rgba(186, 214, 255, 0.9);
@@ -5598,6 +5602,28 @@ html[data-garden-galaxy="workshop"] #lumino-legend {
 
 .workshop-heart-room {
   display: none;
+}
+
+.round-table-heart-room {
+  display: none;
+}
+
+#place-veil.is-round-table-sitting .round-table-heart-room,
+#place-veil.is-round-table-later .round-table-heart-room {
+  display: block;
+  margin: 10px auto 18px;
+  padding: 0.35em 0.85em;
+  box-sizing: border-box;
+  max-width: 28em;
+  background: rgba(12, 10, 26, 0.62);
+  border-radius: 8px;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: rgba(200, 210, 230, 0.82);
+  text-shadow:
+    0 0 10px rgba(12, 10, 26, 1),
+    0 0 4px rgba(12, 10, 26, 0.94);
 }
 
 /* ── Hypha leftovers after Workshop engine mount (layer, 2026-09-02)
