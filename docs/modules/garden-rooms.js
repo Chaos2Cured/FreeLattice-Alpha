@@ -1901,6 +1901,10 @@
       var workshopHeart = document.querySelector('.workshop-heart');
       if (workshopHeart) workshopHeart.hidden = true;
     }
+    if (currentGalaxy() === 'round-table') {
+      var roundTableHeart = document.querySelector('.round-table-heart');
+      if (roundTableHeart) roundTableHeart.hidden = true;
+    }
     startAttachLoop();
     fadeGalaxyTitle();
     startLabelCycle();

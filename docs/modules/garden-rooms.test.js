@@ -770,6 +770,13 @@ check('Learn mounts the Garden engine; own hues; heart rests; extra bead skipped
   assert.ok(skyFn, 'setRoundTableSky is in the file');
   assert.ok(skyFn[0].indexOf('heart.hidden = true') !== -1, 'setRoundTableSky keeps the heart hidden');
   assert.ok(skyFn[0].indexOf('heart.hidden = false') === -1, 'heart does not reappear on the Learn sky');
+  assert.ok(css.indexOf('html[data-garden-galaxy="round-table"] #gardenContainer') !== -1, 'Learn canvas container is sized');
+  assert.ok(css.indexOf('html[data-garden-galaxy="round-table"] #gardenContainer canvas') !== -1, 'Learn canvas fills the container');
+  var bootFn = roomsSrc.match(/function boot\(\) \{[\s\S]*?\n  \}/);
+  assert.ok(bootFn, 'boot is in the file');
+  assert.ok(bootFn[0].indexOf("currentGalaxy() === 'round-table'") !== -1, 'boot rests Learn heart');
+  assert.ok(bootFn[0].indexOf('.round-table-heart') !== -1, 'boot finds .round-table-heart');
+  assert.ok(bootFn[0].indexOf('roundTableHeart.hidden = true') !== -1, 'boot sets Learn heart hidden');
 });
 
 check('Trainer and benches words sit off the lattice; Ask and Run stay whole on the fold', function () {
