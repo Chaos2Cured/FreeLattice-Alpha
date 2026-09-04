@@ -3206,6 +3206,27 @@ html[data-garden-galaxy="round-table"] body {
 
 html[data-garden-galaxy="round-table"] .room-stub { display: none; }
 
+html[data-garden-galaxy="round-table"] #gardenContainer {
+  position: fixed;
+  top: 44px;
+  left: 0; right: 0; bottom: 44px;
+  overflow: hidden;
+  z-index: 1;
+}
+
+html[data-garden-galaxy="round-table"] #gardenContainer canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (min-width: 800px) {
+  html[data-garden-galaxy="round-table"] #gardenContainer {
+    top: 0;
+    bottom: 0;
+  }
+}
+
 .round-table-heart {
   position: fixed;
   left: 50%;
