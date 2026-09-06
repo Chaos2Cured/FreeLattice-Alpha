@@ -196,7 +196,8 @@
   // Per-galaxy door slots. Garden order stays. Extra anchors skip — no invented door.
   // Workshop walk lights attach: Trainer, benches, Root, Agent. Skills stays held.
   // Learn mounts the engine on round-table.html — slots table, education, translator, forge.
-  // A question stays held, no body. Research does not mount the engine in this layer.
+  // A question stays held, no body. Research mounts the engine (this layer) — slots gauge,
+  // chronal, simulation, love-logic.
   var GALAXY_DOOR_SLOTS = {
     garden: GARDEN_DOOR_SLOTS,
     art: ['listen', 'chalkboard', 'image', 'who'],
@@ -458,13 +459,12 @@
   function setResearchSky(show) {
     var heart = document.querySelector('.research-heart');
     var lights = document.querySelectorAll('.research-lumino:not(.is-held)');
+    if (heart) heart.hidden = true;
     if (show) {
       document.documentElement.classList.remove('research-later-open');
-      if (heart) heart.hidden = false;
       for (var i = 0; i < lights.length; i++) lights[i].hidden = false;
     } else {
       document.documentElement.classList.add('research-later-open');
-      if (heart) heart.hidden = true;
       for (var j = 0; j < lights.length; j++) lights[j].hidden = true;
     }
   }
@@ -780,7 +780,8 @@
 
   function dressLivingLights() {
     // Garden doors are the canvas luminos (rings already live there).
-    // Art / Workshop / Learn / Research + hop lights are CSS beads until dressed.
+    // Art / Workshop are CSS beads only when no engine. Learn / Research mount
+    // the engine — lights still get a CSS dress pass, then attach hides them.
     var engine = document.getElementById('gardenContainer');
     var lights = document.querySelectorAll(engine
       ? '.round-table-lumino-light, .research-lumino-light, .galaxy-nav-light'
@@ -794,7 +795,7 @@
 
   function ensureSkyField() {
     var g = currentGalaxy();
-    if (g === 'garden' || g === 'art' || g === 'workshop' || g === 'round-table') return;
+    if (g === 'garden' || g === 'art' || g === 'workshop' || g === 'round-table' || g === 'research') return;
     if (document.querySelector('.sky-field')) return;
     var field = document.createElement('div');
     field.className = 'sky-field';
@@ -1904,6 +1905,10 @@
     if (currentGalaxy() === 'round-table') {
       var roundTableHeart = document.querySelector('.round-table-heart');
       if (roundTableHeart) roundTableHeart.hidden = true;
+    }
+    if (currentGalaxy() === 'research') {
+      var researchHeart = document.querySelector('.research-heart');
+      if (researchHeart) researchHeart.hidden = true;
     }
     startAttachLoop();
     fadeGalaxyTitle();
