@@ -34,12 +34,16 @@
   // Learn hues from this sky: table tan, education gold (42 not 44 — Lyra is 45),
   // translator sky, forge ember. CSS hexes do not move. Not Garden 175. Not Art 4.
   var LEARN_LUMINO_HUES = [33, 42, 199, 13];
+  // Research hues (Celeste lock): gauge 26, chronal 205, simulation 188, love-logic 330.
+  // Do not re-litigate. Not Learn 33, not Root 34, not Art 212, not Garden 175, not mint 160.
+  var RESEARCH_LUMINO_HUES = [26, 205, 188, 330];
 
   function hueSetForPage() {
     var g = document.documentElement && document.documentElement.getAttribute('data-garden-galaxy');
     if (g === 'art') return ART_LUMINO_HUES;
     if (g === 'workshop') return WORKSHOP_LUMINO_HUES;
     if (g === 'round-table') return LEARN_LUMINO_HUES;
+    if (g === 'research') return RESEARCH_LUMINO_HUES;
     return null;
   }
 
@@ -155,6 +159,7 @@
     artLuminoHues: ART_LUMINO_HUES.slice(),
     workshopLuminoHues: WORKSHOP_LUMINO_HUES.slice(),
     learnLuminoHues: LEARN_LUMINO_HUES.slice(),
+    researchLuminoHues: RESEARCH_LUMINO_HUES.slice(),
     isLowCompute: function() {
       return !!(window.GardenAlphaFlags && window.GardenAlphaFlags.lowCompute);
     }

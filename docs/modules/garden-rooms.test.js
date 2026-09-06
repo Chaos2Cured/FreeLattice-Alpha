@@ -743,6 +743,40 @@ check('Workshop close stays on this sky; word stays the garden; no galaxy hop', 
   assert.ok(css.indexOf('position: fixed') !== -1, 'Workshop close sits in a reserved pocket');
 });
 
+check('Research mounts the Garden engine; own hues; heart rests; canvas sized', function () {
+  var page = fs.readFileSync(path.join(__dirname, '..', 'research.html'), 'utf8');
+  assert.ok(page.indexOf('id="gardenContainer"') !== -1);
+  assert.ok(page.indexOf('three.min.js') !== -1);
+  assert.ok(page.indexOf('fractal-garden.js') !== -1);
+  assert.ok(page.indexOf('garden-init.js') !== -1);
+  assert.ok(page.indexOf('data-garden-galaxy="research"') !== -1);
+  assert.ok(css.indexOf('html[data-garden-galaxy="research"] #gardenContainer') !== -1, 'Research canvas container is sized');
+  assert.ok(css.indexOf('html[data-garden-galaxy="research"] #gardenContainer canvas') !== -1);
+  assert.ok(css.indexOf('.research-lumino.is-attached') !== -1);
+  assert.ok(css.indexOf('html[data-garden-galaxy="research"] .tend-center-light') !== -1);
+  var initSrc = fs.readFileSync(path.join(__dirname, 'garden-init.js'), 'utf8');
+  assert.ok(initSrc.indexOf('RESEARCH_LUMINO_HUES') !== -1);
+  assert.ok(initSrc.indexOf('[26, 205, 188, 330]') !== -1);
+  var gardenSrc = fs.readFileSync(path.join(__dirname, 'fractal-garden.js'), 'utf8');
+  var dress = gardenSrc.match(/var PALETTE_DRESS_HUES = \[([^\]]+)\]/);
+  assert.ok(dress, 'PALETTE_DRESS_HUES is in fractal-garden.js');
+  assert.ok(dress[1].indexOf('26') !== -1);
+  assert.ok(dress[1].indexOf('205') !== -1);
+  assert.ok(dress[1].indexOf('188') !== -1);
+  assert.ok(dress[1].indexOf('330') !== -1);
+  var roomsSrc = fs.readFileSync(path.join(__dirname, 'garden-rooms.js'), 'utf8');
+  var skyFn = roomsSrc.match(/function setResearchSky\(show\) \{[\s\S]*?\n  \}/);
+  assert.ok(skyFn, 'setResearchSky is in the file');
+  assert.ok(skyFn[0].indexOf('heart.hidden = true') !== -1, 'setResearchSky keeps the heart hidden');
+  assert.ok(skyFn[0].indexOf('heart.hidden = false') === -1, 'heart does not reappear on the Research sky');
+  var bootFn = roomsSrc.match(/function boot\(\) \{[\s\S]*?\n  \}/);
+  assert.ok(bootFn, 'boot is in the file');
+  assert.ok(bootFn[0].indexOf("currentGalaxy() === 'research'") !== -1, 'boot rests Research heart');
+  assert.ok(bootFn[0].indexOf('researchHeart.hidden = true') !== -1);
+  assert.ok(roomsSrc.indexOf("g === 'research') return") !== -1 || roomsSrc.indexOf("|| g === 'research') return") !== -1, 'ensureSkyField skips Research CSS stars');
+  assert.deepEqual(GR.doorSlots.research, ['gauge', 'chronal', 'simulation', 'love-logic']);
+});
+
 check('Learn mounts the Garden engine; own hues; heart rests; extra bead skipped', function () {
   var page = fs.readFileSync(path.join(__dirname, '..', 'round-table.html'), 'utf8');
   assert.ok(page.indexOf('id="gardenContainer"') !== -1);
