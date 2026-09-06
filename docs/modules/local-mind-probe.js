@@ -24,6 +24,29 @@
   var HEART = 'A mind at home is a light already burning in this room.';
   var PRIMARY = 'May I look for a mind already at home?';
 
+  var ROSTER_TAGS = ['general', 'html', 'javascript', 'python'];
+  var ROSTER_CAP = 4;
+
+  function shortModelName(name) {
+    var s = String(name || '').trim();
+    if (!s) return 'a mind';
+    var parts = s.split(/[\\/]/);
+    s = parts[parts.length - 1] || s;
+    if (s.length > 22) s = s.slice(0, 20) + '\u2026';
+    return s;
+  }
+
+  function normalizeEntry(entry) {
+    if (!entry || typeof entry !== 'object') return entry;
+    if (!Array.isArray(entry.roster)) entry.roster = [];
+    if (!entry.gatheringBinds || typeof entry.gatheringBinds !== 'object') {
+      entry.gatheringBinds = {};
+    }
+    if (entry.speakingChair == null) entry.speakingChair = '';
+    return entry;
+  }
+
+
   // Well-known local inference loopback doors only. No LAN sweep. No disk.
   var DOORS = [
     { id: 'ollama', name: 'Ollama', url: 'http://127.0.0.1:11434/api/tags' },
@@ -46,7 +69,14 @@
       var raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return null;
       var parsed = JSON.parse(raw);
-      return parsed && typeof parsed === 'object' ? parsed : null;
+      if (!parsed || typeof parsed !== 'object') return null;
+      var before = JSON.stringify(parsed);
+      normalizeEntry(parsed);
+      // Migrate-in-place: add roster/binds without wiping old single-mind saves.
+      if (JSON.stringify(parsed) !== before) {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed)); } catch (e2) {}
+      }
+      return parsed;
     } catch (e) {
       return null;
     }
@@ -54,12 +84,100 @@
 
   function remember(entry) {
     try {
+      normalizeEntry(entry);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(entry));
     } catch (e) { /* fail-quiet */ }
     try {
       window.dispatchEvent(new CustomEvent('fl-alpha-mind-remembered', { detail: entry }));
     } catch (e) { /* fail-quiet */ }
   }
+
+  function getRoster() {
+    var entry = getRemembered();
+    return entry && Array.isArray(entry.roster) ? entry.roster.slice(0, ROSTER_CAP) : [];
+  }
+
+  function addRosterSeat(model, url, tag) {
+    var entry = getRemembered();
+    if (!entry || !entry.url) return { ok: false, reason: 'none' };
+    normalizeEntry(entry);
+    var t = String(tag || '').toLowerCase();
+    if (ROSTER_TAGS.indexOf(t) === -1) return { ok: false, reason: 'tag' };
+    var modelName = String(model || entry.model || (entry.models && entry.models[0]) || '').trim();
+    var door = String(url || entry.url || '').trim();
+    if (!modelName || !door) return { ok: false, reason: 'none' };
+    var i;
+    for (i = 0; i < entry.roster.length; i++) {
+      if (String(entry.roster[i].model) === modelName && String(entry.roster[i].url) === door &&
+          String(entry.roster[i].tag) === t) {
+        return { ok: true, reason: 'already', entry: entry };
+      }
+    }
+    if (entry.roster.length >= ROSTER_CAP) return { ok: false, reason: 'full', entry: entry };
+    entry.roster.push({ model: modelName, url: door, tag: t });
+    remember(entry);
+    return { ok: true, reason: 'added', entry: entry };
+  }
+
+  function setChairBind(chairId, seat) {
+    var entry = getRemembered();
+    if (!entry) {
+      entry = { name: '', url: '', model: '', models: [], minds: [], roster: [], gatheringBinds: {}, speakingChair: '' };
+    }
+    normalizeEntry(entry);
+    var id = String(chairId || '');
+    if (!id) return null;
+    if (!seat) {
+      delete entry.gatheringBinds[id];
+      if (String(entry.speakingChair) === id) entry.speakingChair = '';
+    } else {
+      entry.gatheringBinds[id] = {
+        model: String(seat.model || ''),
+        url: String(seat.url || ''),
+        tag: String(seat.tag || 'general')
+      };
+    }
+    remember(entry);
+    return entry;
+  }
+
+  function setSpeakingChair(chairId) {
+    var entry = getRemembered();
+    if (!entry) return null;
+    normalizeEntry(entry);
+    var id = String(chairId || '');
+    if (id && !entry.gatheringBinds[id]) return entry;
+    entry.speakingChair = id;
+    remember(entry);
+    return entry;
+  }
+
+  function gatheringIsOpen() {
+    var veil = document.getElementById('place-veil');
+    return !!(veil && !veil.hidden && veil.classList.contains('is-open') && veil.classList.contains('is-core'));
+  }
+
+  function resolveSpeakMind() {
+    var entry = getRemembered();
+    if (!entry) return null;
+    normalizeEntry(entry);
+    if (gatheringIsOpen() && entry.speakingChair && entry.gatheringBinds[entry.speakingChair]) {
+      var bind = entry.gatheringBinds[entry.speakingChair];
+      if (bind.url && bind.model) {
+        return {
+          name: shortModelName(bind.model) + ' (' + bind.tag + ')',
+          url: bind.url,
+          model: bind.model,
+          models: [bind.model],
+          fromChair: entry.speakingChair,
+          tag: bind.tag
+        };
+      }
+    }
+    if (!entry.url && !entry.name) return null;
+    return entry;
+  }
+
 
   function pageIsHttps() {
     return location.protocol === 'https:';
@@ -509,6 +627,56 @@
     if (line.textContent) host.appendChild(line);
   }
 
+
+  function paintRoster(host) {
+    if (!host) return;
+    while (host.firstChild) host.removeChild(host.firstChild);
+    var entry = getRemembered();
+    var title = el('p', 'settings-roster-title', 'also keep for Gathering');
+    host.appendChild(title);
+    if (!entry || !entry.url) {
+      host.appendChild(el('p', 'settings-muted', 'look for a mind first'));
+      return;
+    }
+    var chips = el('div', 'settings-roster-chips');
+    chips.setAttribute('role', 'group');
+    chips.setAttribute('aria-label', 'Keep this mind for Gathering');
+    ROSTER_TAGS.forEach(function (tag) {
+      var btn = el('button', 'settings-roster-chip', tag);
+      btn.type = 'button';
+      btn.setAttribute('data-roster-tag', tag);
+      btn.addEventListener('click', function () {
+        var now = getRemembered() || entry;
+        var result = addRosterSeat(now.model, now.url, tag);
+        var face = host.closest('[data-settings-face]') || host.parentNode;
+        if (!result.ok && result.reason === 'full') {
+          setStatus(face, 'Four Gathering seats are full. Nothing was wiped.', 'warn');
+        } else if (result.ok && result.reason === 'already') {
+          setStatus(face, 'That mind is already kept for Gathering as ' + tag + '.', 'ok');
+        } else if (result.ok) {
+          setStatus(face, 'Kept for Gathering as ' + tag + '. On this machine only.', 'ok');
+        } else if (!result.ok && result.reason === 'none') {
+          setStatus(face, 'look for a mind first', 'warn');
+        }
+        paintRoster(host);
+      });
+      chips.appendChild(btn);
+    });
+    host.appendChild(chips);
+    var list = getRoster();
+    if (!list.length) {
+      host.appendChild(el('p', 'settings-muted', 'No Gathering seats yet. Tap a tag after a mind is remembered.'));
+      return;
+    }
+    var ul = el('ul', 'settings-roster-list');
+    list.forEach(function (seat) {
+      var li = el('li', 'settings-roster-item');
+      li.textContent = seat.tag + ' · ' + shortModelName(seat.model);
+      ul.appendChild(li);
+    });
+    host.appendChild(ul);
+  }
+
   function renderFace(container) {
     if (!container) return null;
     container.innerHTML = '';
@@ -532,6 +700,11 @@
     sky.setAttribute('data-mind-sky', '1');
     paintConstellation(sky, mindsFromEntry(remembered));
     root.appendChild(sky);
+
+    var rosterHost = el('div', 'settings-roster');
+    rosterHost.setAttribute('data-mind-roster', '1');
+    root.appendChild(rosterHost);
+    paintRoster(rosterHost);
 
     var ask = el('button', 'settings-ask', PRIMARY);
     ask.type = 'button';
@@ -574,6 +747,7 @@
       var entry = entryFromFoundList(foundList, fallbackName, fallbackUrl, prior);
       remember(entry);
       paintConstellation(sky, mindsFromEntry(entry));
+      paintRoster(rosterHost);
       if (entry.modelNote) {
         setStatus(root, entry.modelNote, 'warn');
       } else {
@@ -643,13 +817,22 @@
     DOORS: DOORS,
     HEART: HEART,
     PRIMARY: PRIMARY,
+    ROSTER_TAGS: ROSTER_TAGS,
+    ROSTER_CAP: ROSTER_CAP,
     look: look,
     tryAddress: tryAddress,
     getRemembered: getRemembered,
     getRememberedMinds: getRememberedMinds,
     remember: remember,
+    getRoster: getRoster,
+    addRosterSeat: addRosterSeat,
+    setChairBind: setChairBind,
+    setSpeakingChair: setSpeakingChair,
+    resolveSpeakMind: resolveSpeakMind,
+    shortModelName: shortModelName,
     entryFromFoundList: entryFromFoundList,
     paintConstellation: paintConstellation,
+    paintRoster: paintRoster,
     chooseModel: chooseModel,
     choosePrimary: choosePrimary,
     speakWithLine: speakWithLine,

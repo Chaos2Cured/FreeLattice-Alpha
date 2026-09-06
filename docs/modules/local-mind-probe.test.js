@@ -424,4 +424,57 @@ check('two doors: marking primary writes that door onto the entry', function () 
   assert.equal(studio.primary, true);
 });
 
+
+check('roster save/load layers onto fl_alpha_local_mind without wiping single-mind', function () {
+  resetMemory();
+  var entry = LMP.entryFromFoundList(FOUND, 'Ollama', FOUND[0].url, null);
+  LMP.remember(entry);
+  var bare = JSON.parse(store[LMP.STORAGE_KEY]);
+  assert.ok(bare.model || (bare.models && bare.models.length));
+  assert.ok(Array.isArray(LMP.getRemembered().roster));
+  var add = LMP.addRosterSeat(bare.model || bare.models[0], bare.url, 'html');
+  assert.equal(add.ok, true);
+  assert.equal(LMP.getRoster().length, 1);
+  assert.equal(LMP.getRoster()[0].tag, 'html');
+  var again = LMP.getRemembered();
+  assert.ok(again.url, 'old single-mind url still loads');
+  assert.equal(again.roster.length, 1);
+});
+
+check('roster cap is 4; duplicate tag+model is already', function () {
+  resetMemory();
+  var entry = LMP.entryFromFoundList(FOUND, 'Ollama', FOUND[0].url, null);
+  entry.model = 'm1';
+  LMP.remember(entry);
+  assert.equal(LMP.addRosterSeat('m1', entry.url, 'general').ok, true);
+  assert.equal(LMP.addRosterSeat('m1', entry.url, 'general').reason, 'already');
+  assert.equal(LMP.addRosterSeat('m2', entry.url, 'html').ok, true);
+  assert.equal(LMP.addRosterSeat('m3', entry.url, 'javascript').ok, true);
+  assert.equal(LMP.addRosterSeat('m4', entry.url, 'python').ok, true);
+  var full = LMP.addRosterSeat('m5', entry.url, 'general');
+  assert.equal(full.ok, false);
+  assert.equal(full.reason, 'full');
+  assert.equal(LMP.getRoster().length, 4);
+});
+
+check('chair bind and speaking chair resolve for Gathering chat', function () {
+  resetMemory();
+  var entry = LMP.entryFromFoundList(FOUND, 'Ollama', FOUND[0].url, null);
+  entry.model = 'spec-html:4b';
+  LMP.remember(entry);
+  LMP.addRosterSeat('spec-html:4b', entry.url, 'html');
+  LMP.setChairBind('cortex', { model: 'spec-html:4b', url: entry.url, tag: 'html' });
+  LMP.setSpeakingChair('cortex');
+  // Simulate Gathering veil open
+  var veil = { hidden: false, classList: { contains: function (c) { return c === 'is-open' || c === 'is-core'; } } };
+  var old = document.getElementById;
+  document.getElementById = function (id) { return id === 'place-veil' ? veil : null; };
+  var speak = LMP.resolveSpeakMind();
+  document.getElementById = old;
+  assert.ok(speak);
+  assert.equal(speak.model, 'spec-html:4b');
+  assert.equal(speak.fromChair, 'cortex');
+  assert.ok(speak.url);
+});
+
 console.log('\nSettings model chooser smokes hold.');

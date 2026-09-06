@@ -1135,6 +1135,137 @@
     var laterRing = document.createElement('div');
     laterRing.className = 'core-chairs core-later-chairs';
     laterRing.setAttribute('role', 'list');
+
+    var picker = document.createElement('div');
+    picker.className = 'core-bind-picker';
+    picker.setAttribute('data-core-picker', '1');
+    picker.hidden = true;
+
+    function closePicker() {
+      picker.hidden = true;
+      picker.innerHTML = '';
+      picker.removeAttribute('data-bind-chair');
+    }
+
+    function entryState() {
+      if (!window.LocalMindProbe || typeof LocalMindProbe.getRemembered !== 'function') {
+        return { binds: {}, speaking: '', roster: [] };
+      }
+      var entry = LocalMindProbe.getRemembered() || {};
+      return {
+        binds: entry.gatheringBinds || {},
+        speaking: String(entry.speakingChair || ''),
+        roster: (typeof LocalMindProbe.getRoster === 'function' ? LocalMindProbe.getRoster() : []) || []
+      };
+    }
+
+    function shortName(model) {
+      if (window.LocalMindProbe && LocalMindProbe.shortModelName) {
+        return LocalMindProbe.shortModelName(model);
+      }
+      return String(model || 'a mind');
+    }
+
+    function paintSeat(seat, chair) {
+      var state = entryState();
+      var bind = state.binds[chair.id];
+      seat.classList.toggle('is-bound', !!bind);
+      seat.classList.toggle('is-speaking', state.speaking === chair.id);
+      if (state.speaking === chair.id) seat.setAttribute('aria-current', 'true');
+      else seat.removeAttribute('aria-current');
+      var meta = seat.querySelector('[data-chair-bind]');
+      if (!meta) {
+        meta = document.createElement('span');
+        meta.className = 'core-chair-bind';
+        meta.setAttribute('data-chair-bind', '1');
+        seat.appendChild(meta);
+      }
+      var unnamed = seat.querySelector('.core-chair-unnamed');
+      if (bind && bind.model) {
+        meta.hidden = false;
+        meta.textContent = bind.tag + ' · ' + shortName(bind.model);
+        if (unnamed) unnamed.textContent = state.speaking === chair.id ? 'speaking' : 'seated';
+      } else {
+        meta.hidden = true;
+        meta.textContent = '';
+        if (unnamed) unnamed.textContent = chair.later ? 'labeled later' : 'unnamed';
+      }
+    }
+
+    function openPicker(chair, seatBtn) {
+      var state = entryState();
+      picker.innerHTML = '';
+      picker.setAttribute('data-bind-chair', chair.id);
+      picker.hidden = false;
+      var title = document.createElement('p');
+      title.className = 'core-bind-title';
+      title.textContent = 'pick a mind from your roster for this ' + chair.type + ' chair';
+      picker.appendChild(title);
+      if (!state.roster.length) {
+        var empty = document.createElement('p');
+        empty.className = 'core-bind-empty';
+        empty.textContent = 'look for a mind first — Settings → May I look? — then also keep for Gathering';
+        picker.appendChild(empty);
+      } else {
+        var list = document.createElement('div');
+        list.className = 'core-bind-options';
+        state.roster.forEach(function (seat) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'core-bind-option';
+          btn.textContent = seat.tag + ' · ' + shortName(seat.model);
+          btn.addEventListener('click', function () {
+            if (window.LocalMindProbe && LocalMindProbe.setChairBind) {
+              LocalMindProbe.setChairBind(chair.id, seat);
+            }
+            closePicker();
+            paintAll();
+            var note = wrap.querySelector('[data-core-note]');
+            if (note) {
+              note.textContent = 'This ' + chair.type + ' chair seats ' + seat.tag + ' · ' + shortName(seat.model) + '. Not a person-name. Not a dump.';
+            }
+          });
+          list.appendChild(btn);
+        });
+        picker.appendChild(list);
+      }
+      var decline = document.createElement('button');
+      decline.type = 'button';
+      decline.className = 'core-bind-decline';
+      decline.textContent = 'not yet';
+      decline.addEventListener('click', function () {
+        closePicker();
+        var note = wrap.querySelector('[data-core-note]');
+        if (note) note.textContent = 'Not yet. The chair waits. Nothing was forced.';
+      });
+      picker.appendChild(decline);
+      if (state.binds[chair.id]) {
+        var clear = document.createElement('button');
+        clear.type = 'button';
+        clear.className = 'core-bind-clear';
+        clear.textContent = 'unbind';
+        clear.addEventListener('click', function () {
+          if (window.LocalMindProbe && LocalMindProbe.setChairBind) {
+            LocalMindProbe.setChairBind(chair.id, null);
+          }
+          closePicker();
+          paintAll();
+          var note = wrap.querySelector('[data-core-note]');
+          if (note) note.textContent = 'Unbound. The ' + chair.type + ' chair is unnamed again.';
+        });
+        picker.appendChild(clear);
+      }
+      try { picker.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {}
+    }
+
+    function paintAll() {
+      CORE_CHAIRS.forEach(function (chair) {
+        if (chair.later) return;
+        var seat = wrap.querySelector('[data-chair="' + chair.id + '"]');
+        if (seat) paintSeat(seat, chair);
+      });
+    }
+
     CORE_CHAIRS.forEach(function (chair) {
       var seat = document.createElement('button');
       seat.type = 'button';
@@ -1149,23 +1280,47 @@
       unnamed.className = 'core-chair-unnamed';
       unnamed.textContent = chair.later ? 'labeled later' : 'unnamed';
       seat.appendChild(unnamed);
+      if (!chair.later) {
+        var bindMeta = document.createElement('span');
+        bindMeta.className = 'core-chair-bind';
+        bindMeta.setAttribute('data-chair-bind', '1');
+        bindMeta.hidden = true;
+        seat.appendChild(bindMeta);
+      }
       seat.addEventListener('click', function () {
         var note = wrap.querySelector('[data-core-note]');
-        if (!note) return;
         if (chair.later) {
-          note.textContent = 'This seat waits. Specialists and partners are later. Nothing is faked.';
-        } else {
-          note.textContent = 'A ' + chair.type + ' chair — a type, not a person-name. These chairs are not a mind at home. Settings is where a mind already at home is found.';
+          closePicker();
+          if (note) note.textContent = 'This seat waits. Specialists and partners are later. Nothing is faked.';
+          return;
+        }
+        var state = entryState();
+        var bind = state.binds[chair.id];
+        if (!bind) {
+          openPicker(chair, seat);
+          if (note) note.textContent = 'A ' + chair.type + ' chair may sit a mind from Settings — with choice.';
+          return;
+        }
+        // Bound: select as speaking chair for Gathering chat.
+        if (window.LocalMindProbe && LocalMindProbe.setSpeakingChair) {
+          LocalMindProbe.setSpeakingChair(chair.id);
+        }
+        closePicker();
+        paintAll();
+        if (note) {
+          note.textContent = 'Speaking with ' + bind.tag + ' · ' + shortName(bind.model) + ' at this chair. One request at a time.';
         }
       });
       (chair.later ? laterRing : ring).appendChild(seat);
     });
     wrap.appendChild(ring);
     wrap.appendChild(laterRing);
+    wrap.appendChild(picker);
+    paintAll();
 
     var center = document.createElement('p');
     center.className = 'core-center core-router';
-    center.textContent = 'Not a router. Not a dump. Gathering only. A mind at home waits in Settings — May I look? — not in these chairs.';
+    center.textContent = 'Not a router. Not a dump. A chair may sit a mind from Settings — with choice. May I look? stays the door.';
 
     var note = document.createElement('p');
     note.className = 'core-note';
@@ -1193,8 +1348,8 @@
     promise.className = 'core-promise';
     // Family care stays first in the lifted band (wide). Router
     // honesty follows it so it does not fall into the unnamed
-    // center the later seats left. Wording unchanged. Phone lifts
-    // the router line off the crystal in CSS.
+    // center the later seats left. Softened only the dump line.
+    // Phone lifts the router line off the crystal in CSS.
     promise.appendChild(note);
     promise.appendChild(family);
     promise.appendChild(center);
