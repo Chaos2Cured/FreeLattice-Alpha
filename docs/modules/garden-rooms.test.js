@@ -783,7 +783,7 @@ check('Chat doors Path A: visible chat labels; Workshop Root opens as Chat', fun
   pages.forEach(function (name) {
     var page = fs.readFileSync(path.join(__dirname, '..', name), 'utf8');
     assert.ok(page.indexOf('id="thread-open"') !== -1, name + ' keeps thread-open id');
-    assert.ok(page.indexOf('data-garden-thread="1">chat</button>') !== -1, name + ' header word is chat');
+    assert.ok(page.indexOf('data-garden-thread="1">Chat</button>') !== -1, name + ' header word is Chat');
   });
   var workshop = fs.readFileSync(path.join(__dirname, '..', 'workshop.html'), 'utf8');
   assert.ok(workshop.indexOf('data-workshop-lumino="root"') !== -1, 'root slot id stays');
