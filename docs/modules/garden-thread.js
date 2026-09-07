@@ -83,9 +83,13 @@
   }
 
   function listener() {
-    if (!window.LocalMindProbe || typeof LocalMindProbe.getRemembered !== 'function') {
-      return null;
+    if (!window.LocalMindProbe) return null;
+    // Gathering speaking chair first (when veil is open and bound); else Settings default.
+    if (typeof LocalMindProbe.resolveSpeakMind === 'function') {
+      var seated = LocalMindProbe.resolveSpeakMind();
+      if (seated && (seated.url || seated.name)) return seated;
     }
+    if (typeof LocalMindProbe.getRemembered !== 'function') return null;
     var mind = LocalMindProbe.getRemembered();
     if (!mind || (!mind.url && !mind.name)) return null;
     return mind;

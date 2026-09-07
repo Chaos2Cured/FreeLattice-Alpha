@@ -1414,6 +1414,110 @@ html.sky-portal-open .gt-hint {
 }
 
 /* ── Settings grandmother ── */
+
+/* Gathering roster bind (layer, 2026-09-06). Choice, not a dump. */
+.core-chair.is-bound {
+  border-color: rgba(74, 159, 212, 0.45);
+}
+.core-chair.is-speaking {
+  box-shadow: 0 0 0 1px rgba(110, 231, 183, 0.55), 0 0 18px rgba(110, 231, 183, 0.18);
+}
+.core-chair-bind {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: rgba(186, 214, 255, 0.82);
+}
+.core-bind-picker {
+  margin: 12px auto 0;
+  max-width: 28em;
+  padding: 0.85rem 1rem;
+  background: rgba(12, 10, 26, 0.72);
+  border-radius: 10px;
+  border: 1px solid rgba(74, 159, 212, 0.28);
+  text-align: center;
+}
+.core-bind-title,
+.core-bind-empty {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.88rem;
+  color: rgba(200, 210, 230, 0.78);
+  margin: 0 0 0.65rem;
+}
+.core-bind-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 0.65rem;
+}
+.core-bind-option,
+.core-bind-decline,
+.core-bind-clear {
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(200, 210, 230, 0.22);
+  background: rgba(12, 10, 26, 0.45);
+  color: rgba(200, 210, 230, 0.9);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.core-bind-option:hover,
+.core-bind-decline:hover,
+.core-bind-clear:hover {
+  border-color: rgba(110, 231, 183, 0.55);
+}
+.settings-roster {
+  margin: 14px 0 8px;
+  padding: 0.75rem 0.85rem;
+  background: rgba(12, 10, 26, 0.42);
+  border-radius: 10px;
+  border: 1px solid rgba(232, 176, 25, 0.18);
+}
+.settings-roster-title {
+  margin: 0 0 0.55rem;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.92rem;
+  color: rgba(232, 176, 25, 0.9);
+}
+.settings-roster-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 0.55rem;
+}
+.settings-roster-chip {
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(232, 176, 25, 0.35);
+  background: transparent;
+  color: #e8b019;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.settings-roster-chip:hover,
+.settings-roster-chip:focus-visible {
+  border-color: #e8b019;
+  outline: none;
+}
+.settings-roster-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.settings-roster-item {
+  font-size: 0.82rem;
+  color: rgba(200, 210, 230, 0.72);
+}
+
 .settings-face {
   width: min(32em, 100%);
   text-align: center;
