@@ -82,7 +82,7 @@
     core: 'you are in The Gathering',
     nursery: 'you are in Nursery',
     settings: 'you are in Settings',
-    thread: 'you are in a thread'
+    thread: 'you are in a chat'
   };
 
   // Night-sky later sentences are garden voice, not a file tree.
@@ -92,7 +92,7 @@
     trainer: 'Trainer is a simple face for making. Weights wait until a human chooses. Nursery remains Grow. Nothing here is faked.',
     workshop: 'Workshop is the benches — human and mind, side by side. They wait in this light. Nothing here is faked.',
     skills: 'Skills waits. This light is held, not cut. Nothing here is faked.',
-    root: 'Root is a look outward, if you ask. Nothing was searched. Not here yet. Nothing here is faked.',
+    root: 'Chat lives in this room — same fail-closed mind as Gathering. May I look? stays the door. Nothing here is faked.',
     agent: 'Agent stays unnamed until a Gathering chair is ready. Not Workshop under another name. Nursery hatches companions. Nothing here is faked.'
   };
 
@@ -159,7 +159,7 @@
     core: 'The Gathering',
     nursery: 'Nursery',
     settings: 'Settings',
-    thread: 'Thread',
+    thread: 'Chat',
     listen: 'Listen',
     chalkboard: 'Chalkboard',
     image: 'Image',
@@ -167,7 +167,7 @@
     trainer: 'Trainer',
     workshop: 'Workshop',
     skills: 'Skills',
-    root: 'Root',
+    root: 'Chat',
     agent: 'Agent',
     table: 'Round Table',
     education: 'Education',
@@ -893,6 +893,12 @@
         GardenRooms.openWorkshopTrainer();
         return;
       }
+      // Path A: Root stays data-workshop-lumino="root"; visible word is Chat.
+      // Opens the same fail-closed room/overlay chat face — not an honest-later dump.
+      if (id === 'root' && window.GardenRooms && GardenRooms.openThread) {
+        GardenRooms.openThread();
+        return;
+      }
       if (window.GardenRooms && GardenRooms.openWorkshopLater) {
         GardenRooms.openWorkshopLater(id);
       }
@@ -1586,6 +1592,8 @@
       }
       var word = document.getElementById('thread-open');
       if (word) word.removeAttribute('aria-current');
+      var rootDoor = document.querySelector('[data-workshop-lumino="root"]');
+      if (rootDoor) rootDoor.removeAttribute('aria-current');
       if (!opts || !opts.keepMenu) hideLuminoMenu();
       if (!opts || !opts.silentSky) {
         setWorkshopSky(true);
@@ -1624,6 +1632,10 @@
       }
       var word = document.getElementById('thread-open');
       if (word) word.setAttribute('aria-current', 'true');
+      if (currentGalaxy() === 'workshop') {
+        var rootDoor = document.querySelector('[data-workshop-lumino="root"]');
+        if (rootDoor) rootDoor.setAttribute('aria-current', 'true');
+      }
       document.documentElement.classList.add('thread-open');
       veil.hidden = false;
       setRoomLabelText(PLACE_LABELS.thread);
