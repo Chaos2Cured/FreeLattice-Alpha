@@ -33,7 +33,7 @@
   'use strict';
 
   var HEART_NONE =
-    'A mind at home waits in Settings. That grandmother door asks: May I look for a mind already at home? Not these chairs. Not this thread, until a light is remembered.';
+    'A mind at home waits in Settings. That grandmother door asks: May I look for a mind already at home? Not these chairs. Not this chat, until a light is remembered.';
   var HEART_BLOCKED =
     'The mind is there, but it has not opened the door to this garden yet. ' +
     'This garden is a secure page, and the mind lives at a quieter door. ' +
@@ -563,15 +563,15 @@
     fileInput.setAttribute('tabindex', '-1');
     fileInput.setAttribute('aria-hidden', 'true');
 
-    var exportBtn = el('button', 'thread-tool', 'keep this thread');
+    var exportBtn = el('button', 'thread-tool', 'keep this chat');
     exportBtn.type = 'button';
     exportBtn.setAttribute('data-thread-export', '1');
-    exportBtn.setAttribute('aria-label', 'Keep this thread as a file on this machine');
+    exportBtn.setAttribute('aria-label', 'Keep this chat as a file on this machine');
 
-    var importBtn = el('button', 'thread-tool', 'a prior thread');
+    var importBtn = el('button', 'thread-tool', 'a prior chat');
     importBtn.type = 'button';
     importBtn.setAttribute('data-thread-import', '1');
-    importBtn.setAttribute('aria-label', 'A prior thread from this machine');
+    importBtn.setAttribute('aria-label', 'A prior chat from this machine');
     var importInput = document.createElement('input');
     importInput.type = 'file';
     importInput.accept = 'application/json,.json';

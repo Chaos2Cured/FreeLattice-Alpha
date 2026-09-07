@@ -777,6 +777,29 @@ check('Research mounts the Garden engine; own hues; heart rests; canvas sized', 
   assert.deepEqual(GR.doorSlots.research, ['gauge', 'chronal', 'simulation', 'love-logic']);
 });
 
+
+check('Chat doors Path A: visible chat labels; Workshop Root opens as Chat', function () {
+  var pages = ['index.html', 'workshop.html', 'round-table.html', 'research.html', 'music.html'];
+  pages.forEach(function (name) {
+    var page = fs.readFileSync(path.join(__dirname, '..', name), 'utf8');
+    assert.ok(page.indexOf('id="thread-open"') !== -1, name + ' keeps thread-open id');
+    assert.ok(page.indexOf('data-garden-thread="1">chat</button>') !== -1, name + ' header word is chat');
+  });
+  var workshop = fs.readFileSync(path.join(__dirname, '..', 'workshop.html'), 'utf8');
+  assert.ok(workshop.indexOf('data-workshop-lumino="root"') !== -1, 'root slot id stays');
+  assert.ok(workshop.indexOf('aria-label="Chat"') !== -1, 'Root door aria is Chat');
+  assert.ok(workshop.indexOf('>Chat</span>') !== -1, 'Root visible word is Chat');
+  var roomsSrc = fs.readFileSync(path.join(__dirname, 'garden-rooms.js'), 'utf8');
+  assert.ok(roomsSrc.indexOf("id === 'root' && window.GardenRooms && GardenRooms.openThread") !== -1,
+    'Workshop root opens openThread');
+  assert.ok(roomsSrc.indexOf("thread: 'you are in a chat'") !== -1, 'room label says chat');
+  assert.ok(roomsSrc.indexOf("root: 'Chat'") !== -1, 'GO_WORDS.root is Chat');
+  var threadSrc = fs.readFileSync(path.join(__dirname, 'garden-thread.js'), 'utf8');
+  assert.ok(threadSrc.indexOf("keep this chat") !== -1);
+  assert.ok(threadSrc.indexOf("a prior chat") !== -1);
+  assert.ok(threadSrc.indexOf('Not this chat') !== -1);
+});
+
 check('Learn mounts the Garden engine; own hues; heart rests; extra bead skipped', function () {
   var page = fs.readFileSync(path.join(__dirname, '..', 'round-table.html'), 'utf8');
   assert.ok(page.indexOf('id="gardenContainer"') !== -1);
