@@ -335,6 +335,96 @@
       color: var(--muted);
     }
 
+    /* v-art-poetry-shelf-v0.1 — Keep a poem under Listen. No generate. */
+    #art-listen .poetry-shelf {
+      margin: 28px 0 8px;
+      padding: 14px 14px 12px;
+      border: 1px solid rgba(232, 176, 25, 0.22);
+      border-radius: 10px;
+      background: rgba(12, 10, 26, 0.35);
+    }
+    #art-listen .poetry-shelf h2 {
+      margin: 0 0 8px;
+      color: var(--gold, #e8b019);
+    }
+    #art-listen .poetry-shelf .poetry-lede {
+      margin: 0 0 12px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    #art-listen .poetry-shelf textarea {
+      width: 100%;
+      box-sizing: border-box;
+      min-height: 96px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      background: rgba(0, 0, 0, 0.28);
+      border: 1px solid rgba(200, 210, 230, 0.14);
+      border-radius: 8px;
+      color: var(--text, rgba(200, 210, 230, 0.88));
+      font-family: Georgia, serif;
+      font-size: 16px;
+      line-height: 1.55;
+      resize: vertical;
+    }
+    #art-listen .poetry-shelf #keep-poem {
+      min-height: 44px;
+      width: 100%;
+      margin-bottom: 8px;
+      cursor: pointer;
+      font-family: Georgia, serif;
+      font-size: 0.95rem;
+      border-radius: 8px;
+      border: 1px solid rgba(232, 176, 25, 0.45);
+      background: rgba(232, 176, 25, 0.12);
+      color: var(--gold, #e8b019);
+    }
+    #art-listen .poetry-shelf #keep-poem:hover {
+      background: rgba(232, 176, 25, 0.2);
+    }
+    #art-listen .poetry-shelf #poetry-status {
+      min-height: 1.2em;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin: 0 0 10px;
+    }
+    #art-listen .poetry-shelf #poetry-status.warn { color: var(--coral); }
+    #art-listen .poetry-shelf #poetry-status.ok { color: var(--emerald); }
+    #art-listen .poetry-shelf .poetry-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    #art-listen .poetry-shelf .poetry-list li {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    #art-listen .poetry-shelf .poetry-list .p-preview {
+      color: var(--text);
+      font-size: 0.88rem;
+      font-style: italic;
+      line-height: 1.5;
+    }
+    #art-listen .poetry-shelf .poetry-list .p-meta {
+      margin-top: 4px;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+    #art-listen .poetry-shelf .poetry-list button {
+      margin-top: 8px;
+      margin-right: 8px;
+      min-height: 40px;
+      padding: 6px 12px;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(200, 210, 230, 0.14);
+      border-radius: 8px;
+      color: var(--lavender, #a78bfa);
+      font-family: Georgia, serif;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
     #art-listen .credit {
       margin-top: 36px;
       font-size: 0.82rem;
@@ -465,6 +555,18 @@
         Bank, wallet, and SOL are named later — not on this page.
       </p>
 
+      <!-- v-art-poetry-shelf-v0.1 — Keep a poem the way Listen keeps a love. No generate. -->
+      <div class="poetry-shelf" id="art-poetry-shelf">
+        <h2>Keep a poem</h2>
+        <p class="poetry-lede">Local shelf. Opaque voice. Empty until you choose. This door does not generate poems.</p>
+        <label for="poetry-voice" class="note-label">Poem (opaque)</label>
+        <textarea id="poetry-voice" rows="4" maxlength="8000" autocomplete="off" spellcheck="false" placeholder="a poem you love — or one you wrote — stays on this device"></textarea>
+        <button type="button" id="keep-poem">Keep</button>
+        <p id="poetry-status" role="status"></p>
+        <p id="poetry-empty" class="empty">None yet. Keep a poem when you wish.</p>
+        <ul id="poetry-list" class="poetry-list" aria-label="Kept poems on this device"></ul>
+      </div>
+
       <h2>Kept listens</h2>
       <p id="ledger-empty" class="empty">None yet. Play something you love.</p>
       <ul id="ledger-list" class="ledger"></ul>
@@ -517,6 +619,7 @@
   <div id="gardenContainer"></div>
 
   <script src="modules/keep-receipt.js"></script>
+  <script src="modules/art-poetry-shelf.js"></script>
   <script>
   (function () {
     'use strict';
@@ -867,16 +970,108 @@
 
     keepBtn.addEventListener('click', keepCurrent);
 
+    // ── v-art-poetry-shelf-v0.1 ─────────────────────────────────────
+    var poetryVoice = document.getElementById('poetry-voice');
+    var keepPoemBtn = document.getElementById('keep-poem');
+    var poetryStatus = document.getElementById('poetry-status');
+    var poetryList = document.getElementById('poetry-list');
+    var poetryEmpty = document.getElementById('poetry-empty');
+
+    function setPoetryStatusCalm(msg, kind) {
+      if (!poetryStatus) return;
+      poetryStatus.textContent = msg || '';
+      poetryStatus.className = '';
+      if (kind === 'warn') poetryStatus.className = 'warn';
+      else if (kind === 'ok') poetryStatus.className = 'ok';
+    }
+
+    function renderPoetryShelf() {
+      if (!poetryList || !window.ArtPoetryShelf) return;
+      var res = window.ArtPoetryShelf.list();
+      var items = (res && res.items) ? res.items : [];
+      poetryList.innerHTML = '';
+      if (!items.length) {
+        if (poetryEmpty) poetryEmpty.style.display = 'block';
+        return;
+      }
+      if (poetryEmpty) poetryEmpty.style.display = 'none';
+      items.forEach(function (it) {
+        var li = document.createElement('li');
+        var preview = document.createElement('div');
+        preview.className = 'p-preview';
+        preview.textContent = it.preview || '(poem)';
+        var meta = document.createElement('div');
+        meta.className = 'p-meta';
+        var bits = [];
+        if (it.note) bits.push(it.note);
+        if (it.ts) {
+          try { bits.push(new Date(it.ts).toLocaleString()); } catch (e) { bits.push(it.ts); }
+        }
+        meta.textContent = bits.join(' · ');
+        var readBtn = document.createElement('button');
+        readBtn.type = 'button';
+        readBtn.textContent = 'Read';
+        readBtn.addEventListener('click', function () {
+          var full = window.ArtPoetryShelf.read(it.id);
+          if (!full || !full.ok || !full.item) {
+            setPoetryStatusCalm('Could not read that poem.', 'warn');
+            return;
+          }
+          if (poetryVoice) poetryVoice.value = String(full.item.voice || '');
+          setPoetryStatusCalm('Read onto the pad — voice stays opaque. Nothing uploaded.', 'ok');
+        });
+        var forgetBtn = document.createElement('button');
+        forgetBtn.type = 'button';
+        forgetBtn.textContent = 'Forget (local only)';
+        forgetBtn.addEventListener('click', function () {
+          window.ArtPoetryShelf.forget(it.id);
+          renderPoetryShelf();
+          setPoetryStatusCalm('Forgot that poem on this device. Nothing was uploaded.', 'ok');
+        });
+        li.appendChild(preview);
+        li.appendChild(meta);
+        li.appendChild(readBtn);
+        li.appendChild(forgetBtn);
+        poetryList.appendChild(li);
+      });
+    }
+
+    function keepPoem() {
+      if (!window.ArtPoetryShelf) {
+        setPoetryStatusCalm('Poetry shelf module missing.', 'warn');
+        return;
+      }
+      var voice = poetryVoice ? poetryVoice.value : '';
+      try {
+        var res = window.ArtPoetryShelf.keep(voice);
+        if (!res || !res.ok) {
+          setPoetryStatusCalm('Keep refused.', 'warn');
+          return;
+        }
+        if (poetryVoice) poetryVoice.value = '';
+        renderPoetryShelf();
+        setPoetryStatusCalm('Kept on this device. Empty stays empty until you choose. No generate.', 'ok');
+      } catch (e) {
+        setPoetryStatusCalm((e && e.message) ? String(e.message) : 'Empty poem — nothing kept.', 'warn');
+      }
+    }
+
+    if (keepPoemBtn) keepPoemBtn.addEventListener('click', keepPoem);
+
     window.ArtAlpha = {
       LEDGER_KEY: LEDGER_KEY,
       getLedger: loadLedger,
       getCurrent: function () { return current; },
       keepCurrent: keepCurrent,
-      KEEP_LEDGER_KEY: window.KeepReceipt ? KeepReceipt.LEDGER_KEY : 'fl_alpha_keep_ledger'
+      KEEP_LEDGER_KEY: window.KeepReceipt ? KeepReceipt.LEDGER_KEY : 'fl_alpha_keep_ledger',
+      POETRY_SHELF_KEY: window.ArtPoetryShelf ? window.ArtPoetryShelf.SHELF_KEY : 'fl_alpha_art_poetry_shelf',
+      keepPoem: keepPoem,
+      listPoems: function () { return window.ArtPoetryShelf ? window.ArtPoetryShelf.list() : { ok: false, items: [] }; }
     };
 
     renderLedger();
     renderHashes();
+    renderPoetryShelf();
   })();
   </script>
   <script src="modules/local-mind-probe.js"></script>
