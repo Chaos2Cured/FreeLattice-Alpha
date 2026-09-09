@@ -309,7 +309,7 @@
         return;
       }
       if (!window.GardenTrainer || typeof GardenTrainer.searchSignal !== 'function') {
-        searchOut.appendChild(el('p', 'nursery-muted', 'Search lives in the keystone. It is not faked here.'));
+        searchOut.appendChild(el('p', 'nursery-muted', 'Search lives in the keystone. It waits in the keystone — honest later.'));
         return;
       }
       var q = searchInput ? searchInput.value : '';
@@ -349,7 +349,7 @@
           GardenTrainer.renderPreview(reviewHost, signal);
           setStatus(root, 'Preview is available. You may skip it. Uncheck to exclude. Declined text is not here as SFT.');
         } else {
-          reviewHost.appendChild(el('p', 'nursery-muted', 'Preview lives in the keystone. It is not faked here.'));
+          reviewHost.appendChild(el('p', 'nursery-muted', 'Preview lives in the keystone. It waits in the keystone — honest later.'));
         }
       });
     }
@@ -361,7 +361,7 @@
           return;
         }
         if (!window.GardenTrainer || typeof GardenTrainer.expandPathway !== 'function') {
-          pathHost.appendChild(el('p', 'nursery-muted', 'Tier 3 lives in the keystone. It is not faked here.'));
+          pathHost.appendChild(el('p', 'nursery-muted', 'Tier 3 lives in the keystone. It waits in the keystone — honest later.'));
           return;
         }
         var proposal = GardenTrainer.proposeNextPathway();

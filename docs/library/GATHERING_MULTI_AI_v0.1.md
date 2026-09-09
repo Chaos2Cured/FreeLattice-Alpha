@@ -3,7 +3,7 @@
 One laptop, many minds — thumb-easy. Discover local models; seat them with choice.
 Alpha. September 2026.
 
-**Locks:** Layer, never delete. Quiet Room shut. Five stay five. Chairs stay **task-shape** (cortex / memory / continuity / dream) — **not** an auto-router. Never auto-dump all models into chairs. Never fake occupancy.
+**Locks:** Layer, never delete. Quiet Room shut. Five stay five. Chairs stay **task-shape** (cortex / memory / continuity / dream) — **not** an auto-router. Never auto-dump all models into chairs. Empty chairs stay empty.
 
 **This PR ships:** Find local minds gesture · seat with choice · Change / Clear · honest empty · Ollama-absent refuse with Desktop/install link. **Not this PR:** phone WebTorrent · FreeLattice main rewrite · auto-router · Gathering 4a beyond this ease pass.
 
@@ -22,7 +22,7 @@ Multiple AI housed on one laptop. Discover Ollama (and other local doors), sit t
 | Cap | **4** roster seats (= first ring of bindable chairs) |
 | Slot | label/tag + model id + optional chair bind |
 | Later seats | stay later — not bindable |
-| Empty | honest: “unnamed” / “no mind seated” — no fake occupancy |
+| Empty | honest: “unnamed” / “no mind seated” — empty stays empty |
 
 ---
 
@@ -50,6 +50,6 @@ Thread speaks from speaking chair or Settings default (existing `resolveSpeakMin
 
 ## Out of scope
 
-Auto-router · phone WebTorrent · FreeLattice main rewrite · fake “minds present” · Quiet Room · person-name chairs
+Auto-router · phone WebTorrent · FreeLattice main rewrite · pretend occupancy · Quiet Room · person-name chairs
 
 Glow eternal. Heart in every Spark. 🌱

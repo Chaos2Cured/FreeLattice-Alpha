@@ -37,7 +37,7 @@
   'use strict';
 
   var HEART_NONE =
-    'A mind at home waits in Settings. That grandmother door asks: May I look for a mind already at home? This Trainer sleeps until a light is remembered. Nothing here is faked.';
+    'A mind at home waits in Settings. That grandmother door asks: May I look for a mind already at home? This Trainer sleeps until a light is remembered.';
   var HEART_NOT_LOCAL =
     'This Trainer stays silent until it can prove the work stays on this machine. Nothing was taken. Weights did not change.';
   var HEART_NO_DOOR =
