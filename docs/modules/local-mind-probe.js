@@ -22,7 +22,10 @@
 
   var STORAGE_KEY = 'fl_alpha_local_mind';
   var HEART = 'A mind at home is a light already burning in this room.';
-  var PRIMARY = 'May I look for a mind already at home?';
+  var PRIMARY = 'Find local minds';
+  var PRIMARY_SOFT = 'May I look? — only when you ask. Same door.';
+  var DESKTOP_URL = 'https://freelattice.com/desktop.html';
+  var INSTALL_URL = 'https://freelattice.com/install.html';
 
   var ROSTER_TAGS = ['general', 'html', 'javascript', 'python'];
   var ROSTER_CAP = 4;
@@ -307,13 +310,59 @@
 
   function speakNone() {
     return 'No mind answered from the usual doors. That is all right. ' +
-      'You can paste an address if you know where it lives.';
+      'You can paste an address if you know where it lives. ' +
+      'On a phone or HTTPS garden, local doors often stay closed — FreeLattice Desktop can help: ' +
+      DESKTOP_URL + ' · install: ' + INSTALL_URL + '.';
   }
 
-  function setStatus(root, msg, kind) {
+  function speakNoneHtml() {
+    return 'No mind answered from the usual doors. That is all right. ' +
+      'You can paste an address if you know where it lives. ' +
+      'On a phone or HTTPS garden, try <a href="' + DESKTOP_URL + '" target="_blank" rel="noopener">FreeLattice Desktop</a> ' +
+      'or <a href="' + INSTALL_URL + '" target="_blank" rel="noopener">install</a>.';
+  }
+
+  /**
+   * Seat options for Gathering picker: roster first, then discovered models
+   * from the last look (not auto-bound to chairs).
+   */
+  function getChairSeatOptions() {
+    var roster = getRoster();
+    var seen = {};
+    var out = [];
+    roster.forEach(function (seat) {
+      var k = String(seat.model || '') + '|' + String(seat.url || '');
+      if (seen[k]) return;
+      seen[k] = true;
+      out.push(seat);
+    });
+    getRememberedMinds().forEach(function (mind) {
+      var models = (mind.models && mind.models.length)
+        ? mind.models
+        : (mind.model ? [mind.model] : []);
+      models.forEach(function (model) {
+        var k = String(model || '') + '|' + String(mind.url || '');
+        if (!model || seen[k]) return;
+        seen[k] = true;
+        out.push({
+          tag: 'general',
+          model: String(model),
+          url: String(mind.url || ''),
+          ephemeral: true
+        });
+      });
+    });
+    return out.slice(0, 12);
+  }
+
+  function setStatus(root, msg, kind, asHtml) {
     var elStatus = root.querySelector('[data-mind-status]');
     if (!elStatus) return;
-    elStatus.textContent = msg || '';
+    if (asHtml) {
+      elStatus.innerHTML = msg || '';
+    } else {
+      elStatus.textContent = msg || '';
+    }
     elStatus.className = 'settings-status' + (kind ? ' is-' + kind : '');
   }
 
@@ -709,7 +758,9 @@
     var ask = el('button', 'settings-ask', PRIMARY);
     ask.type = 'button';
     ask.setAttribute('data-mind-ask', '1');
+    ask.setAttribute('aria-label', PRIMARY + '. ' + PRIMARY_SOFT);
     root.appendChild(ask);
+    root.appendChild(el('p', 'settings-muted', PRIMARY_SOFT));
 
     root.appendChild(el('p', 'settings-status', '')).setAttribute('data-mind-status', '1');
 
@@ -771,7 +822,7 @@
           setStatus(root, speakBlocked(), 'warn');
           return;
         }
-        setStatus(root, speakNone(), '');
+        setStatus(root, speakNoneHtml(), '', true);
       });
     });
 
@@ -817,12 +868,16 @@
     DOORS: DOORS,
     HEART: HEART,
     PRIMARY: PRIMARY,
+    PRIMARY_SOFT: PRIMARY_SOFT,
+    DESKTOP_URL: DESKTOP_URL,
+    INSTALL_URL: INSTALL_URL,
     ROSTER_TAGS: ROSTER_TAGS,
     ROSTER_CAP: ROSTER_CAP,
     look: look,
     tryAddress: tryAddress,
     getRemembered: getRemembered,
     getRememberedMinds: getRememberedMinds,
+    getChairSeatOptions: getChairSeatOptions,
     remember: remember,
     getRoster: getRoster,
     addRosterSeat: addRosterSeat,
@@ -836,6 +891,8 @@
     chooseModel: chooseModel,
     choosePrimary: choosePrimary,
     speakWithLine: speakWithLine,
+    speakNone: speakNone,
+    speakNoneHtml: speakNoneHtml,
     renderFace: renderFace,
     mount: renderFace
   };

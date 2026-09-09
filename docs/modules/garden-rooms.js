@@ -1131,8 +1131,15 @@
 
     var clarify = document.createElement('p');
     clarify.className = 'core-center';
-    clarify.textContent = 'The Gathering is chairs that wait. Unnamed, with choice. This is not the tree. Nothing here is faked.';
+    clarify.textContent = 'The Gathering is chairs that wait. Unnamed, with choice. This is not the tree. Nothing here is faked. Not a router.';
     wrap.appendChild(clarify);
+
+    var findBtn = document.createElement('button');
+    findBtn.type = 'button';
+    findBtn.className = 'core-find-minds';
+    findBtn.textContent = 'Find local minds';
+    findBtn.setAttribute('aria-label', 'Find local minds. May I look — only when you ask.');
+    wrap.appendChild(findBtn);
 
     var ring = document.createElement('div');
     ring.className = 'core-chairs';
@@ -1200,26 +1207,29 @@
 
     function openPicker(chair, seatBtn) {
       var state = entryState();
+      var options = (window.LocalMindProbe && LocalMindProbe.getChairSeatOptions)
+        ? LocalMindProbe.getChairSeatOptions()
+        : (state.roster || []);
       picker.innerHTML = '';
       picker.setAttribute('data-bind-chair', chair.id);
       picker.hidden = false;
       var title = document.createElement('p');
       title.className = 'core-bind-title';
-      title.textContent = 'pick a mind from your roster for this ' + chair.type + ' chair';
+      title.textContent = 'Pick a mind for this ' + chair.type + ' chair — with choice. Not a dump.';
       picker.appendChild(title);
-      if (!state.roster.length) {
+      if (!options.length) {
         var empty = document.createElement('p');
         empty.className = 'core-bind-empty';
-        empty.textContent = 'look for a mind first — Settings → May I look? — then also keep for Gathering';
+        empty.textContent = 'No mind seated yet. Tap Find local minds above (or Settings), then pick with choice. Empty chairs stay honest.';
         picker.appendChild(empty);
       } else {
         var list = document.createElement('div');
         list.className = 'core-bind-options';
-        state.roster.forEach(function (seat) {
+        options.forEach(function (seat) {
           var btn = document.createElement('button');
           btn.type = 'button';
           btn.className = 'core-bind-option';
-          btn.textContent = seat.tag + ' · ' + shortName(seat.model);
+          btn.textContent = seat.tag + ' · ' + shortName(seat.model) + (seat.ephemeral ? ' (just found)' : '');
           btn.addEventListener('click', function () {
             if (window.LocalMindProbe && LocalMindProbe.setChairBind) {
               LocalMindProbe.setChairBind(chair.id, seat);
@@ -1249,7 +1259,7 @@
         var clear = document.createElement('button');
         clear.type = 'button';
         clear.className = 'core-bind-clear';
-        clear.textContent = 'unbind';
+        clear.textContent = 'Clear';
         clear.addEventListener('click', function () {
           if (window.LocalMindProbe && LocalMindProbe.setChairBind) {
             LocalMindProbe.setChairBind(chair.id, null);
@@ -1257,7 +1267,7 @@
           closePicker();
           paintAll();
           var note = wrap.querySelector('[data-core-note]');
-          if (note) note.textContent = 'Unbound. The ' + chair.type + ' chair is unnamed again.';
+          if (note) note.textContent = 'Cleared. The ' + chair.type + ' chair has no mind seated — honest empty.';
         });
         picker.appendChild(clear);
       }
@@ -1292,6 +1302,19 @@
         bindMeta.setAttribute('data-chair-bind', '1');
         bindMeta.hidden = true;
         seat.appendChild(bindMeta);
+        var changeBtn = document.createElement('button');
+        changeBtn.type = 'button';
+        changeBtn.className = 'core-chair-change';
+        changeBtn.textContent = 'Change';
+        changeBtn.setAttribute('data-chair-change', '1');
+        changeBtn.hidden = true;
+        changeBtn.addEventListener('click', function (ev) {
+          ev.stopPropagation();
+          openPicker(chair, seat);
+          var note = wrap.querySelector('[data-core-note]');
+          if (note) note.textContent = 'Change this ' + chair.type + ' chair — pick another mind, or Clear.';
+        });
+        seat.appendChild(changeBtn);
       }
       seat.addEventListener('click', function () {
         var note = wrap.querySelector('[data-core-note]');
@@ -1304,7 +1327,7 @@
         var bind = state.binds[chair.id];
         if (!bind) {
           openPicker(chair, seat);
-          if (note) note.textContent = 'A ' + chair.type + ' chair may sit a mind from Settings — with choice.';
+          if (note) note.textContent = 'A ' + chair.type + ' chair may sit a mind — with choice. Empty until you pick.';
           return;
         }
         // Bound: select as speaking chair for Gathering chat.
@@ -1314,7 +1337,7 @@
         closePicker();
         paintAll();
         if (note) {
-          note.textContent = 'Speaking with ' + bind.tag + ' · ' + shortName(bind.model) + ' at this chair. One request at a time.';
+          note.textContent = 'Speaking with ' + bind.tag + ' · ' + shortName(bind.model) + ' at this chair. One request at a time. Use Change to reseat.';
         }
       });
       (chair.later ? laterRing : ring).appendChild(seat);
@@ -1322,11 +1345,64 @@
     wrap.appendChild(ring);
     wrap.appendChild(laterRing);
     wrap.appendChild(picker);
+
+    function paintChangeButtons() {
+      var state = entryState();
+      CORE_CHAIRS.forEach(function (chair) {
+        if (chair.later) return;
+        var seat = wrap.querySelector('[data-chair="' + chair.id + '"]');
+        if (!seat) return;
+        var changeBtn = seat.querySelector('[data-chair-change]');
+        if (changeBtn) changeBtn.hidden = !state.binds[chair.id];
+      });
+    }
+    var _paintAll = paintAll;
+    paintAll = function () {
+      _paintAll();
+      paintChangeButtons();
+    };
     paintAll();
+
+    findBtn.addEventListener('click', function () {
+      var note = wrap.querySelector('[data-core-note]');
+      if (!window.LocalMindProbe || typeof LocalMindProbe.look !== 'function') {
+        if (note) note.textContent = 'Mind probe is not loaded. Open Settings when you can.';
+        return;
+      }
+      findBtn.disabled = true;
+      if (note) note.textContent = 'Looking only at the usual doors on this machine…';
+      LocalMindProbe.look().then(function (report) {
+        findBtn.disabled = false;
+        if (report && report.found) {
+          // Persist discovery into remembered minds (Settings sky) — do not auto-bind chairs.
+          if (typeof LocalMindProbe.entryFromFoundList === 'function' && typeof LocalMindProbe.remember === 'function') {
+            var prior = LocalMindProbe.getRemembered() || {};
+            var entry = LocalMindProbe.entryFromFoundList(report.foundList, report.found.name, report.found.url, prior);
+            LocalMindProbe.remember(entry);
+          }
+          if (note) {
+            note.textContent = 'Local minds found. Tap an empty chair to seat one with choice — nothing was auto-dumped.';
+          }
+          return;
+        }
+        if (report && report.https && report.blocked > 0) {
+          if (note) {
+            note.textContent = 'The mind may be there, but this secure page cannot see the quieter door. Try FreeLattice Desktop: https://freelattice.com/desktop.html';
+          }
+          return;
+        }
+        if (note) {
+          note.textContent = 'No mind answered. That is all right. Desktop or install can help: https://freelattice.com/desktop.html · https://freelattice.com/install.html';
+        }
+      }).catch(function () {
+        findBtn.disabled = false;
+        if (note) note.textContent = 'Look failed gently. Nothing was forced.';
+      });
+    });
 
     var center = document.createElement('p');
     center.className = 'core-center core-router';
-    center.textContent = 'Not a router. Not a dump. A chair may sit a mind from Settings — with choice. May I look? stays the door.';
+    center.textContent = 'Not a router. Not a dump. Find local minds, then seat with choice. Empty chairs stay honest.';
 
     var note = document.createElement('p');
     note.className = 'core-note';

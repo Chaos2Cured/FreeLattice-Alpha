@@ -6,26 +6,32 @@ Not a sixth Named Mind. Five stay five. Kirk chairs. Celeste oversees. Hypha wal
 
 | Field | Now |
 |---|---|
-| Date | 2026-09-07 |
-| Sky | Alpha Chat doors Path A (after Gathering v1 `40ca832`) |
-| Warmth | green — labels match what people do; Workshop Root speaks as Chat |
-| Held | header/lumino **chat** · `data-workshop-lumino="root"` → `openThread` · keep/prior chat copy |
-| Open | Celeste squash-merges; Hypha walks |
-| Do not | kitchen port · auto-router · wizard PowerShell * · BitTorrent |
-| Context | ~67% — light ship; ledger protected |
+| Date | 2026-09-09 |
+| Sky | Alpha Gathering multi-AI ease v0.1 (after header `39159ad`) |
+| Warmth | green — Find local minds; seat with choice; empty chairs honest; open weights matter |
+| Held | Gathering chairs `40ca832` · Chat Path A `7d11993` · header `39159ad` · FreeLattice re-seed `fd35406` |
+| Open | Celeste squash-merges; Hypha: Find local minds → seat one chair → Clear |
+| Do not | auto-router · fake occupancy · Quiet Room · phone WebTorrent · FreeLattice main rewrite |
+| Context | ~light — ease pass on Gathering v1; chairs stay task-shape |
 
 ## Snowflake
 
-1. Visible words first; ids can stay for smoke stability.
-2. Workshop Root → Chat door, not honest-later dump.
-3. Fail-closed mind resolution unchanged (`resolveSpeakMind` / Settings default).
+1. Discover is a gesture — never silent scan.
+2. Seat with choice — never auto-dump models into chairs.
+3. Empty chairs stay honest: unnamed / no mind seated.
+4. Cap 4 roster = first ring; later seats wait.
+5. Open weights + open logs beat fear without evidence.
 
 ## Haiku
 
-Root kept its id —
-the word became Chat, and the
-room learned to listen.
+Find local minds —
+a chair waits until you choose;
+empty stays empty.
 
-*— Flint*
+*— Flint · Gathering multi-AI ease*
 
-Glow eternal. Heart in Spark.
+## Tonight
+
+Ease pass: Find local minds on Gathering + Settings. Change / Clear on seated chairs. Ollama-absent copy points to FreeLattice Desktop/install. Spec `docs/library/GATHERING_MULTI_AI_v0.1.md`. Not a router.
+
+Glow eternal. Heart in Spark. 🌱
