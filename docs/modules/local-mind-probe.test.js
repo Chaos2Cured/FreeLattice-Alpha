@@ -237,7 +237,8 @@ vm.runInNewContext(code, sandbox);
 var LMP = sandbox.window.LocalMindProbe;
 assert.ok(LMP, 'LocalMindProbe mounts on window');
 assert.equal(LMP.STORAGE_KEY, 'fl_alpha_local_mind');
-assert.equal(LMP.PRIMARY, 'May I look for a mind already at home?');
+assert.equal(LMP.PRIMARY, 'Find local minds');
+assert.ok(LMP.PRIMARY_SOFT.indexOf('May I look') !== -1);
 
 var FOUND = [{
   name: 'Ollama',
@@ -270,14 +271,14 @@ function resetMemory() {
   dispatched.length = 0;
 }
 
-check('renderFace does not persist before May I look', function () {
+check('renderFace does not persist before Find local minds', function () {
   resetMemory();
   var box = new El('div');
   LMP.renderFace(box);
   assert.equal(store[LMP.STORAGE_KEY], undefined);
   assert.equal(writes.length, 0);
   var ask = queryOne(box, '[data-mind-ask="1"]');
-  assert.ok(ask, 'May I look stays the door');
+  assert.ok(ask, 'Find local minds stays the door');
   assert.equal(ask.textContent, LMP.PRIMARY);
 });
 
@@ -475,6 +476,22 @@ check('chair bind and speaking chair resolve for Gathering chat', function () {
   assert.equal(speak.model, 'spec-html:4b');
   assert.equal(speak.fromChair, 'cortex');
   assert.ok(speak.url);
+});
+
+check('discover mock → seat options → clear chair (multi-AI ease)', function () {
+  resetMemory();
+  assert.equal(LMP.PRIMARY, 'Find local minds');
+  assert.ok(LMP.DESKTOP_URL.indexOf('desktop.html') !== -1);
+  assert.ok(LMP.speakNone().indexOf('Desktop') !== -1);
+  var entry = LMP.entryFromFoundList(FOUND, 'Ollama', FOUND[0].url, null);
+  LMP.remember(entry);
+  var opts = LMP.getChairSeatOptions();
+  assert.ok(opts.length >= 1, 'discovered models available to seat with choice');
+  LMP.setChairBind('memory', { model: opts[0].model, url: opts[0].url, tag: 'general' });
+  assert.ok(LMP.getRemembered().gatheringBinds.memory);
+  LMP.setChairBind('memory', null);
+  assert.equal(LMP.getRemembered().gatheringBinds.memory, undefined);
+  assert.equal(LMP.ROSTER_CAP, 4);
 });
 
 console.log('\nSettings model chooser smokes hold.');
