@@ -27,7 +27,7 @@
   'use strict';
 
   var HEART_NONE =
-    'A mind at home waits in Settings. That grandmother door asks: May I look for a mind already at home? These benches sleep until a light is remembered. Nothing here is faked.';
+    'A mind at home waits in Settings. That grandmother door asks: May I look for a mind already at home? These benches sleep until a light is remembered.';
   var HEART_BLOCKED =
     'The mind is there, but it has not opened the door to this garden yet. ' +
     'This garden is a secure page, and the mind lives at a quieter door. ' +

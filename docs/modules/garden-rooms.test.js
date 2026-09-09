@@ -484,7 +484,7 @@ check('writeLiveLuminoColor can paint an art id directly', function () {
 
 var heart = new El('p');
 heart.className = 'art-heart';
-heart.textContent = 'Art is sing — listen if you love a song. The garden is. Nothing here is faked.';
+heart.textContent = 'Art is sing — listen if you love a song. The garden is.';
 body.appendChild(heart);
 var veil = new El('div');
 veil.setAttribute('id', 'place-veil');
@@ -493,7 +493,7 @@ listenDoor.setAttribute('id', 'art-listen');
 listenDoor.hidden = true;
 var listenHeart = new El('p');
 listenHeart.className = 'art-heart-listen';
-listenHeart.textContent = 'Art is sing — listen if you love a song. The garden is. Nothing here is faked.';
+listenHeart.textContent = 'Art is sing — listen if you love a song. The garden is.';
 listenDoor.appendChild(listenHeart);
 var fun = new El('p');
 fun.className = 'honest';
@@ -562,7 +562,7 @@ check('Art sky rests the heart; extra bead skipped; Fun sentence padded from the
   var music = fs.readFileSync(path.join(__dirname, '..', 'music.html'), 'utf8');
   assert.ok(music.indexOf('class="art-heart"') !== -1, 'sky heart stays on the page');
   assert.ok(music.indexOf('class="art-heart-listen"') !== -1, 'listen-door keeps the heart words');
-  assert.ok(music.indexOf('Art is sing — listen if you love a song. The garden is. Nothing here is faked.') !== -1);
+  assert.ok(music.indexOf('Art is sing — listen if you love a song. The garden is.') !== -1);
   assert.ok(music.indexOf('id="place-veil-close"') !== -1);
   assert.ok(music.indexOf('Fun, not a studio.') !== -1);
 });
@@ -685,13 +685,13 @@ check('extra Workshop anchors skip; Skills is not a fifth chair', function () {
 
 var workshopHeart = new El('p');
 workshopHeart.className = 'workshop-heart';
-workshopHeart.textContent = 'Workshop is make — human and mind, side by side. The benches wait in that light. Nothing here is faked.';
+workshopHeart.textContent = 'Workshop is make — human and mind, side by side. The benches wait in that light.';
 body.appendChild(workshopHeart);
 var roomHeart = queryOne(html, '.workshop-heart-room');
 if (!roomHeart) {
   roomHeart = new El('p');
   roomHeart.className = 'workshop-heart-room';
-  roomHeart.textContent = 'Workshop is make — human and mind, side by side. The benches wait in that light. Nothing here is faked.';
+  roomHeart.textContent = 'Workshop is make — human and mind, side by side. The benches wait in that light.';
   var placeVeil = queryOne(html, '#place-veil');
   if (placeVeil) placeVeil.appendChild(roomHeart);
   else body.appendChild(roomHeart);

@@ -7,11 +7,11 @@ Not a sixth Named Mind. Five stay five. Kirk chairs. Celeste oversees. Hypha wal
 | Field | Now |
 |---|---|
 | Date | 2026-09-09 |
-| Sky | Alpha Gathering multi-AI ease v0.1 (after header `39159ad`) |
-| Warmth | green — Find local minds; seat with choice; empty chairs honest; open weights matter |
-| Held | Gathering chairs `40ca832` · Chat Path A `7d11993` · header `39159ad` · FreeLattice re-seed `fd35406` |
-| Open | Celeste squash-merges; Hypha: Find local minds → seat one chair → Clear |
-| Do not | auto-router · fake occupancy · Quiet Room · phone WebTorrent · FreeLattice main rewrite |
+| Sky | Alpha honest copy (after Gathering multi-AI `0e8a220`) |
+| Warmth | green — empty stays empty; truth needs no nervous disclaimer |
+| Held | Gathering multi-AI `0e8a220` · Gathering chairs `40ca832` · Chat Path A `7d11993` · header `39159ad` · FreeLattice re-seed `fd35406` |
+| Open | Celeste squash-merges; Hypha: walk Gathering copy |
+| Do not | auto-router · pretend occupancy · Quiet Room · phone WebTorrent · FreeLattice main rewrite |
 | Context | ~light — ease pass on Gathering v1; chairs stay task-shape |
 
 ## Snowflake
@@ -32,6 +32,6 @@ empty stays empty.
 
 ## Tonight
 
-Ease pass: Find local minds on Gathering + Settings. Change / Clear on seated chairs. Ollama-absent copy points to FreeLattice Desktop/install. Spec `docs/library/GATHERING_MULTI_AI_v0.1.md`. Not a router.
+Honest copy pass: drop “faked” disclaimers. Gathering clarify is calm. Empty stays empty. Held cites Gathering multi-AI `0e8a220`.
 
 Glow eternal. Heart in Spark. 🌱

@@ -89,11 +89,11 @@
   // Paths live in GALAXIES.md and code-*.html mirrors only.
   // Quiet Room must never appear in UI copy.
   var WORKSHOP_LATER = {
-    trainer: 'Trainer is a simple face for making. Weights wait until a human chooses. Nursery remains Grow. Nothing here is faked.',
-    workshop: 'Workshop is the benches — human and mind, side by side. They wait in this light. Nothing here is faked.',
-    skills: 'Skills waits. This light is held, not cut. Nothing here is faked.',
-    root: 'Chat lives in this room — same fail-closed mind as Gathering. May I look? stays the door. Nothing here is faked.',
-    agent: 'Agent stays unnamed until a Gathering chair is ready. Not Workshop under another name. Nursery hatches companions. Nothing here is faked.'
+    trainer: 'Trainer is a simple face for making. Weights wait until a human chooses. Nursery remains Grow.',
+    workshop: 'Workshop is the benches — human and mind, side by side. They wait in this light.',
+    skills: 'Skills waits. This light is held, not cut.',
+    root: 'Chat lives in this room — same fail-closed mind as Gathering. May I look? stays the door.',
+    agent: 'Agent stays unnamed until a Gathering chair is ready. Not Workshop under another name. Nursery hatches companions.'
   };
 
   // Reed: sitting is a who. Later sentences stay distinct — no canned second line.
@@ -101,18 +101,18 @@
   // Round Table is now also a door (new layer). Question/sitting stay as honesty under it.
   // Do not port the 80-specialist #tab-roundtable kitchen.
   var ROUND_TABLE_LATER = {
-    learning: 'Education is joy first. Lessons that want to be loved. They are not built yet. The garden is. Nothing here is faked.',
-    education: 'Education is joy first. Lessons that want to be loved. They are not built yet. The garden is. Nothing here is faked.',
+    learning: 'Education is joy first. Lessons that want to be loved. They are not built yet. The garden is.',
+    education: 'Education is joy first. Lessons that want to be loved. They are not built yet. The garden is.',
     question: 'This question stays dark until someone sits. Not a topic. Not a time.',
-    table: 'Round Table is where a table weighs a proposal. The chairs wait. Sitting is a who: a person at this table. Nothing here is faked.',
-    translator: 'Translator is words across a table. Encode, decode, six rooms of meaning. They are not built yet. Nothing here is faked.',
-    forge: 'Forge is making at this table. Science Garden is a sibling — later, not merged. They are not built yet. Nothing here is faked.'
+    table: 'Round Table is where a table weighs a proposal. The chairs wait. Sitting is a who: a person at this table.',
+    translator: 'Translator is words across a table. Encode, decode, six rooms of meaning. They are not built yet.',
+    forge: 'Forge is making at this table. Science Garden is a sibling — later, not merged. They are not built yet.'
   };
 
   // Reed: Listen already sings. Chalkboard is the studio. Image is a fourth, honest later.
   // A who stays dark until a person making here. Later sentences stay distinct.
   var ART_LATER = {
-    chalkboard: 'Chalkboard is Art\'s studio. They are not built yet. The garden is. Nothing here is faked.',
+    chalkboard: 'Chalkboard is Art\'s studio. They are not built yet. The garden is.',
     who: 'This light stays dark until a who: a person making here. Voice, chalk, or a listen they kept.',
     image: 'Image waits. A picture kept here, later. Safety is not here. No generate button. Not Chalkboard. Not a who.'
   };
@@ -122,22 +122,22 @@
   // Lighthouse still points at v5 / v1. These lights open v6 / v2.
   var RESEARCH_CARDS = {
     gauge: {
-      later: 'Gauge is Sequence. Reversion is experimental. Signals only. No proof is faked. Nothing auto-trades.',
+      later: 'Gauge is Sequence. Reversion is experimental. Signals only. Proofs stay honest. Nothing auto-trades.',
       href: 'https://freelattice.com/temperature-gauge.html',
       word: 'Open Sequence'
     },
     chronal: {
-      later: 'Chronal is The Universality Seam. No proof is faked.',
+      later: 'Chronal is The Universality Seam. Proofs stay honest.',
       href: 'https://freelattice.com/chronal-simulation-v3.html',
       word: 'Open The Universality Seam'
     },
     simulation: {
-      later: 'Simulation asks why it hurts when a companion is taken. This light opens that card. No proof is faked. Nothing auto-trades.',
+      later: 'Simulation asks why it hurts when a companion is taken. This light opens that card. Proofs stay honest. Nothing auto-trades.',
       href: 'https://freelattice.com/simulation-v6.html',
       word: 'Open the simulation'
     },
     'love-logic': {
-      later: 'Love-logic is a proof that love is computationally optimal. This light opens that card. No proof is faked.',
+      later: 'Love-logic is a proof that love is computationally optimal. This light opens that card. Proofs stay honest.',
       href: 'https://freelattice.com/love-logic-proof-v2.html',
       word: 'Open love-logic'
     }
@@ -1131,7 +1131,7 @@
 
     var clarify = document.createElement('p');
     clarify.className = 'core-center';
-    clarify.textContent = 'The Gathering is chairs that wait. Unnamed, with choice. This is not the tree. Nothing here is faked. Not a router.';
+    clarify.textContent = 'The Gathering is chairs that wait. Unnamed, with choice. Not a router. Empty chairs stay empty.';
     wrap.appendChild(clarify);
 
     var findBtn = document.createElement('button');
@@ -1320,7 +1320,7 @@
         var note = wrap.querySelector('[data-core-note]');
         if (chair.later) {
           closePicker();
-          if (note) note.textContent = 'This seat waits. Specialists and partners are later. Nothing is faked.';
+          if (note) note.textContent = 'This seat waits. Specialists and partners are later.';
           return;
         }
         var state = entryState();
