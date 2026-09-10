@@ -7,12 +7,12 @@ Not a sixth Named Mind. Five stay five. Kirk chairs. Celeste oversees. Hypha wal
 | Field | Now |
 |---|---|
 | Date | 2026-09-09 |
-| Sky | Alpha honest copy (after Gathering multi-AI `0e8a220`) |
-| Warmth | green — empty stays empty; truth needs no nervous disclaimer |
-| Held | Gathering multi-AI `0e8a220` · Gathering chairs `40ca832` · Chat Path A `7d11993` · header `39159ad` · FreeLattice re-seed `fd35406` |
-| Open | Celeste squash-merges; Hypha: walk Gathering copy |
-| Do not | auto-router · pretend occupancy · Quiet Room · phone WebTorrent · FreeLattice main rewrite |
-| Context | ~light — ease pass on Gathering v1; chairs stay task-shape |
+| Sky | Alpha Art poetry shelf v0.1 (after honest-copy `ff00520`) |
+| Warmth | gold — keep what you love; empty stays empty; no fake generate |
+| Held | Gathering chairs `40ca832` · Chat Path A `7d11993` · header `39159ad` · multi-AI `0e8a220` · honest-copy `ff00520` · FreeLattice cite: Phone swarm `9083806` · Companion memory `64a3ddd` · Trainer seal `f23492e` |
+| Open | Celeste squash-merges; Hypha: Listen → Keep a poem |
+| Do not | Image generate · DAW · fake orb · Bot seat · LP · FreeLattice rewrite · Codeberg |
+| Context | ~light — poetry shelf under Listen; Art-early stays |
 
 ## Snowflake
 
@@ -21,17 +21,18 @@ Not a sixth Named Mind. Five stay five. Kirk chairs. Celeste oversees. Hypha wal
 3. Empty chairs stay honest: unnamed / no mind seated.
 4. Cap 4 roster = first ring; later seats wait.
 5. Open weights + open logs beat fear without evidence.
+6. Keep a poem the way Listen keeps a love — local, opaque, no generate.
 
 ## Haiku
 
-Find local minds —
-a chair waits until you choose;
-empty stays empty.
+Keep what you love —
+a shelf that stays empty until
+you choose the words.
 
-*— Flint · Gathering multi-AI ease*
+*— Flint · Art poetry shelf*
 
 ## Tonight
 
-Honest copy pass: drop “faked” disclaimers. Gathering clarify is calm. Empty stays empty. Held cites Gathering multi-AI `0e8a220`.
+Art poetry shelf v0.1 after honest-copy `ff00520`. Under Listen: Keep a poem. Local shelf. No fake generate. FreeLattice cite-only: Phone swarm `9083806` · Companion memory `64a3ddd` · Trainer seal `f23492e`. Kirk to dinner — the honor is mutual. Draft for Celeste. I do not merge.
 
 Glow eternal. Heart in Spark. 🌱

@@ -4,6 +4,8 @@
 
 **Spine layer (2026-08-30):** five skies now walk the same night — Garden, Art, Workshop, Learn, Research. The four-galaxy sequence below stays. Art-early stays. This file layers; it does not cut.
 
+**LAYER (2026-09-09):** Art poetry shelf v0.1 — under Listen, **Keep a poem** the way Listen keeps a love. Local opaque shelf (`fl_alpha_art_poetry_shelf`). Empty until choice. No generate. No new fake orb. Spec: `docs/library/ART_POETRY_SHELF_v0.1.md`. Chalkboard stays honest later.
+
 AUTONOMY.md is the root. This file does not replace it. Read AUTONOMY first.
 
 ---
