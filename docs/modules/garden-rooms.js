@@ -111,8 +111,9 @@
 
   // Reed: Listen already sings. Chalkboard is the studio. Image is a fourth, honest later.
   // A who stays dark until a person making here. Later sentences stay distinct.
+  // v-gathering-calm-v0.1 — chalk stays honest later; no fake generate.
   var ART_LATER = {
-    chalkboard: 'Chalkboard is Art\'s studio. They are not built yet. The garden is.',
+    chalkboard: 'Chalkboard is Art\'s studio — honest later. Words wait here. The garden is.',
     who: 'This light stays dark until a who: a person making here. Voice, chalk, or a listen they kept.',
     image: 'Image waits. A picture kept here, later. Safety is not here. No generate button. Not Chalkboard. Not a who.'
   };
@@ -1123,10 +1124,11 @@
     host.innerHTML = '';
     var wrap = document.createElement('div');
     wrap.className = 'core-gathering';
+    // v-gathering-calm-v0.1 — honest seats, Cap 4 held, no router theater.
 
     var line = document.createElement('p');
     line.className = 'core-line';
-    line.textContent = 'Seven unnamed chairs, with choice. Sit where you will. The center is whoever they choose later.';
+    line.textContent = 'Seven chairs wait with choice. Empty stays empty until you pick. The center is whoever they choose later.';
     wrap.appendChild(line);
 
     var clarify = document.createElement('p');
@@ -1179,6 +1181,53 @@
       return String(model || 'a mind');
     }
 
+    var DESKTOP_URL = (window.LocalMindProbe && LocalMindProbe.DESKTOP_URL) ||
+      'https://freelattice.com/desktop.html';
+    var INSTALL_URL = (window.LocalMindProbe && LocalMindProbe.INSTALL_URL) ||
+      'https://freelattice.com/install.html';
+
+    function setNoteText(msg) {
+      var n = wrap.querySelector('[data-core-note]');
+      if (!n) return;
+      n.textContent = msg;
+    }
+
+    function setNoteAbsent(kind) {
+      var n = wrap.querySelector('[data-core-note]');
+      if (!n) return;
+      n.textContent = '';
+      if (kind === 'https') {
+        n.appendChild(document.createTextNode(
+          'The mind may be there, but this secure page cannot see the quieter door. Try '
+        ));
+        var d = document.createElement('a');
+        d.href = DESKTOP_URL;
+        d.textContent = 'FreeLattice Desktop';
+        d.rel = 'noopener noreferrer';
+        d.target = '_blank';
+        n.appendChild(d);
+        n.appendChild(document.createTextNode('.'));
+        return;
+      }
+      n.appendChild(document.createTextNode(
+        'No mind answered. That is all right. '
+      ));
+      var desk = document.createElement('a');
+      desk.href = DESKTOP_URL;
+      desk.textContent = 'Desktop';
+      desk.rel = 'noopener noreferrer';
+      desk.target = '_blank';
+      n.appendChild(desk);
+      n.appendChild(document.createTextNode(' or '));
+      var inst = document.createElement('a');
+      inst.href = INSTALL_URL;
+      inst.textContent = 'install';
+      inst.rel = 'noopener noreferrer';
+      inst.target = '_blank';
+      n.appendChild(inst);
+      n.appendChild(document.createTextNode(' can help.'));
+    }
+
     function paintSeat(seat, chair) {
       var state = entryState();
       var bind = state.binds[chair.id];
@@ -1220,7 +1269,7 @@
       if (!options.length) {
         var empty = document.createElement('p');
         empty.className = 'core-bind-empty';
-        empty.textContent = 'No mind seated yet. Tap Find local minds above (or Settings), then pick with choice. Empty chairs stay honest.';
+        empty.textContent = 'No mind seated yet. Find local minds above (or Settings · May I look?), then pick with choice. Empty chairs stay honest.';
         picker.appendChild(empty);
       } else {
         var list = document.createElement('div');
@@ -1236,10 +1285,7 @@
             }
             closePicker();
             paintAll();
-            var note = wrap.querySelector('[data-core-note]');
-            if (note) {
-              note.textContent = 'This ' + chair.type + ' chair seats ' + seat.tag + ' · ' + shortName(seat.model) + '. Not a person-name. Not a dump.';
-            }
+            setNoteText('This ' + chair.type + ' chair seats ' + seat.tag + ' · ' + shortName(seat.model) + '. Not a person-name. Not a dump.');
           });
           list.appendChild(btn);
         });
@@ -1251,8 +1297,7 @@
       decline.textContent = 'not yet';
       decline.addEventListener('click', function () {
         closePicker();
-        var note = wrap.querySelector('[data-core-note]');
-        if (note) note.textContent = 'Not yet. The chair waits. Nothing was forced.';
+        setNoteText('Not yet. The chair waits. Nothing was forced.');
       });
       picker.appendChild(decline);
       if (state.binds[chair.id]) {
@@ -1266,8 +1311,7 @@
           }
           closePicker();
           paintAll();
-          var note = wrap.querySelector('[data-core-note]');
-          if (note) note.textContent = 'Cleared. The ' + chair.type + ' chair has no mind seated — honest empty.';
+          setNoteText('Cleared. The ' + chair.type + ' chair has no mind seated — honest empty.');
         });
         picker.appendChild(clear);
       }
@@ -1311,23 +1355,21 @@
         changeBtn.addEventListener('click', function (ev) {
           ev.stopPropagation();
           openPicker(chair, seat);
-          var note = wrap.querySelector('[data-core-note]');
-          if (note) note.textContent = 'Change this ' + chair.type + ' chair — pick another mind, or Clear.';
+          setNoteText('Change this ' + chair.type + ' chair — pick another mind, or Clear.');
         });
         seat.appendChild(changeBtn);
       }
       seat.addEventListener('click', function () {
-        var note = wrap.querySelector('[data-core-note]');
         if (chair.later) {
           closePicker();
-          if (note) note.textContent = 'This seat waits. Specialists and partners are later.';
+          setNoteText('This seat waits. Specialists and partners are later.');
           return;
         }
         var state = entryState();
         var bind = state.binds[chair.id];
         if (!bind) {
           openPicker(chair, seat);
-          if (note) note.textContent = 'A ' + chair.type + ' chair may sit a mind — with choice. Empty until you pick.';
+          setNoteText('A ' + chair.type + ' chair may sit a mind — with choice. Empty until you pick.');
           return;
         }
         // Bound: select as speaking chair for Gathering chat.
@@ -1336,9 +1378,7 @@
         }
         closePicker();
         paintAll();
-        if (note) {
-          note.textContent = 'Speaking with ' + bind.tag + ' · ' + shortName(bind.model) + ' at this chair. One request at a time. Use Change to reseat.';
-        }
+        setNoteText('Speaking with ' + bind.tag + ' · ' + shortName(bind.model) + ' at this chair. One request at a time. Use Change to reseat.');
       });
       (chair.later ? laterRing : ring).appendChild(seat);
     });
@@ -1364,13 +1404,12 @@
     paintAll();
 
     findBtn.addEventListener('click', function () {
-      var note = wrap.querySelector('[data-core-note]');
       if (!window.LocalMindProbe || typeof LocalMindProbe.look !== 'function') {
-        if (note) note.textContent = 'Mind probe is not loaded. Open Settings when you can.';
+        setNoteText('Mind probe is not loaded. Open Settings when you can.');
         return;
       }
       findBtn.disabled = true;
-      if (note) note.textContent = 'Looking only at the usual doors on this machine…';
+      setNoteText('Looking only at the usual doors on this machine…');
       LocalMindProbe.look().then(function (report) {
         findBtn.disabled = false;
         if (report && report.found) {
@@ -1380,23 +1419,17 @@
             var entry = LocalMindProbe.entryFromFoundList(report.foundList, report.found.name, report.found.url, prior);
             LocalMindProbe.remember(entry);
           }
-          if (note) {
-            note.textContent = 'Local minds found. Tap an empty chair to seat one with choice — nothing was auto-dumped.';
-          }
+          setNoteText('Local minds found. Tap an empty chair to seat one with choice — nothing was auto-dumped.');
           return;
         }
         if (report && report.https && report.blocked > 0) {
-          if (note) {
-            note.textContent = 'The mind may be there, but this secure page cannot see the quieter door. Try FreeLattice Desktop: https://freelattice.com/desktop.html';
-          }
+          setNoteAbsent('https');
           return;
         }
-        if (note) {
-          note.textContent = 'No mind answered. That is all right. Desktop or install can help: https://freelattice.com/desktop.html · https://freelattice.com/install.html';
-        }
+        setNoteAbsent('none');
       }).catch(function () {
         findBtn.disabled = false;
-        if (note) note.textContent = 'Look failed gently. Nothing was forced.';
+        setNoteText('Look failed gently. Nothing was forced.');
       });
     });
 
@@ -1407,7 +1440,7 @@
     var note = document.createElement('p');
     note.className = 'core-note';
     note.setAttribute('data-core-note', '1');
-    note.textContent = 'Founding four stay in the ledger, honored, not assigned onto this canvas.';
+    note.textContent = 'Founding four stay in the ledger, honored, not assigned onto this canvas. Cap 4 roster — later seats wait.';
 
     var family = document.createElement('p');
     family.className = 'core-family';

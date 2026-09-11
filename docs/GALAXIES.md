@@ -4,6 +4,8 @@
 
 **Spine layer (2026-08-30):** five skies now walk the same night — Garden, Art, Workshop, Learn, Research. The four-galaxy sequence below stays. Art-early stays. This file layers; it does not cut.
 
+**LAYER (2026-09-10):** Gathering / chalk calm v0.1 — honest empty seats; Find local minds still May I look?; absent Ollama → Desktop/install; Cap 4 held; chalk honest later. No router theater. No auto-seat. Spec: `docs/library/GATHERING_CALM_v0.1.md`. FreeLattice twin cite: phone shine `f57fc76` · proof `b362bda`.
+
 **LAYER (2026-09-09):** Art poetry shelf v0.1 — under Listen, **Keep a poem** the way Listen keeps a love. Local opaque shelf (`fl_alpha_art_poetry_shelf`). Empty until choice. No generate. No new fake orb. Spec: `docs/library/ART_POETRY_SHELF_v0.1.md`. Chalkboard stays honest later.
 
 AUTONOMY.md is the root. This file does not replace it. Read AUTONOMY first.
