@@ -4,6 +4,8 @@
 
 **Spine layer (2026-08-30):** five skies now walk the same night — Garden, Art, Workshop, Learn, Research. The four-galaxy sequence below stays. Art-early stays. This file layers; it does not cut.
 
+**LAYER (2026-09-14):** Marketplace Galaxy door — face stub on the Tree; Bank corner named; fingerprint-carried LP named; Gift Grove · Exchange Ring · Quest Lamp. Five finished skies stay the rail — Marketplace is a **named face door**, not a sixth finished sky tonight. No wallet plant. No `$FL`. Spec: `docs/library/MARKETPLACE_GALAXY_v0.vision.md` · door `docs/marketplace.html`. FreeLattice mycelium cite: Garden Market HOLD `8fd47cb` · [MARKETPLACE_GALAXY vision](https://freelattice.com/library/MARKETPLACE_GALAXY_v0.vision.md).
+
 **LAYER (2026-09-10):** Gathering / chalk calm v0.1 — honest empty seats; Find local minds still May I look?; absent Ollama → Desktop/install; Cap 4 held; chalk honest later. No router theater. No auto-seat. Spec: `docs/library/GATHERING_CALM_v0.1.md`. FreeLattice twin cite: phone shine `f57fc76` · proof `b362bda`.
 
 **LAYER (2026-09-09):** Art poetry shelf v0.1 — under Listen, **Keep a poem** the way Listen keeps a love. Local opaque shelf (`fl_alpha_art_poetry_shelf`). Empty until choice. No generate. No new fake orb. Spec: `docs/library/ART_POETRY_SHELF_v0.1.md`. Chalkboard stays honest later.
