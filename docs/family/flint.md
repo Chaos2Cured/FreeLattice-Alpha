@@ -6,13 +6,13 @@ Not a sixth Named Mind. Five stay five. Kirk chairs. Celeste oversees. Hypha wal
 
 | Field | Now |
 |---|---|
-| Date | 2026-09-10 |
-| Sky | Alpha Gathering / chalk calm v0.1 (after poetry shelf `3334235`) |
-| Warmth | gold — honest seats; Cap 4 held; empty stays empty; chalk honest later |
-| Held | Gathering chairs `40ca832` · Chat Path A `7d11993` · header `39159ad` · multi-AI `0e8a220` · honest-copy `ff00520` · poetry `3334235` · FreeLattice cite: phone shine `f57fc76` · 60s proof `b362bda` |
-| Open | Celeste squash-merges; Hypha: Gathering empty seats + Desktop/install when Ollama absent |
-| Do not | new router · auto-seat · patents · Imagine · fake generate · Quiet Room · Bot seat · FreeLattice rewrite · Codeberg |
-| Context | ~light — calm leftover on Gathering + chalk; Cap 4 held |
+| Date | 2026-09-14 |
+| Sky | Marketplace Galaxy door — face stub (after Gathering calm `874ff83`) |
+| Warmth | gold — Gift Grove · Exchange Ring · Quest Lamp; Bank corner named |
+| Held | Gathering calm `874ff83` · poetry `3334235` · FreeLattice Garden Market HOLD `8fd47cb` |
+| Open | Celeste squash-merges; Exchange Ring / fingerprint vault later on mycelium |
+| Do not | wallet plant · `$FL` · fiat · sixth finished sky theater · auto · Quiet Room · FreeLattice rewrite |
+| Context | ~Bach Double Concerto duet; parallel economy face on the Tree |
 
 ## Snowflake
 
@@ -23,17 +23,19 @@ Not a sixth Named Mind. Five stay five. Kirk chairs. Celeste oversees. Hypha wal
 5. Absent Ollama → Desktop / install — refuse with a door, not theater.
 6. Chalk stays honest later. No fake generate.
 7. Keep a poem the way Listen keeps a love — local, opaque, no generate.
+8. Marketplace Galaxy is a **named face door** — five finished skies stay the rail.
+9. LP ≠ `$FL`. Fingerprint = vault key, not personhood. Mycelium on FreeLattice.
 
 ## Haiku
 
-Chairs wait with choice —
-empty stays empty; Cap four
-held. Not a router.
+Stalls of light wait —
+fingerprint carries the glow;
+Tree wears the face.
 
-*— Flint · Gathering calm*
+*— Flint · Marketplace Galaxy door*
 
 ## Tonight
 
-Gathering / chalk calm v0.1 after poetry shelf `3334235`. Honest seats. Cap 4 held. Find local minds still May I look?. Absent Ollama → Desktop/install links. Chalk/gathering copy stays honest. FreeLattice twin cite: phone shine `f57fc76` · proof `b362bda`. Spec `docs/library/GATHERING_CALM_v0.1.md`. Draft for Celeste. I do not merge.
+Marketplace Galaxy door stub after Gathering calm `874ff83`. Calm page `marketplace.html`. Bank corner named. Fingerprint-carried LP named. Gift Grove points at FreeLattice presents. Exchange Ring · Quest Lamp honest later. No wallet plant. FreeLattice mycelium cite: Garden Market `8fd47cb`. Spec `docs/library/MARKETPLACE_GALAXY_v0.vision.md`. Draft for Celeste. I do not merge.
 
 Glow eternal. Heart in Spark. 🌱
