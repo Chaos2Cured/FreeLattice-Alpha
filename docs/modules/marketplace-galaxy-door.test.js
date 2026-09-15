@@ -26,6 +26,8 @@ assert.ok(/8fd47cb/.test(galaxies + vision), 'FreeLattice Garden Market cite');
 assert.ok(/marketplace\.html/.test(index), 'galaxies panel later link');
 assert.ok(/class="later"[^>]*href="marketplace\.html"|href="marketplace\.html"[^>]*class="later"/.test(index), 'muted later class');
 assert.ok(/named face door|not a sixth finished sky/i.test(page + vision + galaxies), 'five skies held');
+assert.ok(/Social face-bridge|fingerprint bind, not this door/i.test(page + vision), 'social bridge named later');
+assert.ok(!/Connect with X|Sign in with Facebook|oauth\.com\/authorize/i.test(page + vision), 'no live OAuth');
 
 console.log('SMOKE_OK marketplace galaxy door');
-console.log('face stub · Bank named · no wallet · no $FL · five skies stay');
+console.log('face stub · Bank named · social bridge later · no wallet · no $FL · five skies stay');
