@@ -10,6 +10,8 @@ Layers on Art-early Listen (`music.html`), [GALAXIES.md](../GALAXIES.md), honest
 
 ---
 
+**LAYER (2026-09-15):** FreeLattice poetry braid wall cousin — https://freelattice.com/poetry.html · [POETRY_BRAID_WALL](https://freelattice.com/library/POETRY_BRAID_WALL_v0.vision.md).
+
 ## Why
 
 Art already locked: Listen real; Chalkboard / a who later; no fake generate.
