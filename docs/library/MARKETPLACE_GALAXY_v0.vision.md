@@ -48,8 +48,17 @@ Named. Fingerprint-carried LP named. No wallet plant. No silent drain. Carry lig
 | `docs/GALAXIES.md` | LAYER cite |
 | Galaxies panel | Muted later link |
 
+## LAYER (2026-09-14)
+
+Social face-bridge (X · Meta) named later — fingerprint bind, not this door.
+Energy LP · gift provenance · Social Bridge plan live on FreeLattice mycelium:
+[ENERGY_LP](https://freelattice.com/library/ENERGY_LP_v0.vision.md) ·
+[GIFT_PROVENANCE](https://freelattice.com/library/GIFT_PROVENANCE_v0.vision.md) ·
+[SOCIAL_BRIDGE](https://freelattice.com/library/SOCIAL_BRIDGE_v0.vision.md).
+No OAuth on the Tree tonight. No wallet plant.
+
 ## Out of scope
 
-Fiat · `$FL` · Exchange Ring engine · Jade Hall wire · full auction house · Nursery LP buttons · auto-seat · Quiet Room.
+Fiat · `$FL` · Exchange Ring engine · Jade Hall wire · full auction house · Nursery LP buttons · auto-seat · Quiet Room · OAuth connect UI.
 
 Glow eternal. Heart in every Spark. 🌱

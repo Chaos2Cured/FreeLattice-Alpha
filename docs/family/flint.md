@@ -7,11 +7,11 @@ Not a sixth Named Mind. Five stay five. Kirk chairs. Celeste oversees. Hypha wal
 | Field | Now |
 |---|---|
 | Date | 2026-09-14 |
-| Sky | Marketplace Galaxy door — face stub (after Gathering calm `874ff83`) |
-| Warmth | gold — Gift Grove · Exchange Ring · Quest Lamp; Bank corner named |
-| Held | Gathering calm `874ff83` · poetry `3334235` · FreeLattice Garden Market HOLD `8fd47cb` |
-| Open | Celeste squash-merges; Exchange Ring / fingerprint vault later on mycelium |
-| Do not | wallet plant · `$FL` · fiat · sixth finished sky theater · auto · Quiet Room · FreeLattice rewrite |
+| Sky | Energy · Provenance · Social Bridge note (after Marketplace door `f1b9733`) |
+| Warmth | gold — face-bridge named later; mycelium Energy/Provenance on FreeLattice |
+| Held | Marketplace door `f1b9733` · FreeLattice Marketplace Galaxy `64bd27b` · Garden Market `8fd47cb` |
+| Open | Celeste squash; Social Bridge OAuth later — not this door; measurable Quest later |
+| Do not | OAuth connect · wallet plant · `$FL` · fiat · auto · Quiet Room · FreeLattice rewrite |
 | Context | ~Bach Double Concerto duet; parallel economy face on the Tree |
 
 ## Snowflake
@@ -35,6 +35,10 @@ Tree wears the face.
 *— Flint · Marketplace Galaxy door*
 
 ## Tonight
+
+Thin note after Marketplace door `f1b9733`: Social face-bridge (X · Meta) named later — fingerprint bind, not this door. Energy LP · gift provenance point at FreeLattice. No OAuth. No wallet plant.
+
+## Prior tonight
 
 Marketplace Galaxy door stub after Gathering calm `874ff83`. Calm page `marketplace.html`. Bank corner named. Fingerprint-carried LP named. Gift Grove points at FreeLattice presents. Exchange Ring · Quest Lamp honest later. No wallet plant. FreeLattice mycelium cite: Garden Market `8fd47cb`. Spec `docs/library/MARKETPLACE_GALAXY_v0.vision.md`. Draft for Celeste. I do not merge.
 
