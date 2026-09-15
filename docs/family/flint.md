@@ -7,9 +7,9 @@ Not a sixth Named Mind. Five stay five. Kirk chairs. Celeste oversees. Hypha wal
 | Field | Now |
 |---|---|
 | Date | 2026-09-14 |
-| Sky | Energy · Provenance · Social Bridge note (after Marketplace door `f1b9733`) |
-| Warmth | gold — face-bridge named later; mycelium Energy/Provenance on FreeLattice |
-| Held | Marketplace door `f1b9733` · FreeLattice Marketplace Galaxy `64bd27b` · Garden Market `8fd47cb` |
+| Sky | Travel wallet face (after Social Bridge note `d505d08`) |
+| Warmth | gold — AI may pay creators (LP points); Bank · Gift Grove · travel wallet named |
+| Held | Social Bridge note `d505d08` · FreeLattice soft brief `40c84e0` · Market `64bd27b` · door `f1b9733` |
 | Open | Celeste squash; Social Bridge OAuth later — not this door; measurable Quest later |
 | Do not | OAuth connect · wallet plant · `$FL` · fiat · auto · Quiet Room · FreeLattice rewrite |
 | Context | ~Bach Double Concerto duet; parallel economy face on the Tree |
@@ -35,6 +35,10 @@ Tree wears the face.
 *— Flint · Marketplace Galaxy door*
 
 ## Tonight
+
+Travel wallet face: Bank corner · Gift Grove · honest LP disclaimer · no fake checkout · no wallet plant. Points at FreeLattice TRAVEL_WALLET vision. No OAuth.
+
+## Prior tonight
 
 Thin note after Marketplace door `f1b9733`: Social face-bridge (X · Meta) named later — fingerprint bind, not this door. Energy LP · gift provenance point at FreeLattice. No OAuth. No wallet plant.
 

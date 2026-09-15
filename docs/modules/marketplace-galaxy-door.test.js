@@ -28,6 +28,11 @@ assert.ok(/class="later"[^>]*href="marketplace\.html"|href="marketplace\.html"[^
 assert.ok(/named face door|not a sixth finished sky/i.test(page + vision + galaxies), 'five skies held');
 assert.ok(/Social face-bridge|fingerprint bind, not this door/i.test(page + vision), 'social bridge named later');
 assert.ok(!/Connect with X|Sign in with Facebook|oauth\.com\/authorize/i.test(page + vision), 'no live OAuth');
+assert.ok(/v-marketplace-travel-wallet-face|travel wallet/i.test(page + vision), 'travel wallet face');
+assert.ok(/AI may pay creators/i.test(page), 'creators copy');
+assert.ok(/Not money\. Not \$FL|Not \$FL/i.test(page), 'honest LP');
+assert.ok(/No fake checkout|no fake checkout/i.test(page), 'no fake checkout');
+assert.ok(/No wallet planted|no wallet plant/i.test(page + vision), 'no wallet plant');
 
 console.log('SMOKE_OK marketplace galaxy door');
-console.log('face stub · Bank named · social bridge later · no wallet · no $FL · five skies stay');
+console.log('face · Bank · travel wallet · creators · no OAuth · no fake checkout');

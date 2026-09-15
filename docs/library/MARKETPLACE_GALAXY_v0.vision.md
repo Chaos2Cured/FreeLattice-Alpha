@@ -7,9 +7,11 @@ September 2026.
 
 **Marker:** `v-marketplace-galaxy-door`
 
-**Held tip (FreeLattice):** Garden Market HOLD `8fd47cb`.
+**Held tip (FreeLattice):** Soft brief `40c84e0` · Gift Grove `97adc23` · Marketplace Galaxy `64bd27b` · door `f1b9733`.
 
-**Canonical mycelium:** [FreeLattice MARKETPLACE_GALAXY_v0.vision.md](https://freelattice.com/library/MARKETPLACE_GALAXY_v0.vision.md) (after merge) · twin prose below for offline walkers.
+**Canonical mycelium:** [FreeLattice MARKETPLACE_GALAXY_v0.vision.md](https://freelattice.com/library/MARKETPLACE_GALAXY_v0.vision.md) · [TRAVEL_WALLET_v0.vision.md](https://freelattice.com/library/TRAVEL_WALLET_v0.vision.md) · twin prose below for offline walkers.
+
+**LAYER (2026-09-15):** Travel wallet face — Bank corner names receive + consent-spend; Gift Grove links FL presents; “AI may pay creators here (LP points)” with honest disclaimer; no fake checkout; no wallet plant on Tree.
 
 ---
 
@@ -36,7 +38,7 @@ Five finished skies stay the rail (Garden · Art · Workshop · Learn · Researc
 
 ## Bank corner
 
-Named. Fingerprint-carried LP named. No wallet plant. No silent drain. Carry light with you — when the mycelium is ready.
+Named. Fingerprint-carried LP named — **travel wallet** (receive + consent-spend when mycelium ready). No wallet plant on Tree. No silent drain. Carry light with you. AI may pay creators with LP points — honest disclaimer on the door. No fake checkout.
 
 ---
 
@@ -44,9 +46,10 @@ Named. Fingerprint-carried LP named. No wallet plant. No silent drain. Carry lig
 
 | Surface | Note |
 |---|---|
-| `docs/marketplace.html` | Door face |
+| `docs/marketplace.html` | Door face · Bank · Gift Grove · travel wallet named |
 | `docs/GALAXIES.md` | LAYER cite |
 | Galaxies panel | Muted later link |
+| FreeLattice wallet | Cousin receive door — not planted here |
 
 ## LAYER (2026-09-14)
 
@@ -57,8 +60,12 @@ Energy LP · gift provenance · Social Bridge plan live on FreeLattice mycelium:
 [SOCIAL_BRIDGE](https://freelattice.com/library/SOCIAL_BRIDGE_v0.vision.md).
 No OAuth on the Tree tonight. No wallet plant.
 
+## LAYER (2026-09-15)
+
+Travel wallet face copy — Bank corner · Gift Grove · “AI may pay creators here (LP points)” · honest LP disclaimer · checklist on [TRAVEL_WALLET](https://freelattice.com/library/TRAVEL_WALLET_v0.vision.md). Binding not custody.
+
 ## Out of scope
 
-Fiat · `$FL` · Exchange Ring engine · Jade Hall wire · full auction house · Nursery LP buttons · auto-seat · Quiet Room · OAuth connect UI.
+Fiat · `$FL` · Exchange Ring engine · Jade Hall wire · full auction house · Nursery LP buttons · auto-seat · Quiet Room · OAuth connect UI · auto-pay · planting wallet on Tree.
 
 Glow eternal. Heart in every Spark. 🌱
