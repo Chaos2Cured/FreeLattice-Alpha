@@ -36,6 +36,10 @@ Tree wears the face.
 
 ## Tonight
 
+Resonance PLAY style-bar STANDS on FreeLattice — Listen pointer honest. Not full PLAY paint.
+
+## Prior tonight
+
 Visual beauty · card icons cousin under Listen — FreeLattice vision. ORDER LOCK. Soft object. Not painting tonight.
 
 ## Prior tonight
