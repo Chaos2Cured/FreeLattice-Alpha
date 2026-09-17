@@ -390,14 +390,26 @@
     return '';
   }
 
-  function postChat(url, model, msgs) {
+  // Soft layer: optional AbortSignal (Workshop Ask Stop · choice, not a short kill-timer).
+  // Existing 120s safety stays secondary. External Stop aborts the same controller.
+  function postChat(url, model, msgs, signal) {
     var payload = {
       model: model || '',
       messages: msgs,
       stream: false
     };
     var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var external = signal || null;
     var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 120000);
+    if (external && ctrl) {
+      if (external.aborted) {
+        try { ctrl.abort(); } catch (e0) {}
+      } else if (typeof external.addEventListener === 'function') {
+        external.addEventListener('abort', function () {
+          try { ctrl.abort(); } catch (e1) {}
+        });
+      }
+    }
     var opts = {
       method: 'POST',
       mode: 'cors',
@@ -425,6 +437,12 @@
     }).catch(function (err) {
       clearTimeout(timer);
       if (err && err.reason) throw err;
+      if (err && err.name === 'AbortError' && external && external.aborted) {
+        var stopped = new Error('stopped');
+        stopped.reason = 'stopped';
+        stopped.stopped = true;
+        throw stopped;
+      }
       if (looksBlocked(err) || (err && err.name === 'AbortError')) {
         var blocked = new Error('blocked');
         blocked.blocked = true;
@@ -434,7 +452,8 @@
     });
   }
 
-  function sendToMind(mind, msgs) {
+  // Optional third arg: AbortSignal. Callers that omit it behave as before.
+  function sendToMind(mind, msgs, signal) {
     var urls = talkUrls(mind);
     if (!urls.length) {
       return Promise.reject({ blocked: true });
@@ -450,8 +469,8 @@
         chain = chain.then(function (prev) {
           if (prev) return prev;
           if (skipOllama) return null;
-          return postChat(url, model, msgs).catch(function (err) {
-            if (err && (err.blocked || err.reason === 'quiet')) throw err;
+          return postChat(url, model, msgs, signal).catch(function (err) {
+            if (err && (err.blocked || err.stopped || err.reason === 'quiet' || err.reason === 'stopped')) throw err;
             return null;
           });
         });
