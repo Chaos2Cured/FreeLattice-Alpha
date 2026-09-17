@@ -4,6 +4,8 @@
 
 **Spine layer (2026-08-30):** five skies now walk the same night — Garden, Art, Workshop, Learn, Research. The four-galaxy sequence below stays. Art-early stays. This file layers; it does not cut.
 
+**LAYER (2026-09-17 overnight · joy face):** Soft Alpha joy face (marker `v-alpha-joy-face-v0`). FreeLattice **Vision board** + **Chalkboard** sister drafted on mycelium — Listen pointers only (FL #92 / #93); Alpha does **not** port those rooms tonight. Workshop porch twin draft #78 awaits Kirk (soft cite · do not restack). Joy both sides of the glass: Settings / Chat fail-closed strips stay honest; long local thinks valid; Stop is choice. Listen leftovers only — no kitchen dump. Spec: `docs/library/ALPHA_JOY_FACE_v0.md`.
+
 **LAYER (2026-09-17):** Listen — Hang Cancel + Adaptive (mycelium · marker `v-alpha-listen-hang-adaptive-v0`). FreeLattice Chat: **Hang Cancel** — Stop only · no duration kill · `v-chat-hang-cancel-v0` · tip `d14eaf8` / #87. **Adaptive Context Depth** — Surface / Standard / Deep under Smart · `v-adaptive-context-depth-v0` · tip `06d0ba4` / #85. Alpha stays Listen / fail-closed — **no second context kitchen** tonight. Long local thinks are valid; Stop is choice, not a timer. Market-beside-Feel pointer stays. Presence chips ≠ SKUs. Workshop benches still wait for the FreeLattice Workshop twin — grandmother honesty, not rebuild tonight.
 
 **LAYER (2026-09-16):** Listen pointer — FreeLattice Chat ships Marketplace expand **beside** Feel (Weft sibling PASS · marker `v-marketplace-expand-beside-feel-v0`). Alpha stays honest pointer-only: Galaxy door `docs/marketplace.html` · this file. Do **not** dump Galaxy into chat presence. Presence chips ≠ SKUs. Mycelium cite when Feel tip / Market sibling land on freelattice.com.
