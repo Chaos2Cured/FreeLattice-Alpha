@@ -25,6 +25,11 @@
 //   sandbox allow-scripts only. Mycelium from FreeLattice porch
 //   694ec2e / #91 (v-workshop-porch-v0). Not a Create/Code/Projects kitchen.
 //
+// v-gathering-grokhome-cortex-v0 — Workshop cortex routes among seated
+//   Gathering specialists only (cortex/memory/continuity/dream). @override ·
+//   keywords · speakingChair · first seated · else fail-closed. Ask-as chip.
+//   Prepare-commit Copy/Download scaffold — git default OFF · no auto-commit.
+//
 // Mirror: docs/code-workshop.html  (read that FIRST)
 // ═══════════════════════════════════════════════════════════════
 
@@ -75,11 +80,121 @@
     'If you write code, prefer a complete HTML document so it can run in a sandbox. ' +
     'If you cannot, say so in words. Do not invent a mind. Do not invent a galaxy. ' +
     'Do not use stage directions. Just the code, or honest words.';
+  var SPECIALISTS = ['cortex', 'memory', 'continuity', 'dream'];
+  var HEART_SEAT_FIRST =
+    'Seat a mind in The Gathering first (cortex · memory · continuity · dream). Cortex only asks among seated binds — never a dump.';
 
   var hostEl = null;
   var busy = false;
   var askAbort = null;
   var askToken = 0;
+
+  function seatedBinds() {
+    if (!window.LocalMindProbe || typeof LocalMindProbe.getRemembered !== 'function') return {};
+    var entry = LocalMindProbe.getRemembered() || {};
+    return entry.gatheringBinds && typeof entry.gatheringBinds === 'object' ? entry.gatheringBinds : {};
+  }
+
+  function speakingChairId() {
+    if (!window.LocalMindProbe || typeof LocalMindProbe.getRemembered !== 'function') return '';
+    var entry = LocalMindProbe.getRemembered() || {};
+    return String(entry.speakingChair || '');
+  }
+
+  function bindToMind(chairId, bind) {
+    if (!bind || !bind.url) return null;
+    return {
+      name: (window.LocalMindProbe && LocalMindProbe.shortModelName
+        ? LocalMindProbe.shortModelName(bind.model) : String(bind.model || 'mind')) + ' (' + (bind.tag || chairId) + ')',
+      url: bind.url,
+      model: bind.model,
+      models: bind.model ? [bind.model] : [],
+      fromChair: chairId,
+      tag: bind.tag || chairId,
+      specialist: chairId
+    };
+  }
+
+  // Cortex router — only among seated Gathering specialists (Cap 4 · never auto-seat)
+  function routeAsk(text, askAs) {
+    var binds = seatedBinds();
+    var seatedIds = SPECIALISTS.filter(function (id) { return !!(binds[id] && binds[id].url); });
+    if (!seatedIds.length) {
+      return { ok: false, reason: 'none-seated', message: HEART_SEAT_FIRST };
+    }
+
+    var chosen = '';
+    var how = '';
+    var raw = String(text || '');
+    var asMode = String(askAs || 'auto').toLowerCase();
+
+    if (asMode && asMode !== 'auto' && SPECIALISTS.indexOf(asMode) !== -1) {
+      chosen = asMode;
+      how = 'ask-as';
+    }
+
+    if (!chosen) {
+      var at = raw.match(/@(cortex|memory|continuity|dream)\b/i);
+      if (at && seatedIds.indexOf(at[1].toLowerCase()) !== -1) {
+        chosen = at[1].toLowerCase();
+        how = 'override';
+      }
+    }
+
+    if (!chosen) {
+      var lower = raw.toLowerCase();
+      if (/\b(code|build|fix|bug|sandbox|html|css|js)\b/.test(lower) && seatedIds.indexOf('cortex') !== -1) {
+        chosen = 'cortex'; how = 'keyword';
+      } else if (/\b(remember|recall|memory|earlier|history)\b/.test(lower) && seatedIds.indexOf('memory') !== -1) {
+        chosen = 'memory'; how = 'keyword';
+      } else if (/\b(plan|git|commit|path|continue|continuity)\b/.test(lower) && seatedIds.indexOf('continuity') !== -1) {
+        chosen = 'continuity'; how = 'keyword';
+      } else if (/\b(poem|spark|dream|imagine|story)\b/.test(lower) && seatedIds.indexOf('dream') !== -1) {
+        chosen = 'dream'; how = 'keyword';
+      }
+    }
+
+    if (!chosen) {
+      var speaking = speakingChairId();
+      if (speaking && seatedIds.indexOf(speaking) !== -1) {
+        chosen = speaking;
+        how = 'speaking';
+      }
+    }
+
+    if (!chosen) {
+      chosen = seatedIds[0];
+      how = 'first-seated';
+    }
+
+    if (!chosen || seatedIds.indexOf(chosen) === -1) {
+      return { ok: false, reason: 'none-seated', message: HEART_SEAT_FIRST };
+    }
+
+    var mind = bindToMind(chosen, binds[chosen]);
+    if (!mind) return { ok: false, reason: 'none-seated', message: HEART_SEAT_FIRST };
+    return {
+      ok: true,
+      chair: chosen,
+      how: how,
+      mind: mind,
+      label: 'Asking · ' + chosen + ' · ' + (mind.tag || 'mind')
+    };
+  }
+
+  function prepareCommitScaffold(padText, meta) {
+    meta = meta || {};
+    var body = [
+      '# Prepare commit (scaffold · git OFF · no silent push)',
+      '# Marker: v-gathering-grokhome-cortex-v0',
+      '# Route: ' + (meta.route || 'unspecified'),
+      '# Asked: ' + (meta.asked || ''),
+      '# Fingerprint / double-hash / human confirm — later path (see AUTONOMOUS_COMMIT_PATH_v0.md)',
+      '',
+      String(padText || '')
+    ].join('\n');
+    return body;
+  }
 
   function el(tag, className, text) {
     var node = document.createElement(tag);
@@ -344,15 +459,44 @@
     var runBtn = el('button', 'workshop-benches-act', 'Run');
     runBtn.type = 'button';
     runBtn.setAttribute('data-workshop-run', '1');
+    // Ask-as · Auto / Cortex / Memory / Continuity / Dream (seated only at ask time)
+    var askAs = document.createElement('select');
+    askAs.className = 'workshop-ask-as';
+    askAs.setAttribute('data-workshop-ask-as', '1');
+    askAs.setAttribute('aria-label', 'Ask as specialist');
+    ['auto', 'cortex', 'memory', 'continuity', 'dream'].forEach(function (id) {
+      var opt = document.createElement('option');
+      opt.value = id;
+      opt.textContent = id === 'auto' ? 'Ask-as · Auto' : 'Ask-as · ' + id;
+      askAs.appendChild(opt);
+    });
+    var askingChip = el('span', 'workshop-asking-chip', 'Asking · —');
+    askingChip.setAttribute('data-workshop-asking', '1');
     // Layer: Ask and Run on their own row so the input cannot eat them
     // on the 1280 sky. Same Ask. Same Run. Not a second pair.
     var askActs = el('div', 'workshop-ask-acts');
     askActs.setAttribute('data-workshop-ask-acts', '1');
+    askActs.appendChild(askAs);
     askActs.appendChild(askBtn);
     askActs.appendChild(runBtn);
     askForm.appendChild(askInput);
     askForm.appendChild(askActs);
+    askForm.appendChild(askingChip);
     bench.appendChild(askForm);
+
+    // Prepare commit scaffold — Copy / Download only (git default OFF · no silent push)
+    var prep = el('div', 'workshop-prepare');
+    prep.setAttribute('data-workshop-prepare', '1');
+    prep.appendChild(el('span', 'workshop-prepare-label', 'Prepare commit'));
+    var copyPrep = el('button', 'workshop-benches-act', 'Copy scaffold');
+    copyPrep.type = 'button';
+    copyPrep.setAttribute('data-workshop-prep-copy', '1');
+    var dlPrep = el('button', 'workshop-benches-act', 'Download scaffold');
+    dlPrep.type = 'button';
+    dlPrep.setAttribute('data-workshop-prep-download', '1');
+    prep.appendChild(copyPrep);
+    prep.appendChild(dlPrep);
+    bench.appendChild(prep);
 
     // v-alpha-workshop-porch-twin-v0 — example chips fill Ask (grandmother-calm)
     var chips = el('div', 'workshop-porch-chips');
@@ -656,14 +800,23 @@
     askForm.addEventListener('submit', function (ev) {
       ev.preventDefault();
       if (busy) return;
-      var nowMind = listener();
-      if (!nowMind || root.classList.contains('is-closed')) {
+      if (root.classList.contains('is-closed')) {
         setOpen(false);
         return;
       }
       var ask = (askInput.value || '').trim();
       var code = (pad.value || '').trim();
       if (!ask && !code) return;
+
+      var routed = routeAsk(ask || code, askAs.value || 'auto');
+      if (!routed.ok) {
+        askingChip.textContent = 'Asking · —';
+        setStatus(routed.message || HEART_SEAT_FIRST, true);
+        return;
+      }
+      var nowMind = routed.mind;
+      askingChip.textContent = routed.label;
+      setStatus(routed.label + ' · ' + (routed.how || 'route'), false);
 
       var human = ask || 'Please look at this code.';
       if (code) human += '\n\nCode on the bench:\n' + code;
@@ -682,10 +835,10 @@
       askAbort = typeof AbortController !== 'undefined' ? new AbortController() : null;
       var signal = askAbort ? askAbort.signal : undefined;
       setAskStopFace();
-      setStatus(HEART_THINK, false);
+      setStatus(HEART_THINK + ' · ' + routed.label, false);
 
       send(nowMind, [
-        { role: 'system', content: ASK_SYSTEM },
+        { role: 'system', content: ASK_SYSTEM + ' You are the ' + routed.chair + ' specialist at this Gathering chair.' },
         { role: 'user', content: human }
       ], signal).then(function (reply) {
         if (myToken !== askToken) return; // ignore late resolve after Stop
@@ -696,7 +849,7 @@
           savePad(got.code);
           pushHistory(promptForHistory, got.code);
           renderHistory();
-          setStatus('The mind wrote. Nothing was invented. Run when you are ready.', false);
+          setStatus('The ' + routed.chair + ' mind wrote. Nothing was invented. Run when you are ready.', false);
         } else if (got.words) {
           setStatus(got.words, false);
         } else {
@@ -717,6 +870,49 @@
         }
         setStatus(speakHonest(reason), true);
       });
+    });
+
+    copyPrep.addEventListener('click', function () {
+      var scaffold = prepareCommitScaffold(pad.value, {
+        route: askingChip.textContent || '',
+        asked: (askInput.value || '').trim()
+      });
+      function ok() { setStatus('Scaffold copied. Git stays OFF until a real door exists.', false); }
+      function fail() { setStatus('Could not copy. Try Download scaffold.', true); }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(scaffold).then(ok, fail);
+      } else {
+        try {
+          var ta = document.createElement('textarea');
+          ta.value = scaffold;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          ok();
+        } catch (e) { fail(); }
+      }
+    });
+
+    dlPrep.addEventListener('click', function () {
+      var scaffold = prepareCommitScaffold(pad.value, {
+        route: askingChip.textContent || '',
+        asked: (askInput.value || '').trim()
+      });
+      try {
+        var blob = new Blob([scaffold], { type: 'text/plain;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'workshop-prepare-commit-' + Date.now() + '.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        setStatus('Scaffold downloaded. No silent push. Git default OFF.', false);
+      } catch (e) {
+        setStatus('Download failed gently.', true);
+      }
     });
 
     container.appendChild(root);
@@ -751,15 +947,21 @@
     loadHistory: loadHistory,
     pushHistory: pushHistory,
     clearHistoryConsent: clearHistoryConsent,
+    routeAsk: routeAsk,
+    prepareCommitScaffold: prepareCommitScaffold,
+    seatedBinds: seatedBinds,
+    SPECIALISTS: SPECIALISTS,
     GIT_PUSH_KEY: GIT_PUSH_KEY,
     HISTORY_KEY: HISTORY_KEY,
     SANDBOX: SANDBOX,
     EXAMPLE_CHIPS: EXAMPLE_CHIPS,
     porchMarker: 'v-alpha-workshop-porch-twin-v0',
+    cortexMarker: 'v-gathering-grokhome-cortex-v0',
     HEART_NONE: HEART_NONE,
     HEART_LATER: HEART_LATER,
     HEART_STOP: HEART_STOP,
     HEART_THINK: HEART_THINK,
+    HEART_SEAT_FIRST: HEART_SEAT_FIRST,
     GIT_OFF: GIT_OFF,
     GIT_ON: GIT_ON,
     GIT_NO_DOOR: GIT_NO_DOOR,

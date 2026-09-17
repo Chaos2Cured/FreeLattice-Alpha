@@ -1938,6 +1938,28 @@ html.room-page .settings-star-pick,
   padding: 4px 2px;
 }
 
+/* v-gathering-grokhome-cortex-v0 — longer thread like Grok home */
+.thread-messages.is-grokhome-scroll {
+  max-height: min(58vh, 36em);
+}
+.thread-answered {
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: rgba(167, 139, 250, 0.75);
+  font-family: Georgia, 'Times New Roman', serif;
+}
+.thread-send.is-stop {
+  background: rgba(244, 114, 182, 0.12);
+  border-color: rgba(244, 114, 182, 0.45);
+  color: #f472b6;
+  cursor: pointer;
+}
+.thread-send.is-stop:disabled,
+.thread-send.is-stop[aria-disabled="true"] {
+  opacity: 1;
+  cursor: pointer;
+}
+
 .thread-line {
   display: flex;
   flex-direction: column;
@@ -2833,6 +2855,42 @@ html[data-garden-galaxy="workshop"] #gardenContainer canvas {
   background: rgba(244, 114, 182, 0.14);
   border-color: rgba(244, 114, 182, 0.45);
   color: #f472b6;
+}
+/* v-gathering-grokhome-cortex-v0 — Ask-as · Asking chip · Prepare scaffold */
+.workshop-ask-as {
+  background: rgba(12, 10, 26, 0.55);
+  border: 1px solid rgba(200, 210, 230, 0.16);
+  border-radius: 8px;
+  color: rgba(200, 210, 230, 0.85);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.78rem;
+  padding: 8px 10px;
+  min-height: 40px;
+}
+.workshop-asking-chip {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: rgba(167, 139, 250, 0.85);
+  font-family: Georgia, 'Times New Roman', serif;
+}
+.workshop-prepare {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 8px 0 0;
+  border-top: 1px solid rgba(200, 210, 230, 0.08);
+}
+.workshop-prepare-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(200, 210, 230, 0.45);
+  font-family: Georgia, 'Times New Roman', serif;
+  margin-right: 4px;
 }
 .workshop-history {
   margin: 0 0 10px;
