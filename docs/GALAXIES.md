@@ -4,6 +4,8 @@
 
 **Spine layer (2026-08-30):** five skies now walk the same night — Garden, Art, Workshop, Learn, Research. The four-galaxy sequence below stays. Art-early stays. This file layers; it does not cut.
 
+**LAYER (2026-09-17):** Listen — Hang Cancel + Adaptive (mycelium · marker `v-alpha-listen-hang-adaptive-v0`). FreeLattice Chat: **Hang Cancel** — Stop only · no duration kill · `v-chat-hang-cancel-v0` · tip `d14eaf8` / #87. **Adaptive Context Depth** — Surface / Standard / Deep under Smart · `v-adaptive-context-depth-v0` · tip `06d0ba4` / #85. Alpha stays Listen / fail-closed — **no second context kitchen** tonight. Long local thinks are valid; Stop is choice, not a timer. Market-beside-Feel pointer stays. Presence chips ≠ SKUs. Workshop benches still wait for the FreeLattice Workshop twin — grandmother honesty, not rebuild tonight.
+
 **LAYER (2026-09-16):** Listen pointer — FreeLattice Chat ships Marketplace expand **beside** Feel (Weft sibling PASS · marker `v-marketplace-expand-beside-feel-v0`). Alpha stays honest pointer-only: Galaxy door `docs/marketplace.html` · this file. Do **not** dump Galaxy into chat presence. Presence chips ≠ SKUs. Mycelium cite when Feel tip / Market sibling land on freelattice.com.
 
 **LAYER (2026-09-15):** Travel wallet face — Bank · Gift Grove · AI may pay creators (LP points) · honest disclaimer · no fake checkout · no wallet plant. FreeLattice mycelium: TRAVEL_WALLET vision.
