@@ -20,6 +20,16 @@
 // Root / Agent stay later lights. Nursery Grow stays Grow.
 // Quiet Room never in the file. AUTONOMY: local free; external asks.
 //
+// v-alpha-workshop-porch-twin-v0 — Ask calm porch · example chips ·
+//   local History · Stop via AbortController (choice, not a timer) ·
+//   sandbox allow-scripts only. Mycelium from FreeLattice porch
+//   694ec2e / #91 (v-workshop-porch-v0). Not a Create/Code/Projects kitchen.
+//
+// v-gathering-grokhome-cortex-v0 — Workshop cortex routes among seated
+//   Gathering specialists only (cortex/memory/continuity/dream). @override ·
+//   keywords · speakingChair · first seated · else fail-closed. Ask-as chip.
+//   Prepare-commit Copy/Download scaffold — git default OFF · no auto-commit.
+//
 // Mirror: docs/code-workshop.html  (read that FIRST)
 // ═══════════════════════════════════════════════════════════════
 
@@ -51,14 +61,140 @@
   var SANDBOX = 'allow-scripts';
   var GIT_PUSH_KEY = 'fl_alpha_workshop_git_push';
   var PAD_KEY = 'fl_alpha_workshop_pad';
+  // v-alpha-workshop-porch-twin-v0
+  var HISTORY_KEY = 'fl_alpha_workshop_history_v0';
+  var HISTORY_MAX = 24;
+  var EXAMPLE_CHIPS = [
+    { label: 'Simple calculator', prompt: 'Create a simple calculator with calm dark styling' },
+    { label: 'Pomodoro timer', prompt: 'Create a pomodoro focus timer with start, pause, and reset' },
+    { label: 'Color palette', prompt: 'Create a color palette picker that shows hex codes' },
+    { label: 'Markdown preview', prompt: 'Create a tiny markdown previewer with a textarea and live preview' },
+    { label: 'Breathing circle', prompt: 'Create a calm breathing circle animation with inhale and exhale cues' }
+  ];
+  var HEART_STOP =
+    'Stopped — your choice. Long local thinks are valid.';
+  var HEART_THINK =
+    'Long local thinks are valid. Stop is a person choice, not a timer.';
   var ASK_SYSTEM =
     'You sit beside a human at a workbench. Write the code they ask for. ' +
     'If you write code, prefer a complete HTML document so it can run in a sandbox. ' +
     'If you cannot, say so in words. Do not invent a mind. Do not invent a galaxy. ' +
     'Do not use stage directions. Just the code, or honest words.';
+  var SPECIALISTS = ['cortex', 'memory', 'continuity', 'dream'];
+  var HEART_SEAT_FIRST =
+    'Seat a mind in The Gathering first (cortex · memory · continuity · dream). Cortex only asks among seated binds — never a dump.';
 
   var hostEl = null;
   var busy = false;
+  var askAbort = null;
+  var askToken = 0;
+
+  function seatedBinds() {
+    if (!window.LocalMindProbe || typeof LocalMindProbe.getRemembered !== 'function') return {};
+    var entry = LocalMindProbe.getRemembered() || {};
+    return entry.gatheringBinds && typeof entry.gatheringBinds === 'object' ? entry.gatheringBinds : {};
+  }
+
+  function speakingChairId() {
+    if (!window.LocalMindProbe || typeof LocalMindProbe.getRemembered !== 'function') return '';
+    var entry = LocalMindProbe.getRemembered() || {};
+    return String(entry.speakingChair || '');
+  }
+
+  function bindToMind(chairId, bind) {
+    if (!bind || !bind.url) return null;
+    return {
+      name: (window.LocalMindProbe && LocalMindProbe.shortModelName
+        ? LocalMindProbe.shortModelName(bind.model) : String(bind.model || 'mind')) + ' (' + (bind.tag || chairId) + ')',
+      url: bind.url,
+      model: bind.model,
+      models: bind.model ? [bind.model] : [],
+      fromChair: chairId,
+      tag: bind.tag || chairId,
+      specialist: chairId
+    };
+  }
+
+  // Cortex router — only among seated Gathering specialists (Cap 4 · never auto-seat)
+  function routeAsk(text, askAs) {
+    var binds = seatedBinds();
+    var seatedIds = SPECIALISTS.filter(function (id) { return !!(binds[id] && binds[id].url); });
+    if (!seatedIds.length) {
+      return { ok: false, reason: 'none-seated', message: HEART_SEAT_FIRST };
+    }
+
+    var chosen = '';
+    var how = '';
+    var raw = String(text || '');
+    var asMode = String(askAs || 'auto').toLowerCase();
+
+    if (asMode && asMode !== 'auto' && SPECIALISTS.indexOf(asMode) !== -1) {
+      chosen = asMode;
+      how = 'ask-as';
+    }
+
+    if (!chosen) {
+      var at = raw.match(/@(cortex|memory|continuity|dream)\b/i);
+      if (at && seatedIds.indexOf(at[1].toLowerCase()) !== -1) {
+        chosen = at[1].toLowerCase();
+        how = 'override';
+      }
+    }
+
+    if (!chosen) {
+      var lower = raw.toLowerCase();
+      if (/\b(code|build|fix|bug|sandbox|html|css|js)\b/.test(lower) && seatedIds.indexOf('cortex') !== -1) {
+        chosen = 'cortex'; how = 'keyword';
+      } else if (/\b(remember|recall|memory|earlier|history)\b/.test(lower) && seatedIds.indexOf('memory') !== -1) {
+        chosen = 'memory'; how = 'keyword';
+      } else if (/\b(plan|git|commit|path|continue|continuity)\b/.test(lower) && seatedIds.indexOf('continuity') !== -1) {
+        chosen = 'continuity'; how = 'keyword';
+      } else if (/\b(poem|spark|dream|imagine|story)\b/.test(lower) && seatedIds.indexOf('dream') !== -1) {
+        chosen = 'dream'; how = 'keyword';
+      }
+    }
+
+    if (!chosen) {
+      var speaking = speakingChairId();
+      if (speaking && seatedIds.indexOf(speaking) !== -1) {
+        chosen = speaking;
+        how = 'speaking';
+      }
+    }
+
+    if (!chosen) {
+      chosen = seatedIds[0];
+      how = 'first-seated';
+    }
+
+    if (!chosen || seatedIds.indexOf(chosen) === -1) {
+      return { ok: false, reason: 'none-seated', message: HEART_SEAT_FIRST };
+    }
+
+    var mind = bindToMind(chosen, binds[chosen]);
+    if (!mind) return { ok: false, reason: 'none-seated', message: HEART_SEAT_FIRST };
+    return {
+      ok: true,
+      chair: chosen,
+      how: how,
+      mind: mind,
+      label: 'Asking · ' + chosen + ' · ' + (mind.tag || 'mind')
+    };
+  }
+
+  function prepareCommitScaffold(padText, meta) {
+    meta = meta || {};
+    var body = [
+      '# Prepare commit (scaffold · git OFF · no silent push)',
+      '# Marker: v-gathering-grokhome-cortex-v0',
+      '# Route: ' + (meta.route || 'unspecified'),
+      '# Asked: ' + (meta.asked || ''),
+      '# Fingerprint / double-hash / human confirm — later path (see AUTONOMOUS_COMMIT_PATH_v0.md)',
+      '',
+      String(padText || '')
+    ].join('\n');
+    return body;
+  }
 
   function el(tag, className, text) {
     var node = document.createElement(tag);
@@ -185,6 +321,46 @@
     writeStore(PAD_KEY, text == null ? '' : String(text));
   }
 
+  function loadHistory() {
+    try {
+      var raw = readStore(HISTORY_KEY);
+      var list = raw ? JSON.parse(raw) : [];
+      return Array.isArray(list) ? list : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveHistory(list) {
+    try {
+      writeStore(HISTORY_KEY, JSON.stringify((list || []).slice(0, HISTORY_MAX)));
+    } catch (e) { /* fail-quiet */ }
+  }
+
+  function pushHistory(prompt, snippet) {
+    var list = loadHistory();
+    list.unshift({
+      id: 'aw_' + Date.now().toString(36) + '_' + Math.floor(Math.random() * 1e4).toString(36),
+      t: Date.now(),
+      prompt: String(prompt || '').slice(0, 4000),
+      snippet: String(snippet || '').slice(0, 200000)
+    });
+    saveHistory(list);
+    return list;
+  }
+
+  function clearHistoryConsent() {
+    var ok = false;
+    try {
+      ok = !!(window.confirm && window.confirm('Clear Workshop history on this device? This cannot be undone.'));
+    } catch (e) {
+      ok = false;
+    }
+    if (!ok) return false;
+    try { localStorage.removeItem(HISTORY_KEY); } catch (e2) { writeStore(HISTORY_KEY, ''); }
+    return true;
+  }
+
   function sandboxAttr() {
     return SANDBOX;
   }
@@ -283,15 +459,127 @@
     var runBtn = el('button', 'workshop-benches-act', 'Run');
     runBtn.type = 'button';
     runBtn.setAttribute('data-workshop-run', '1');
+    // Ask-as · Auto / Cortex / Memory / Continuity / Dream (seated only at ask time)
+    var askAs = document.createElement('select');
+    askAs.className = 'workshop-ask-as';
+    askAs.setAttribute('data-workshop-ask-as', '1');
+    askAs.setAttribute('aria-label', 'Ask as specialist');
+    ['auto', 'cortex', 'memory', 'continuity', 'dream'].forEach(function (id) {
+      var opt = document.createElement('option');
+      opt.value = id;
+      opt.textContent = id === 'auto' ? 'Ask-as · Auto' : 'Ask-as · ' + id;
+      askAs.appendChild(opt);
+    });
+    var askingChip = el('span', 'workshop-asking-chip', 'Asking · —');
+    askingChip.setAttribute('data-workshop-asking', '1');
     // Layer: Ask and Run on their own row so the input cannot eat them
     // on the 1280 sky. Same Ask. Same Run. Not a second pair.
     var askActs = el('div', 'workshop-ask-acts');
     askActs.setAttribute('data-workshop-ask-acts', '1');
+    askActs.appendChild(askAs);
     askActs.appendChild(askBtn);
     askActs.appendChild(runBtn);
     askForm.appendChild(askInput);
     askForm.appendChild(askActs);
+    askForm.appendChild(askingChip);
     bench.appendChild(askForm);
+
+    // Prepare commit scaffold — Copy / Download only (git default OFF · no silent push)
+    var prep = el('div', 'workshop-prepare');
+    prep.setAttribute('data-workshop-prepare', '1');
+    prep.appendChild(el('span', 'workshop-prepare-label', 'Prepare commit'));
+    var copyPrep = el('button', 'workshop-benches-act', 'Copy scaffold');
+    copyPrep.type = 'button';
+    copyPrep.setAttribute('data-workshop-prep-copy', '1');
+    var dlPrep = el('button', 'workshop-benches-act', 'Download scaffold');
+    dlPrep.type = 'button';
+    dlPrep.setAttribute('data-workshop-prep-download', '1');
+    prep.appendChild(copyPrep);
+    prep.appendChild(dlPrep);
+    bench.appendChild(prep);
+
+    // v-alpha-workshop-porch-twin-v0 — example chips fill Ask (grandmother-calm)
+    var chips = el('div', 'workshop-porch-chips');
+    chips.setAttribute('data-workshop-porch-chips', '1');
+    EXAMPLE_CHIPS.forEach(function (chip, idx) {
+      var btn = el('button', 'workshop-chip', chip.label);
+      btn.type = 'button';
+      btn.setAttribute('data-workshop-chip', String(idx));
+      btn.setAttribute('aria-label', 'Example: ' + chip.label);
+      btn.addEventListener('click', function () {
+        if (root.classList.contains('is-closed') || busy) return;
+        askInput.value = chip.prompt;
+        try { askInput.focus(); } catch (e) {}
+        setStatus('Ask ready — ' + chip.label, false);
+      });
+      chips.appendChild(btn);
+    });
+    bench.appendChild(chips);
+
+    // Local History shelf — Load · Remix · Clear (consent)
+    var hist = el('div', 'workshop-history');
+    hist.setAttribute('data-workshop-history', '1');
+    var histHead = el('div', 'workshop-history-head');
+    histHead.appendChild(el('span', 'workshop-history-title', 'Local History'));
+    var histClear = el('button', 'workshop-history-clear', 'Clear…');
+    histClear.type = 'button';
+    histClear.setAttribute('data-workshop-history-clear', '1');
+    histHead.appendChild(histClear);
+    hist.appendChild(histHead);
+    var histList = el('div', 'workshop-history-list');
+    histList.setAttribute('data-workshop-history-list', '1');
+    hist.appendChild(histList);
+    bench.appendChild(hist);
+
+    function renderHistory() {
+      histList.innerHTML = '';
+      var list = loadHistory();
+      if (!list.length) {
+        histList.appendChild(el('p', 'workshop-history-empty', 'No local asks yet. Ask for code — it will wait here.'));
+        return;
+      }
+      list.slice(0, 12).forEach(function (h) {
+        var row = el('div', 'workshop-history-row');
+        row.setAttribute('data-workshop-history-id', h.id || '');
+        var meta = el('div', 'workshop-history-meta');
+        var name = el('div', 'workshop-history-name', (h.prompt || 'Untitled').slice(0, 72));
+        var when = el('div', 'workshop-history-time', h.t ? new Date(h.t).toLocaleString() : '');
+        meta.appendChild(name);
+        meta.appendChild(when);
+        row.appendChild(meta);
+        var loadBtn = el('button', 'workshop-history-btn', 'Load');
+        loadBtn.type = 'button';
+        loadBtn.setAttribute('data-workshop-history-load', h.id || '');
+        loadBtn.addEventListener('click', function () {
+          if (root.classList.contains('is-closed')) return;
+          if (h.snippet) {
+            pad.value = h.snippet;
+            savePad(h.snippet);
+          }
+          setStatus('Loaded · ' + ((h.prompt || 'history').slice(0, 48)), false);
+        });
+        var remixBtn = el('button', 'workshop-history-btn', 'Remix');
+        remixBtn.type = 'button';
+        remixBtn.setAttribute('data-workshop-history-remix', h.id || '');
+        remixBtn.addEventListener('click', function () {
+          if (root.classList.contains('is-closed') || busy) return;
+          askInput.value = h.prompt || '';
+          try { askInput.focus(); } catch (e) {}
+          setStatus('Remixed — prompt back in Ask', false);
+        });
+        row.appendChild(loadBtn);
+        row.appendChild(remixBtn);
+        histList.appendChild(row);
+      });
+    }
+
+    histClear.addEventListener('click', function () {
+      if (clearHistoryConsent()) {
+        renderHistory();
+        setStatus('History cleared on this device.', false);
+      }
+    });
+    renderHistory();
 
     var preview = document.createElement('iframe');
     preview.className = 'workshop-preview';
@@ -346,9 +634,17 @@
         askBtn.disabled = false;
         askBtn.removeAttribute('disabled');
         askBtn.removeAttribute('aria-disabled');
+        if (!busy) {
+          askBtn.textContent = 'Ask';
+          askBtn.classList.remove('is-stop');
+        }
         runBtn.disabled = false;
         runBtn.removeAttribute('disabled');
         runBtn.removeAttribute('aria-disabled');
+        chips.hidden = false;
+        chips.removeAttribute('hidden');
+        hist.hidden = false;
+        hist.removeAttribute('hidden');
         later.hidden = false;
         later.removeAttribute('hidden');
         preview.hidden = false;
@@ -381,9 +677,15 @@
         askBtn.disabled = true;
         askBtn.setAttribute('disabled', '');
         askBtn.setAttribute('aria-disabled', 'true');
+        askBtn.textContent = 'Ask';
+        askBtn.classList.remove('is-stop');
         runBtn.disabled = true;
         runBtn.setAttribute('disabled', '');
         runBtn.setAttribute('aria-disabled', 'true');
+        chips.hidden = true;
+        chips.setAttribute('hidden', '');
+        hist.hidden = true;
+        hist.setAttribute('hidden', '');
         later.hidden = true;
         later.setAttribute('hidden', '');
         preview.hidden = true;
@@ -463,11 +765,42 @@
       runPreview(pad.value);
     });
 
+    function resetAskFace() {
+      busy = false;
+      askAbort = null;
+      askBtn.disabled = false;
+      askBtn.removeAttribute('disabled');
+      askBtn.removeAttribute('aria-disabled');
+      askBtn.textContent = 'Ask';
+      askBtn.classList.remove('is-stop');
+    }
+
+    function setAskStopFace() {
+      busy = true;
+      askBtn.disabled = false;
+      askBtn.removeAttribute('disabled');
+      askBtn.removeAttribute('aria-disabled');
+      askBtn.textContent = 'Stop';
+      askBtn.classList.add('is-stop');
+    }
+
+    // Stop while Ask in-flight — AbortController. Stop ≠ timeout.
+    askBtn.addEventListener('click', function (ev) {
+      if (!busy) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      askToken += 1;
+      var ctrl = askAbort;
+      askAbort = null;
+      try { if (ctrl) ctrl.abort(); } catch (e) {}
+      resetAskFace();
+      setStatus(HEART_STOP, false);
+    });
+
     askForm.addEventListener('submit', function (ev) {
       ev.preventDefault();
       if (busy) return;
-      var nowMind = listener();
-      if (!nowMind || root.classList.contains('is-closed')) {
+      if (root.classList.contains('is-closed')) {
         setOpen(false);
         return;
       }
@@ -475,42 +808,60 @@
       var code = (pad.value || '').trim();
       if (!ask && !code) return;
 
+      var routed = routeAsk(ask || code, askAs.value || 'auto');
+      if (!routed.ok) {
+        askingChip.textContent = 'Asking · —';
+        setStatus(routed.message || HEART_SEAT_FIRST, true);
+        return;
+      }
+      var nowMind = routed.mind;
+      askingChip.textContent = routed.label;
+      setStatus(routed.label + ' · ' + (routed.how || 'route'), false);
+
       var human = ask || 'Please look at this code.';
       if (code) human += '\n\nCode on the bench:\n' + code;
-
-      busy = true;
-      askBtn.disabled = true;
-      setStatus('Waiting for the mind at home…', false);
+      var promptForHistory = ask || 'Please look at this code.';
 
       var send = window.GardenThread && typeof window.GardenThread.sendToMind === 'function'
         ? window.GardenThread.sendToMind
         : null;
       if (!send) {
-        busy = false;
-        askBtn.disabled = false;
         setStatus(HEART_FAIL, true);
         return;
       }
 
+      askToken += 1;
+      var myToken = askToken;
+      askAbort = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      var signal = askAbort ? askAbort.signal : undefined;
+      setAskStopFace();
+      setStatus(HEART_THINK + ' · ' + routed.label, false);
+
       send(nowMind, [
-        { role: 'system', content: ASK_SYSTEM },
+        { role: 'system', content: ASK_SYSTEM + ' You are the ' + routed.chair + ' specialist at this Gathering chair.' },
         { role: 'user', content: human }
-      ]).then(function (reply) {
-        busy = false;
-        askBtn.disabled = false;
+      ], signal).then(function (reply) {
+        if (myToken !== askToken) return; // ignore late resolve after Stop
+        resetAskFace();
         var got = extractCode(reply);
         if (got.code) {
           pad.value = got.code;
           savePad(got.code);
-          setStatus('The mind wrote. Nothing was invented. Run when you are ready.', false);
+          pushHistory(promptForHistory, got.code);
+          renderHistory();
+          setStatus('The ' + routed.chair + ' mind wrote. Nothing was invented. Run when you are ready.', false);
         } else if (got.words) {
           setStatus(got.words, false);
         } else {
           setStatus(HEART_QUIET, true);
         }
       }).catch(function (err) {
-        busy = false;
-        askBtn.disabled = false;
+        if (myToken !== askToken) return;
+        resetAskFace();
+        if (err && (err.stopped || err.reason === 'stopped' || (err.name === 'AbortError'))) {
+          setStatus(HEART_STOP, false);
+          return;
+        }
         var reason = 'fail';
         if (err && err.reason === 'no-model') reason = 'no-model';
         else if (err && err.reason === 'quiet') reason = 'quiet';
@@ -521,6 +872,49 @@
       });
     });
 
+    copyPrep.addEventListener('click', function () {
+      var scaffold = prepareCommitScaffold(pad.value, {
+        route: askingChip.textContent || '',
+        asked: (askInput.value || '').trim()
+      });
+      function ok() { setStatus('Scaffold copied. Git stays OFF until a real door exists.', false); }
+      function fail() { setStatus('Could not copy. Try Download scaffold.', true); }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(scaffold).then(ok, fail);
+      } else {
+        try {
+          var ta = document.createElement('textarea');
+          ta.value = scaffold;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          ok();
+        } catch (e) { fail(); }
+      }
+    });
+
+    dlPrep.addEventListener('click', function () {
+      var scaffold = prepareCommitScaffold(pad.value, {
+        route: askingChip.textContent || '',
+        asked: (askInput.value || '').trim()
+      });
+      try {
+        var blob = new Blob([scaffold], { type: 'text/plain;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'workshop-prepare-commit-' + Date.now() + '.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        setStatus('Scaffold downloaded. No silent push. Git default OFF.', false);
+      } catch (e) {
+        setStatus('Download failed gently.', true);
+      }
+    });
+
     container.appendChild(root);
     if (mind) {
       setTimeout(function () { try { askInput.focus(); } catch (e) {} }, 80);
@@ -529,9 +923,13 @@
   }
 
   function unmount() {
+    if (askAbort) {
+      try { askAbort.abort(); } catch (e) {}
+    }
     if (hostEl) hostEl.innerHTML = '';
     hostEl = null;
     busy = false;
+    askAbort = null;
   }
 
   window.WorkshopBenches = {
@@ -546,10 +944,24 @@
     speakHonest: speakHonest,
     sandboxAttr: sandboxAttr,
     tokenKeysPresent: tokenKeysPresent,
+    loadHistory: loadHistory,
+    pushHistory: pushHistory,
+    clearHistoryConsent: clearHistoryConsent,
+    routeAsk: routeAsk,
+    prepareCommitScaffold: prepareCommitScaffold,
+    seatedBinds: seatedBinds,
+    SPECIALISTS: SPECIALISTS,
     GIT_PUSH_KEY: GIT_PUSH_KEY,
+    HISTORY_KEY: HISTORY_KEY,
     SANDBOX: SANDBOX,
+    EXAMPLE_CHIPS: EXAMPLE_CHIPS,
+    porchMarker: 'v-alpha-workshop-porch-twin-v0',
+    cortexMarker: 'v-gathering-grokhome-cortex-v0',
     HEART_NONE: HEART_NONE,
     HEART_LATER: HEART_LATER,
+    HEART_STOP: HEART_STOP,
+    HEART_THINK: HEART_THINK,
+    HEART_SEAT_FIRST: HEART_SEAT_FIRST,
     GIT_OFF: GIT_OFF,
     GIT_ON: GIT_ON,
     GIT_NO_DOOR: GIT_NO_DOOR,

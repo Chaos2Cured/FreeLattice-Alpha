@@ -178,4 +178,33 @@ check('no invented reply when the door is quiet or blocked', function () {
   assert.equal(WB.speakHonest('fail').indexOf('Nothing was invented') !== -1, true);
 });
 
+check('porch twin marker · history key · chips · Stop language', function () {
+  assert.equal(WB.porchMarker, 'v-alpha-workshop-porch-twin-v0');
+  assert.equal(WB.HISTORY_KEY, 'fl_alpha_workshop_history_v0');
+  assert.ok(Array.isArray(WB.EXAMPLE_CHIPS) && WB.EXAMPLE_CHIPS.length >= 3);
+  var labels = WB.EXAMPLE_CHIPS.map(function (c) { return c.label; }).join(' ');
+  assert.ok(/calculator/i.test(labels));
+  assert.ok(/Pomodoro|pomodoro/i.test(labels));
+  assert.ok(/palette/i.test(labels));
+  assert.ok(/AbortController|Stop|choice|not a timer/i.test(WB.HEART_STOP + WB.HEART_THINK));
+  assert.equal(WB.HEART_THINK.indexOf('timer') !== -1, true);
+});
+
+check('history push · Load shape · Clear needs confirm', function () {
+  delete store[WB.HISTORY_KEY];
+  WB.pushHistory('Simple calculator', '<!DOCTYPE html><html></html>');
+  var list = WB.loadHistory();
+  assert.equal(list.length, 1);
+  assert.ok(list[0].id);
+  assert.ok(list[0].t);
+  assert.equal(list[0].prompt, 'Simple calculator');
+  assert.ok(list[0].snippet.indexOf('<!DOCTYPE') === 0);
+  windowObj.confirm = function () { return false; };
+  assert.equal(WB.clearHistoryConsent(), false);
+  assert.equal(WB.loadHistory().length, 1);
+  windowObj.confirm = function () { return true; };
+  assert.equal(WB.clearHistoryConsent(), true);
+  assert.equal(WB.loadHistory().length, 0);
+});
+
 console.log('\nWorkshop benches honesty holds.');
