@@ -1582,6 +1582,12 @@
 
     function closePlace(opts) {
       if (!veil) return;
+      // v-connect-under-more-v0 heal v0.1 — stop FlConnect loop when Settings room closes
+      try {
+        if (window.FlConnect && typeof FlConnect.unmount === 'function') FlConnect.unmount();
+        var connectHost = document.getElementById('fl-connect-mount-garden');
+        if (connectHost) connectHost.hidden = true;
+      } catch (eUn) {}
       // Close stays on this sky. Word stays "the garden". No galaxy hop.
       veil.classList.remove('is-open');
       hideRoomChat();
