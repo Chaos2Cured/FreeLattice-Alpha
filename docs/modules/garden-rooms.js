@@ -1628,6 +1628,20 @@
         }
       } else if (id === 'settings') {
         veil.classList.add('is-settings');
+        // v-connect-under-more-v0 — FlConnect face above grandmother LocalMindProbe
+        if (settingsFace && window.FlConnect && typeof FlConnect.mount === 'function') {
+          var connectHost = document.getElementById('fl-connect-mount-garden');
+          if (!connectHost) {
+            connectHost = document.createElement('div');
+            connectHost.id = 'fl-connect-mount-garden';
+            connectHost.style.maxWidth = '40rem';
+            connectHost.style.margin = '0 auto 1rem';
+            if (settingsFace.parentNode) settingsFace.parentNode.insertBefore(connectHost, settingsFace);
+            else settingsFace.appendChild(connectHost);
+          }
+          connectHost.hidden = false;
+          FlConnect.mount(connectHost);
+        }
         if (settingsFace && window.LocalMindProbe) {
           settingsFace.hidden = false;
           LocalMindProbe.mount(settingsFace);
