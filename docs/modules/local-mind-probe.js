@@ -237,31 +237,69 @@
 
   function look() {
     // Permission already given by the caller (the tap).
-    var jobs = DOORS.map(function (d) {
-      return fetchDoor(d.url, 2500).then(function (result) {
-        result.id = d.id;
-        result.name = d.name;
-        return result;
-      });
-    });
-    return Promise.all(jobs).then(function (results) {
-      var foundList = [];
-      var blocked = 0;
-      for (var i = 0; i < results.length; i++) {
-        if (results[i].ok) {
-          foundList.push(results[i]);
-        } else if (results[i].blocked || results[i].status === 0) {
-          blocked += 1;
+    // v-connect-under-more-v0 — soft-point: helped Bridge via FlConnect before bare 11434 DOORS.
+    var bridgeFirst = Promise.resolve(null);
+    if (window.FlConnect && typeof window.FlConnect.probe === 'function') {
+      bridgeFirst = window.FlConnect.probe({ gesture: true }).then(function (report) {
+        if (report && report.helped && report.models && report.models.length && report.base) {
+          var names = report.models.map(function (m) {
+            return (m && (m.name || m.model)) || String(m);
+          }).filter(Boolean);
+          return {
+            found: {
+              ok: true,
+              id: 'bridge',
+              name: 'Bridge',
+              url: String(report.base).replace(/\/+$/, '') + '/api/tags',
+              models: names,
+              status: 200
+            },
+            foundList: [{
+              ok: true,
+              id: 'bridge',
+              name: 'Bridge',
+              url: String(report.base).replace(/\/+$/, '') + '/api/tags',
+              models: names,
+              status: 200
+            }],
+            blocked: 0,
+            https: pageIsHttps(),
+            tried: 1,
+            results: [],
+            via: 'fl-connect'
+          };
         }
-      }
-      return {
-        found: foundList[0] || null,
-        foundList: foundList,
-        blocked: blocked,
-        https: pageIsHttps(),
-        tried: results.length,
-        results: results
-      };
+        return null;
+      }).catch(function () { return null; });
+    }
+    return bridgeFirst.then(function (bridged) {
+      if (bridged) return bridged;
+      var jobs = DOORS.map(function (d) {
+        return fetchDoor(d.url, 2500).then(function (result) {
+          result.id = d.id;
+          result.name = d.name;
+          return result;
+        });
+      });
+      return Promise.all(jobs).then(function (results) {
+        var foundList = [];
+        var blocked = 0;
+        for (var i = 0; i < results.length; i++) {
+          if (results[i].ok) {
+            foundList.push(results[i]);
+          } else if (results[i].blocked || results[i].status === 0) {
+            blocked += 1;
+          }
+        }
+        return {
+          found: foundList[0] || null,
+          foundList: foundList,
+          blocked: blocked,
+          https: pageIsHttps(),
+          tried: results.length,
+          results: results
+        };
+      });
     });
   }
 

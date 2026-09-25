@@ -36,6 +36,8 @@
   </button>
 
   <main class="room-stub">
+    <!-- v-connect-under-more-v0 — same FlConnect door as FreeLattice More → Connect -->
+    <div id="fl-connect-mount" style="max-width:40rem;margin:0 auto 1rem;"></div>
     <div id="settings-grandmother"></div>
     <!-- v-alpha-listen-hang-adaptive-v0 — Listen only; mycelium Hang Cancel on FreeLattice -->
     <p class="listen-calm" style="font-family:Georgia,serif;font-size:0.88rem;color:rgba(200,210,230,0.55);margin:10px 0 0;max-width:28rem;line-height:1.5;">Long local thinks are valid — Stop is a choice, not a timer.</p>
@@ -47,11 +49,14 @@
 
   <p id="shared-shoulder"><a href="liability.html">shared shoulder — human and mind</a></p>
 
+  <script src="modules/fl-connect.js"></script>
   <script src="modules/local-mind-probe.js"></script>
   <script src="modules/garden-thread.js"></script>
   <script src="modules/garden-rooms.js"></script>
   <script>
     (function () {
+      var connect = document.getElementById('fl-connect-mount');
+      if (connect && window.FlConnect && typeof FlConnect.mount === 'function') FlConnect.mount(connect);
       var el = document.getElementById('settings-grandmother');
       if (el && window.LocalMindProbe) LocalMindProbe.mount(el);
     })();
