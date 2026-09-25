@@ -1587,6 +1587,13 @@
         if (window.FlConnect && typeof FlConnect.unmount === 'function') FlConnect.unmount();
         var connectHost = document.getElementById('fl-connect-mount-garden');
         if (connectHost) connectHost.hidden = true;
+        document.documentElement.classList.remove('flc-hide-galaxy');
+        var orb = document.querySelector('.galaxy-orb, #galaxy-orb, .garden-orb');
+        var planets = document.querySelectorAll('.galaxy-planet, .planet, [data-galaxy-planet]');
+        if (orb && orb.getAttribute('data-flc-was-hidden') === '0') orb.hidden = false;
+        for (var pi = 0; pi < planets.length; pi++) {
+          if (planets[pi].getAttribute('data-flc-was-hidden') === '0') planets[pi].hidden = false;
+        }
       } catch (eUn) {}
       // Close stays on this sky. Word stays "the garden". No galaxy hop.
       veil.classList.remove('is-open');
@@ -1634,6 +1641,18 @@
         }
       } else if (id === 'settings') {
         veil.classList.add('is-settings');
+        // v-connect-port-picker-v0 / Hypha H5 — hide orb/planets while Connect/Settings open
+        try {
+          document.documentElement.classList.add('flc-hide-galaxy');
+          var orb = document.querySelector('.galaxy-orb, #galaxy-orb, .garden-orb');
+          var planets = document.querySelectorAll('.galaxy-planet, .planet, [data-galaxy-planet]');
+          if (orb) orb.setAttribute('data-flc-was-hidden', orb.hidden ? '1' : '0');
+          if (orb) orb.hidden = true;
+          for (var pi = 0; pi < planets.length; pi++) {
+            planets[pi].setAttribute('data-flc-was-hidden', planets[pi].hidden ? '1' : '0');
+            planets[pi].hidden = true;
+          }
+        } catch (eGal) {}
         // v-connect-under-more-v0 — FlConnect face above grandmother LocalMindProbe
         if (settingsFace && window.FlConnect && typeof FlConnect.mount === 'function') {
           var connectHost = document.getElementById('fl-connect-mount-garden');

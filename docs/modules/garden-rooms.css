@@ -6021,3 +6021,36 @@ html.room-page .workshop-benches-settings,
     0 0 10px rgba(12, 10, 26, 1),
     0 0 4px rgba(12, 10, 26, 0.94);
 }
+
+
+/* v-connect-port-picker-v0 / Hypha H5 — Connect/Settings above galaxy at phone width */
+html.flc-hide-galaxy .galaxy-orb,
+html.flc-hide-galaxy #galaxy-orb,
+html.flc-hide-galaxy .garden-orb,
+html.flc-hide-galaxy .galaxy-planet,
+html.flc-hide-galaxy .planet,
+html.flc-hide-galaxy [data-galaxy-planet] {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+#fl-connect-mount,
+#fl-connect-mount-garden {
+  position: relative;
+  z-index: 50;
+  max-height: calc(100dvh - 5rem);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+@media (max-width: 480px) {
+  #settings-grandmother,
+  #fl-connect-mount,
+  #fl-connect-mount-garden {
+    width: 100%;
+    max-width: 100%;
+    padding: 0 0.75rem;
+  }
+  #place-veil.is-settings #room-chat {
+    position: relative;
+    z-index: 45;
+  }
+}
