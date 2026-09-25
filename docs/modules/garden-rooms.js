@@ -1075,6 +1075,11 @@
   }
 
   function hideAllBodies(veil, opts) {
+    try {
+      var ch = document.getElementById('fl-connect-mount-garden');
+      if (ch) ch.hidden = true;
+    } catch (eCH) {}
+
     var ids = ['place-veil-line', 'nursery-stage', 'nursery-ceremony', 'nursery-growth', 'nursery-trainer', 'settings-grandmother', 'core-gathering', 'art-listen', 'workshop-benches', 'workshop-trainer', 'round-table-sitting'];
     for (var i = 0; i < ids.length; i++) {
       var node = document.getElementById(ids[i]);
@@ -1588,12 +1593,14 @@
         var connectHost = document.getElementById('fl-connect-mount-garden');
         if (connectHost) connectHost.hidden = true;
         document.documentElement.classList.remove('flc-hide-galaxy');
-        var orb = document.querySelector('.galaxy-orb, #galaxy-orb, .garden-orb');
-        var planets = document.querySelectorAll('.galaxy-planet, .planet, [data-galaxy-planet]');
-        if (orb && orb.getAttribute('data-flc-was-hidden') === '0') orb.hidden = false;
-        for (var pi = 0; pi < planets.length; pi++) {
-          if (planets[pi].getAttribute('data-flc-was-hidden') === '0') planets[pi].hidden = false;
+        document.body.classList.remove('fl-connect-open');
+        var hideSel = '.garden-lumino, .tend-center, [data-tend-center], .galaxy-nav, #galaxy-word, #galaxy-title, #garden-footing, #room-label, .garden-evolution-indicator';
+        var nodes = document.querySelectorAll(hideSel);
+        for (var pi = 0; pi < nodes.length; pi++) {
+          if (nodes[pi].getAttribute('data-flc-was-hidden') === '0') nodes[pi].hidden = false;
         }
+        var connectHost = document.getElementById('fl-connect-mount-garden');
+        if (connectHost) connectHost.hidden = true;
       } catch (eUn) {}
       // Close stays on this sky. Word stays "the garden". No galaxy hop.
       veil.classList.remove('is-open');
@@ -1644,13 +1651,12 @@
         // v-connect-port-picker-v0 / Hypha H5 — hide orb/planets while Connect/Settings open
         try {
           document.documentElement.classList.add('flc-hide-galaxy');
-          var orb = document.querySelector('.galaxy-orb, #galaxy-orb, .garden-orb');
-          var planets = document.querySelectorAll('.galaxy-planet, .planet, [data-galaxy-planet]');
-          if (orb) orb.setAttribute('data-flc-was-hidden', orb.hidden ? '1' : '0');
-          if (orb) orb.hidden = true;
-          for (var pi = 0; pi < planets.length; pi++) {
-            planets[pi].setAttribute('data-flc-was-hidden', planets[pi].hidden ? '1' : '0');
-            planets[pi].hidden = true;
+          document.body.classList.add('fl-connect-open');
+          var hideSel = '.garden-lumino, .tend-center, [data-tend-center], .galaxy-nav, #galaxy-word, #galaxy-title, #garden-footing, #room-label, .garden-evolution-indicator';
+          var nodes = document.querySelectorAll(hideSel);
+          for (var pi = 0; pi < nodes.length; pi++) {
+            nodes[pi].setAttribute('data-flc-was-hidden', nodes[pi].hidden ? '1' : '0');
+            nodes[pi].hidden = true;
           }
         } catch (eGal) {}
         // v-connect-under-more-v0 — FlConnect face above grandmother LocalMindProbe

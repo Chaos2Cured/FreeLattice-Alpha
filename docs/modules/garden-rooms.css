@@ -6023,21 +6023,39 @@ html.room-page .workshop-benches-settings,
 }
 
 
-/* v-connect-port-picker-v0 / Hypha H5 — Connect/Settings above galaxy at phone width */
-html.flc-hide-galaxy .galaxy-orb,
-html.flc-hide-galaxy #galaxy-orb,
-html.flc-hide-galaxy .garden-orb,
-html.flc-hide-galaxy .galaxy-planet,
-html.flc-hide-galaxy .planet,
-html.flc-hide-galaxy [data-galaxy-planet] {
+  #place-veil.is-settings #room-chat {
+    position: relative;
+    z-index: 45;
+  }
+}
+
+
+/* v-connect-port-picker-v0 heal v0.2 / Hypha H5 — real galaxy elements */
+html.flc-hide-galaxy .garden-lumino,
+html.flc-hide-galaxy .tend-center,
+html.flc-hide-galaxy [data-tend-center],
+html.flc-hide-galaxy .galaxy-nav,
+html.flc-hide-galaxy #galaxy-word,
+html.flc-hide-galaxy #galaxy-title,
+html.flc-hide-galaxy #garden-footing,
+html.flc-hide-galaxy #room-label,
+html.flc-hide-galaxy .garden-evolution-indicator,
+body.fl-connect-open .garden-lumino,
+body.fl-connect-open .tend-center,
+body.fl-connect-open .galaxy-nav,
+body.fl-connect-open #galaxy-word,
+body.fl-connect-open #galaxy-title,
+body.fl-connect-open #garden-footing,
+body.fl-connect-open #room-label,
+body.fl-connect-open .garden-evolution-indicator {
   visibility: hidden !important;
   pointer-events: none !important;
 }
 #fl-connect-mount,
 #fl-connect-mount-garden {
   position: relative;
-  z-index: 50;
-  max-height: calc(100dvh - 5rem);
+  z-index: 60;
+  max-height: 100dvh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -6049,8 +6067,7 @@ html.flc-hide-galaxy [data-galaxy-planet] {
     max-width: 100%;
     padding: 0 0.75rem;
   }
-  #place-veil.is-settings #room-chat {
-    position: relative;
-    z-index: 45;
+  #place-veil.is-settings {
+    z-index: 55;
   }
 }
