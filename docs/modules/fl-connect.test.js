@@ -78,5 +78,16 @@ sandbox.FlConnect.stopLoop();
 sandbox.FlConnect.unmount();
 assert.ok(typeof sandbox.FlConnect.lookAgain === 'function', 'look again');
 
-console.log('SMOKE_OK connect port picker alpha v0.2 heal');
-console.log('local needs model · Bridge URL · soft-point · unmount · 5min · port-only');
+// Brace balance in garden-rooms.css (H5 phone galaxy-hide must parse)
+const css = fs.readFileSync(path.join(__dirname, 'garden-rooms.css'), 'utf8');
+assert.strictEqual((css.match(/{/g) || []).length, (css.match(/}/g) || []).length, 'CSS brace counts equal');
+assert.ok(/@media \(max-width: 480px\) \{\s*#place-veil\.is-settings #room-chat/.test(css), 'phone room-chat inside media');
+assert.ok(/display:\s*none\s*!important/.test(css), 'galaxy hide uses display none');
+// Layer: restore older regex checks (still true)
+assert.ok(/heal v0\.1|v0\.1/.test(src), 'heal v0.1');
+assert.ok(/fl_alpha_local_mind/.test(src), 'alpha key named');
+assert.ok(/11435/.test(src) && /bridge\/health/.test(src), 'bridge health');
+assert.ok(/unmount|stopLoop|Look again|visibilitychange|fullScan|stickyFallback|manualQuiet/.test(src), 'loop heal APIs');
+
+console.log('SMOKE_OK connect port picker alpha v0.3 tiny heal');
+console.log('braces equal · display none · local model · port-only');

@@ -6022,7 +6022,7 @@ html.room-page .workshop-benches-settings,
     0 0 4px rgba(12, 10, 26, 0.94);
 }
 
-
+@media (max-width: 480px) {
   #place-veil.is-settings #room-chat {
     position: relative;
     z-index: 45;
@@ -6030,7 +6030,7 @@ html.room-page .workshop-benches-settings,
 }
 
 
-/* v-connect-port-picker-v0 heal v0.2 / Hypha H5 — real galaxy elements */
+/* v-connect-port-picker-v0 heal v0.3 / Hypha H5 — real galaxy elements */
 html.flc-hide-galaxy .garden-lumino,
 html.flc-hide-galaxy .tend-center,
 html.flc-hide-galaxy [data-tend-center],
@@ -6048,7 +6048,7 @@ body.fl-connect-open #galaxy-title,
 body.fl-connect-open #garden-footing,
 body.fl-connect-open #room-label,
 body.fl-connect-open .garden-evolution-indicator {
-  visibility: hidden !important;
+  display: none !important;
   pointer-events: none !important;
 }
 #fl-connect-mount,
