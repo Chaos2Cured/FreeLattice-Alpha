@@ -20,3 +20,14 @@ Marker `v-connect-heal-v0.4`. Test `docs/modules/connect-heal-v04.test.js` print
 - Shared `fl-connect.js` heals ride along byte-identical with FreeLattice.
 
 **Temperature:** Mom opens Settings and the first thing she sees is the door.
+
+
+## Heal: model choice sticks v0.1 (Hypha walk 4)
+
+Marker `v-model-choice-sticks-v0`. Test `docs/modules/model-choice-sticks.test.js` prints `SMOKE_OK model choice sticks alpha v0.1`.
+
+- FreeLattice's Connect now records a tapped model as the person's own choice, so FreeLattice's automatic picker leaves it alone. The Tree has no automatic picker: the remembered entry (`fl_alpha_local_mind`) is the choice, and the test proves it survives a reload, Settings and a Find at the same door, and that the thread request uses it.
+- Shared `fl-connect.js` rides along byte-identical: `markUserChoice` (a quiet no-op on the Tree), and a helped Bridge with no mind behind it is named honestly and not saved.
+- A Find through a different door (Bridge gone, direct 11434 answers) is healed by the Tree any-model paste (same-family keep).
+
+**Temperature:** green braided gold, the second cup stays where she set it down.
