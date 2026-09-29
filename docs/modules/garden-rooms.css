@@ -1938,6 +1938,28 @@ html.room-page .settings-star-pick,
   padding: 4px 2px;
 }
 
+/* v-gathering-grokhome-cortex-v0 — longer thread like Grok home */
+.thread-messages.is-grokhome-scroll {
+  max-height: min(58vh, 36em);
+}
+.thread-answered {
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: rgba(167, 139, 250, 0.75);
+  font-family: Georgia, 'Times New Roman', serif;
+}
+.thread-send.is-stop {
+  background: rgba(244, 114, 182, 0.12);
+  border-color: rgba(244, 114, 182, 0.45);
+  color: #f472b6;
+  cursor: pointer;
+}
+.thread-send.is-stop:disabled,
+.thread-send.is-stop[aria-disabled="true"] {
+  opacity: 1;
+  cursor: pointer;
+}
+
 .thread-line {
   display: flex;
   flex-direction: column;
@@ -2803,6 +2825,153 @@ html[data-garden-galaxy="workshop"] #gardenContainer canvas {
 .workshop-benches-act.is-ask:focus-visible {
   border-color: #34d399;
 }
+
+/* v-alpha-workshop-porch-twin-v0 — calm chips · History · Ask↔Stop */
+.workshop-porch-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 10px;
+}
+.workshop-chip {
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.28);
+  color: #6ee7b7;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  font-family: Georgia, 'Times New Roman', serif;
+  line-height: 1.3;
+  min-height: 36px;
+}
+.workshop-chip:hover,
+.workshop-chip:focus-visible {
+  outline: none;
+  border-color: rgba(52, 211, 153, 0.55);
+  background: rgba(52, 211, 153, 0.14);
+}
+.workshop-benches-act.is-stop {
+  background: rgba(244, 114, 182, 0.14);
+  border-color: rgba(244, 114, 182, 0.45);
+  color: #f472b6;
+}
+/* v-gathering-grokhome-cortex-v0 — Ask-as · Asking chip · Prepare scaffold */
+.workshop-ask-as {
+  background: rgba(12, 10, 26, 0.55);
+  border: 1px solid rgba(200, 210, 230, 0.16);
+  border-radius: 8px;
+  color: rgba(200, 210, 230, 0.85);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.78rem;
+  padding: 8px 10px;
+  min-height: 40px;
+}
+.workshop-asking-chip {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: rgba(167, 139, 250, 0.85);
+  font-family: Georgia, 'Times New Roman', serif;
+}
+.workshop-prepare {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 8px 0 0;
+  border-top: 1px solid rgba(200, 210, 230, 0.08);
+}
+.workshop-prepare-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(200, 210, 230, 0.45);
+  font-family: Georgia, 'Times New Roman', serif;
+  margin-right: 4px;
+}
+.workshop-history {
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(200, 210, 230, 0.08);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.workshop-history-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.workshop-history-title {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(200, 210, 230, 0.45);
+  font-family: Georgia, 'Times New Roman', serif;
+}
+.workshop-history-clear {
+  background: none;
+  border: none;
+  color: rgba(148, 163, 184, 0.85);
+  font-size: 0.72rem;
+  cursor: pointer;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+.workshop-history-clear:hover { color: #f07068; }
+.workshop-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 140px;
+  overflow: auto;
+}
+.workshop-history-empty {
+  margin: 0;
+  font-size: 0.75rem;
+  color: rgba(148, 163, 184, 0.75);
+  font-family: Georgia, 'Times New Roman', serif;
+}
+.workshop-history-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+}
+.workshop-history-meta { flex: 1; min-width: 0; }
+.workshop-history-name {
+  font-size: 0.8rem;
+  color: rgba(230, 237, 243, 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.workshop-history-time {
+  font-size: 0.68rem;
+  color: rgba(100, 116, 139, 0.95);
+}
+.workshop-history-btn {
+  background: rgba(22, 27, 34, 0.85);
+  border: 1px solid rgba(48, 54, 61, 0.9);
+  border-radius: 6px;
+  color: rgba(139, 148, 158, 0.95);
+  font-size: 0.7rem;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-family: inherit;
+  min-height: 32px;
+}
+.workshop-history-btn:hover {
+  border-color: #e8b019;
+  color: #e8b019;
+}
+.workshop-porch-chips[hidden],
+.workshop-history[hidden] { display: none !important; }
 
 .workshop-preview {
   display: block;

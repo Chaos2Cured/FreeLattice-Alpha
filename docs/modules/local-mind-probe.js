@@ -152,6 +152,12 @@
     if (id && !entry.gatheringBinds[id]) return entry;
     entry.speakingChair = id;
     remember(entry);
+    // v-gathering-grokhome-cortex-v0 — thread heart refreshes speaking · type · tag
+    try {
+      window.dispatchEvent(new CustomEvent('fl-alpha-speaking-changed', {
+        detail: { chairId: id }
+      }));
+    } catch (e) {}
     return entry;
   }
 

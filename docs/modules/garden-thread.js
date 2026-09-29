@@ -16,6 +16,11 @@
 // In Settings, skip the Settings button — May I look? is already the door.
 // FreeLattice Chat our way (v5.79.44): speak as prose. Never a fake mind.
 //
+// v-gathering-grokhome-cortex-v0 — Gathering Grok-home:
+//   speaking · {type} · {tag}; long scroll thread; Send+Stop (AbortSignal,
+//   Stop ≠ timer — no duration kill); who-answered under mind replies;
+//   tap bound chair to switch speaking (garden-rooms). Cap 4 · never auto-seat.
+//
 // This Chat working room (next after the fail-closed face):
 //   1. A local file may enter the thread. Grandmother-sized. Not a wall.
 //      Bytes stay on this machine. Nothing is sent to a kitchen.
@@ -64,6 +69,8 @@
   var messages = [];
   var hostEl = null;
   var busy = false;
+  var talkAbort = null;
+  var talkToken = 0;
 
   function el(tag, className, text) {
     var node = document.createElement(tag);
@@ -390,14 +397,14 @@
     return '';
   }
 
-  function postChat(url, model, msgs) {
+  // AbortSignal only — Stop is choice, not a timer (Hang Cancel / Grok-home).
+  // Long local thinks are valid. Do not reintroduce a duration kill.
+  function postChat(url, model, msgs, signal) {
     var payload = {
       model: model || '',
       messages: msgs,
       stream: false
     };
-    var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
-    var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 120000);
     var opts = {
       method: 'POST',
       mode: 'cors',
@@ -405,9 +412,8 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     };
-    if (ctrl) opts.signal = ctrl.signal;
+    if (signal) opts.signal = signal;
     return fetch(url, opts).then(function (res) {
-      clearTimeout(timer);
       if (!res.ok) {
         var err = new Error('door-status-' + res.status);
         err.status = res.status;
@@ -423,18 +429,48 @@
         return text;
       });
     }).catch(function (err) {
-      clearTimeout(timer);
       if (err && err.reason) throw err;
-      if (looksBlocked(err) || (err && err.name === 'AbortError')) {
+      if (err && err.name === 'AbortError') {
+        if (signal && signal.aborted) {
+          var stopped = new Error('stopped');
+          stopped.reason = 'stopped';
+          stopped.stopped = true;
+          throw stopped;
+        }
         var blocked = new Error('blocked');
         blocked.blocked = true;
         throw blocked;
+      }
+      if (looksBlocked(err)) {
+        var blocked2 = new Error('blocked');
+        blocked2.blocked = true;
+        throw blocked2;
       }
       throw err;
     });
   }
 
-  function sendToMind(mind, msgs) {
+  function speakingLine() {
+    if (!window.LocalMindProbe || typeof LocalMindProbe.getRemembered !== 'function') return '';
+    var entry = LocalMindProbe.getRemembered() || {};
+    var chairId = String(entry.speakingChair || '');
+    var binds = entry.gatheringBinds || {};
+    var bind = chairId ? binds[chairId] : null;
+    if (!bind) return '';
+    var type = chairId || 'chair';
+    var tag = bind.tag || 'mind';
+    return 'speaking · ' + type + ' · ' + tag;
+  }
+
+  function whoAnsweredMeta(mind) {
+    var line = speakingLine();
+    if (line) return line.replace(/^speaking · /, 'answered · ');
+    if (mind && mind.fromChair) return 'answered · ' + mind.fromChair + ' · ' + (mind.tag || mind.name || 'mind');
+    return 'answered · ' + ((mind && (mind.tag || mind.name)) || 'mind');
+  }
+
+  // Optional third arg: AbortSignal. Callers that omit it behave as before.
+  function sendToMind(mind, msgs, signal) {
     var urls = talkUrls(mind);
     if (!urls.length) {
       return Promise.reject({ blocked: true });
@@ -450,8 +486,8 @@
         chain = chain.then(function (prev) {
           if (prev) return prev;
           if (skipOllama) return null;
-          return postChat(url, model, msgs).catch(function (err) {
-            if (err && (err.blocked || err.reason === 'quiet')) throw err;
+          return postChat(url, model, msgs, signal).catch(function (err) {
+            if (err && (err.blocked || err.stopped || err.reason === 'quiet' || err.reason === 'stopped')) throw err;
             return null;
           });
         });
@@ -479,6 +515,9 @@
       var body = el('span', 'thread-body', m.text || (m.file && m.file.name ? 'a file: ' + m.file.name : ''));
       item.appendChild(who);
       item.appendChild(body);
+      if (m.role === 'mind' && m.answered) {
+        item.appendChild(el('span', 'thread-answered', m.answered));
+      }
       if (m.file && m.file.name) {
         var fileNote = el('span', 'thread-file', 'a file · ' + m.file.name);
         item.appendChild(fileNote);
@@ -501,11 +540,19 @@
 
     var mind = listener();
     var heart = el('p', 'thread-heart');
-    if (mind) {
-      heart.textContent = 'Listening: ' + (mind.name || 'a mind at home') + '. On this machine only.';
-    } else {
-      heart.textContent = HEART_NONE;
+    heart.setAttribute('data-thread-heart', '1');
+    function paintHeart() {
+      var speak = speakingLine();
+      var now = listener();
+      if (speak) {
+        heart.textContent = speak + ' · on this machine only.';
+      } else if (now) {
+        heart.textContent = 'Listening: ' + (now.name || 'a mind at home') + '. On this machine only. Seat a Gathering chair to name who speaks.';
+      } else {
+        heart.textContent = HEART_NONE;
+      }
     }
+    paintHeart();
     root.appendChild(heart);
 
     var later = el('p', 'thread-later', HEART_LATER);
@@ -531,7 +578,9 @@
     var list = el('ol', 'thread-messages');
     list.setAttribute('data-thread-list', '1');
     list.setAttribute('aria-live', 'polite');
+    list.classList.add('is-grokhome-scroll');
     root.appendChild(list);
+    renderMessages(list);
 
     var form = document.createElement('form');
     form.className = 'thread-compose';
@@ -545,6 +594,7 @@
     input.setAttribute('maxlength', '4000');
     var sendBtn = el('button', 'thread-send', 'Send');
     sendBtn.type = 'submit';
+    sendBtn.setAttribute('data-thread-send', '1');
     row.appendChild(input);
     row.appendChild(sendBtn);
     form.appendChild(row);
@@ -588,6 +638,24 @@
     form.appendChild(tools);
     root.appendChild(form);
 
+    function setSendIdle() {
+      sendBtn.type = 'submit';
+      sendBtn.textContent = 'Send';
+      sendBtn.classList.remove('is-stop');
+      sendBtn.title = '';
+      sendBtn.setAttribute('aria-label', 'Send');
+    }
+    function setSendStop() {
+      sendBtn.type = 'button';
+      sendBtn.textContent = 'Stop';
+      sendBtn.classList.add('is-stop');
+      sendBtn.title = 'Stop — cancel this reply (no time limit; you choose)';
+      sendBtn.setAttribute('aria-label', 'Stop waiting for reply');
+      sendBtn.disabled = false;
+      sendBtn.removeAttribute('disabled');
+      sendBtn.removeAttribute('aria-disabled');
+    }
+
     function setComposeOpen(open) {
       if (open) {
         form.classList.remove('is-closed');
@@ -602,10 +670,13 @@
         input.removeAttribute('tabindex');
         input.placeholder = 'Say something';
         input.setAttribute('aria-label', 'Say something');
-        sendBtn.disabled = false;
-        sendBtn.removeAttribute('disabled');
-        sendBtn.removeAttribute('aria-disabled');
-        sendBtn.removeAttribute('tabindex');
+        if (!busy) {
+          sendBtn.disabled = false;
+          sendBtn.removeAttribute('disabled');
+          sendBtn.removeAttribute('aria-disabled');
+          sendBtn.removeAttribute('tabindex');
+          setSendIdle();
+        }
         tools.hidden = false;
         tools.removeAttribute('hidden');
         fileBtn.disabled = false;
@@ -628,10 +699,13 @@
         input.setAttribute('aria-label', 'The thread is waiting for a mind in Settings');
         input.value = '';
         try { input.blur(); } catch (e) {}
+        busy = false;
+        talkAbort = null;
         sendBtn.disabled = true;
         sendBtn.setAttribute('disabled', '');
         sendBtn.setAttribute('aria-disabled', 'true');
         sendBtn.tabIndex = -1;
+        setSendIdle();
         tools.hidden = true;
         tools.setAttribute('hidden', '');
         fileBtn.disabled = true;
@@ -643,6 +717,7 @@
     }
 
     setComposeOpen(!!mind);
+    paintHeart();
 
     var status = el('p', 'thread-status');
     status.setAttribute('data-thread-status', '1');
@@ -670,8 +745,13 @@
     function talkNow(nowMind) {
       if (busy) return;
       busy = true;
-      sendBtn.disabled = true;
-      setStatus('Waiting for the mind at home…', false);
+      talkToken += 1;
+      var myToken = talkToken;
+      talkAbort = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      var signal = talkAbort ? talkAbort.signal : undefined;
+      setSendStop();
+      setStatus('Waiting — long local thinks are valid. Stop is your choice.', false);
+      paintHeart();
 
       var payload = [{ role: 'system', content: JUST_TALK }].concat(
         messages
@@ -681,20 +761,31 @@
           })
       );
 
-      sendToMind(nowMind, payload).then(function (reply) {
+      sendToMind(nowMind, payload, signal).then(function (reply) {
+        if (myToken !== talkToken) return;
         busy = false;
-        sendBtn.disabled = false;
+        talkAbort = null;
+        setSendIdle();
         setStatus('', false);
         messages.push({
           role: 'mind',
           text: reply,
-          listener: nowMind.name || 'a mind at home'
+          listener: nowMind.name || 'a mind at home',
+          answered: whoAnsweredMeta(nowMind)
         });
         saveHistory();
         renderMessages(list);
+        paintHeart();
       }).catch(function (err) {
+        if (myToken !== talkToken) return;
         busy = false;
-        sendBtn.disabled = false;
+        talkAbort = null;
+        setSendIdle();
+        if (err && (err.stopped || err.reason === 'stopped')) {
+          setStatus('Stopped — whenever you are ready.', false);
+          paintHeart();
+          return;
+        }
         var reason = 'fail';
         if (err && err.reason === 'no-model') reason = 'no-model';
         else if (err && err.reason === 'quiet') reason = 'quiet';
@@ -705,8 +796,23 @@
         saveHistory();
         renderMessages(list);
         setStatus('', true);
+        paintHeart();
       });
     }
+
+    // Stop while in-flight — AbortSignal only (no duration kill)
+    sendBtn.addEventListener('click', function (ev) {
+      if (!busy || !sendBtn.classList.contains('is-stop')) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      talkToken += 1;
+      var ctrl = talkAbort;
+      talkAbort = null;
+      try { if (ctrl) ctrl.abort(); } catch (e) {}
+      busy = false;
+      setSendIdle();
+      setStatus('Stopped — whenever you are ready.', false);
+    });
 
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
@@ -727,6 +833,14 @@
       }
       talkNow(nowMind);
     });
+
+    // Soft refresh when Gathering speaking chair changes
+    try {
+      window.addEventListener('fl-alpha-speaking-changed', function () {
+        paintHeart();
+        setComposeOpen(!!listener());
+      });
+    } catch (eSp) {}
 
     fileBtn.addEventListener('click', function () {
       if (form.classList.contains('is-closed') || !listener()) return;
@@ -831,6 +945,8 @@
     unmount: unmount,
     listener: listener,
     sendToMind: sendToMind,
+    speakingLine: speakingLine,
+    whoAnsweredMeta: whoAnsweredMeta,
     hostIs: function (el) { return hostEl === el; },
     HISTORY_KEY: HISTORY_KEY,
     EXPORT_KIND: EXPORT_KIND,
@@ -841,6 +957,7 @@
     applyImported: applyImported,
     loadHistory: loadHistory,
     saveHistory: saveHistory,
-    getMessages: function () { return messages.slice(); }
+    getMessages: function () { return messages.slice(); },
+    grokHomeMarker: 'v-gathering-grokhome-cortex-v0'
   };
 })();
