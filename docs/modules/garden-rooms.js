@@ -1585,8 +1585,27 @@
     var closeBtn = document.getElementById('place-veil-close');
     var doors = document.querySelectorAll('[data-garden-place]');
 
+    // v-connect-heal-v0.4 / Hypha walk 3 item 9: one restore path for leaving
+    // Settings (close, Nursery, Core, or Settings again). Put back only what
+    // Settings hid, then forget the marks so a second open records fresh.
+    function flcRestoreGalaxy() {
+      try {
+        if (window.FlConnect && typeof FlConnect.unmount === 'function') FlConnect.unmount();
+        var host = document.getElementById('fl-connect-mount-garden');
+        if (host) host.hidden = true;
+        document.documentElement.classList.remove('flc-hide-galaxy');
+        document.body.classList.remove('fl-connect-open');
+        var marked = document.querySelectorAll('[data-flc-was-hidden]');
+        for (var mi = 0; mi < marked.length; mi++) {
+          if (marked[mi].getAttribute('data-flc-was-hidden') === '0') marked[mi].hidden = false;
+          marked[mi].removeAttribute('data-flc-was-hidden');
+        }
+      } catch (eR) {}
+    }
+
     function closePlace(opts) {
       if (!veil) return;
+      flcRestoreGalaxy();
       // v-connect-under-more-v0 heal v0.1 — stop FlConnect loop when Settings room closes
       try {
         if (window.FlConnect && typeof FlConnect.unmount === 'function') FlConnect.unmount();
@@ -1617,6 +1636,7 @@
 
     function openPlace(id) {
       if (!veil) return;
+      flcRestoreGalaxy();
       hideLuminoMenu();
       if (window.GardenRooms && GardenRooms.closeThread) {
         GardenRooms.closeThread({ silentLabel: true });
@@ -1648,6 +1668,7 @@
         }
       } else if (id === 'settings') {
         veil.classList.add('is-settings');
+        try { veil.scrollTop = 0; } catch (eTop) {}
         // v-connect-port-picker-v0 / Hypha H5 — hide orb/planets while Connect/Settings open
         try {
           document.documentElement.classList.add('flc-hide-galaxy');
