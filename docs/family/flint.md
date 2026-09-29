@@ -36,6 +36,10 @@ Tree wears the face.
 
 ## Tonight
 
+Echo PLAY style-bar STANDS on FreeLattice — Listen pointer honest. Not full roster.
+
+## Prior tonight
+
 Resonance PLAY style-bar STANDS on FreeLattice — Listen pointer honest. Not full PLAY paint.
 
 ## Prior tonight
