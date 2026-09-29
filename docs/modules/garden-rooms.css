@@ -6071,3 +6071,46 @@ body.fl-connect-open .garden-evolution-indicator {
     z-index: 55;
   }
 }
+
+/* v-connect-heal-v0.4 / Hypha walk 3 item 1: Mom sees Download Bridge.
+   The mount was a shrinkable flex child with its own scroller inside the
+   flex-column veil, so it collapsed to 0px at 390px and clipped at 1280px.
+   One scroller only: the Settings veil. The mount keeps its full height,
+   the card gets a night backing, and the canvas sky dims while Connect is
+   open so orbs never draw across the words. Layer, never delete. */
+#place-veil.is-settings #fl-connect-mount-garden {
+  flex: 0 0 auto;
+  min-height: min-content;
+  max-height: none;
+  overflow: visible;
+  width: min(40rem, 100%);
+  box-sizing: border-box;
+  background: rgba(12, 10, 26, 0.88);
+  border: 1px solid rgba(200, 210, 230, 0.1);
+  border-radius: 14px;
+}
+#place-veil.is-settings #fl-connect-mount-garden .flc-wrap {
+  max-height: none;
+  overflow: visible;
+}
+html.flc-hide-galaxy #gardenContainer {
+  opacity: 0.12;
+  transition: opacity 400ms ease;
+}
+#place-veil.is-settings #place-veil-close {
+  position: sticky;
+  left: auto;
+  bottom: 8px;
+  transform: none;
+  flex: 0 0 auto;
+  margin-top: 12px;
+  padding: 8px 16px;
+  background: rgba(12, 10, 26, 0.94);
+  border: 1px solid rgba(232, 176, 25, 0.35);
+  border-radius: 999px;
+  opacity: 1;
+  z-index: 61;
+}
+#place-veil.is-settings {
+  padding-bottom: 1.25rem;
+}
