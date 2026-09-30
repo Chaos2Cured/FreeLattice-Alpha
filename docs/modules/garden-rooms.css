@@ -664,9 +664,13 @@ html[data-garden-galaxy="art"] .galaxy-nav-next { opacity: 0.4; }
 }
 
 /* Honest room stubs (Nursery, Settings, Team): same sky, no canvas. */
-html.room-page *,
-html.room-page *::before,
-html.room-page *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* v-tree-glow-1-v0: this reset now has zero weight (:where), so every card's own
+   padding and margin wins again on the room pages (Settings, Nursery, Team and the
+   galaxy pages). It still zeroes the browser's default margins. Was:
+   html.room-page *, html.room-page *::before, html.room-page *::after { ... } */
+:where(html.room-page) *,
+:where(html.room-page) *::before,
+:where(html.room-page) *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html.room-page,
 html.room-page body {
@@ -6113,4 +6117,70 @@ html.flc-hide-galaxy #gardenContainer {
 }
 #place-veil.is-settings {
   padding-bottom: 1.25rem;
+}
+
+/* ── v-tree-glow-1-v0: every light in reach (Hypha walk 4 cosmetics, the Gathering
+   Find, the lights that orbit away). Layer, never delete. ── */
+
+/* A. Phone: "Use a different address" field stays inside its card (it poked 7px out). */
+@media (max-width: 480px) {
+  .flc-picker-row input {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+}
+
+/* B. Settings in the garden: lines fade before "the garden" pill instead of
+   running under it. The band never takes a tap. */
+#place-veil.is-settings::after {
+  content: '';
+  position: sticky;
+  bottom: 0;
+  align-self: stretch;
+  flex: 0 0 auto;
+  height: 64px;
+  margin: -64px -28px -20px;
+  background: linear-gradient(to top, rgba(12, 10, 26, 0.96) 0%, rgba(12, 10, 26, 0.9) 55%, rgba(12, 10, 26, 0) 100%);
+  pointer-events: none;
+  z-index: 60;
+}
+
+/* C. Nursery on a phone: the last card clears the galaxy hop at the bottom. */
+@media (max-width: 640px) {
+  html.room-page .room-nursery {
+    padding-bottom: 7.5rem;
+  }
+}
+
+/* D. The Gathering, wide screens: the promise band sits under Find local minds,
+   not on top of it, so Find can be tapped (and the absent-Ollama words can show). */
+@media (min-width: 641px) {
+  #place-veil.is-core .core-promise {
+    top: 14.6rem;
+  }
+}
+
+/* E. The legend words are quiet doors too: a light that has orbited off a small
+   screen can still be opened by its word. Same words, same colors. */
+#lumino-legend .lumino-legend-row[data-lumino-row] {
+  pointer-events: auto;
+  cursor: pointer;
+  border-radius: 6px;
+}
+#lumino-legend .lumino-legend-row[data-lumino-row]:hover .lumino-legend-word,
+#lumino-legend .lumino-legend-row[data-lumino-row]:focus-visible .lumino-legend-word {
+  color: rgba(232, 176, 25, 0.95);
+}
+#lumino-legend .lumino-legend-row[data-lumino-row]:focus-visible {
+  outline: 1px solid rgba(232, 176, 25, 0.6);
+  outline-offset: 2px;
+}
+@media (max-width: 799px) {
+  #lumino-legend { gap: 0; }
+  #lumino-legend .lumino-legend-row[data-lumino-row] {
+    min-height: 26px;
+    padding: 2px 10px 2px 0;
+  }
 }

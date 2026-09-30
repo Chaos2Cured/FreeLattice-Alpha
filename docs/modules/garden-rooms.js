@@ -817,6 +817,24 @@
     document.body.insertBefore(field, document.body.firstChild);
   }
 
+  // v-tree-glow-1-v0: a legend word opens its light, the same way "go to" does.
+  function bindLegendRow(row, id) {
+    row.setAttribute('role', 'button');
+    row.setAttribute('tabindex', '0');
+    row.setAttribute('aria-label', 'go to ' + goWord(id));
+    row.addEventListener('click', function (e) {
+      if (e && e.preventDefault) e.preventDefault();
+      if (e && e.stopPropagation) e.stopPropagation();
+      goToLumino(id);
+    });
+    row.addEventListener('keydown', function (e) {
+      var k = e && e.key;
+      if (k !== 'Enter' && k !== ' ') return;
+      if (e.preventDefault) e.preventDefault();
+      goToLumino(id);
+    });
+  }
+
   function ensureSkyLegend() {
     // Tiny quiet chip: which current color links to what.
     // Not a wall. Not a second you-are-here. Words help.
@@ -825,7 +843,9 @@
     if (!doors.length) return;
     var list = document.createElement('div');
     list.id = 'lumino-legend';
-    list.setAttribute('aria-hidden', 'true');
+    // v-tree-glow-1-v0: the words are quiet doors now (a light may orbit off a phone
+    // screen for most of a minute). Was aria-hidden; now each row says where it goes.
+    list.setAttribute('role', 'group');
     for (var i = 0; i < doors.length; i++) {
       if (doors[i].hidden || doors[i].classList.contains('is-held')) continue;
       var id = doors[i].getAttribute('data-garden-lumino') ||
@@ -845,6 +865,7 @@
       word.textContent = goWord(id);
       row.appendChild(dot);
       row.appendChild(word);
+      if (id) bindLegendRow(row, id); // v-tree-glow-1-v0
       list.appendChild(row);
     }
     if (!list.childNodes.length) return;
