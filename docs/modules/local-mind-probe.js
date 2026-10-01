@@ -29,6 +29,9 @@
 
   var ROSTER_TAGS = ['general', 'html', 'javascript', 'python'];
   var ROSTER_CAP = 4;
+  // v-tree-any-model-v0: every model at a door is choosable. Soft ceiling only against a runaway list.
+  var MODEL_CAP = 64;
+  var SKY_FOLD = 8; // stars shown before "Show all N"; the chosen one is always shown
 
   function shortModelName(name) {
     var s = String(name || '').trim();
@@ -208,7 +211,11 @@
         if (n) names.push(String(n));
       });
     }
-    return names.slice(0, 5);
+    // before v-tree-any-model-v0: return names.slice(0, 5);
+    // v-tree-any-model-v0: was names.slice(0, 5); every downloaded model is a choice.
+    var seenName = {};
+    names = names.filter(function (n) { if (seenName[n]) return false; seenName[n] = true; return true; });
+    return names.slice(0, MODEL_CAP);
   }
 
   function fetchDoor(url, ms) {
@@ -273,7 +280,18 @@
       }).catch(function () { return null; });
     }
     return bridgeFirst.then(function (bridged) {
-      if (bridged) return bridged;
+      // v-tree-any-model-v0: the Bridge speaks for Ollama; other doors still get asked
+      if (bridged) {
+        var others = DOORS.filter(function (d) { return d.id !== 'ollama'; });
+        return Promise.all(others.map(function (d) {
+          return fetchDoor(d.url, 2500).then(function (r) { r.id = d.id; r.name = d.name; return r; });
+        })).then(function (results) {
+          results.forEach(function (r) { if (r.ok) bridged.foundList.push(r); });
+          bridged.tried = 1 + results.length;
+          bridged.results = results;
+          return bridged;
+        });
+      }
       var jobs = DOORS.map(function (d) {
         return fetchDoor(d.url, 2500).then(function (result) {
           result.id = d.id;
@@ -307,6 +325,15 @@
     var text = String(raw || '').trim();
     if (!text) {
       return Promise.resolve({ ok: false, empty: true });
+    }
+    // v-tree-any-model-v0: 127.0.0.1 only. Nothing leaves this computer.
+    // A bare port ("1234" or ":1234") means this computer's own door.
+    if (/^:?\d{1,5}$/.test(text)) text = '127.0.0.1:' + text.replace(/^:/, '');
+    var hostPart = text.replace(/^https?:\/\//i, '').split(/[\/?#]/)[0];
+    var hostOnly = hostPart.replace(/:\d{1,5}$/, '').toLowerCase();
+    if (hostOnly === 'localhost') text = text.replace(/localhost/i, '127.0.0.1');
+    if (!(hostOnly === '127.0.0.1' || hostOnly === 'localhost' || hostOnly === '[::1]')) {
+      return Promise.resolve({ ok: false, refused: true, pasted: String(raw || '') });
     }
     if (!/^https?:\/\//i.test(text)) {
       text = 'http://' + text;
@@ -390,7 +417,9 @@
         });
       });
     });
-    return out.slice(0, 12);
+    // before v-tree-any-model-v0: return out.slice(0, 12);
+    // v-tree-any-model-v0: every remembered model can take a chair
+    return out.slice(0, MODEL_CAP);
   }
 
   function setStatus(root, msg, kind, asHtml) {
@@ -471,6 +500,21 @@
     return false;
   }
 
+  // v-tree-any-model-v0: find a prior model at any found door (the Bridge and 11434 are the same Ollama)
+  function doorFamily(url) {
+    var u = String(url || '');
+    if (/\/v1\/models$/i.test(u)) return 'openai:' + u.replace(/\/v1\/models$/i, '');
+    return 'ollama';
+  }
+  function findModelAnywhere(minds, name) {
+    if (!name) return null;
+    var i;
+    for (i = 0; i < minds.length; i++) {
+      if (modelOnList(minds[i].models || [], name)) return minds[i];
+    }
+    return null;
+  }
+
   function entryFromFoundList(foundList, fallbackName, fallbackUrl, prior) {
     var minds = (foundList || []).map(function (r) {
       var url = r.url;
@@ -518,7 +562,35 @@
     var priorChosen = priorModelForUrl(prior, primary.url) || (prior && prior.model ? String(prior.model) : '');
     var model = primary.model || '';
     var modelNote = '';
-    if (priorChosen && !modelOnList(models, priorChosen)) {
+    // v-tree-any-model-v0: a chosen model that is still at a found door is never called gone.
+    var anyNote = '';
+    var anyKept = false;
+    var priorDoor = priorPrimaryUrl(prior) || (prior && prior.url ? String(prior.url) : '');
+    if (priorChosen && modelOnList(models, priorChosen) && model !== priorChosen) {
+      // the chosen model is at this door, but under a new address (Bridge <-> 11434)
+      primary.model = priorChosen;
+      model = priorChosen;
+      anyKept = true;
+      anyNote = 'Still speaking with ' + priorChosen + ', now through ' + (primary.name || 'a mind at home') + '.';
+    } else if (priorChosen && !modelOnList(models, priorChosen)) {
+      var elsewhere = findModelAnywhere(minds, priorChosen);
+      if (elsewhere && doorFamily(elsewhere.url) === doorFamily(priorDoor)) {
+        for (i = 0; i < minds.length; i++) minds[i].primary = minds[i] === elsewhere;
+        elsewhere.model = priorChosen;
+        primary = elsewhere;
+        models = primary.models || [];
+        model = priorChosen;
+        anyKept = true;
+        anyNote = 'Still speaking with ' + priorChosen + ', now through ' + (elsewhere.name || 'a mind at home') + '.';
+      } else if (elsewhere) {
+        anyKept = true;
+        anyNote = 'The chosen model ' + priorChosen + ' is at ' + (elsewhere.name || 'another door') +
+          '. Tap it to speak with it again.';
+      }
+    }
+    if (anyKept) {
+      modelNote = anyNote;
+    } else if (priorChosen && !modelOnList(models, priorChosen)) {
       modelNote = speakModelGone(priorChosen, model);
     }
     var entry = {
@@ -590,6 +662,40 @@
     }
     entry.minds = minds;
     syncEntryFromMind(entry, target);
+    remember(entry);
+    return entry;
+  }
+
+  // v-tree-any-model-v0: Connect and paste add to the sky; they never wipe it.
+  // found = { name, url, models: [names], model }
+  function mergeFound(found) {
+    if (!found || !found.url) return null;
+    var url = String(found.url);
+    var models = (found.models || []).map(function (m) {
+      return String((m && (m.name || m.model || m.id)) || m);
+    }).filter(Boolean).slice(0, MODEL_CAP);
+    var model = String(found.model || '');
+    if (model && !modelOnList(models, model)) models.unshift(model);
+    var entry = getRemembered() || { name: '', url: '', model: '', models: [], minds: [],
+      roster: [], gatheringBinds: {}, speakingChair: '' };
+    normalizeEntry(entry);
+    var minds = mindsFromEntry(entry);
+    var target = null;
+    var i;
+    for (i = 0; i < minds.length; i++) {
+      if (String(minds[i].url || '') === url) { target = minds[i]; break; }
+    }
+    if (!target) {
+      target = { name: String(found.name || 'a mind at home'), url: url, models: [], model: '', primary: false };
+      minds.push(target);
+    }
+    if (found.name) target.name = String(found.name);
+    target.models = models.length ? models : (target.models || []);
+    target.model = model || target.model || (target.models && target.models[0]) || '';
+    entry.minds = minds.slice(0, 7);
+    if (entry.minds.indexOf(target) < 0) entry.minds[entry.minds.length - 1] = target;
+    syncEntryFromMind(entry, target);
+    entry.foundAt = new Date().toISOString();
     remember(entry);
     return entry;
   }
@@ -666,7 +772,15 @@
         star.appendChild(light);
         star.appendChild(nameNode);
       }
-      var models = (m.models || []).slice(0, 5);
+      // before v-tree-any-model-v0: var models = (m.models || []).slice(0, 5);
+      // v-tree-any-model-v0: all models; fold after SKY_FOLD, chosen always visible
+      var allModels = (m.models || []).slice(0, MODEL_CAP);
+      var expanded = host.getAttribute('data-sky-open') === '1';
+      var models = allModels;
+      if (!expanded && allModels.length > SKY_FOLD) {
+        models = allModels.slice(0, SKY_FOLD);
+        if (isPrimary && chosen && allModels.indexOf(chosen) >= SKY_FOLD) models.push(chosen);
+      }
       if (models.length) {
         var cluster = el('span', 'settings-star-models');
         cluster.setAttribute('role', 'radiogroup');
@@ -701,6 +815,16 @@
           if (next) paintConstellation(host, mindsFromEntry(next));
         });
         star.appendChild(cluster);
+        if (!expanded && allModels.length > models.length) {
+          var more = el('button', 'settings-star-more', 'Show all ' + allModels.length + ' models');
+          more.type = 'button';
+          more.setAttribute('data-sky-more', '1');
+          more.addEventListener('click', function () {
+            host.setAttribute('data-sky-open', '1');
+            paintConstellation(host, mindsFromEntry(getRemembered()));
+          });
+          star.appendChild(more);
+        }
       }
       host.appendChild(star);
     });
@@ -825,6 +949,10 @@
       'We only look at well-known local doors, and only when you ask. ' +
       'We never look through this computer\'s files. We never upload. Quality of the sky is later.'
     ));
+    // v-tree-any-model-v0: one honest line for LM Studio on a secure page
+    root.appendChild(el('p', 'settings-muted settings-honesty',
+      'LM Studio: turn on CORS in its server settings so this garden can hear it.'
+    ));
 
     function showNext() {
       next.hidden = false;
@@ -873,6 +1001,22 @@
         if (result.empty) {
           setStatus(root, 'Paste an address when you are ready. There is no hurry.', '');
           return;
+        }
+        // v-tree-any-model-v0: only this computer's own doors
+        if (result.refused) {
+          setStatus(root, 'Only this computer\'s own doors (127.0.0.1). Nothing was sent.', 'warn');
+          return;
+        }
+        // v-tree-any-model-v0: a pasted door joins the sky instead of replacing it
+        var had = getRemembered();
+        if (result.ok && had && had.url) {
+          var mergedPaste = mergeFound({ name: 'a mind at home', url: result.url, models: result.models || [] });
+          if (mergedPaste) {
+            paintConstellation(sky, mindsFromEntry(mergedPaste));
+            paintRoster(rosterHost);
+            setStatus(root, speakFound(mergedPaste.name, mergedPaste.url), 'ok');
+            return;
+          }
         }
         if (result.ok) {
           onFound(
@@ -928,6 +1072,8 @@
     paintRoster: paintRoster,
     chooseModel: chooseModel,
     choosePrimary: choosePrimary,
+    mergeFound: mergeFound, // v-tree-any-model-v0
+    MODEL_CAP: MODEL_CAP,
     speakWithLine: speakWithLine,
     speakNone: speakNone,
     speakNoneHtml: speakNoneHtml,

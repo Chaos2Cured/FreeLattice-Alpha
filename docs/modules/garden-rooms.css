@@ -6184,3 +6184,34 @@ html.flc-hide-galaxy #gardenContainer {
     padding: 2px 10px 2px 0;
   }
 }
+
+/* v-tree-any-model-v0: every model at a door is a star. Eight show, then "Show all N".
+   A long chair list scrolls inside the picker. "change mind" sits quietly by the heart. */
+.settings-star-models { flex-wrap: wrap; }
+.settings-star-more {
+  font: inherit;
+  font-size: 0.85rem;
+  background: none;
+  border: 0;
+  color: inherit;
+  opacity: 0.75;
+  text-decoration: underline;
+  min-height: 44px;
+  padding: 0 0.5rem;
+  cursor: pointer;
+}
+.core-bind-options { max-height: 50vh; overflow-y: auto; overscroll-behavior: contain; }
+.thread-change {
+  font: inherit;
+  font-size: 0.82rem;
+  min-height: 32px;
+  margin: 0.15rem 0 0.35rem;
+  padding: 0.1rem 0.6rem;
+  background: none;
+  border: 1px solid rgba(200, 210, 230, 0.3);
+  border-radius: 999px;
+  color: inherit;
+  opacity: 0.85;
+  cursor: pointer;
+}
+.thread-change:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }

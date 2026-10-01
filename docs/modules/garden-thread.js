@@ -490,6 +490,24 @@
 
   messages = loadHistory();
 
+  // v-tree-any-model-v0: "Listening: Ollama · llama3.2:latest. On this machine only."
+  function heartListening(mind) {
+    var speaking = mind.model || (mind.models && mind.models[0]) || '';
+    return 'Listening: ' + (mind.name || 'a mind at home') +
+      (speaking && speaking !== mind.name ? ' \u00b7 ' + speaking : '') + '. On this machine only.';
+  }
+  // v-tree-any-model-v0: every mounted thread repaints its heart when a mind is remembered
+  try {
+    window.addEventListener('fl-alpha-mind-remembered', function () {
+      var hearts = document.querySelectorAll('[data-thread-heart]');
+      if (!hearts.length) return;
+      var now = listener();
+      for (var hi = 0; hi < hearts.length; hi++) {
+        hearts[hi].textContent = now ? heartListening(now) : HEART_NONE;
+      }
+    });
+  } catch (eHeart) { /* fail-quiet */ }
+
   function mount(container, opts) {
     opts = opts || {};
     if (!container) return null;
@@ -506,7 +524,21 @@
     } else {
       heart.textContent = HEART_NONE;
     }
+    // v-tree-any-model-v0: name the model, not only the door (the line above stays as the base)
+    heart.setAttribute('data-thread-heart', '1');
+    if (mind) heart.textContent = heartListening(mind);
     root.appendChild(heart);
+    // v-tree-any-model-v0: change the mind from where you are
+    if (mind && !opts.inSettings) {
+      var change = el('button', 'thread-change', 'change mind');
+      change.type = 'button';
+      change.setAttribute('data-thread-change', '1');
+      change.addEventListener('click', function () {
+        if (window.GardenRooms && typeof GardenRooms.openPlace === 'function') GardenRooms.openPlace('settings');
+        else location.href = 'settings.html';
+      });
+      root.appendChild(change);
+    }
 
     var later = el('p', 'thread-later', HEART_LATER);
     later.setAttribute('data-thread-later', '1');

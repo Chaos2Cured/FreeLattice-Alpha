@@ -68,6 +68,18 @@ const GardenTrainer = (() => {
   // Reveals depth as the relationship deepens. Never gates — always reveals.
   // The feature is always there. It becomes visible and named when earned.
   // ================================================================
+  // v-tree-any-model-v0: the Tree remembers its model in fl_alpha_local_mind.
+  // (Before: localStorage.getItem('fl_active_model') at each call, a FreeLattice key the Tree never writes.)
+  function activeModelName() {
+    try {
+      var a = localStorage.getItem('fl_active_model');
+      if (a) return a;
+      var m = window.LocalMindProbe && LocalMindProbe.getRemembered && LocalMindProbe.getRemembered();
+      if (m && m.model) return String(m.model);
+    } catch (e) {}
+    return '';
+  }
+
   function getTrainerTierUnlocks() {
     var rank = 'Seed';
     try {
@@ -728,7 +740,7 @@ const GardenTrainer = (() => {
     var t1btn = document.createElement('button');
     t1btn.className = 'trainer-btn primary';
     t1btn.textContent = 'Export Personality File';
-    t1btn.onclick = function() { exportPersonalityModelfile(localStorage.getItem('fl_active_model')); };
+    t1btn.onclick = function() { exportPersonalityModelfile(activeModelName()); };
     t1.appendChild(t1btn);
     panel.appendChild(t1);
 
@@ -765,7 +777,7 @@ const GardenTrainer = (() => {
     var btnPy = document.createElement('button');
     btnPy.className = 'trainer-btn secondary';
     btnPy.textContent = 'Export Python Fine-Tuner';
-    btnPy.onclick = function() { exportPythonHelper(localStorage.getItem('fl_active_model')); };
+    btnPy.onclick = function() { exportPythonHelper(activeModelName()); };
     t2btns.appendChild(btnPy);
 
     t2.appendChild(t2btns);
@@ -896,9 +908,9 @@ const GardenTrainer = (() => {
     }
 
     btnExpand.onclick = function() {
-      var proposal = proposeNextPathway(localStorage.getItem('fl_active_model'));
+      var proposal = proposeNextPathway(activeModelName());
       var artifact = expandPathway(proposal, {
-        modelName: localStorage.getItem('fl_active_model') || 'phi-pathway'
+        modelName: activeModelName() || 'phi-pathway'
       });
       _renderArtifact(artifact);
     };
@@ -1089,7 +1101,7 @@ const GardenTrainer = (() => {
     keepBtn.style.fontFamily = 'Georgia, serif';
     keepBtn.style.fontWeight = '600';
     keepBtn.onclick = function() {
-      exportPersonalityModelfile(localStorage.getItem('fl_active_model'));
+      exportPersonalityModelfile(activeModelName());
     };
     face.appendChild(keepBtn);
 
