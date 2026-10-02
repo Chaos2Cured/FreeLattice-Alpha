@@ -44,6 +44,14 @@
     'The mind was quiet. Nothing was invented.';
   var HEART_FAIL =
     'The door did not answer. Nothing was invented.';
+  // v-tree-honest-reasons-v0: say the right one.
+  var HEART_STOPPED =
+    'Nothing answered at the mind\'s door on this machine. If Ollama (or your local app) is stopped, ' +
+    'start it and send again. Nothing was invented.';
+  function heartModelMissing(model) {
+    return 'The mind at home answered, but it does not have ' + (model || 'that model') + ' now. ' +
+      'Pick another in Settings, or Change this chair. Nothing was invented.';
+  }
   var HEART_LATER =
     'Deep research, a picture, a sound, and speech wait. This mind speaks in words. Those doors open when this garden can keep them without a kitchen.';
   // FreeLattice Chat honesty (v5.79.14 / v5.79.44). Not a kitchen prompt.
@@ -411,7 +419,16 @@
       if (!res.ok) {
         var err = new Error('door-status-' + res.status);
         err.status = res.status;
-        throw err;
+        // before v-tree-honest-reasons-v0: throw err;
+        // v-tree-honest-reasons-v0: Ollama says 404 "model 'x' not found" when the seated
+        // model is gone. Read only that short line, never show raw text.
+        return res.text().then(function (body) {
+          if (res.status === 404 && /model[\s\S]{0,120}not found|not found[\s\S]{0,40}model/i.test(String(body || '').slice(0, 300))) {
+            err.reason = 'model-missing';
+            err.model = model || '';
+          }
+          throw err;
+        }, function () { throw err; });
       }
       return res.json().then(function (json) {
         var text = parseReply(url, json);
@@ -451,7 +468,8 @@
           if (prev) return prev;
           if (skipOllama) return null;
           return postChat(url, model, msgs).catch(function (err) {
-            if (err && (err.blocked || err.reason === 'quiet')) throw err;
+            // before v-tree-honest-reasons-v0: if (err && (err.blocked || err.reason === 'quiet')) throw err;
+            if (err && (err.blocked || err.reason === 'quiet' || err.reason === 'model-missing')) throw err;
             return null;
           });
         });
@@ -486,6 +504,13 @@
       list.appendChild(item);
     });
     list.scrollTop = list.scrollHeight;
+    // v-tree-honest-reasons-v0: a long garden line showed only its last words in the
+    // small card. Show where it begins; the rest scrolls.
+    var last = list.lastElementChild;
+    if (last && /\bis-garden\b/.test(last.className) && last.getBoundingClientRect) {
+      var dy = last.getBoundingClientRect().top - list.getBoundingClientRect().top;
+      if (dy < 0) list.scrollTop = Math.max(0, list.scrollTop + dy);
+    }
   }
 
   messages = loadHistory();
@@ -733,10 +758,27 @@
         else if (err && (err.blocked || looksBlocked(err))) {
           reason = pageIsHttps() ? 'blocked' : 'fail';
         }
-        messages.push({ role: 'garden', text: speakHonest(reason) });
-        saveHistory();
-        renderMessages(list);
-        setStatus('', true);
+        // before v-tree-honest-reasons-v0: messages.push({ role: 'garden', text: speakHonest(reason) });
+        //   saveHistory(); renderMessages(list); setStatus('', true);  (now inside say(), same steps)
+        function say(text) {
+          messages.push({ role: 'garden', text: text });
+          saveHistory();
+          renderMessages(list);
+          setStatus('', true);
+        }
+        // v-tree-honest-reasons-v0: a missing model is named; a quiet door gets one
+        // no-cors knock (after this Send only) so "stopped" and "shut" are told apart.
+        if (err && err.reason === 'model-missing') { say(heartModelMissing(err.model)); return; }
+        var door = (talkUrls(nowMind)[0]) || '';
+        if ((reason === 'blocked' || reason === 'fail') && door &&
+            window.LocalMindProbe && typeof LocalMindProbe.knock === 'function') {
+          LocalMindProbe.knock(door).then(function (k) {
+            if (k === 'down') say(HEART_STOPPED);
+            else say(speakHonest(reason));
+          });
+          return;
+        }
+        say(speakHonest(reason));
       });
     }
 

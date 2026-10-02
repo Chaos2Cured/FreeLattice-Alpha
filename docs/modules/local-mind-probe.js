@@ -367,6 +367,53 @@
       '. We will remember, on this machine. Nothing was uploaded.';
   }
 
+  // v-tree-honest-reasons-v0: when every door was quiet, a quiet knock tells "nothing is
+  // running" apart from "a mind answered but keeps its door shut to this page". A no-cors
+  // knock reads nothing from the mind; it only learns whether anything answered at that
+  // door. It runs only after a tap (Find, May I look?, Send), never on its own.
+  function knock(url, ms) {
+    if (typeof fetch !== 'function' || !url) return Promise.resolve('unknown');
+    var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, ms || 2000);
+    var opts = { method: 'GET', mode: 'no-cors', cache: 'no-store' };
+    if (ctrl) opts.signal = ctrl.signal;
+    return fetch(url, opts).then(function () {
+      clearTimeout(timer);
+      return 'up';
+    }, function (err) {
+      clearTimeout(timer);
+      return err && err.name === 'AbortError' ? 'slow' : 'down';
+    });
+  }
+
+  // After a look with no mind found: 'shut' (something answered at a door, its door is
+  // closed to this page, with that door's name), 'stopped' (nothing answered anywhere),
+  // or 'none' (nothing to knock).
+  function whyQuiet(report) {
+    var quiet = ((report && report.results) || []).filter(function (r) {
+      return r && !r.ok && (r.blocked || r.status === 0) && r.url;
+    });
+    if (!quiet.length) return Promise.resolve({ kind: 'none' });
+    return Promise.all(quiet.map(function (r) {
+      return knock(r.url).then(function (k) { return { name: r.name || 'a mind', state: k }; });
+    })).then(function (ks) {
+      var up = ks.filter(function (k) { return k.state === 'up' || k.state === 'slow'; });
+      if (up.length) return { kind: 'shut', name: up[0].name };
+      return { kind: 'stopped' };
+    });
+  }
+
+  function speakShut(name) {
+    return 'Something answered at the ' + (name || 'mind') + ' door, but it has not opened that door to this garden yet. ' +
+      'This garden is a secure page, and the mind lives at a quieter door. ' +
+      'That is why we cannot see in from here.';
+  }
+
+  function speakStopped() {
+    return 'Nothing answered at the usual doors on this machine. If Ollama (or your local app) is stopped, ' +
+      'start it, then look again. If it is running, let this page look at local devices when the browser asks.';
+  }
+
   function speakBlocked() {
     return 'The mind is there, but it has not opened the door to this garden yet. ' +
       'This garden is a secure page, and the mind lives at a quieter door. ' +
@@ -984,8 +1031,14 @@
         showNext();
         // HTTPS pages often cannot see http://127.0.0.1 (mixed content / PNA).
         // Speak that honestly. On a quiet local http page, no-answer is simply none.
+        // before v-tree-honest-reasons-v0: setStatus(root, speakBlocked(), 'warn');  (kept as the last branch)
+        // v-tree-honest-reasons-v0: knock first, so a stopped mind is not called "there".
         if (report.https && report.blocked > 0) {
-          setStatus(root, speakBlocked(), 'warn');
+          whyQuiet(report).then(function (why) {
+            if (why.kind === 'shut') setStatus(root, speakShut(why.name), 'warn');
+            else if (why.kind === 'stopped') setStatus(root, speakStopped(), 'warn');
+            else setStatus(root, speakBlocked(), 'warn');
+          });
           return;
         }
         setStatus(root, speakNoneHtml(), '', true);
@@ -1056,6 +1109,10 @@
     ROSTER_TAGS: ROSTER_TAGS,
     ROSTER_CAP: ROSTER_CAP,
     look: look,
+    knock: knock,
+    whyQuiet: whyQuiet,
+    speakShut: speakShut,
+    speakStopped: speakStopped,
     tryAddress: tryAddress,
     getRemembered: getRemembered,
     getRememberedMinds: getRememberedMinds,

@@ -1280,6 +1280,13 @@
     // v-tree-glow-2a-v0: a second tap on the legend landed on Find as it slid in
     // under the finger and looked unasked. A tap in the first moment is not a yes.
     var findReadyAt = Date.now() + 700;
+    // v-tree-honest-reasons-v0 (Grok's Glow 2a walk): a tap in that first moment still gets
+    // a gentle answer, so it never looks like nothing happened. Nothing is looked at.
+    findBtn.addEventListener('click', function () {
+      if (Date.now() < findReadyAt) {
+        setNoteText('One moment. Tap Find local minds again when you are ready. Nothing was looked at yet.');
+      }
+    });
 
     var ring = document.createElement('div');
     ring.className = 'core-chairs';
@@ -1332,14 +1339,24 @@
       n.classList.add('is-fresh');
     }
 
-    function setNoteAbsent(kind) {
+    // before v-tree-honest-reasons-v0: function setNoteAbsent(kind) { ... if (kind === 'https') {
+    //   'The mind may be there, but this secure page cannot see the quieter door. Try ' (kept below)
+    function setNoteAbsent(kind, doorName) {
       var n = wrap.querySelector('[data-core-note]');
       if (!n) return;
       n.textContent = '';
       n.classList.add('is-fresh');
-      if (kind === 'https') {
+      if (kind === 'stopped') {
         n.appendChild(document.createTextNode(
-          'The mind may be there, but this secure page cannot see the quieter door. Try '
+          'Nothing answered at the usual doors on this machine. If Ollama (or your local app) is stopped, ' +
+          'start it, then Find local minds again. If it is running, let this page look at local devices when the browser asks.'
+        ));
+        return;
+      }
+      if (kind === 'https') {
+        n.appendChild(document.createTextNode(doorName
+          ? 'Something answered at the ' + doorName + ' door, but this secure page cannot see in. Try '
+          : 'The mind may be there, but this secure page cannot see the quieter door. Try '
         ));
         var d = document.createElement('a');
         d.href = DESKTOP_URL;
@@ -1565,6 +1582,14 @@
           return;
         }
         if (report && report.https && report.blocked > 0) {
+          // v-tree-honest-reasons-v0: knock first. A stopped mind is not "there".
+          if (typeof LocalMindProbe.whyQuiet === 'function') {
+            return LocalMindProbe.whyQuiet(report).then(function (why) {
+              if (why.kind === 'stopped') setNoteAbsent('stopped');
+              else if (why.kind === 'shut') setNoteAbsent('https', why.name);
+              else setNoteAbsent('https');
+            });
+          }
           setNoteAbsent('https');
           return;
         }
