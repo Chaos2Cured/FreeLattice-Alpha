@@ -847,7 +847,16 @@
     container.appendChild(root);
     renderMessages(list);
     if (mind) {
-      setTimeout(function () { try { input.focus(); } catch (e) {} }, 80);
+      // v-tree-glow-2a-v0: a quiet remount (a mind was remembered) must not pull the
+      // page down to Send while she is reading Find's answer. No scroll, and never
+      // take focus from something she is using.
+      setTimeout(function () {
+        try {
+          var a = document.activeElement;
+          if (a && a !== document.body && !root.contains(a)) return;
+          input.focus({ preventScroll: true });
+        } catch (e) {}
+      }, 80);
     }
     return root;
   }
