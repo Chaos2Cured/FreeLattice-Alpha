@@ -25,3 +25,17 @@ Alpha layer, marker `v-tree-glow-1-v0`. September 30, 2026.
 6. Play universe (largest; its own vision doc first).
 
 Leftovers to fold in: code-nursery 22px overflow at 390; the first-visit "They grow." hint sits behind the header.
+
+## Glow 2a: Grandma heal, zoom, feedback, a calm way back (v-tree-glow-2a-v0)
+
+**Temperature:** Grandma can zoom in, tap Find, see what happened, and always find the way back.
+
+From Hypha's persona walks (2026-09-30), most harmful first:
+
+- At 150% and 200% zoom the Gathering scrolls as one page: the way back stays at the top, Find takes a tap, the chairs are in reach, and the Chat card's words no longer sit on its own Send (the chairs box was 0px tall at 200%).
+- On a phone, the newest Find or seat line ("Local minds found", "This cortex chair seats...", "Cleared...") stays in view at the foot of the chairs until the next one replaces it.
+- A calm way back: Escape closes the top layer (galaxies, picker, Chat, place); a tap on the empty glass closes the place; galaxies has a visible close and closes on an outside tap; browser Back closes what is open instead of leaving the site. "the garden" is a bigger target with a quiet close mark.
+- A second tap on the legend no longer lands on Find as it slides in (no unasked look).
+- The picker's "not yet" sits above the later seats at 1280.
+- Zoomed home: the light legend leaves "Garden Galaxy / you are in the garden", and "galaxies" stays inside the edge. Zoomed Nursery: the egg fits, the sentence wraps, Begin is in view; on a phone the hop lights rest dim behind it.
+- A quiet Chat remount (a mind was remembered) no longer pulls the page down to Send.
