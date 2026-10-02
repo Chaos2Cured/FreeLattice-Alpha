@@ -4,6 +4,8 @@
 
 **Spine layer (2026-08-30):** five skies now walk the same night — Garden, Art, Workshop, Learn, Research. The four-galaxy sequence below stays. Art-early stays. This file layers; it does not cut.
 
+**LAYER (2026-10-01):** Any model, any order (marker `v-tree-any-model-v0`). Every local model at a door can be chosen (no cap of five, eight stars then Show all), Connect adds to the sky instead of wiping it, a chosen model is never called gone while it is at a found door, the paste field takes 127.0.0.1 only, the Chat heart names the model with a "change mind" button, and the trainer reads the Tree's model. Shared fl-connect.js stays byte-identical with FreeLattice. Plan: `docs/library/TREE_ANY_MODEL_v0.1.md`. Layer, never delete.
+
 **LAYER (2026-09-30):** Tree glow 1, every light in reach (marker `v-tree-glow-1-v0`). Room pages breathe again, the 390 address box stays in its card, the Gathering promise band steps below Find local minds at desktop, and the sky legend is one tap to each light. Plan: `docs/library/TREE_GLOW_v0.md`. Layer, never delete.
 
 **LAYER (2026-09-17):** Listen — Hang Cancel + Adaptive (mycelium · marker `v-alpha-listen-hang-adaptive-v0`). FreeLattice Chat: **Hang Cancel** — Stop only · no duration kill · `v-chat-hang-cancel-v0` · tip `d14eaf8` / #87. **Adaptive Context Depth** — Surface / Standard / Deep under Smart · `v-adaptive-context-depth-v0` · tip `06d0ba4` / #85. Alpha stays Listen / fail-closed — **no second context kitchen** tonight. Long local thinks are valid; Stop is choice, not a timer. Market-beside-Feel pointer stays. Presence chips ≠ SKUs. Workshop benches still wait for the FreeLattice Workshop twin — grandmother honesty, not rebuild tonight.
