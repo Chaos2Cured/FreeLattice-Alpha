@@ -6429,3 +6429,16 @@ html.flc-hide-galaxy #gardenContainer {
   border-color: rgba(232, 196, 104, 0.6);
   color: #e8c468;
 }
+
+/* v-tree-menu-clarity-v0: menus and veils a hint more solid so words read over the sky.
+   Layer, never delete: each rule above stays; these win by order. About +0.10 alpha each. */
+#place-veil { background: rgba(12, 10, 26, 0.32); }
+#place-veil.is-core { background: rgba(12, 10, 26, 0.28); }
+#place-veil.is-settings { background: rgba(12, 10, 26, 0.38); }
+#place-veil.is-open.is-workshop-later { background: rgba(12, 10, 26, 0.32); }
+#thread-veil { background: rgba(12, 10, 26, 0.38); }
+.galaxies-panel,
+html.room-page .galaxies-panel { background: rgba(12, 10, 26, 0.985); }
+@media (min-width: 800px) {
+  #garden-header { background: linear-gradient(to bottom, rgba(12, 10, 26, 0.88), transparent); }
+}
