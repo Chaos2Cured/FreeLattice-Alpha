@@ -2054,6 +2054,10 @@
       if (line) line.hidden = true;
       host.hidden = false;
       WorkshopTrainer.mount(host);
+      // v-tree-refusal-score-v0.1: layer the refusal score under the trainer face (same host, same close).
+      if (window.TreeRefusalScore && TreeRefusalScore.mount) {
+        try { TreeRefusalScore.mount(host); } catch (e) {}
+      }
       veil.hidden = false;
       veil.classList.add('is-open');
       markWorkshopDoor('trainer');
