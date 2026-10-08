@@ -3105,6 +3105,64 @@ html.room-page .workshop-git,
 .workshop-trainer-mode[hidden],
 .workshop-trainer-mode-help[hidden] { display: none !important; }
 
+/* v-tree-score-heals-v0.1: the refusal score card gets a readable backing, like the
+   other Trainer items, so the sky and the Art galaxy light stay behind the words.
+   Per-subject lines wrap at 390. Layer, never delete. */
+#workshop-trainer .tree-refusal-score {
+  position: relative;
+  z-index: 1;
+  margin: 18px 0 8px;
+  padding: 14px 16px;
+  text-align: left;
+  background: rgba(12, 10, 26, 0.88);
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 0 24px rgba(12, 10, 26, 0.9);
+  font-family: Georgia, 'Times New Roman', serif;
+  color: rgba(220, 226, 240, 0.92);
+}
+#workshop-trainer .tree-refusal-title {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+  line-height: 1.35;
+  color: rgba(232, 196, 104, 0.95);
+}
+#workshop-trainer .tree-refusal-honest,
+#workshop-trainer .tree-refusal-limits,
+#workshop-trainer .tree-refusal-note {
+  margin: 0 0 10px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+#workshop-trainer .tree-refusal-status {
+  margin: 0 0 10px;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: #fff;
+}
+#workshop-trainer .tree-refusal-out,
+#workshop-trainer .tree-refusal-steps {
+  margin: 0 0 10px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+#workshop-trainer .tree-refusal-run:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+#workshop-trainer .tree-refusal-more summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+}
+@media (max-width: 480px) {
+  #workshop-trainer .tree-refusal-score { padding: 12px; }
+  #workshop-trainer .tree-refusal-run { display: block; width: 100%; }
+}
+
 /* Layer: Hypha two leftovers after PR 44 (Trainer face).
    Train sat as a tiny faint smudge — smaller than Settings,
    smaller than Ask and Run. html.room-page * zeros padding,
