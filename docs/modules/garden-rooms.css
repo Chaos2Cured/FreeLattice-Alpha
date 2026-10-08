@@ -6442,3 +6442,48 @@ html.room-page .galaxies-panel { background: rgba(12, 10, 26, 0.985); }
 @media (min-width: 800px) {
   #garden-header { background: linear-gradient(to bottom, rgba(12, 10, 26, 0.88), transparent); }
 }
+
+/* v-tree-menu-leftovers-v0: three leftovers GC found walking 020 (PR 91).
+   Layer, never delete: every rule above stays; these win by order or by equal weight. */
+
+/* 1. The Research, Art and Learn hop arrows sat under the open veils already (they cannot
+   take a tap there), but the veils are see-through, so the gold arrows showed through
+   The Gathering, Chat and the later lights. They rest while a veil is open and come back
+   when it closes, the way Settings already hides them. The Nursery keeps its own dim rest. */
+html:has(#place-veil.is-open:not(.is-nursery)) .galaxy-nav,
+html:has(#thread-veil.is-open) .galaxy-nav {
+  visibility: hidden;
+}
+
+/* 2. Room pages kept their header at 0.78 because older rules name the page
+   (html.room-page / html[data-garden-galaxy="..."] #garden-header) and outweigh
+   #garden-header. Same weight, later in the sheet, so 0.88 reaches every room. */
+@media (min-width: 800px) {
+  html.room-page #garden-header,
+  html[data-garden-galaxy="workshop"] #garden-header,
+  html[data-garden-galaxy="art"] #garden-header,
+  html[data-garden-galaxy="round-table"] #garden-header,
+  html[data-garden-galaxy="research"] #garden-header {
+    background: linear-gradient(to bottom, rgba(12, 10, 26, 0.88), transparent);
+  }
+}
+
+/* 3. Settings on a phone (and when zoomed): "the garden" pill stays where it is and
+   stays in view. Behind it the fade band becomes a quiet solid lane, so the lower
+   mind names and the Chat line slide under a footer instead of under a floating pill,
+   and a focused row is scrolled clear of it. The band also reaches the very bottom
+   edge (sticky stopped it 1.25rem short, at the veil's padding). Never takes a tap. */
+@media (max-width: 640px) {
+  #place-veil.is-settings {
+    scroll-padding-bottom: 5.5rem;
+  }
+  #place-veil.is-settings::after {
+    bottom: -1.25rem;
+    height: 84px;
+    margin: -84px -28px -20px;
+    background: linear-gradient(to top, rgba(12, 10, 26, 0.97) 0%, rgba(12, 10, 26, 0.97) 72%, rgba(12, 10, 26, 0) 100%);
+  }
+  #place-veil.is-settings #place-veil-close {
+    bottom: 0;
+  }
+}
