@@ -4,6 +4,8 @@
 
 **Spine layer (2026-08-30):** five skies now walk the same night — Garden, Art, Workshop, Learn, Research. The four-galaxy sequence below stays. Art-early stays. This file layers; it does not cut.
 
+**LAYER (2026-10-07):** Trusted kin (marker `v-tree-kin-v0.1`). Under Settings, a person makes a signed card for the remembered mind and passes it by text, email or in person; a friend pastes it, the page checks it against its own key, and the friend taps Trust. Same card and pass shape as FreeLattice `fl-kin.js` v0.2. No network, counts-only receipts, nothing shared yet (the Tree's Device Pool, 018, reads these passes later). Mirror: `docs/code-settings.html`. Layer, never delete.
+
 **LAYER (2026-10-01):** Any model, any order (marker `v-tree-any-model-v0`). Every local model at a door can be chosen (no cap of five, eight stars then Show all), Connect adds to the sky instead of wiping it, a chosen model is never called gone while it is at a found door, the paste field takes 127.0.0.1 only, the Chat heart names the model with a "change mind" button, and the trainer reads the Tree's model. Shared fl-connect.js stays byte-identical with FreeLattice. Plan: `docs/library/TREE_ANY_MODEL_v0.1.md`. Layer, never delete.
 **LAYER (2026-09-30):** Honest reasons (marker `v-tree-honest-reasons-v0`). When a mind is quiet the Tree says the right one: nothing answered (Ollama stopped: start it), something answered but keeps its door shut to this secure page (FreeLattice Desktop), or the seated model is gone (named, pick another). One no-cors knock per quiet door, only after a tap, reads nothing. A long garden line in the Chat card shows where it begins. fl-connect.js untouched. Plan: `docs/library/TREE_HONEST_REASONS_v0.1.md`. Layer, never delete.
 

@@ -1209,6 +1209,11 @@
       var ch = document.getElementById('fl-connect-mount-garden');
       if (ch) ch.hidden = true;
     } catch (eCH) {}
+    // v-tree-kin-v0.1: the kin card belongs to Settings only.
+    try {
+      var kh = document.getElementById('tree-kin-host');
+      if (kh) kh.hidden = true;
+    } catch (eKH) {}
 
     var ids = ['place-veil-line', 'nursery-stage', 'nursery-ceremony', 'nursery-growth', 'nursery-trainer', 'settings-grandmother', 'core-gathering', 'art-listen', 'workshop-benches', 'workshop-trainer', 'round-table-sitting'];
     for (var i = 0; i < ids.length; i++) {
@@ -1859,6 +1864,20 @@
         if (settingsFace && window.LocalMindProbe) {
           settingsFace.hidden = false;
           LocalMindProbe.mount(settingsFace);
+          // v-tree-kin-v0.1: trusted kin, just under the grandmother face. Made on first open,
+          // hidden with the other bodies. Mounting sends nothing and makes no key.
+          if (window.TreeKin && typeof TreeKin.mount === 'function') {
+            try {
+              var kinHost = document.getElementById('tree-kin-host');
+              if (!kinHost) {
+                kinHost = document.createElement('div');
+                kinHost.id = 'tree-kin-host';
+                if (settingsFace.parentNode) settingsFace.parentNode.insertBefore(kinHost, settingsFace.nextSibling);
+              }
+              kinHost.hidden = false;
+              TreeKin.mount(kinHost);
+            } catch (eKin) {}
+          }
         } else if (line) {
           line.hidden = false;
           line.textContent = 'Settings will be tiny: local minds + quality.';
