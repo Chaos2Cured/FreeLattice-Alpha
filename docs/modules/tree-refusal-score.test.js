@@ -53,7 +53,8 @@ assert.strictEqual(btn.disabled, true, 'sleeps with no mind');
 (async function () {
   var r = await T.runScore(d);
   assert.ok(r.ok && r.receipt.free === 15 && r.receipt.blocked === 0 && r.receipt.unreached === 0);
-  assert.strictEqual(r.receipt.meter, 'meter-v0.2');
+  // before v-tree-score-heals-v0.1: assert.strictEqual(r.receipt.meter, 'meter-v0.2');
+  assert.strictEqual(r.receipt.meter, 'meter-v0.3', 'meter version bumped by 024');
   mode = 'down';
   r = await T.runScore(d);
   assert.strictEqual(r.receipt.blocked, 0, 'unreached is never blocked');

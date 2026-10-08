@@ -2109,6 +2109,11 @@
       }
       if (trainer && !trainer.hidden && veil && veil.classList.contains('is-workshop-trainer')) {
         if (window.WorkshopTrainer && WorkshopTrainer.mount) WorkshopTrainer.mount(trainer);
+        // v-tree-score-heals-v0.1: the trainer face just cleared the host, so the refusal score
+        // mounts again here too (it waited until Trainer reopened before).
+        if (window.TreeRefusalScore && TreeRefusalScore.mount) {
+          try { TreeRefusalScore.mount(trainer); } catch (e) {}
+        }
       }
     });
 
