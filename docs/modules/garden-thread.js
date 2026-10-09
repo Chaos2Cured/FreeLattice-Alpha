@@ -26,6 +26,11 @@
 //      remembered local mind can keep those without inventing a key
 //      kitchen. Honest later sentence in the room. Not a fake button.
 //
+// v-tree-pool-room-v0.2 (019a): Ask the pool from Chat. Only after a human tap in
+// Settings, Device Pool (Use a mind in Chat), a question goes whole to the freest
+// trusted kin device that holds that mind (TreePool.askChat). Kin only, Pause
+// wins there. A device with no mind of its own can chat this way too. Never a
+// fake reply: a turned-away question says why, in plain words.
 // Mirror: docs/code-dialogue.html  (read that FIRST)
 // ═══════════════════════════════════════════════════════════════
 
@@ -481,6 +486,18 @@
     });
   }
 
+  // v-tree-pool-room-v0.2: the route a human chose in the Device Pool, or null.
+  var poolRefresh = null;
+  function poolRoute() {
+    try { return window.TreePool && typeof TreePool.chatRoute === 'function' ? TreePool.chatRoute() : null; } catch (e) { return null; }
+  }
+  function poolLineText(route) {
+    return 'Asking through the Device Pool: ' + route.model + ', on the freest trusted kin device that holds it. Change it in Settings, Device Pool.';
+  }
+  try {
+    window.addEventListener('tree-pool-chat-route', function () { if (poolRefresh) poolRefresh(); });
+  } catch (ePool) { /* fail-quiet */ }
+
   function speakHonest(reason) {
     if (reason === 'none') return HEART_NONE;
     if (reason === 'no-model') return HEART_NO_MODEL;
@@ -564,6 +581,14 @@
       });
       root.appendChild(change);
     }
+
+    // v-tree-pool-room-v0.2: say plainly when Chat asks through the pool.
+    var poolLine = el('p', 'thread-heart', '');
+    poolLine.setAttribute('data-thread-pool', '1');
+    var poolNow = poolRoute();
+    poolLine.textContent = poolNow ? poolLineText(poolNow) : '';
+    poolLine.hidden = !poolNow;
+    root.appendChild(poolLine);
 
     var later = el('p', 'thread-later', HEART_LATER);
     later.setAttribute('data-thread-later', '1');
@@ -699,7 +724,8 @@
       }
     }
 
-    setComposeOpen(!!mind);
+    // before v-tree-pool-room-v0.2: setComposeOpen(!!mind);
+    setComposeOpen(!!mind || !!poolNow);
 
     var status = el('p', 'thread-status');
     status.setAttribute('data-thread-status', '1');
@@ -723,6 +749,36 @@
       var last = messages[messages.length - 1];
       return !!(last && last.role === 'human');
     }
+
+    // v-tree-pool-room-v0.2: the whole chat so far goes to one trusted kin device; its answer, or why not.
+    function talkPool(route) {
+      if (busy) return;
+      busy = true;
+      sendBtn.disabled = true;
+      setStatus('Asking ' + route.model + ' through the Device Pool...', false);
+      var turns = messages
+        .filter(function (m) { return m.role === 'human' || m.role === 'mind'; })
+        .map(function (m) { return { role: m.role === 'mind' ? 'assistant' : 'user', content: messageContent(m) }; });
+      TreePool.askChat(turns).then(function (r) {
+        busy = false;
+        sendBtn.disabled = false;
+        if (r && r.ok) {
+          setStatus('', false);
+          messages.push({ role: 'mind', text: r.text || '', listener: r.label || route.model });
+        } else {
+          setStatus('', true);
+          messages.push({ role: 'garden', text: TreePool.reasonWords(r) + ' Nothing was invented.' });
+        }
+        saveHistory();
+        renderMessages(list);
+      });
+    }
+    poolRefresh = function () {
+      var now = poolRoute();
+      poolLine.textContent = now ? poolLineText(now) : '';
+      poolLine.hidden = !now;
+      setComposeOpen(!!listener() || !!now);
+    };
 
     function talkNow(nowMind) {
       if (busy) return;
@@ -785,6 +841,21 @@
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
       if (busy) return;
+      // v-tree-pool-room-v0.2: a chosen pool route answers instead of this computer's mind.
+      var route = poolRoute();
+      if (route && !form.classList.contains('is-closed')) {
+        var said = (input.value || '').trim();
+        if (said) {
+          messages.push({ role: 'human', text: said, ts: new Date().toISOString() });
+          input.value = '';
+          saveHistory();
+          renderMessages(list);
+        } else if (!lastIsHuman()) {
+          return;
+        }
+        talkPool(route);
+        return;
+      }
       var nowMind = listener();
       if (!nowMind || form.classList.contains('is-closed')) {
         setComposeOpen(false);
