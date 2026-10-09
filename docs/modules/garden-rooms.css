@@ -6545,3 +6545,123 @@ html:has(#thread-veil.is-open) .galaxy-nav {
     bottom: 0;
   }
 }
+
+/* v-tree-first-run-heals-v0.1: Hypha's walk #3 and #10, the first run a newcomer meets.
+   Layer, never delete: every rule above stays; these win by order or by equal weight.
+   Words stay. Lights stay. #place-veil-close is not touched. */
+
+/* #3 (1280): the Chat card's middle layer (#room-chat-stage) was a plain block, so the
+   face grew past the card and the input slid below the card's edge. The stage joins the
+   card's column; the replies take the room; the input stays inside the card. The card
+   may reach a little lower (it sits right of the chairs, clear of the later seats). */
+@media (min-width: 641px) {
+  #place-veil.is-core #room-chat {
+    bottom: 5.5rem;
+    max-height: min(56vh, calc(100vh - 20rem));
+  }
+  #place-veil.is-core #room-chat #room-chat-stage {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  #place-veil.is-core #room-chat .thread-face.is-room .thread-heart {
+    flex: 0 0 auto;
+    max-height: 4.6em;
+  }
+  #place-veil.is-core #room-chat .thread-face.is-room .thread-change {
+    flex: 0 0 auto;
+  }
+  #place-veil.is-core #room-chat .thread-face.is-room .thread-messages {
+    flex: 1 1 auto;
+    min-height: 3em;
+    max-height: none;
+  }
+}
+
+/* #3 (390): after the first Send, the card stayed 7.75rem tall and the input sat over
+   the reply. Once the thread has a line (or the pool line shows, 019a), the card is a
+   column: replies take the room, the input stays at its foot, and the hop pocket below
+   gives some of its air. */
+@media (max-width: 640px) and (min-height: 641px) {
+  #place-veil.is-core:has(#room-chat .thread-messages:not(:empty), #room-chat [data-thread-pool]:not([hidden])) {
+    padding-bottom: 7rem;
+  }
+  #place-veil.is-core #room-chat:has(.thread-messages:not(:empty), [data-thread-pool]:not([hidden])) {
+    display: flex;
+    flex-direction: column;
+    max-height: min(40vh, 21rem);
+    overflow: hidden;
+  }
+  #place-veil.is-core #room-chat:has(.thread-messages:not(:empty), [data-thread-pool]:not([hidden])) .room-chat-word {
+    flex: 0 0 auto;
+    align-self: center;
+  }
+  #place-veil.is-core #room-chat:has(.thread-messages:not(:empty), [data-thread-pool]:not([hidden])) #room-chat-stage {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  #place-veil.is-core #room-chat .thread-face.is-room:has(.thread-messages:not(:empty), [data-thread-pool]:not([hidden])) {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  #place-veil.is-core #room-chat .thread-face.is-room:has(.thread-messages:not(:empty), [data-thread-pool]:not([hidden])) > * {
+    flex: 0 0 auto;
+  }
+  #place-veil.is-core #room-chat .thread-face.is-room:has(.thread-messages:not(:empty)) .thread-messages {
+    flex: 1 1 auto;
+    min-height: 4.5em;
+    max-height: none;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  #place-veil.is-core #room-chat .thread-face.is-room:has(.thread-messages:not(:empty), [data-thread-pool]:not([hidden])) .thread-compose {
+    position: static;
+  }
+  /* The "later" line (deep research, a picture, a sound) rests while the thread has lines on a
+     phone, so the reply has the room. It shows again before the first line, and on wider glass. */
+  #place-veil.is-core #room-chat .thread-face.is-room:has(.thread-messages:not(:empty)) .thread-later {
+    display: none;
+  }
+  /* The pool line (019a) shows whole; the older two-line heart cap stays for the heart. */
+  #place-veil.is-core #room-chat .thread-face.is-room .thread-heart[data-thread-pool] {
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+/* 019a's note, Settings on a phone: the Chat card's input is a sticky foot over words that
+   scroll; at 0.82 the words showed through it. A solid foot, same place, same words. */
+@media (max-width: 640px) {
+  #place-veil.is-settings #room-chat .thread-compose {
+    background: rgba(12, 10, 26, 0.97);
+  }
+}
+
+/* #10: the Gathering's quiet words were below 4.5:1 on the sky (Hypha counted 15 at 390).
+   Same words, a little brighter, small ones a little larger. The asleep Send keeps its
+   sleep look on purpose (a disabled control). "a seat, later" stays quieter than the four. */
+#place-veil.is-core .core-center { color: rgba(200, 210, 230, 0.66); }
+#place-veil.is-core .core-chair-unnamed {
+  color: rgba(214, 222, 238, 0.74);
+  font-size: 0.75rem;
+}
+#place-veil.is-core .core-chair.is-later .core-chair-unnamed { color: rgba(214, 222, 238, 0.66); }
+#place-veil.is-core .core-family {
+  color: rgba(214, 222, 238, 0.72);
+  font-size: 0.8rem;
+}
+#place-veil.is-core .core-family a { color: rgba(196, 181, 253, 0.95); }
+html:has(#place-veil.is-core.is-open) #thread-open,
+html:has(#place-veil.is-core.is-open) details.galaxies > summary { color: rgba(214, 222, 238, 0.74); }
+html:has(#place-veil.is-core.is-open) #galaxy-word { color: rgba(214, 222, 238, 0.7); }
+html:has(#place-veil.is-core.is-open) #shared-shoulder,
+html:has(#place-veil.is-core.is-open) #shared-shoulder a {
+  color: rgba(214, 222, 238, 0.64);
+  font-size: 0.72rem;
+}

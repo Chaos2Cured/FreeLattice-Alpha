@@ -31,6 +31,9 @@
 // trusted kin device that holds that mind (TreePool.askChat). Kin only, Pause
 // wins there. A device with no mind of its own can chat this way too. Never a
 // fake reply: a turned-away question says why, in plain words.
+// v-tree-first-run-heals-v0.1 (Hypha's walk #3, 019a's note): the newest reply shows
+// where it begins, not only its last words. A device with no mind of its own that asks
+// through the pool no longer shows "A mind at home waits in Settings" above the pool line.
 // Mirror: docs/code-dialogue.html  (read that FIRST)
 // ═══════════════════════════════════════════════════════════════
 
@@ -491,6 +494,16 @@
   function poolRoute() {
     try { return window.TreePool && typeof TreePool.chatRoute === 'function' ? TreePool.chatRoute() : null; } catch (e) { return null; }
   }
+  // v-tree-first-run-heals-v0.1: with no mind here and a pool route chosen, the "waits in
+  // Settings" heart sat above the pool line and read like Chat was closed. It rests while the
+  // pool answers; it comes back when the route is stopped. Words unchanged.
+  function heartRestsForPool(heartEl) {
+    if (!heartEl) return;
+    var restFor = !listener() && !!poolRoute();
+    heartEl.hidden = restFor;
+    if (restFor) heartEl.setAttribute('data-thread-heart-rests', 'pool');
+    else heartEl.removeAttribute('data-thread-heart-rests');
+  }
   function poolLineText(route) {
     return 'Asking through the Device Pool: ' + route.model + ', on the freest trusted kin device that holds it. Change it in Settings, Device Pool.';
   }
@@ -524,7 +537,10 @@
     // v-tree-honest-reasons-v0: a long garden line showed only its last words in the
     // small card. Show where it begins; the rest scrolls.
     var last = list.lastElementChild;
-    if (last && /\bis-garden\b/.test(last.className) && last.getBoundingClientRect) {
+    // before v-tree-first-run-heals-v0.1: if (last && /\bis-garden\b/.test(last.className) && last.getBoundingClientRect) {
+    // v-tree-first-run-heals-v0.1: a long first reply showed only its last words (or none, at 390).
+    // The newest mind line also shows where it begins, with who said it.
+    if (last && /\b(is-garden|is-mind)\b/.test(last.className) && last.getBoundingClientRect) {
       var dy = last.getBoundingClientRect().top - list.getBoundingClientRect().top;
       if (dy < 0) list.scrollTop = Math.max(0, list.scrollTop + dy);
     }
@@ -546,6 +562,7 @@
       var now = listener();
       for (var hi = 0; hi < hearts.length; hi++) {
         hearts[hi].textContent = now ? heartListening(now) : HEART_NONE;
+        heartRestsForPool(hearts[hi]);
       }
     });
   } catch (eHeart) { /* fail-quiet */ }
@@ -589,6 +606,7 @@
     poolLine.textContent = poolNow ? poolLineText(poolNow) : '';
     poolLine.hidden = !poolNow;
     root.appendChild(poolLine);
+    heartRestsForPool(heart);
 
     var later = el('p', 'thread-later', HEART_LATER);
     later.setAttribute('data-thread-later', '1');
@@ -778,6 +796,7 @@
       poolLine.textContent = now ? poolLineText(now) : '';
       poolLine.hidden = !now;
       setComposeOpen(!!listener() || !!now);
+      heartRestsForPool(heart);
     };
 
     function talkNow(nowMind) {
