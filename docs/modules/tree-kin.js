@@ -1,4 +1,5 @@
 // tree-kin.js v-tree-kin-v0.1
+// (v-tree-pool-room-v0.2 layers an asking card on top, for a device with no mind of its own)
 //
 // Layer, never delete. Trusted kin for theLatticeTree, the first brick of the
 // Tree's own mesh (017). A Tree-native twin of FreeLattice fl-kin.js v0.2:
@@ -245,6 +246,24 @@
       });
     }).catch(function () { return { ok: false, reason: 'cannot-sign' }; });
   }
+  // v-tree-pool-room-v0.2: an asking card, for a device with no local mind of its own
+  // (a phone, an old laptop). It is the same signed card; its model line says plainly
+  // that it only asks. Kin can still choose to trust it, so a child with no chips or
+  // RAM of their own can ask a trusted kin's mind through the Device Pool.
+  // makeCard() above is unchanged: it still needs a remembered mind.
+  var ASKS_ONLY = 'asks only, no local mind';
+  function makeAskerCard(deviceName, keeperName) {
+    if (!clip(deviceName, 60)) return Promise.resolve({ ok: false, reason: 'name' });
+    return makeIdentity(keeperName).then(function (id) {
+      var body = cardBody({ name: deviceName, model: mindModel() || ASKS_ONLY, home: HOME, keeperMeshId: id.meshId,
+        keeperName: clip(keeperName, 60) || id.displayName, issuedAt: Date.now() });
+      var a = algos(id.cryptoType);
+      return subtle().sign(a.sig, id.keyPair.privateKey, new root.TextEncoder().encode(KIN_DOMAIN + JSON.stringify(body))).then(function (sig) {
+        bump('cardsMade');
+        return { ok: true, card: Object.assign({}, body, { publicKey: id.publicKeyJwk, cryptoType: id.cryptoType, signature: b64(sig) }) };
+      });
+    }).catch(function () { return { ok: false, reason: 'cannot-sign' }; });
+  }
   function encodeCard(card) { return CODE_PREFIX + utf8b64url(JSON.stringify(card)); }
   function decodeCode(code) {
     var s = String(code == null ? '' : code).replace(/\s+/g, '');
@@ -426,6 +445,8 @@
       var model = mindModel();
       if (!model) {
         mine.appendChild(el('p', 'tree-kin-quiet', 'Your card names the mind remembered in Settings. Remember a mind first (Find local minds, or May I look?), then come back here.'));
+        // v-tree-pool-room-v0.2: no mind here? This device can still ask trusted kin's minds.
+        paintAsker();
         return;
       }
       if (code) {
@@ -468,6 +489,49 @@
           }
           code = encodeCard(r.card);
           note.textContent = (store().lasting ? 'Your card is ready.' : 'Your card is ready. This browser cannot keep your key, so it lasts only this visit.');
+          paintMine();
+        });
+      }));
+    }
+
+    // v-tree-pool-room-v0.2: an asking card, for a phone or old laptop with no mind of its own.
+    function paintAsker() {
+      if (code) {
+        mine.appendChild(el('p', '', 'Send this asking card to a friend or teacher. It holds this device\'s name, your name, and a public key. No chats, no secrets.'));
+        var outA = el('textarea', 'tree-kin-code');
+        outA.readOnly = true;
+        outA.value = code;
+        outA.setAttribute('aria-label', 'Your asking card, to copy');
+        mine.appendChild(outA);
+        mine.appendChild(button('Copy my asking card', function () {
+          var doneA = function (ok) { if (ok) bump('copied'); note.textContent = ok ? 'Copied. Paste it into a message.' : 'This browser would not copy. Select the card above and copy it by hand.'; };
+          try {
+            if (root.navigator && root.navigator.clipboard && root.navigator.clipboard.writeText) {
+              root.navigator.clipboard.writeText(code).then(function () { doneA(true); }, function () { doneA(false); });
+            } else { doneA(false); }
+          } catch (e) { doneA(false); }
+        }));
+        return;
+      }
+      var n = names();
+      mine.appendChild(el('p', '', 'No mind on this device? You can still ask a trusted kin\'s mind through the Device Pool below. Make an asking card: it says plainly that this device only asks.'));
+      var dev = el('input', 'tree-kin-ai');
+      dev.type = 'text'; dev.maxLength = 60; dev.placeholder = 'Name this device, for example Ava\'s phone';
+      dev.value = n.ai || '';
+      dev.setAttribute('aria-label', 'This device\'s name');
+      var who = el('input', 'tree-kin-me');
+      who.type = 'text'; who.maxLength = 60; who.placeholder = 'Your first name, so friends know it is you';
+      who.value = n.keeper || '';
+      who.setAttribute('aria-label', 'Your first name');
+      mine.appendChild(dev); mine.appendChild(who);
+      mine.appendChild(button('Make an asking card', function () {
+        if (!clip(dev.value, 60)) { note.textContent = 'Give this device a name first.'; return; }
+        writeJson(NAMES_KEY, { ai: clip(dev.value, 60), keeper: clip(who.value, 60), asks: true });
+        note.textContent = 'Making your asking card on this computer...';
+        makeAskerCard(dev.value, who.value).then(function (r) {
+          if (!r.ok) { note.textContent = 'This browser could not make a key, so no card was made.'; return; }
+          code = encodeCard(r.card);
+          note.textContent = (store().lasting ? 'Your asking card is ready.' : 'Your asking card is ready. This browser cannot keep your key, so it lasts only this visit.');
           paintMine();
         });
       }));
@@ -562,6 +626,8 @@
     makeIdentity: makeIdentity,
     identity: function () { return _identity; },
     makeCard: makeCard,
+    makeAskerCard: makeAskerCard,
+    ASKS_ONLY: ASKS_ONLY,
     encodeCard: encodeCard,
     decodeCode: decodeCode,
     verifyCard: verifyCard,

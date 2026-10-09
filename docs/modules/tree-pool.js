@@ -1,4 +1,21 @@
-// tree-pool.js v-tree-pool-v0.1
+// tree-pool.js v-tree-pool-v0.1, layered by v-tree-pool-room-v0.2 (019a)
+//
+// v-tree-pool-room-v0.2 (019a), browser only, still no server and empty iceServers:
+//   - A room. One device hosts. Every other device joins once (scan or paste the
+//     room invite) and the room then connects it to every other device in the room,
+//     passing the connection codes over connections that already proved their keys.
+//     A lab of 20 is 19 single joins, not 190 pairings, and any device already in
+//     the room can let its neighbor in.
+//   - Picture codes (QR, Nayuki's MIT encoder in docs/lib/qrcodegen.js). A phone
+//     camera opens the Tree with the invite filled in (it rides after the #, which
+//     a browser never sends). Where the browser can read codes (BarcodeDetector),
+//     a tap lets this camera read an invite or a reply. Frames stay on this page.
+//   - Ask the pool from Chat, by a human tap: each question goes whole to the
+//     freest trusted kin device that holds the chosen mind. Kin only, Pause wins.
+//   - After a reload this page remembers which room it was in (the room name only),
+//     so one join brings it back; trusted kin stay trusted.
+//   Splitting one model across machines (llama.cpp rpc-server) is 019b, not here:
+//   a web page cannot start programs on a computer.
 //
 // Layer, never delete. The Device Pool for theLatticeTree (018), with a real
 // share door. A Tree-native twin of FreeLattice fl-pool.js and fl-share-door.js,
@@ -41,7 +58,8 @@
 (function (root) {
   'use strict';
 
-  var VERSION = 'v-tree-pool-v0.1';
+  // before v-tree-pool-room-v0.2: var VERSION = 'v-tree-pool-v0.1';
+  var VERSION = 'v-tree-pool-room-v0.2';
   var DOOR_KEY = 'tree_pool_door';            // off | kin | pause (off until a human taps)
   var PLUG_KEY = 'tree_pool_plugged_only';    // 'true' = only help while plugged in
   var COUNTS_KEY = 'tree_pool_counts';        // numbers only
@@ -62,7 +80,8 @@
 
   var HONEST = 'Memory is not joined across machines. Each question goes whole to one device that holds the model, and the answer comes back. ' +
     'Splitting one big model across machines is a later step.';
-  var LATER = 'Later (019): one tap to join a whole classroom lab, and one big model split across machines on a wired network (llama.cpp, MIT). Not in this card.';
+  // before v-tree-pool-room-v0.2: var LATER = 'Later (019): one tap to join a whole classroom lab, and one big model split across machines on a wired network (llama.cpp, MIT). Not in this card.';
+  var LATER = 'Later (019), its second half: one big model split across machines on a trusted wired network (llama.cpp, MIT). It is possible but slow, for learning, or for a model too big for any one machine. A web page cannot start it, so it waits for a small helper. Not in this card.';
   var LIMITS = 'Limits: ' + MAX_CONCURRENT + ' questions at a time, each up to ' + MAX_CHARS + ' characters. Only trusted kin can ask. ' +
     'As on FreeLattice, trusted kin skip the hourly caps.';
   var RECEIPTS = 'Receipts keep counts only (asked, answered, turned away). Never words, names or keys.';
@@ -216,7 +235,13 @@
   function ownCardCode() {
     var K = kin(), n = readJson(NAMES_KEY, {}) || {};
     if (!K || !K.makeCard || !K.encodeCard || !line(n.ai, 60)) return Promise.resolve('');
-    return Promise.resolve(K.makeCard(n.ai, n.keeper)).then(function (r) { return r && r.ok ? K.encodeCard(r.card) : ''; }, function () { return ''; });
+    // before v-tree-pool-room-v0.2: .then(function (r) { return r && r.ok ? K.encodeCard(r.card) : ''; }, ...)
+    return Promise.resolve(K.makeCard(n.ai, n.keeper)).then(function (r) {
+      if (r && r.ok) return K.encodeCard(r.card);
+      // v-tree-pool-room-v0.2: a device with no mind of its own rides its asking card instead.
+      if (n.asks && K.makeAskerCard) return Promise.resolve(K.makeAskerCard(n.ai, n.keeper)).then(function (a) { return a && a.ok ? K.encodeCard(a.card) : ''; });
+      return '';
+    }, function () { return ''; });
   }
 
   // ---- codes (one pasteable line) ----
@@ -229,7 +254,8 @@
     var c = null;
     try { c = JSON.parse(b64urlUtf8(s.slice(i + CODE_PREFIX.length))); } catch (e) { return null; }
     if (!c || typeof c !== 'object' || c.v !== 1 || c.k !== kind || typeof c.sdp !== 'string' || c.sdp.length > MAX_CODE) return null;
-    return { sdp: c.sdp, card: typeof c.card === 'string' ? c.card.slice(0, 6000) : '' };
+    // before v-tree-pool-room-v0.2: return { sdp: c.sdp, card: typeof c.card === 'string' ? c.card.slice(0, 6000) : '' };
+    return { sdp: c.sdp, card: typeof c.card === 'string' ? c.card.slice(0, 6000) : '', room: cleanRoom(c.room) };
   }
   function fingerprintOf(sdp) {
     var m = /a=fingerprint:(\S+) (\S+)/i.exec(String(sdp || ''));
@@ -297,6 +323,7 @@
     p.why = why;
     Object.keys(_inflight).forEach(function (k) { if (_inflight[k].peerId === p.id) { _inflight[k].why = 'closed'; try { _inflight[k].ctrl && _inflight[k].ctrl.abort(); } catch (e) {} } });
     if (_pending === p) _pending = null;
+    roomClosed(p); // v-tree-pool-room-v0.2
     // Questions this page was waiting on from that device will not come back; say so now.
     Object.keys(_asks).forEach(function (id) {
       var a = _asks[id];
@@ -333,7 +360,8 @@
         .then(ownCardCode).then(function (card) {
           _pending = p;
           bump('invites');
-          return { ok: true, code: encode({ v: 1, k: 'invite', sdp: pc.localDescription.sdp, card: card }), peerId: p.id };
+          // before v-tree-pool-room-v0.2: encode({ v: 1, k: 'invite', sdp: ..., card: card })
+          return { ok: true, code: encode(withRoom({ v: 1, k: 'invite', sdp: pc.localDescription.sdp, card: card })), peerId: p.id };
         });
     }).catch(function () { return { ok: false, reason: 'cannot' }; });
   }
@@ -353,7 +381,8 @@
   function readInvite(code) {
     var c = decode(code, 'invite');
     if (!c) return Promise.resolve({ ok: false, reason: 'not-an-invite' });
-    return checkCarried(c.card).then(function (r) { return { ok: true, sdp: c.sdp, card: r }; });
+    // before v-tree-pool-room-v0.2: { ok: true, sdp: c.sdp, card: r }
+    return checkCarried(c.card).then(function (r) { return { ok: true, sdp: c.sdp, card: r, room: c.room }; });
   }
   // Joiner: tap. Answers the invite and makes the reply to send back.
   function join(sdp) {
@@ -421,12 +450,15 @@
           p.state = 'proved';
           bump('proved');
           hello(p);
+          roomProved(p); // v-tree-pool-room-v0.2
           paint();
         });
       });
       return;
     }
     if (!p.proved) return;
+    // v-tree-pool-room-v0.2: room messages, only on a connection that proved its key.
+    if (typeof msg.type === 'string' && msg.type.indexOf('room-') === 0 && msg.v === 1) { roomMsg(p, msg); return; }
     if (msg.type === 'hello' && msg.v === 1) {
       if (!isKin(p)) return; // hellos are taken from trusted kin only
       p.hello = {
@@ -434,10 +466,13 @@
         mem: num(msg.mem, 64),
         cores: num(msg.cores, 256),
         models: (Array.isArray(msg.models) ? msg.models : []).slice(0, MAX_MODELS).map(function (m) { return line(m, 120); }).filter(Boolean),
+        busy: num(msg.busy, 64),           // v-tree-pool-room-v0.2: questions it is answering now
+        max: num(msg.max, 64) || MAX_CONCURRENT,
         at: Date.now()
       };
       bump('hellosTaken');
       paintList();
+      paintChat(); // v-tree-pool-room-v0.2: the minds Chat can ask follow the hellos
       return;
     }
     if (msg.type === 'ask' && msg.v === 1) { serve(p, msg); return; }
@@ -466,7 +501,9 @@
     if (!isKin(p)) return false;
     var helping = mode() === 'kin';
     var info = helping ? selfInfo() : { mem: 0, cores: 0, models: [] };
-    var ok = sendRaw(p, { type: 'hello', v: 1, helping: helping, mem: info.mem, cores: info.cores, models: info.models });
+    // before v-tree-pool-room-v0.2: { type: 'hello', v: 1, helping, mem, cores, models }
+    var ok = sendRaw(p, { type: 'hello', v: 1, helping: helping, mem: info.mem, cores: info.cores, models: info.models,
+      busy: helping ? liveCount() : 0, max: MAX_CONCURRENT });
     if (ok) bump('hellosSent');
     return ok;
   }
@@ -515,6 +552,7 @@
       var key = p.id + '|' + a.id;
       var ctrl = typeof root.AbortController === 'function' ? new root.AbortController() : null;
       _inflight[key] = { ctrl: ctrl, peerId: p.id, why: '' };
+      helloAll(); // v-tree-pool-room-v0.2: kin learn this device is busier, so the pool can pick a freer one
       var timer = root.setTimeout(function () { if (_inflight[key]) { _inflight[key].why = 'local-ai-quiet'; try { ctrl && ctrl.abort(); } catch (e) {} } }, ANSWER_MS);
       paintState();
       var body = { model: a.door.model, stream: false, messages: a.messages }; // the same shape for Ollama and OpenAI-style doors
@@ -541,6 +579,7 @@
       }).then(function (res) {
         try { root.clearTimeout(timer); } catch (e) {}
         delete _inflight[key];
+        helloAll(); // v-tree-pool-room-v0.2
         paint();
         return res;
       });
@@ -584,7 +623,9 @@
       'no-such-model': 'That device does not hold that model right now.',
       'local-ai-quiet': 'That device\'s own AI did not answer.',
       'no-answer': 'No answer came back. The connection may have closed.',
-      empty: 'Type a question first.'
+      empty: 'Type a question first.',
+      // v-tree-pool-room-v0.2
+      'no-helper': 'No trusted kin device that holds that mind is helping right now.'
     };
     return w[r && r.reason] || 'That question was turned away.';
   }
@@ -611,6 +652,10 @@
     '.tree-pool-means li{margin:0.25rem 0;}',
     '.tree-pool-power{display:flex;align-items:center;gap:10px;min-height:44px;cursor:pointer;}',
     '.tree-pool-power input{width:22px;height:22px;flex:0 0 auto;}',
+    // v-tree-pool-room-v0.2: picture codes and the camera view never push the page sideways
+    '.tree-pool canvas.tree-pool-qr{display:block;width:100%;max-width:360px;height:auto;margin:0.5rem 0;image-rendering:pixelated;border-radius:6px;}',
+    '.tree-pool video.tree-pool-scan{display:block;width:100%;max-width:320px;margin:0.4rem 0;border-radius:10px;background:#000;}',
+    '.tree-pool-list{margin:0.3rem 0;padding-left:1.2rem;}',
     '@media (max-width:480px){.tree-pool{padding:0.9rem 0.8rem;}.tree-pool button{display:block;width:100%;margin:0.45rem 0;}}'
   ].join('\n');
   function addStyle() {
@@ -698,6 +743,7 @@
   function paintConnect() {
     if (!_parts) return;
     var c = _parts.connect;
+    stopScan(); // v-tree-pool-room-v0.2: a repaint closes any camera view
     empty(c);
     c.appendChild(el('p', 'tree-pool-who', 'Connect a device'));
     if (!canConnect()) {
@@ -723,31 +769,48 @@
       return;
     }
     if (f.step === 'invited') {
+      // v-tree-pool-room-v0.2: a host's invite names its room, and it changes after each device joins.
+      if (_room && _room.role === 'host') c.appendChild(el('p', 'tree-pool-state', 'Room ' + _room.id + ' invite. One device at a time: when it has joined, a new invite appears here on its own.'));
+      else if (_room) c.appendChild(el('p', 'tree-pool-quiet', 'This invite lets a neighbor into Room ' + _room.id + '. The room connects it to everyone else.'));
       c.appendChild(el('p', '', '1. Send this invite to the other device by text, email or chat. It holds connection details and your kin card (if made). No chats, no secrets.'));
       c.appendChild(codeBox(f.code, 'Your invite, to copy'));
       c.appendChild(button('Copy invite', function () { copy(f.code); }));
+      addQr(c, inviteUrl(f.code), 'Or let the other device scan this picture code. A phone camera opens the Tree with the invite filled in. Nothing is sent until someone taps Join there.', 'Picture code of your invite');
       c.appendChild(el('p', '', '2. When their reply comes back, paste it here.'));
       var rbox = pasteBox('Their reply', 'Paste the reply here (it starts with ' + CODE_PREFIX + ')');
       c.appendChild(rbox);
-      c.appendChild(button('Finish joining', function () {
+      var scanSpot = el('div', '');
+      // v-tree-pool-room-v0.2: the Finish button below, by name, so a scanned reply can tap it too.
+      var finishBtn = button('Finish joining', function () {
         f.text = rbox.value;
         readReply(rbox.value).then(function (r) {
           if (!r.ok) { note(r.reason === 'no-invite' ? 'That invite has closed. Tap Invite a device again.' : 'That does not look like a reply. A reply starts with ' + CODE_PREFIX + ' and is one long line.'); return; }
           if (r.card && r.card.ok && !r.card.trusted) { _flow = { step: 'reply-card', text: '', code: f.code, check: r.card, sdp: r.sdp, card: '' }; paintConnect(); return; }
           doFinish(r.sdp, r.card);
         });
-      }, 'tree-pool-main'));
+      }, 'tree-pool-main');
+      // before v-tree-pool-room-v0.2: c.appendChild(button('Finish joining', ..., 'tree-pool-main'));
+      c.appendChild(finishBtn);
+      if (canScan()) {
+        c.appendChild(button('Scan their reply', function () {
+          startScan(scanSpot, function (got) { rbox.value = got; f.text = got; finishBtn.click(); });
+        }));
+        c.appendChild(scanSpot);
+      }
       c.appendChild(button('Cancel', function () { if (_pending) disconnect(_pending.id); reset(); }));
       return;
     }
     if (f.step === 'reply-card' || f.step === 'invite-card') {
       c.appendChild(el('p', '', cardLine(f.check)));
+      // v-tree-pool-room-v0.2
+      if (f.step === 'invite-card' && f.room) c.appendChild(el('p', 'tree-pool-quiet', 'This invite opens Room ' + f.room.id + '. Joining connects you to the other devices in it, once you trust the device that sent it.'));
       c.appendChild(button(f.step === 'reply-card' ? 'Trust this AI and finish' : 'Trust this AI and join', function () {
         trustCarried(f.check);
-        if (f.step === 'reply-card') doFinish(f.sdp, f.check); else doJoin(f.sdp);
+        // before v-tree-pool-room-v0.2: ... else doJoin(f.sdp);
+        if (f.step === 'reply-card') doFinish(f.sdp, f.check); else doJoin(f.sdp, f.room);
       }, 'tree-pool-main'));
       c.appendChild(button(f.step === 'reply-card' ? 'Finish without trusting' : 'Join without trusting', function () {
-        if (f.step === 'reply-card') doFinish(f.sdp, f.check); else doJoin(f.sdp);
+        if (f.step === 'reply-card') doFinish(f.sdp, f.check); else doJoin(f.sdp, f.room);
       }));
       c.appendChild(button('Cancel', function () { if (f.step === 'reply-card' && _pending) disconnect(_pending.id); reset(); }));
       return;
@@ -756,15 +819,26 @@
       c.appendChild(el('p', '', 'Paste the invite you were sent.'));
       var ibox = pasteBox('The invite', 'Paste the invite here (it starts with ' + CODE_PREFIX + ')');
       c.appendChild(ibox);
-      c.appendChild(button('Join', function () {
+      var scanSpotJ = el('div', '');
+      // v-tree-pool-room-v0.2: the Join button by name, so a scanned invite can tap it too.
+      var joinBtn = button('Join', function () {
         f.text = ibox.value;
         readInvite(ibox.value).then(function (r) {
           if (!r.ok) { note('That does not look like an invite. An invite starts with ' + CODE_PREFIX + ' and is one long line.'); return; }
           if (r.card && !r.card.ok && r.card.reason === 'own-card') { note('That is your own invite. Send it to the other device instead.'); return; }
-          if (r.card && r.card.ok && !r.card.trusted) { _flow = { step: 'invite-card', text: '', code: '', check: r.card, sdp: r.sdp, card: '' }; paintConnect(); return; }
-          doJoin(r.sdp);
+          // before v-tree-pool-room-v0.2: { step: 'invite-card', ..., card: '' } and doJoin(r.sdp)
+          if (r.card && r.card.ok && !r.card.trusted) { _flow = { step: 'invite-card', text: '', code: '', check: r.card, sdp: r.sdp, card: '', room: r.room }; paintConnect(); return; }
+          doJoin(r.sdp, r.room);
         });
-      }, 'tree-pool-main'));
+      }, 'tree-pool-main');
+      // before v-tree-pool-room-v0.2: c.appendChild(button('Join', ..., 'tree-pool-main'));
+      c.appendChild(joinBtn);
+      if (canScan()) {
+        c.appendChild(button('Scan an invite', function () {
+          startScan(scanSpotJ, function (got) { ibox.value = got; f.text = got; joinBtn.click(); });
+        }));
+        c.appendChild(scanSpotJ);
+      }
       c.appendChild(button('Cancel', reset));
       return;
     }
@@ -772,14 +846,17 @@
       c.appendChild(el('p', '', 'Send this reply back to the person who invited you. The devices connect when they paste it.'));
       c.appendChild(codeBox(f.code, 'Your reply, to copy'));
       c.appendChild(button('Copy reply', function () { copy(f.code); }));
+      addQr(c, f.code, 'Or hold this picture code up to the inviting device. It can read it with Scan their reply.', 'Picture code of your reply'); // v-tree-pool-room-v0.2
       c.appendChild(button('Done', reset));
       return;
     }
   }
-  function doJoin(sdp) {
+  // before v-tree-pool-room-v0.2: function doJoin(sdp) {
+  function doJoin(sdp, room) {
     note('Making a reply on this computer...');
     join(sdp).then(function (r) {
       if (!r.ok) { note(r.reason === 'full' ? 'Too many devices are connected already.' : 'That invite could not be used. Ask for a new one.'); return; }
+      if (room && _peers[r.peerId]) _peers[r.peerId].roomJoin = room.id; // v-tree-pool-room-v0.2
       _flow = { step: 'replied', text: '', code: r.code, check: null, sdp: '', card: '', peerId: r.peerId };
       note('');
       paintConnect();
@@ -793,6 +870,8 @@
       note('Connecting... If nothing connects in a minute, the two devices may not be on the same network.');
       paintConnect();
       paint();
+      // v-tree-pool-room-v0.2: a room host shows the next invite on its own.
+      if (_room && _room.role === 'host') rollInvite();
     });
   }
 
@@ -883,6 +962,8 @@
     if (!_host || !_parts) return;
     paintState();
     paintList();
+    paintRoom(); // v-tree-pool-room-v0.2
+    paintChat(); // v-tree-pool-room-v0.2
   }
 
   function mount(host) {
@@ -904,7 +985,10 @@
     var n = el('p', 'tree-pool-note');
     n.setAttribute('aria-live', 'polite');
     var list = el('div', 'tree-pool-part');
-    wrap.appendChild(state); wrap.appendChild(door); wrap.appendChild(n); wrap.appendChild(connect); wrap.appendChild(list);
+    // before v-tree-pool-room-v0.2: state, door, n, connect, list
+    var roomPart = el('div', 'tree-pool-part');
+    var chatPart = el('div', 'tree-pool-part');
+    wrap.appendChild(state); wrap.appendChild(door); wrap.appendChild(n); wrap.appendChild(connect); wrap.appendChild(roomPart); wrap.appendChild(list); wrap.appendChild(chatPart);
     var means = el('ul', 'tree-pool-means');
     means.appendChild(el('li', '', 'Whose AI: this computer\'s own local AI, the minds remembered in Settings.'));
     means.appendChild(el('li', '', 'What is shared: a question from a connected, trusted kin device runs on that AI, and the answer goes back to it. Nothing else on this computer is reachable.'));
@@ -924,7 +1008,14 @@
     wrap.appendChild(el('p', 'tree-pool-quiet', 'Connections last while this page stays open. After a reload, invite again. Works best on one wired network, like a classroom lab; some school or guest Wi-Fi keeps devices apart, and then the join does not finish.'));
     wrap.appendChild(el('p', 'tree-pool-quiet', LATER));
     host.appendChild(wrap);
-    _parts = { state: state, door: door, connect: connect, list: list, note: n };
+    // before v-tree-pool-room-v0.2: _parts = { state, door, connect, list, note }
+    _parts = { state: state, door: door, connect: connect, list: list, note: n, room: roomPart, chat: chatPart };
+    // v-tree-pool-room-v0.2: an invite that came with the link (after the #) waits for a human tap on Join.
+    if (_arrived && !_flow.step) {
+      _flow = { step: 'join-paste', text: _arrived, code: '', check: null, sdp: '', card: '' };
+      _arrived = '';
+      note('An invite came with the link you opened. Nothing has been sent. Tap Join when you are ready.');
+    }
     paintConnect();
     paint();
   }
@@ -936,6 +1027,536 @@
       root.addEventListener('tree-kin-changed', function () { helloAll(); paint(); });
     }
   } catch (e) {}
+
+  // =====================================================================
+  // v-tree-pool-room-v0.2 (019a): the room, picture codes, and Chat through the pool.
+  // Still no server: iceServers stays empty, and room messages travel only on
+  // connections that already proved their keys. Nothing here opens the door.
+  // =====================================================================
+  var ROOM_KEY = 'tree_pool_room';              // { id, role } only, so a reload can say where you were
+  var ROOM_ABC = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  var MAX_ROSTER = 40;
+  var MAX_HOPS = 4;
+  var RETRY_REASONS = ['busy', 'paused', 'off', 'unplugged', 'no-such-model', 'no-local-mind', 'not-kin', 'no-answer'];
+  var _room = null;      // { id, role: 'host' | 'member', up, upLost, members: { meshId: { card, check, peerId, sponsor } }, offers, downs }
+  var _lastRoom = null;
+  var _chat = null;      // { model } chosen by a human tap; never kept after a reload
+  var _scan = null;      // { stream, video, timer, until }
+  var _arrived = '';     // an invite that came after the # of the link this page opened
+
+  (function readArrival() {
+    try {
+      var last = readJson(ROOM_KEY, null);
+      _lastRoom = (last && cleanRoomId(last.id)) ? { id: cleanRoomId(last.id), role: last.role === 'host' ? 'host' : 'member' } : null;
+      var h = root.location ? String(root.location.hash || '') : '';
+      var m = /^#treepool=(.+)$/.exec(h);
+      if (!m) return;
+      _arrived = decodeURIComponent(m[1]).replace(/\s+/g, '').slice(0, MAX_CODE);
+      if (_arrived.indexOf(CODE_PREFIX) !== 0) _arrived = '';
+      // Take the invite out of the address bar and history, so it is not kept or shared again.
+      if (root.history && root.history.replaceState) root.history.replaceState(null, '', root.location.pathname + root.location.search);
+    } catch (e) { _arrived = ''; }
+  })();
+
+  function cleanRoomId(x) { var s = String(x == null ? '' : x).toUpperCase(); return /^[A-Z0-9]{4,8}$/.test(s) ? s : ''; }
+  function cleanRoom(r) { if (!r || typeof r !== 'object') return null; var id = cleanRoomId(r.id); return id ? { id: id } : null; }
+  function newRoomId() {
+    var a = new Uint8Array(5), out = '';
+    if (root.crypto && root.crypto.getRandomValues) root.crypto.getRandomValues(a);
+    for (var i = 0; i < a.length; i++) out += ROOM_ABC[a[i] % ROOM_ABC.length];
+    return out;
+  }
+  function withRoom(obj) { if (_room) obj.room = { id: _room.id }; return obj; }
+  function myMesh() { try { var id = kin() && kin().identity ? kin().identity() : null; return id ? id.meshId : ''; } catch (e) { return ''; } }
+  function keepRoom() {
+    if (_room) { _lastRoom = { id: _room.id, role: _room.role }; safeSet(ROOM_KEY, JSON.stringify(_lastRoom)); }
+  }
+  function forgetRoom() { _lastRoom = null; safeSet(ROOM_KEY, ''); paint(); }
+  function peerByMesh(meshId) {
+    var hit = null;
+    Object.keys(_peers).some(function (id) { var p = _peers[id]; if (p.proved && p.state === 'proved' && p.meshId === meshId) { hit = p; return true; } return false; });
+    return hit;
+  }
+  function upPeer() { return _room && _room.up ? _peers[_room.up] || null : null; }
+  function upKin() { var u = upPeer(); return !!(u && u.state === 'proved' && isKin(u)); }
+  function newRoom(id, role, up) { return { id: id, role: role, up: up || '', upLost: false, members: {}, offers: {}, downs: {} }; }
+
+  // A host tap. The room is a name plus a rolling invite; it opens no door.
+  function startRoom(id) {
+    if (!canConnect()) return Promise.resolve({ ok: false, reason: 'cannot' });
+    _room = newRoom(cleanRoomId(id) || newRoomId(), 'host');
+    keepRoom();
+    bump('roomsOpened');
+    return rollInvite().then(function (r) { paint(); return r && r.ok ? { ok: true, id: _room.id } : { ok: false, reason: 'cannot' }; });
+  }
+  function rollInvite() {
+    return invite().then(function (r) {
+      if (r.ok) { _flow = { step: 'invited', text: '', code: r.code, check: null, sdp: '', card: '' }; paintConnect(); }
+      return r;
+    });
+  }
+  function closeRoom() {
+    if (!_room) return;
+    if (_room.role === 'host') {
+      Object.keys(_room.members).forEach(function (m) { var p = peerByMesh(m); if (p) sendRaw(p, { type: 'room-closed', v: 1, room: _room.id }); });
+      if (_pending) { try { _pending.pc.close(); } catch (e) {} delete _peers[_pending.id]; _pending = null; }
+      _flow = { step: '', text: '', code: '', check: null, sdp: '', card: '' };
+    }
+    _room = null;
+    forgetRoom();
+    paintConnect();
+  }
+  // Leave: say so to the room, and disconnect every connection the room made.
+  function leaveRoom() {
+    if (!_room) return;
+    var u = upPeer();
+    if (u) sendRaw(u, { type: 'room-leave', v: 1, room: _room.id });
+    Object.keys(_peers).forEach(function (id) { if (_peers[id].room || _peers[id].roomJoin) disconnect(id); });
+    _room = null;
+    forgetRoom();
+  }
+
+  // Offers made for the room carry no card (cards travel in the room list).
+  function inviteFor(meshId) {
+    if (!canConnect()) return Promise.resolve({ ok: false, reason: 'cannot' });
+    if (openCount() >= MAX_PEERS) return Promise.resolve({ ok: false, reason: 'full' });
+    return myIdentity().then(function (me) {
+      if (!me) return { ok: false, reason: 'cannot' };
+      var pc = newPc(), p = newPeer(pc, 'invite');
+      p.me = me; p.room = true; p.roomTo = meshId;
+      wire(p, pc.createDataChannel('tree-pool', { ordered: true }));
+      return pc.createOffer().then(function (o) { return pc.setLocalDescription(o); }).then(function () { return gather(pc); }).then(function () {
+        if (_room) _room.offers[meshId] = p.id;
+        bump('roomOffers');
+        return { ok: true, code: encode(withRoom({ v: 1, k: 'invite', sdp: pc.localDescription.sdp, card: '' })), peerId: p.id };
+      });
+    }).catch(function () { return { ok: false, reason: 'cannot' }; });
+  }
+  function finishPeer(peerId, sdp) {
+    var p = _peers[peerId];
+    if (!p || p.side !== 'invite' || p.state !== 'joining') return Promise.resolve({ ok: false, reason: 'no-invite' });
+    return p.pc.setRemoteDescription({ type: 'answer', sdp: sdp }).then(function () {
+      root.setTimeout(function () { if (p.state === 'joining') closed(p, 'failed'); }, 30000);
+      return { ok: true, peerId: p.id };
+    }, function () { return { ok: false, reason: 'not-a-reply' }; });
+  }
+
+  function checkMember(m) {
+    if (!m || !m.card || m.check) return;
+    m.check = { pending: true };
+    checkCarried(m.card).then(function (r) { m.check = r || { ok: false }; paintRoom(); });
+  }
+  function rosterList(skip) {
+    return Object.keys(_room.members).filter(function (k) { return k !== skip; }).slice(0, MAX_ROSTER).map(function (k) { return { meshId: k, card: _room.members[k].card || '' }; });
+  }
+  // How a message reaches a room device: straight, or (host) through the device that let it in, or (member) up.
+  function routeSend(meshId, msg) {
+    var direct = peerByMesh(meshId);
+    if (direct) return sendRaw(direct, msg);
+    if (!_room) return false;
+    if (_room.role === 'host') { var m = _room.members[meshId], sp = m && m.sponsor ? _peers[m.sponsor] : null; return sp ? sendRaw(sp, msg) : false; }
+    var u = upPeer();
+    return u ? sendRaw(u, msg) : false;
+  }
+
+  // The joiner's side: once the key on the invite's connection is proved, say which room it came for.
+  function roomProved(p) {
+    if (_room && _room.role === 'host' && p.room && _room.members[p.meshId]) _room.members[p.meshId].peerId = p.id;
+    if (!p.roomJoin) return;
+    if (!_room || _room.id !== p.roomJoin) _room = newRoom(p.roomJoin, 'member', p.id);
+    else if (_room.role === 'member' && (!upPeer() || _room.upLost)) { _room.up = p.id; _room.upLost = false; }
+    p.room = true;
+    keepRoom();
+    bump('roomJoins');
+    ownCardCode().then(function (card) {
+      sendRaw(p, { type: 'room-join', v: 1, room: _room.id, who: p.me.meshId, card: card || '' });
+    });
+  }
+  function roomClosed(p) {
+    if (!_room) return;
+    if (_room.role === 'host') {
+      Object.keys(_room.members).forEach(function (k) {
+        var m = _room.members[k];
+        if (m.peerId !== p.id) return;
+        delete _room.members[k];
+        Object.keys(_room.members).forEach(function (o) { var q = peerByMesh(o); if (q && q !== p) sendRaw(q, { type: 'room-gone', v: 1, room: _room.id, meshId: k }); });
+      });
+    } else if (_room.up === p.id) {
+      _room.upLost = true;
+    }
+    Object.keys(_room.downs).forEach(function (k) { if (_room.downs[k] === p.id) delete _room.downs[k]; });
+  }
+
+  function register(who, card, peerId, sponsorId) {
+    var me = myMesh();
+    if (!who || who === me) return;
+    if (!_room.members[who] && Object.keys(_room.members).length >= MAX_ROSTER) return;
+    var fresh = !_room.members[who];
+    _room.members[who] = { card: card, check: null, peerId: peerId, sponsor: sponsorId };
+    checkMember(_room.members[who]);
+    if (fresh) bump('roomMembers');
+    ownCardCode().then(function (hostCard) {
+      if (!_room) return;
+      routeSend(who, { type: 'room-roster', v: 1, room: _room.id, for: who, members: [{ meshId: me, card: hostCard || '' }].concat(rosterList(who)) });
+      Object.keys(_room.members).forEach(function (k) {
+        if (k === who) return;
+        var q = peerByMesh(k);
+        if (!q) return;
+        sendRaw(q, { type: 'room-new', v: 1, room: _room.id, meshId: who, card: card });
+        if (q.id !== sponsorId) sendRaw(q, { type: 'room-intro', v: 1, room: _room.id, to: who }); // q offers to the newcomer
+      });
+      if (!peerId) {
+        // Let in by a neighbor: the host offers too, through that neighbor.
+        inviteFor(who).then(function (r) { if (r.ok && _room) routeSend(who, { type: 'room-signal', v: 1, room: _room.id, kind: 'offer', from: me, to: who, code: r.code, hops: 0 }); });
+      }
+      paint();
+    });
+  }
+  function addMember(meshId, card) {
+    if (!meshId || meshId === myMesh() || Object.keys(_room.members).length >= MAX_ROSTER) return;
+    if (!_room.members[meshId]) _room.members[meshId] = { card: card, check: null, peerId: '', sponsor: '' };
+    checkMember(_room.members[meshId]);
+  }
+
+  function roomMsg(p, msg) {
+    if (!_room || cleanRoomId(msg.room) !== _room.id) return;
+    var t = msg.type, fromUp = _room.role === 'member' && p.id === _room.up && upKin();
+    var cardIn = typeof msg.card === 'string' ? msg.card.slice(0, 6000) : '';
+    if (t === 'room-join') {
+      var who = line(msg.who, 64), direct = who === p.meshId;
+      if (_room.role === 'host') {
+        if (direct) { p.room = true; register(who, cardIn, p.id, ''); return; }
+        var sp = Object.keys(_room.members).some(function (k) { return _room.members[k].peerId === p.id; });
+        if (sp) register(who, cardIn, '', p.id);
+        return;
+      }
+      // A member let a neighbor in: pass the join up to the host, if this device trusts the way up.
+      if (!direct || !upKin()) return;
+      p.room = true;
+      _room.downs[who] = p.id;
+      bump('roomRelayed');
+      sendRaw(upPeer(), { type: 'room-join', v: 1, room: _room.id, who: who, card: cardIn });
+      return;
+    }
+    if (t === 'room-leave') {
+      if (_room.role === 'host' && _room.members[p.meshId]) { try { disconnect(p.id); } catch (e) {} }
+      return;
+    }
+    if (!fromUp && t !== 'room-signal') return; // everything else comes only from the trusted way up
+    if (t === 'room-roster') {
+      var forWho = line(msg['for'], 64);
+      if (forWho && forWho !== myMesh()) {
+        // The host's list for a neighbor this device let in: pass it down, keep nothing.
+        var dn = _room.downs[forWho] ? _peers[_room.downs[forWho]] : null;
+        if (dn) { bump('roomRelayed'); sendRaw(dn, msg); }
+        return;
+      }
+      (Array.isArray(msg.members) ? msg.members : []).slice(0, MAX_ROSTER).forEach(function (m) {
+        if (m && typeof m === 'object') addMember(line(m.meshId, 64), typeof m.card === 'string' ? m.card.slice(0, 6000) : '');
+      });
+      paint();
+      return;
+    }
+    if (t === 'room-new') { addMember(line(msg.meshId, 64), cardIn); paint(); return; }
+    if (t === 'room-gone') { delete _room.members[line(msg.meshId, 64)]; paint(); return; }
+    if (t === 'room-closed') { _room = null; forgetRoom(); note('The host closed the room. Connections already made stay until you disconnect them.'); return; }
+    if (t === 'room-intro') {
+      var to = line(msg.to, 64);
+      if (!to || to === myMesh() || peerByMesh(to) || _room.offers[to]) return;
+      inviteFor(to).then(function (r) {
+        if (r.ok && _room) routeSend(to, { type: 'room-signal', v: 1, room: _room.id, kind: 'offer', from: myMesh(), to: to, code: r.code, hops: 0 });
+      });
+      return;
+    }
+    if (t === 'room-signal') signal(p, msg, fromUp);
+  }
+
+  function signal(p, msg, fromUp) {
+    var to = line(msg.to, 64), from = line(msg.from, 64), hops = num(msg.hops, 99);
+    if (!to || !from || typeof msg.code !== 'string' || msg.code.length > MAX_CODE || hops > MAX_HOPS) return;
+    if (msg.kind !== 'offer' && msg.kind !== 'answer') return;
+    var me = myMesh(), fwd = { type: 'room-signal', v: 1, room: _room.id, kind: msg.kind, from: from, to: to, code: msg.code, hops: hops + 1 };
+    if (to !== me) {
+      if (_room.role === 'host') {
+        var known = from === p.meshId || (_room.members[from] && _room.members[from].sponsor === p.id);
+        if (known && _room.members[to]) { bump('roomRelayed'); routeSend(to, fwd); }
+        return;
+      }
+      if (fromUp && _room.downs[to]) { var d = _peers[_room.downs[to]]; if (d) { bump('roomRelayed'); sendRaw(d, fwd); } return; }
+      if (_room.downs[from] === p.id && upPeer()) { bump('roomRelayed'); sendRaw(upPeer(), fwd); }
+      return;
+    }
+    // For this device. Only from the way up it trusts, or straight from a room device.
+    var straight = p.meshId === from;
+    var viaSponsor = _room.role === 'host' && !!_room.members[from] && _room.members[from].sponsor === p.id;
+    if (!fromUp && !straight && !viaSponsor) return;
+    if (!_room.members[from] && _room.role === 'member') return;
+    if (msg.kind === 'offer') {
+      if (peerByMesh(from) || openCount() >= MAX_PEERS) return;
+      var c = decode(msg.code, 'invite');
+      if (!c) return;
+      join(c.sdp).then(function (r) {
+        if (!r.ok || !_room) return;
+        var q = _peers[r.peerId];
+        if (q) { q.room = true; q.roomFrom = from; }
+        routeSend(from, { type: 'room-signal', v: 1, room: _room.id, kind: 'answer', from: me, to: from, code: r.code, hops: 0 });
+        paint();
+      });
+      return;
+    }
+    var pid = _room.offers[from], a = decode(msg.code, 'reply');
+    if (!pid || !a) return;
+    delete _room.offers[from];
+    finishPeer(pid, a.sdp);
+  }
+
+  // One human tap trusts every room card that checks out and is not trusted yet. The list is shown first.
+  function roomUntrusted() {
+    if (!_room) return [];
+    var K = kin(), out = [];
+    Object.keys(_room.members).forEach(function (k) {
+      var c = _room.members[k].check;
+      if (c && c.ok && !(K && K.isTrusted && K.isTrusted(c.fp))) out.push(c);
+    });
+    return out;
+  }
+  function trustRoom() {
+    var list = roomUntrusted();
+    list.forEach(function (r) { trustCarried({ ok: true, trusted: false, fp: r.fp, keyHash: r.keyHash, body: r.body }); });
+    if (list.length) bump('roomTrusts');
+    paint();
+    return list.length;
+  }
+  function roomView() {
+    if (!_room) return null;
+    var keys = Object.keys(_room.members);
+    return { id: _room.id, role: _room.role, members: keys.length, connected: keys.filter(function (k) { return !!peerByMesh(k); }).length,
+      upKin: _room.role === 'member' ? upKin() : true, untrusted: roomUntrusted().length };
+  }
+
+  // ---- picture codes (QR) and the camera ----
+  function inviteUrl(code) {
+    try {
+      var loc = root.location;
+      if (loc && /^https?:$/.test(loc.protocol)) return new root.URL('settings.html', loc.href).href.replace(/[#?].*$/, '') + '#treepool=' + code;
+    } catch (e) {}
+    return code;
+  }
+  function addQr(where, text, caption, label) {
+    var Q = root.qrcodegen, d = root.document;
+    if (!Q || !Q.QrCode || !d || !d.createElement) return false;
+    var qr = null;
+    try { qr = Q.QrCode.encodeText(String(text), Q.QrCode.Ecc.LOW); } catch (e) { qr = null; }
+    if (!qr) { where.appendChild(el('p', 'tree-pool-quiet', 'This code is too long for a picture code. Copy it instead.')); return false; }
+    var c = d.createElement('canvas'), scale = 4, border = 4, size = (qr.size + border * 2) * scale;
+    var g = c.getContext ? c.getContext('2d') : null;
+    if (!g) return false;
+    c.className = 'tree-pool-qr';
+    c.width = size; c.height = size;
+    g.fillStyle = '#ffffff'; g.fillRect(0, 0, size, size);
+    g.fillStyle = '#000000';
+    for (var y = 0; y < qr.size; y++) for (var x = 0; x < qr.size; x++) if (qr.getModule(x, y)) g.fillRect((x + border) * scale, (y + border) * scale, scale, scale);
+    c.setAttribute('role', 'img');
+    c.setAttribute('aria-label', label);
+    where.appendChild(el('p', 'tree-pool-quiet', caption));
+    where.appendChild(c);
+    bump('pictureCodes');
+    return true;
+  }
+  function canScan() {
+    try { return !!(root.BarcodeDetector && root.navigator && root.navigator.mediaDevices && root.navigator.mediaDevices.getUserMedia); } catch (e) { return false; }
+  }
+  function codeFrom(v) {
+    var s = String(v == null ? '' : v), i = s.indexOf('#treepool=');
+    if (i !== -1) { try { s = decodeURIComponent(s.slice(i + 10)); } catch (e) { return ''; } }
+    s = s.replace(/\s+/g, '');
+    return s.indexOf(CODE_PREFIX) === 0 && s.length <= MAX_CODE ? s : '';
+  }
+  function stopScan() {
+    var sc = _scan;
+    _scan = null;
+    if (!sc) return;
+    try { root.clearInterval(sc.timer); } catch (e) {}
+    try { sc.stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e2) {}
+    try { if (sc.video.parentNode) sc.video.parentNode.removeChild(sc.video); } catch (e3) {}
+  }
+  // Only after a human tap. The camera view stays on this page; no frame is kept or sent.
+  function startScan(where, onCode) {
+    stopScan();
+    var det = null;
+    try { det = new root.BarcodeDetector({ formats: ['qr_code'] }); } catch (e) { det = null; }
+    if (!det) { note('This browser cannot read picture codes here. Paste the code instead.'); return; }
+    var video = el('video', 'tree-pool-scan');
+    video.muted = true;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('aria-label', 'Camera view, to read a picture code');
+    note('Hold the picture code up to this camera. The camera view stays on this page.');
+    root.navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false }).then(function (stream) {
+      var sc = { stream: stream, video: video, timer: null, until: Date.now() + 90000 };
+      _scan = sc;
+      where.appendChild(video);
+      video.srcObject = stream;
+      try { var pl = video.play && video.play(); if (pl && pl.catch) pl.catch(function () {}); } catch (e) {}
+      bump('scans');
+      sc.timer = root.setInterval(function () {
+        if (_scan !== sc) return;
+        if (Date.now() > sc.until) { stopScan(); note('No picture code was read. Paste the code instead, or tap Scan again.'); return; }
+        Promise.resolve(det.detect(video)).then(function (found) {
+          var hit = '';
+          (found || []).some(function (x) { hit = codeFrom(x && x.rawValue); return !!hit; });
+          if (hit && _scan === sc) { stopScan(); note('Read the picture code.'); onCode(hit); }
+        }, function () {});
+      }, 300);
+    }, function () { stopScan(); note('The camera did not open (it may need permission). Paste the code instead.'); });
+  }
+
+  // ---- asking the pool: each question goes whole to the freest trusted kin device that holds the mind ----
+  function holders(model) {
+    return Object.keys(_peers).map(function (id) { return _peers[id]; }).filter(function (p) {
+      return p.state === 'proved' && isKin(p) && p.hello && p.hello.helping && p.hello.models.indexOf(model) !== -1;
+    });
+  }
+  function freeOf(p) { return (p.hello.max || MAX_CONCURRENT) - (p.hello.busy || 0) - (p.mine || 0); }
+  function bestFor(model, skip) {
+    var list = holders(model).filter(function (p) { return skip.indexOf(p.id) === -1; });
+    list.sort(function (a, b) { return (freeOf(b) - freeOf(a)) || (b.hello.mem - a.hello.mem) || (b.hello.cores - a.hello.cores) || (a.at - b.at); });
+    return list[0] || null;
+  }
+  function chatModels() {
+    var seen = {};
+    Object.keys(_peers).forEach(function (id) {
+      var p = _peers[id];
+      if (p.state !== 'proved' || !isKin(p) || !p.hello || !p.hello.helping) return;
+      p.hello.models.forEach(function (m) { seen[m] = (seen[m] || 0) + 1; });
+    });
+    return Object.keys(seen).slice(0, MAX_MODELS).map(function (m) { return { model: m, devices: seen[m] }; });
+  }
+  function cleanTurns(list) {
+    if (!Array.isArray(list)) return null;
+    var out = list.filter(function (x) { return x && (x.role === 'user' || x.role === 'assistant') && typeof x.content === 'string' && x.content; })
+      .map(function (x) { return { role: x.role, content: x.content }; });
+    if (!out.length || out[out.length - 1].role !== 'user') return null;
+    while (out.length > 1 && (out.length > MAX_TURNS || charCount(out) > MAX_CHARS)) out.shift();
+    return out;
+  }
+  function askTurns(peerId, model, turns) {
+    var p = _peers[peerId];
+    if (!p || p.state === 'closed' || p.state === 'set-aside') return Promise.resolve({ ok: false, reason: 'no-answer' });
+    if (!isKin(p)) return Promise.resolve({ ok: false, reason: 'not-kin-here' });
+    if (!p.hello || !p.hello.helping) return Promise.resolve({ ok: false, reason: 'off' });
+    var msgs = cleanTurns(turns);
+    if (!msgs) return Promise.resolve({ ok: false, reason: 'empty' });
+    if (charCount(msgs) > MAX_CHARS) return Promise.resolve({ ok: false, reason: 'too-long' });
+    var id = nonce();
+    p.mine = (p.mine || 0) + 1;
+    return new Promise(function (resolve) {
+      _asks[id] = { peerId: p.id, resolve: resolve, timer: root.setTimeout(function () { if (_asks[id]) { delete _asks[id]; resolve({ ok: false, reason: 'no-answer' }); } }, ANSWER_MS + 15000) };
+      if (!sendRaw(p, { type: 'ask', v: 1, id: id, model: line(model, 120), messages: msgs })) {
+        delete _asks[id];
+        resolve({ ok: false, reason: 'no-answer' });
+        return;
+      }
+      bump('asked');
+    }).then(function (r) {
+      p.mine = Math.max(0, (p.mine || 1) - 1);
+      if (r.ok) bump('answersTaken');
+      return r;
+    });
+  }
+  function askBest(model, turns, tried) {
+    tried = tried || [];
+    var p = bestFor(line(model, 120), tried);
+    if (!p) return Promise.resolve({ ok: false, reason: tried.lastReason || 'no-helper' });
+    tried.push(p.id);
+    return askTurns(p.id, model, turns).then(function (r) {
+      if (r.ok) { r.peerId = p.id; r.label = model + ' on ' + peerName(p); return r; }
+      if (RETRY_REASONS.indexOf(r.reason) !== -1 && tried.length < 3) { tried.lastReason = r.reason; return askBest(model, turns, tried); }
+      return r;
+    });
+  }
+  function chatRoute() {
+    if (!_chat) return null;
+    return { model: _chat.model, devices: holders(_chat.model).length };
+  }
+  function askChat(turns) {
+    if (!_chat) return Promise.resolve({ ok: false, reason: 'no-helper' });
+    return askBest(_chat.model, turns);
+  }
+  function useInChat(model) {
+    _chat = model ? { model: line(model, 120) } : null;
+    bump(model ? 'chatOn' : 'chatOff');
+    try { if (root.dispatchEvent && typeof root.CustomEvent === 'function') root.dispatchEvent(new root.CustomEvent('tree-pool-chat-route')); } catch (e) {}
+    paint();
+  }
+
+  // ---- the room and Chat parts of the card ----
+  function paintRoom() {
+    if (!_parts || !_parts.room) return;
+    var r = _parts.room;
+    empty(r);
+    r.appendChild(el('p', 'tree-pool-who', 'A room, for a classroom lab or a family'));
+    if (!_room) {
+      if (_lastRoom) {
+        r.appendChild(el('p', '', _lastRoom.role === 'host'
+          ? 'Before this page reloaded, this device hosted Room ' + _lastRoom.id + '. A reload ends connections. Open it again with the same name, and each device joins once more. Trusted kin stay trusted, and the room connects the rest on its own.'
+          : 'Before this page reloaded, this device was in Room ' + _lastRoom.id + '. A reload ends connections. Scan or paste the room invite once to rejoin. Trusted kin stay trusted, and the room connects you to the rest on its own.'));
+        if (_lastRoom.role === 'host') r.appendChild(button('Open Room ' + _lastRoom.id + ' again', function () { startRoom(_lastRoom.id); note('Room ' + _lastRoom.id + ' is open again.'); }, 'tree-pool-main'));
+        r.appendChild(button('Forget Room ' + _lastRoom.id, function () { forgetRoom(); note('Forgotten.'); }));
+      }
+      r.appendChild(el('p', 'tree-pool-quiet', 'One device hosts. Every other device joins once, by scanning or pasting the room invite, and the room then connects it to every other device in the room on its own. ' +
+        'Each question still goes whole to one trusted device, so many people can ask at once.'));
+      if (canConnect()) r.appendChild(button('Start a room on this device', function () {
+        note('Opening a room on this computer...');
+        startRoom().then(function (x) { note(x.ok ? 'Room ' + x.id + ' is open. Its invite is above.' : 'This browser could not open a room.'); });
+      }));
+    } else {
+      var v = roomView();
+      if (_room.role === 'host') {
+        r.appendChild(el('p', 'tree-pool-state', 'Room ' + _room.id + ' is open on this device. Devices in the room: ' + v.members + '. Connected here: ' + v.connected + '.'));
+        r.appendChild(el('p', 'tree-pool-quiet', 'The room invite is above, under Connect a device. Any device already in the room can also invite its neighbor, and the room connects it to everyone. Up to ' + MAX_PEERS + ' devices.'));
+      } else {
+        r.appendChild(el('p', 'tree-pool-state', 'You are in Room ' + _room.id + '. Devices in the room: ' + (v.members + 1) + '. Connected here: ' + openRoomCount() + '.'));
+        if (_room.upLost) r.appendChild(el('p', '', 'The connection to the device that let you in has closed. Devices already connected stay connected.'));
+        else if (!v.upKin) r.appendChild(el('p', '', 'You joined without trusting the device that let you in, so the room will not connect you to anyone else. Trust its card in Trusted kin to let it.'));
+      }
+      var un = roomUntrusted();
+      if (un.length) {
+        r.appendChild(el('p', '', 'Cards in this room you have not trusted yet:'));
+        var ul = el('ul', 'tree-pool-list');
+        un.slice(0, 12).forEach(function (c) { ul.appendChild(el('li', '', c.body.name + ' (' + c.body.model + '), from ' + (c.body.keeperName || 'someone') + '\'s computer')); });
+        if (un.length > 12) ul.appendChild(el('li', '', 'and ' + (un.length - 12) + ' more'));
+        r.appendChild(ul);
+        r.appendChild(button('Trust everyone in this room (' + un.length + ')', function () { var n = trustRoom(); note('Trusted ' + n + (n === 1 ? ' card' : ' cards') + '. You can stop trusting any of them in Trusted kin.'); }, 'tree-pool-main'));
+        r.appendChild(el('p', 'tree-pool-quiet', 'Trust them only if you know everyone in this room. Trusting lets their devices ask your AI while your door is open, and lets you ask theirs.'));
+      }
+      if (_room.role === 'host') r.appendChild(button('Close the room', function () { closeRoom(); note('The room is closed. Connections already made stay until you disconnect them.'); }));
+      else r.appendChild(button('Leave the room', function () { leaveRoom(); note('You left the room.'); }));
+    }
+    r.appendChild(el('p', 'tree-pool-quiet', 'Use a room only on a network you trust, like one wired classroom or your home. Devices in a room can see each other\'s network address. No server is asked anything.'));
+  }
+  function openRoomCount() { return Object.keys(_peers).filter(function (id) { return _peers[id].room && _peers[id].state === 'proved'; }).length; }
+  function paintChat() {
+    if (!_parts || !_parts.chat) return;
+    var c = _parts.chat;
+    empty(c);
+    c.appendChild(el('p', 'tree-pool-who', 'Ask the pool from Chat'));
+    var models = chatModels();
+    if (_chat) {
+      var n = holders(_chat.model).length;
+      c.appendChild(el('p', 'tree-pool-state', 'Chat is asking ' + _chat.model + ' through the pool, on the freest trusted kin device that holds it (' + n + (n === 1 ? ' device' : ' devices') + ' now).'));
+      c.appendChild(el('p', 'tree-pool-quiet', 'For each answer, the chat so far (up to ' + MAX_CHARS + ' characters) goes whole to that one device\'s AI. Nothing is kept there but a count. That device can pause at any time.'));
+      c.appendChild(button('Stop asking through the pool', function () { useInChat(''); note('Chat asks this computer\'s own mind again.'); }));
+    }
+    var others = models.filter(function (m) { return !_chat || m.model !== _chat.model; });
+    if (!models.length && !_chat) {
+      c.appendChild(el('p', 'tree-pool-quiet', 'When a trusted kin device is helping, its minds can answer in Chat here. A device with no mind of its own can ask this way too.'));
+      return;
+    }
+    others.forEach(function (m) {
+      c.appendChild(button('Use ' + m.model + ' in Chat', function () { useInChat(m.model); note('Chat now asks ' + m.model + ' through the pool.'); }));
+      c.appendChild(el('p', 'tree-pool-quiet', m.devices + (m.devices === 1 ? ' trusted device holds it.' : ' trusted devices hold it. Each question goes to the freest one.')));
+    });
+  }
 
   root.TreePool = {
     VERSION: VERSION,
@@ -974,6 +1595,24 @@
       });
     },
     liveCount: liveCount,
-    counts: counts
+    counts: counts,
+    // v-tree-pool-room-v0.2
+    startRoom: startRoom,
+    closeRoom: closeRoom,
+    leaveRoom: leaveRoom,
+    room: roomView,
+    trustRoom: trustRoom,
+    inviteFor: inviteFor,
+    finishPeer: finishPeer,
+    inviteUrl: inviteUrl,
+    codeFrom: codeFrom,
+    holders: function (model) { return holders(model).map(function (p) { return p.id; }); },
+    bestFor: function (model) { var b = bestFor(model, []); return b ? b.id : ''; },
+    askTurns: askTurns,
+    askBest: askBest,
+    askChat: askChat,
+    useInChat: useInChat,
+    chatRoute: chatRoute,
+    chatModels: chatModels
   };
 })(typeof window !== 'undefined' ? window : this);
