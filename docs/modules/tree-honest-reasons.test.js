@@ -68,7 +68,10 @@ var quietReport = { found: null, https: true, blocked: 2, results: [
   // Find (Gathering) and May I look? (Settings) knock only in the quiet secure-page case
   assert.ok(/LocalMindProbe\.whyQuiet\(report\)\.then\(function \(why\) \{\s*if \(why\.kind === 'stopped'\) setNoteAbsent\('stopped'\);/.test(rooms), 'Find says stopped');
   assert.ok(/kind === 'stopped'\) \{\s*n\.appendChild\(document\.createTextNode\(\s*'Nothing answered at the usual doors on this machine\./.test(rooms), 'Find stopped line');
-  assert.ok(/whyQuiet\(report\)\.then\(function \(why\) \{\s*if \(why\.kind === 'shut'\) setStatus\(root, speakShut\(why\.name\), 'warn'\);/.test(src), 'Settings says shut or stopped');
+  // before v-tree-first-run-heals-v0.1:
+  // assert.ok(/whyQuiet\(report\)\.then\(function \(why\) \{\s*if \(why\.kind === 'shut'\) setStatus\(root, speakShut\(why\.name\), 'warn'\);/.test(src), 'Settings says shut or stopped');
+  // v-tree-first-run-heals-v0.1: a knock names the port, not a guessed app (speakShut stays for a door with no port).
+  assert.ok(/whyQuiet\(report\)\.then\(function \(why\) \{[\s\S]{0,200}if \(why\.kind === 'shut' && why\.port\) setStatus\(root, speakAnswered\(why\.port\), 'warn'\);\s*else if \(why\.kind === 'shut'\) setStatus\(root, speakShut\(why\.name\), 'warn'\);/.test(src), 'Settings says shut or stopped');
 
   // Chat: model missing is named; a quiet door is knocked once after this Send
   assert.ok(/res\.status === 404 && \/model/.test(thread) && /err\.reason = 'model-missing';/.test(thread), '404 model not found is read');

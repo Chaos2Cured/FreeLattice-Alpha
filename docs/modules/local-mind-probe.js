@@ -15,6 +15,11 @@
 // One storage key: fl_alpha_local_mind. remember() persists.
 // Later scans keep a still-present chosen model. A vanished name
 // writes a visible fallback note; it does not stay as a ghost.
+//
+// v-tree-first-run-heals-v0.1 (Hypha's walk #11): a door is named as an app only when its
+// answer has that app's shape (Ollama: a models list; the others: an OpenAI-style data list).
+// Anything else on a well-known port is "something answered on port N", never seated. A quiet
+// no-cors knock reads nothing, so it never names an app either: it names the port.
 // ═══════════════════════════════════════════════════════════════
 
 (function () {
@@ -218,6 +223,35 @@
     return names.slice(0, MODEL_CAP);
   }
 
+  // v-tree-first-run-heals-v0.1: the port of a door address ("" if none).
+  function portOf(url) {
+    var m = String(url || '').match(/^https?:\/\/[^\/:]+:(\d{1,5})/i);
+    return m ? m[1] : '';
+  }
+  // v-tree-first-run-heals-v0.1: did this answer come in the door's own shape? Ollama's
+  // /api/tags gives { models: [...] }; LM Studio, llama.cpp, Jan, GPT4All and KoboldCPP give
+  // an OpenAI-style { data: [...] } on /v1/models. A dev server's page or {} is not a mind.
+  function shapeConfirms(result) {
+    if (!result || !result.ok) return false;
+    var json = result.json;
+    if (!json || typeof json !== 'object') return false;
+    if (/\/api\/tags$/.test(String(result.url || ''))) return Array.isArray(json.models);
+    return Array.isArray(json.data) || Array.isArray(json.models);
+  }
+  // v-tree-first-run-heals-v0.1: an answer in the wrong shape is kept as "answered, unnamed".
+  function confirmOrUnname(result) {
+    if (!result || !result.ok) return result;
+    if (shapeConfirms(result)) return result;
+    result.ok = false;
+    result.unconfirmed = true;
+    result.port = portOf(result.url);
+    return result;
+  }
+  function unconfirmedOf(results) {
+    return (results || []).filter(function (r) { return r && r.unconfirmed; })
+      .map(function (r) { return { port: r.port, usual: r.name || '' }; });
+  }
+
   function fetchDoor(url, ms) {
     var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
     var timer = setTimeout(function () {
@@ -286,6 +320,9 @@
         return Promise.all(others.map(function (d) {
           return fetchDoor(d.url, 2500).then(function (r) { r.id = d.id; r.name = d.name; return r; });
         })).then(function (results) {
+          // v-tree-first-run-heals-v0.1: a wrong-shaped answer is not pushed as a found app.
+          results.forEach(confirmOrUnname);
+          bridged.unconfirmed = unconfirmedOf(results);
           results.forEach(function (r) { if (r.ok) bridged.foundList.push(r); });
           bridged.tried = 1 + results.length;
           bridged.results = results;
@@ -300,6 +337,8 @@
         });
       });
       return Promise.all(jobs).then(function (results) {
+        // v-tree-first-run-heals-v0.1: only an answer in the app's own shape is found and named.
+        results.forEach(confirmOrUnname);
         var foundList = [];
         var blocked = 0;
         for (var i = 0; i < results.length; i++) {
@@ -315,7 +354,8 @@
           blocked: blocked,
           https: pageIsHttps(),
           tried: results.length,
-          results: results
+          results: results,
+          unconfirmed: unconfirmedOf(results) // v-tree-first-run-heals-v0.1
         };
       });
     });
@@ -395,10 +435,14 @@
     });
     if (!quiet.length) return Promise.resolve({ kind: 'none' });
     return Promise.all(quiet.map(function (r) {
-      return knock(r.url).then(function (k) { return { name: r.name || 'a mind', state: k }; });
+      // before v-tree-first-run-heals-v0.1: return knock(r.url).then(function (k) { return { name: r.name || 'a mind', state: k }; });
+      return knock(r.url).then(function (k) { return { name: r.name || 'a mind', port: portOf(r.url), state: k }; });
     })).then(function (ks) {
       var up = ks.filter(function (k) { return k.state === 'up' || k.state === 'slow'; });
-      if (up.length) return { kind: 'shut', name: up[0].name };
+      // before v-tree-first-run-heals-v0.1: if (up.length) return { kind: 'shut', name: up[0].name };
+      // v-tree-first-run-heals-v0.1: name is only the app that usually lives there (not confirmed);
+      // port is what we know. confirmed is always false for a knock.
+      if (up.length) return { kind: 'shut', name: up[0].name, port: up[0].port, confirmed: false };
       return { kind: 'stopped' };
     });
   }
@@ -407,6 +451,16 @@
     return 'Something answered at the ' + (name || 'mind') + ' door, but it has not opened that door to this garden yet. ' +
       'This garden is a secure page, and the mind lives at a quieter door. ' +
       'That is why we cannot see in from here.';
+  }
+
+  // v-tree-first-run-heals-v0.1: honest lines that name the port, not a guessed app.
+  function speakAnswered(port) {
+    return 'Something answered on port ' + (port || '?') + ' on this machine, but this secure page cannot see what it is, ' +
+      'so we do not name it. If it is your local AI app, it has not opened its door to this garden yet.';
+  }
+  function speakUnconfirmed(port) {
+    return 'Something answered on port ' + (port || '?') + ' on this machine, but it did not answer like a local AI app, ' +
+      'so it was not named or seated.';
   }
 
   function speakStopped() {
@@ -1035,10 +1089,17 @@
         // v-tree-honest-reasons-v0: knock first, so a stopped mind is not called "there".
         if (report.https && report.blocked > 0) {
           whyQuiet(report).then(function (why) {
-            if (why.kind === 'shut') setStatus(root, speakShut(why.name), 'warn');
+            // before v-tree-first-run-heals-v0.1: if (why.kind === 'shut') setStatus(root, speakShut(why.name), 'warn');
+            if (why.kind === 'shut' && why.port) setStatus(root, speakAnswered(why.port), 'warn');
+            else if (why.kind === 'shut') setStatus(root, speakShut(why.name), 'warn');
             else if (why.kind === 'stopped') setStatus(root, speakStopped(), 'warn');
             else setStatus(root, speakBlocked(), 'warn');
           });
+          return;
+        }
+        // v-tree-first-run-heals-v0.1: something answered in the wrong shape: say the port.
+        if (report.unconfirmed && report.unconfirmed.length) {
+          setStatus(root, speakUnconfirmed(report.unconfirmed[0].port), 'warn');
           return;
         }
         setStatus(root, speakNoneHtml(), '', true);
@@ -1113,6 +1174,10 @@
     whyQuiet: whyQuiet,
     speakShut: speakShut,
     speakStopped: speakStopped,
+    speakAnswered: speakAnswered, // v-tree-first-run-heals-v0.1
+    speakUnconfirmed: speakUnconfirmed, // v-tree-first-run-heals-v0.1
+    shapeConfirms: shapeConfirms, // v-tree-first-run-heals-v0.1
+    portOf: portOf, // v-tree-first-run-heals-v0.1
     tryAddress: tryAddress,
     getRemembered: getRemembered,
     getRememberedMinds: getRememberedMinds,

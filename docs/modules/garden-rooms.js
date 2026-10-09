@@ -43,6 +43,9 @@
 // Fade: opacity 400ms. No flash. No Unreal engine.
 // Light veils — garden keeps running. Never a 0.82 blackout.
 //
+// v-tree-first-run-heals-v0.1 (Hypha's walk #3, #5, #11): a press near the Chat card is never a
+// tap on the glass; a mind already in another chair is said so (choice kept, never blocked);
+// Find names an app only when its door answered in that app's shape, else it names the port.
 // Mirror: docs/code-garden.html · workshop: docs/code-workshop.html
 // round-table: docs/code-round-table.html · art: docs/code-art.html
 // research: docs/code-research.html · listen-door: docs/code-music.html
@@ -893,6 +896,14 @@
     var place = document.getElementById('place-veil');
     var thread = document.getElementById('thread-veil');
     function isOpen(v) { return !!(v && v.classList.contains('is-open')); }
+    // v-tree-first-run-heals-v0.1: the Chat card and a 16px margin around it are not glass.
+    function nearChatCard(v, x, y) {
+      var card = v && v.querySelector ? v.querySelector('#room-chat') : null;
+      if (!card || card.hidden || typeof card.getBoundingClientRect !== 'function') return false;
+      var r = card.getBoundingClientRect();
+      if (!r || !r.width || !r.height) return false;
+      return x >= r.left - 16 && x <= r.right + 16 && y >= r.top - 16 && y <= r.bottom + 16;
+    }
     function openGalaxies() { return document.querySelector('details.galaxies[open]'); }
     function closeTop() {
       var gal = openGalaxies();
@@ -929,6 +940,10 @@
       veil.addEventListener('click', function (e) {
         var ok = downOnGlass && e.target === veil && isOpen(veil) && openedAt && Date.now() - openedAt > 600;
         downOnGlass = false;
+        // v-tree-first-run-heals-v0.1: at 1280 the Chat input slid past the card's edge, and a click
+        // there was a tap on the glass, so the whole Gathering closed. A press within 16px of the
+        // Chat card is never the glass.
+        if (ok && nearChatCard(veil, e.clientX, e.clientY)) ok = false;
         if (!ok) return;
         var btn = document.getElementById(veil === thread ? 'thread-close' : 'place-veil-close');
         if (btn) btn.click();
@@ -1363,6 +1378,25 @@
         ));
         return;
       }
+      // v-tree-first-run-heals-v0.1 (Hypha #11): a quiet knock cannot tell which app answered, and a
+      // door that answered in the wrong shape is not a mind. Name the port; name an app only when
+      // its own answer confirmed it (then it is found, not here).
+      if (kind === 'answered' || kind === 'unconfirmed') {
+        n.appendChild(document.createTextNode(kind === 'answered'
+          ? (window.LocalMindProbe && LocalMindProbe.speakAnswered ? LocalMindProbe.speakAnswered(doorName) :
+            'Something answered on port ' + doorName + ' on this machine, but this secure page cannot see what it is, so we do not name it.') + ' Try '
+          : (window.LocalMindProbe && LocalMindProbe.speakUnconfirmed ? LocalMindProbe.speakUnconfirmed(doorName) :
+            'Something answered on port ' + doorName + ' on this machine, but it did not answer like a local AI app, so it was not seated.') + ' If your AI app is meant to be there, start it and Find local minds again, or try '
+        ));
+        var dk = document.createElement('a');
+        dk.href = DESKTOP_URL;
+        dk.textContent = 'FreeLattice Desktop';
+        dk.rel = 'noopener noreferrer';
+        dk.target = '_blank';
+        n.appendChild(dk);
+        n.appendChild(document.createTextNode('.'));
+        return;
+      }
       if (kind === 'https') {
         n.appendChild(document.createTextNode(doorName
           ? 'Something answered at the ' + doorName + ' door, but this secure page cannot see in. Try '
@@ -1394,6 +1428,19 @@
       inst.target = '_blank';
       n.appendChild(inst);
       n.appendChild(document.createTextNode(' can help.'));
+    }
+
+    // v-tree-first-run-heals-v0.1: which other seated chair (type word) already holds this mind, if any.
+    function otherChairWith(chairId, seat) {
+      if (!seat || !seat.model) return '';
+      var binds = entryState().binds || {};
+      for (var ci = 0; ci < CORE_CHAIRS.length; ci++) {
+        var other = CORE_CHAIRS[ci];
+        if (other.later || other.id === chairId) continue;
+        var b = binds[other.id];
+        if (b && String(b.model) === String(seat.model) && String(b.url || '') === String(seat.url || '')) return other.type;
+      }
+      return '';
     }
 
     function paintSeat(seat, chair) {
@@ -1447,6 +1494,13 @@
           btn.type = 'button';
           btn.className = 'core-bind-option';
           btn.textContent = seat.tag + ' · ' + shortName(seat.model) + (seat.ephemeral ? ' (just found)' : '');
+          // v-tree-first-run-heals-v0.1 (Hypha #5): the same mind in two chairs was taken with no word.
+          // It stays a choice (one small model may sit twice), and the picker and the note say so.
+          var alsoIn = otherChairWith(chair.id, seat);
+          if (alsoIn) {
+            btn.textContent = btn.textContent + ' (already in the ' + alsoIn + ' chair)';
+            btn.setAttribute('data-core-already', alsoIn);
+          }
           btn.addEventListener('click', function () {
             if (window.LocalMindProbe && LocalMindProbe.setChairBind) {
               LocalMindProbe.setChairBind(chair.id, seat);
@@ -1454,6 +1508,11 @@
             closePicker();
             paintAll();
             setNoteText('This ' + chair.type + ' chair seats ' + seat.tag + ' · ' + shortName(seat.model) + '. Not a person-name. Not a dump.');
+            if (alsoIn) {
+              setNoteText('This ' + chair.type + ' chair seats ' + seat.tag + ' · ' + shortName(seat.model) +
+                '. The ' + alsoIn + ' chair seats the same mind, so these two chairs are one mind, not two. ' +
+                'Pick another mind with Change if you want two voices.');
+            }
           });
           list.appendChild(btn);
         });
@@ -1596,11 +1655,18 @@
           if (typeof LocalMindProbe.whyQuiet === 'function') {
             return LocalMindProbe.whyQuiet(report).then(function (why) {
               if (why.kind === 'stopped') setNoteAbsent('stopped');
+              // before v-tree-first-run-heals-v0.1: else if (why.kind === 'shut') setNoteAbsent('https', why.name);
+              else if (why.kind === 'shut' && why.port) setNoteAbsent('answered', why.port);
               else if (why.kind === 'shut') setNoteAbsent('https', why.name);
               else setNoteAbsent('https');
             });
           }
           setNoteAbsent('https');
+          return;
+        }
+        // v-tree-first-run-heals-v0.1: something answered, but not in a mind's shape. Say the port.
+        if (report && report.unconfirmed && report.unconfirmed.length) {
+          setNoteAbsent('unconfirmed', report.unconfirmed[0].port);
           return;
         }
         setNoteAbsent('none');
