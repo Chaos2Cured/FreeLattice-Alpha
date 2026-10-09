@@ -41,6 +41,8 @@
     <div id="settings-grandmother"></div>
     <!-- v-tree-kin-v0.1: trusted kin, under the grandmother face -->
     <div id="tree-kin-host"></div>
+    <!-- v-tree-pool-v0.1: the Device Pool, under Trusted kin -->
+    <div id="tree-pool-host"></div>
     <!-- v-alpha-listen-hang-adaptive-v0 — Listen only; mycelium Hang Cancel on FreeLattice -->
     <p class="listen-calm" style="font-family:Georgia,serif;font-size:0.88rem;color:rgba(200,210,230,0.55);margin:10px 0 0;max-width:28rem;line-height:1.5;">Long local thinks are valid — Stop is a choice, not a timer.</p>
     <div id="room-chat">
@@ -54,6 +56,7 @@
   <script src="modules/fl-connect.js"></script>
   <script src="modules/local-mind-probe.js"></script>
   <script src="modules/tree-kin.js"></script>
+  <script src="modules/tree-pool.js"></script>
   <script src="modules/garden-thread.js"></script>
   <script src="modules/garden-rooms.js"></script>
   <script>
@@ -65,6 +68,9 @@
       // v-tree-kin-v0.1
       var kin = document.getElementById('tree-kin-host');
       if (kin && window.TreeKin && typeof TreeKin.mount === 'function') TreeKin.mount(kin);
+      // v-tree-pool-v0.1
+      var pool = document.getElementById('tree-pool-host');
+      if (pool && window.TreePool && typeof TreePool.mount === 'function') TreePool.mount(pool);
     })();
   </script>
 </body>

@@ -1214,6 +1214,11 @@
       var kh = document.getElementById('tree-kin-host');
       if (kh) kh.hidden = true;
     } catch (eKH) {}
+    // v-tree-pool-v0.1: the Device Pool card belongs to Settings only (hiding it closes nothing).
+    try {
+      var ph = document.getElementById('tree-pool-host');
+      if (ph) ph.hidden = true;
+    } catch (ePH) {}
 
     var ids = ['place-veil-line', 'nursery-stage', 'nursery-ceremony', 'nursery-growth', 'nursery-trainer', 'settings-grandmother', 'core-gathering', 'art-listen', 'workshop-benches', 'workshop-trainer', 'round-table-sitting'];
     for (var i = 0; i < ids.length; i++) {
@@ -1877,6 +1882,21 @@
               kinHost.hidden = false;
               TreeKin.mount(kinHost);
             } catch (eKin) {}
+          }
+          // v-tree-pool-v0.1: the Device Pool, just under Trusted kin. Mounting connects
+          // nothing and makes no key; the door stays as the person left it (off at first).
+          if (window.TreePool && typeof TreePool.mount === 'function') {
+            try {
+              var poolHost = document.getElementById('tree-pool-host');
+              var poolAfter = document.getElementById('tree-kin-host') || settingsFace;
+              if (!poolHost) {
+                poolHost = document.createElement('div');
+                poolHost.id = 'tree-pool-host';
+                if (poolAfter.parentNode) poolAfter.parentNode.insertBefore(poolHost, poolAfter.nextSibling);
+              }
+              poolHost.hidden = false;
+              TreePool.mount(poolHost);
+            } catch (ePool) {}
           }
         } else if (line) {
           line.hidden = false;
