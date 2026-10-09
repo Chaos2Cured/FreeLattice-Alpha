@@ -48,7 +48,8 @@
   var HONEST = 'A card shows which computer made it. It does not prove who the person is or what the model is. ' +
     'Only trust a card from someone you know, sent a way you trust.';
   var NOTHING_SENT = 'Nothing is sent from here. You pass cards by text, email or in person.';
-  var LATER = 'Later, the Device Pool on the Tree will let trusted kin help each other. Not in this card yet.';
+  // before v-tree-pool-v0.1: var LATER = 'Later, the Device Pool on the Tree will let trusted kin help each other. Not in this card yet.';
+  var LATER = 'The Device Pool, just below, lets connected trusted kin ask each other\'s AI. Nothing is shared until you tap Let this device help there.';
 
   var _store = null;      // identity store; IndexedDB by default, tests may pass their own
   var _identity = null;   // { meshId, displayName, cryptoType, publicKeyJwk, keyPair, createdAt }
@@ -304,6 +305,7 @@
       history: ((prior && prior.history) || []).concat(prior && prior.revokedAt ? [{ grantedAt: prior.grantedAt, revokedAt: prior.revokedAt }] : []).slice(-20) };
     writeJson(PASSES_KEY, p);
     bump('trusted');
+    changed();
   }
   function revoke(fp) {
     var p = passes();
@@ -311,6 +313,14 @@
     p[fp].revokedAt = Date.now();
     writeJson(PASSES_KEY, p);
     bump('stopped');
+    changed();
+  }
+  // v-tree-pool-v0.1: tell the Device Pool (018) a pass was given or stopped, so it
+  // re-reads kin at once. An event on this page only; nothing leaves it.
+  function changed() {
+    try {
+      if (root.dispatchEvent && typeof root.CustomEvent === 'function') root.dispatchEvent(new root.CustomEvent('tree-kin-changed'));
+    } catch (e) {}
   }
   function kinCount() {
     var p = passes();
