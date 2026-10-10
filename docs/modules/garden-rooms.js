@@ -1234,6 +1234,11 @@
       var ph = document.getElementById('tree-pool-host');
       if (ph) ph.hidden = true;
     } catch (ePH) {}
+    // v-tree-no-install-mind-v0.1: the no-install card belongs to Settings only (hiding it keeps the mind awake).
+    try {
+      var bh = document.getElementById('tree-browser-mind-host');
+      if (bh) bh.hidden = true;
+    } catch (eBH) {}
 
     var ids = ['place-veil-line', 'nursery-stage', 'nursery-ceremony', 'nursery-growth', 'nursery-trainer', 'settings-grandmother', 'core-gathering', 'art-listen', 'workshop-benches', 'workshop-trainer', 'round-table-sitting'];
     for (var i = 0; i < ids.length; i++) {
@@ -1963,6 +1968,21 @@
               poolHost.hidden = false;
               TreePool.mount(poolHost);
             } catch (ePool) {}
+          }
+          // v-tree-no-install-mind-v0.1: a mind with no install, just under the grandmother
+          // face (made on first open, after kin and pool, so it lands above them). Mounting
+          // downloads nothing; it only asks the browser whether WebGPU is here.
+          if (window.TreeBrowserMind && typeof TreeBrowserMind.mount === 'function') {
+            try {
+              var bmHost = document.getElementById('tree-browser-mind-host');
+              if (!bmHost) {
+                bmHost = document.createElement('div');
+                bmHost.id = 'tree-browser-mind-host';
+                if (settingsFace.parentNode) settingsFace.parentNode.insertBefore(bmHost, settingsFace.nextSibling);
+              }
+              bmHost.hidden = false;
+              TreeBrowserMind.mount(bmHost);
+            } catch (eBm) {}
           }
         } else if (line) {
           line.hidden = false;

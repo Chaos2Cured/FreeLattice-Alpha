@@ -48,6 +48,9 @@
     'That is why we cannot hear it from here. Nothing was invented.';
   var HEART_NO_MODEL =
     'The mind is at home, but it has not told us its name yet. Nothing was invented.';
+  // v-tree-no-install-mind-v0.1
+  var HEART_BROWSER_ASLEEP = 'The in-browser mind is asleep. Wake it in Settings, A mind with no install. If its files are already kept in this browser, nothing downloads again.';
+  var HEART_BROWSER_QUIET = 'The in-browser mind did not answer this time. Nothing was invented. Try again, or put it to sleep and wake it in Settings.';
   var HEART_QUIET =
     'The mind was quiet. Nothing was invented.';
   var HEART_FAIL =
@@ -459,7 +462,13 @@
     });
   }
 
+  // v-tree-no-install-mind-v0.1: an in-browser mind (tree-browser-mind.js) answers in this page.
+  // Nothing is fetched for it; the loopback doors below are unchanged.
+  function inBrowser(mind) {
+    return !!(window.TreeBrowserMind && typeof TreeBrowserMind.isEntry === 'function' && TreeBrowserMind.isEntry(mind));
+  }
   function sendToMind(mind, msgs) {
+    if (inBrowser(mind)) return TreeBrowserMind.chat(rememberedModel(mind), msgs);
     var urls = talkUrls(mind);
     if (!urls.length) {
       return Promise.reject({ blocked: true });
@@ -844,6 +853,8 @@
         // v-tree-honest-reasons-v0: a missing model is named; a quiet door gets one
         // no-cors knock (after this Send only) so "stopped" and "shut" are told apart.
         if (err && err.reason === 'model-missing') { say(heartModelMissing(err.model)); return; }
+        // v-tree-no-install-mind-v0.1: the in-browser mind has its own plain words (no door to knock).
+        if (inBrowser(nowMind)) { say(err && err.reason === 'browser-mind-asleep' ? HEART_BROWSER_ASLEEP : HEART_BROWSER_QUIET); return; }
         var door = (talkUrls(nowMind)[0]) || '';
         if ((reason === 'blocked' || reason === 'fail') && door &&
             window.LocalMindProbe && typeof LocalMindProbe.knock === 'function') {
