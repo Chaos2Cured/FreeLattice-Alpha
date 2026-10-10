@@ -781,6 +781,11 @@
     var f = _flow;
     function reset() { _flow = { step: '', text: '', code: '', check: null, sdp: '', card: '' }; paintConnect(); }
     if (!f.step) {
+      // v-tree-grandmother-door-v0.1: the guided way first. It opens a window with one big picture code.
+      if (root.TreeDoor && typeof root.TreeDoor.share === 'function') {
+        c.appendChild(button('Share this computer with a phone', function () { root.TreeDoor.share(); }, 'tree-pool-main'));
+        c.appendChild(el('p', 'tree-pool-quiet', 'A window shows one picture code. Point the phone camera at it, tap Yes on the phone, then hold the phone up to this computer. Or use the steps below.'));
+      }
       c.appendChild(el('p', 'tree-pool-quiet', 'Devices connect straight to each other, with no server in between, so both must be on the same network. ' +
         'One person taps Invite a device and sends the invite by text, email or chat. The other pastes it and sends back a reply. ' +
         'If you have made your kin card, it rides along, so one invite and one reply can make you kin and connected.'));
@@ -1090,6 +1095,10 @@
       if (root.history && root.history.replaceState) root.history.replaceState(null, '', root.location.pathname + root.location.search);
     } catch (e) { _arrived = ''; }
   })();
+  // v-tree-grandmother-door-v0.1: the grandmother door (tree-door.js) reads the same arrived invite once,
+  // to ask its Yes or No. The Join box below is still filled in too, so nothing is lost if the person taps No.
+  var _doorArrived = _arrived;
+  function takeArrived() { var c = _doorArrived; _doorArrived = ''; return c; }
 
   function cleanRoomId(x) { var s = String(x == null ? '' : x).toUpperCase(); return /^[A-Z0-9]{4,8}$/.test(s) ? s : ''; }
   function cleanRoom(r) { if (!r || typeof r !== 'object') return null; var id = cleanRoomId(r.id); return id ? { id: id } : null; }
@@ -1591,6 +1600,32 @@
     });
   }
 
+  // v-tree-grandmother-door-v0.1: small doors for the grandmother door window (tree-door.js).
+  // They call the same join, finish and room code as the buttons above. Nothing here trusts,
+  // opens the door or connects on its own: each is called from a human tap in that window.
+  function doorJoin(sdp, room) {
+    return join(sdp).then(function (r) {
+      if (!r.ok) return r;
+      if (room && _peers[r.peerId]) _peers[r.peerId].roomJoin = room.id;
+      _flow = { step: 'replied', text: '', code: r.code, check: null, sdp: '', card: '', peerId: r.peerId };
+      paintConnect();
+      paint();
+      return r;
+    });
+  }
+  function doorFinish(sdp) {
+    return finish(sdp).then(function (r) {
+      if (!r.ok) return r;
+      _flow = { step: '', text: '', code: '', check: null, sdp: '', card: '' };
+      paintConnect();
+      paint();
+      if (_room && _room.role === 'host') rollInvite();
+      return r;
+    });
+  }
+  function currentInvite() { return _flow.step === 'invited' && _pending ? _flow.code : ''; }
+  function peerState(peerId) { var p = _peers[peerId]; return p ? { state: p.state, kin: isKin(p), helping: !!(p.hello && p.hello.helping), models: p.hello ? p.hello.models.slice() : [] } : null; }
+
   root.TreePool = {
     VERSION: VERSION,
     HONEST: HONEST,
@@ -1647,6 +1682,16 @@
     askChat: askChat,
     useInChat: useInChat,
     chatRoute: chatRoute,
-    chatModels: chatModels
+    chatModels: chatModels,
+    // v-tree-grandmother-door-v0.1
+    takeArrived: takeArrived,
+    doorJoin: doorJoin,
+    doorFinish: doorFinish,
+    currentInvite: currentInvite,
+    doorInvite: rollInvite,
+    peerState: peerState,
+    canScan: canScan,
+    scanInto: startScan,
+    stopScan: stopScan
   };
 })(typeof window !== 'undefined' ? window : this);

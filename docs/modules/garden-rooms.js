@@ -1239,6 +1239,11 @@
       var bh = document.getElementById('tree-browser-mind-host');
       if (bh) bh.hidden = true;
     } catch (eBH) {}
+    // v-tree-grandmother-door-v0.1: the Help me wake a mind button belongs to Settings only.
+    try {
+      var tdh = document.getElementById('tree-door-host');
+      if (tdh) tdh.hidden = true;
+    } catch (eTDH) {}
 
     var ids = ['place-veil-line', 'nursery-stage', 'nursery-ceremony', 'nursery-growth', 'nursery-trainer', 'settings-grandmother', 'core-gathering', 'art-listen', 'workshop-benches', 'workshop-trainer', 'round-table-sitting'];
     for (var i = 0; i < ids.length; i++) {
@@ -1983,6 +1988,19 @@
               bmHost.hidden = false;
               TreeBrowserMind.mount(bmHost);
             } catch (eBm) {}
+          }
+          // v-tree-grandmother-door-v0.1: after Not now, a way back to the welcome window (only while no mind is seated).
+          if (window.TreeDoor && typeof TreeDoor.mountRelaunch === 'function') {
+            try {
+              var tdHost = document.getElementById('tree-door-host');
+              if (!tdHost) {
+                tdHost = document.createElement('div');
+                tdHost.id = 'tree-door-host';
+                if (settingsFace.parentNode) settingsFace.parentNode.insertBefore(tdHost, settingsFace.nextSibling);
+                TreeDoor.mountRelaunch(tdHost);
+              }
+              tdHost.hidden = false;
+            } catch (eTd) {}
           }
         } else if (line) {
           line.hidden = false;

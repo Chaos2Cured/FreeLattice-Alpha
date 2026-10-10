@@ -40,6 +40,8 @@
     <div id="fl-connect-mount" style="max-width:40rem;margin:0 auto 1rem;"></div>
     <div id="settings-grandmother"></div>
     <!-- v-tree-no-install-mind-v0.1: a mind with no install, under the grandmother face -->
+    <!-- v-tree-grandmother-door-v0.1: Help me wake a mind, after Not now -->
+    <div id="tree-door-host"></div>
     <div id="tree-browser-mind-host"></div>
     <!-- v-tree-kin-v0.1: trusted kin, under the grandmother face -->
     <div id="tree-kin-host"></div>
@@ -63,6 +65,8 @@
   <script src="modules/tree-pool.js"></script>
   <!-- v-tree-no-install-mind-v0.1: a mind with no install (WebLLM in the page, vendored); downloads nothing until a human taps -->
   <script src="modules/tree-browser-mind.js"></script>
+  <!-- v-tree-grandmother-door-v0.1: the grandmother door: a welcome window when no mind is seated, and Yes or No pooling by picture codes; fetches nothing itself -->
+  <script src="modules/tree-door.js"></script>
   <script src="modules/garden-thread.js"></script>
   <script src="modules/garden-rooms.js"></script>
   <script>
@@ -80,6 +84,9 @@
       // v-tree-no-install-mind-v0.1
       var bmind = document.getElementById('tree-browser-mind-host');
       if (bmind && window.TreeBrowserMind && typeof TreeBrowserMind.mount === 'function') TreeBrowserMind.mount(bmind);
+      // v-tree-grandmother-door-v0.1
+      var tdoor = document.getElementById('tree-door-host');
+      if (tdoor && window.TreeDoor && typeof TreeDoor.mountRelaunch === 'function') TreeDoor.mountRelaunch(tdoor);
     })();
   </script>
 </body>
