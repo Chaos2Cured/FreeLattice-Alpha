@@ -1,4 +1,9 @@
-// tree-pool.js v-tree-pool-v0.1, layered by v-tree-pool-room-v0.2 (019a)
+// tree-pool.js v-tree-pool-v0.1, layered by v-tree-pool-room-v0.2 (019a), and by
+// v-tree-no-install-mind-v0.1 (028): an awake in-browser mind (tree-browser-mind.js,
+// WebLLM in this page) can be lent through the same door, kin only, Pause wins. It is
+// asked in the page (TreeBrowserMind.chat), never fetched. The loopback-only rule for
+// Ollama and the other apps is unchanged: still one fetch, to this computer's own AI.
+//
 //
 // v-tree-pool-room-v0.2 (019a), browser only, still no server and empty iceServers:
 //   - A room. One device hosts. Every other device joins once (scan or paste the
@@ -186,16 +191,26 @@
   function remembered() {
     try { return root.LocalMindProbe && root.LocalMindProbe.getRemembered ? root.LocalMindProbe.getRemembered() : null; } catch (e) { return null; }
   }
+  // v-tree-no-install-mind-v0.1: the in-browser mind, when one is awake in this page.
+  function browserMind() { var b = root.TreeBrowserMind; return b && typeof b.awakeModel === 'function' ? b : null; }
+  function browserModels() { var b = browserMind(); var id = b ? line(b.awakeModel(), 120) : ''; return id ? [id] : []; }
   function localModels() {
     var m = remembered();
-    if (!m) return [];
-    var list = (Array.isArray(m.models) && m.models.length) ? m.models : (m.model ? [m.model] : []);
+    // before v-tree-no-install-mind-v0.1: if (!m) return [];
+    var bm = browserMind();
+    var list = !m ? [] : (Array.isArray(m.models) && m.models.length) ? m.models : (m.model ? [m.model] : []);
+    if (m && bm && bm.isEntry(m)) list = []; // a seated in-browser mind counts only while it is awake (below)
     var out = [];
     list.forEach(function (x) { var n = line(x && typeof x === 'object' ? x.name : x, 120); if (n && out.indexOf(n) === -1) out.push(n); });
+    browserModels().forEach(function (n) { if (out.indexOf(n) === -1) out.push(n); }); // v-tree-no-install-mind-v0.1
     return out.slice(0, MAX_MODELS);
   }
   function localDoor(model) {
+    // v-tree-no-install-mind-v0.1: the awake in-browser mind answers in this page. No fetch, no address.
+    if (browserModels().indexOf(model) !== -1) return { ok: true, kind: 'in-page', model: model, url: '' };
     var m = remembered();
+    var bmSeat = browserMind();
+    if (m && bmSeat && bmSeat.isEntry(m)) return { ok: false, reason: model === m.model ? 'browser-mind-asleep' : 'no-such-model' };
     if (!m || !m.url) return { ok: false, reason: 'no-local-mind' };
     var u = null;
     try { u = new root.URL(String(m.url)); } catch (e) { u = null; }
@@ -468,6 +483,7 @@
         models: (Array.isArray(msg.models) ? msg.models : []).slice(0, MAX_MODELS).map(function (m) { return line(m, 120); }).filter(Boolean),
         busy: num(msg.busy, 64),           // v-tree-pool-room-v0.2: questions it is answering now
         max: num(msg.max, 64) || MAX_CONCURRENT,
+        inBrowser: (Array.isArray(msg.inBrowser) ? msg.inBrowser : []).slice(0, MAX_MODELS).map(function (m) { return line(m, 120); }).filter(Boolean), // v-tree-no-install-mind-v0.1
         at: Date.now()
       };
       bump('hellosTaken');
@@ -502,8 +518,9 @@
     var helping = mode() === 'kin';
     var info = helping ? selfInfo() : { mem: 0, cores: 0, models: [] };
     // before v-tree-pool-room-v0.2: { type: 'hello', v: 1, helping, mem, cores, models }
+    // v-tree-no-install-mind-v0.1: inBrowser names which of those models run inside this browser.
     var ok = sendRaw(p, { type: 'hello', v: 1, helping: helping, mem: info.mem, cores: info.cores, models: info.models,
-      busy: helping ? liveCount() : 0, max: MAX_CONCURRENT });
+      busy: helping ? liveCount() : 0, max: MAX_CONCURRENT, inBrowser: helping ? browserModels() : [] });
     if (ok) bump('hellosSent');
     return ok;
   }
@@ -558,10 +575,13 @@
       var body = { model: a.door.model, stream: false, messages: a.messages }; // the same shape for Ollama and OpenAI-style doors
       var opts = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) };
       if (ctrl) opts.signal = ctrl.signal;
-      return root.fetch(a.door.url, opts).then(function (r) {
+      // before v-tree-no-install-mind-v0.1: return root .fetch (a.door.url, opts).then(function (r) {  (spaced so the one-fetch smoke counts the live line only)
+      // v-tree-no-install-mind-v0.1: an in-page door asks the in-browser mind here; Pause aborts it the same way.
+      var asked = a.door.kind === 'in-page' ? inPage(a, ctrl) : root.fetch(a.door.url, opts).then(function (r) {
         if (!r.ok) throw new Error('status ' + r.status);
         return r.json();
-      }).then(function (j) {
+      });
+      return asked.then(function (j) {
         var text = (j && j.message && j.message.content) ||
           (j && j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || '';
         var why = _inflight[key] ? _inflight[key].why : 'closed';
@@ -584,6 +604,12 @@
         return res;
       });
     });
+  }
+  // v-tree-no-install-mind-v0.1: the in-browser mind answers in the same shape as Ollama's /api/chat.
+  function inPage(a, ctrl) {
+    var b = browserMind();
+    if (!b) return Promise.reject(new Error('local-ai-quiet'));
+    return b.chat(a.door.model, a.messages, { signal: ctrl ? ctrl.signal : null }).then(function (text) { return { message: { content: text } }; });
   }
   function stopAll(why) {
     Object.keys(_inflight).forEach(function (k) { _inflight[k].why = why; try { _inflight[k].ctrl && _inflight[k].ctrl.abort(); } catch (e) {} });
@@ -625,7 +651,9 @@
       'no-answer': 'No answer came back. The connection may have closed.',
       empty: 'Type a question first.',
       // v-tree-pool-room-v0.2
-      'no-helper': 'No trusted kin device that holds that mind is helping right now.'
+      'no-helper': 'No trusted kin device that holds that mind is helping right now.',
+      // v-tree-no-install-mind-v0.1
+      'browser-mind-asleep': 'That device\'s in-browser mind is asleep. Its keeper can wake it in Settings, A mind with no install.'
     };
     return w[r && r.reason] || 'That question was turned away.';
   }
@@ -875,6 +903,8 @@
     });
   }
 
+  // v-tree-no-install-mind-v0.1: a hello card says which minds run inside a browser.
+  function inBrowserLabel(list) { return function (model) { return list.indexOf(model) !== -1 ? model + ' (in-browser mind)' : model; }; }
   function paintList() {
     if (!_parts) return;
     var list = _parts.list;
@@ -887,7 +917,7 @@
     var info = selfInfo();
     me.appendChild(el('div', 'tree-pool-who', 'This device'));
     me.appendChild(el('div', '', (info.mem ? 'about ' + info.mem + ' GB memory (the browser rounds this)' : 'memory not shared by this browser') +
-      (info.cores ? ', ' + info.cores + ' cores' : '') + '. Minds: ' + (info.models.length ? info.models.join(', ') : 'none remembered yet') + '.'));
+      (info.cores ? ', ' + info.cores + ' cores' : '') + '. Minds: ' + (info.models.length ? info.models.map(inBrowserLabel(browserModels())).join(', ') : 'none remembered yet') + '.')); // v-tree-no-install-mind-v0.1: labels added
     list.appendChild(me);
     var total = info.mem, devices = 1;
     ids.forEach(function (id) {
@@ -919,7 +949,8 @@
           h.models.forEach(function (model) {
             var key = id + '|' + model;
             if (_askOpen !== key) {
-              row.appendChild(button('Ask ' + model + ' on this device', function () { _askOpen = key; paintList(); }));
+              // before v-tree-no-install-mind-v0.1: button('Ask ' + model + ' on this device', ...)
+              row.appendChild(button('Ask ' + inBrowserLabel(h.inBrowser || [])(model) + ' on this device', function () { _askOpen = key; paintList(); }));
               return;
             }
             var box = el('textarea', 'tree-pool-ask');
@@ -966,6 +997,8 @@
     paintChat(); // v-tree-pool-room-v0.2
   }
 
+  // v-tree-no-install-mind-v0.1: waking or sleeping the in-browser mind refreshes the hellos.
+  try { if (root.addEventListener) root.addEventListener('tree-browser-mind-changed', function () { helloAll(); paint(); }); } catch (eBm) {}
   function mount(host) {
     if (!host || !root.document) return;
     _host = host;
@@ -1587,6 +1620,7 @@
     disconnect: disconnect,
     reasonWords: reasonWords,
     localDoor: localDoor,
+    localModels: localModels, // v-tree-no-install-mind-v0.1
     isKin: function (id) { return isKin(_peers[id]); },
     peers: function () {
       return Object.keys(_peers).map(function (id) {

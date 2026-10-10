@@ -39,6 +39,8 @@
     <!-- v-connect-under-more-v0 — same FlConnect door as FreeLattice More → Connect -->
     <div id="fl-connect-mount" style="max-width:40rem;margin:0 auto 1rem;"></div>
     <div id="settings-grandmother"></div>
+    <!-- v-tree-no-install-mind-v0.1: a mind with no install, under the grandmother face -->
+    <div id="tree-browser-mind-host"></div>
     <!-- v-tree-kin-v0.1: trusted kin, under the grandmother face -->
     <div id="tree-kin-host"></div>
     <!-- v-tree-pool-v0.1: the Device Pool, under Trusted kin -->
@@ -59,6 +61,8 @@
   <!-- v-tree-pool-room-v0.2: picture codes (QR) for pool invites; Nayuki, MIT -->
   <script src="lib/qrcodegen.js"></script>
   <script src="modules/tree-pool.js"></script>
+  <!-- v-tree-no-install-mind-v0.1: a mind with no install (WebLLM in the page, vendored); downloads nothing until a human taps -->
+  <script src="modules/tree-browser-mind.js"></script>
   <script src="modules/garden-thread.js"></script>
   <script src="modules/garden-rooms.js"></script>
   <script>
@@ -73,6 +77,9 @@
       // v-tree-pool-v0.1
       var pool = document.getElementById('tree-pool-host');
       if (pool && window.TreePool && typeof TreePool.mount === 'function') TreePool.mount(pool);
+      // v-tree-no-install-mind-v0.1
+      var bmind = document.getElementById('tree-browser-mind-host');
+      if (bmind && window.TreeBrowserMind && typeof TreeBrowserMind.mount === 'function') TreeBrowserMind.mount(bmind);
     })();
   </script>
 </body>
