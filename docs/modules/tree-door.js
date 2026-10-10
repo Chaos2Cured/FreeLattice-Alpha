@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 // tree-door.js: the grandmother door (v-tree-grandmother-door-v0.1, paste 029). Layer, never delete.
+// Layered by v-tree-pool-honest-heals-v0.1 (030): Read a picture of the code, in the ask-only window and the host window.
 //
 // Part A, a window that helps wake a mind. It opens on its own only when no mind is seated,
 // no pool route is chosen, no in-browser mind is awake, and the person has not tapped Not now.
@@ -105,6 +106,8 @@
     '.tree-door button:disabled{opacity:0.55;cursor:default;}',
     '.tree-door button:focus-visible,.tree-door input:focus-visible,.tree-door textarea:focus-visible{outline:2px solid rgba(232,176,25,0.95);outline-offset:2px;}',
     '.tree-door input,.tree-door textarea{display:block;width:100%;box-sizing:border-box;min-height:44px;margin:0.35rem 0;padding:10px 12px;border-radius:10px;border:1px solid rgba(200,210,230,0.4);background:rgba(0,0,0,0.35);color:#fff;font-size:1rem;font-family:inherit;}',
+    // before v-tree-pool-honest-heals-v0.1: no file box in the door. The input rule above would show it.
+    '.tree-door input.tree-pool-file{display:none;min-height:0;margin:0;padding:0;border:0;}',
     '.tree-door textarea{min-height:5rem;font-family:ui-monospace,Menlo,monospace;font-size:0.85rem;word-break:break-all;}',
     '.tree-door input::placeholder,.tree-door textarea::placeholder{color:rgba(226,232,240,0.72);}',
     '.tree-door canvas.tree-door-qr{display:block;width:100%;max-width:320px;height:auto;margin:0.5rem auto;image-rendering:pixelated;border-radius:8px;background:#fff;}',
@@ -162,7 +165,9 @@
   function drawQr(where, text, label) {
     var Q = root.qrcodegen, d = root.document;
     var qr = null;
-    try { qr = Q && Q.QrCode ? Q.QrCode.encodeText(String(text), Q.QrCode.Ecc.LOW) : null; } catch (e) { qr = null; }
+    // before v-tree-pool-honest-heals-v0.1: try { qr = Q && Q.QrCode ? Q.QrCode.encodeText(String(text), Q.QrCode.Ecc.LOW) : null; } catch (e) { qr = null; }
+    var TP = pool();
+    try { qr = Q && Q.QrCode ? (TP && TP.makeQr ? TP.makeQr(Q, text) : Q.QrCode.encodeText(String(text), Q.QrCode.Ecc.LOW)) : null; } catch (e) { qr = null; }
     if (!qr) { where.appendChild(el('p', 'tree-door-quiet', 'This code is too long for one picture code. Use Copy below instead.')); return false; }
     var border = 4, scale = Math.max(3, Math.ceil(320 / (qr.size + border * 2)));
     var c = d.createElement('canvas'), size = (qr.size + border * 2) * scale;
@@ -287,6 +292,13 @@
       var spot = el('div', '');
       w.appendChild(button('Scan the picture code with this page', function () { T.scanInto(spot, function (code) { arrive(code); }); }, 'tree-door-main'));
       w.appendChild(spot);
+    }
+    // v-tree-pool-honest-heals-v0.1: a photo or screenshot of the code works too (read on this device).
+    if (T && T.pictureInto) {
+      var said = el('p', 'tree-door-quiet', '');
+      said.setAttribute('aria-live', 'polite');
+      T.pictureInto(w, function (code) { arrive(code); }, function (t) { said.textContent = t; });
+      w.appendChild(said);
     }
     w.appendChild(button('Back', function () { start.again(); }, 'tree-door-soft'));
     w.appendChild(button('Close', function () { close(true); }, 'tree-door-soft'));
@@ -478,8 +490,14 @@
         T.scanInto(spotCam, function (got) { hostRead(got); });
       }, 'tree-door-main'));
       two.appendChild(spotCam);
-    } else {
+    } else if (!T.pictureInto) {
       two.appendChild(el('p', 'tree-door-quiet', 'This browser cannot read picture codes here. On the phone, tap Copy instead, send it to this computer by email or chat, and paste it below.'));
+    }
+    // v-tree-pool-honest-heals-v0.1: when Copy is refused, a photo or screenshot of the phone's code
+    // can be read here instead. The picture stays on this computer.
+    if (T.pictureInto) {
+      T.pictureInto(two, function (got) { hostRead(got); }, function (t) { msg.textContent = t; });
+      two.appendChild(el('p', 'tree-door-quiet', 'No camera here? Take a photo or a screenshot of the phone\'s code, send it to this computer, and tap Read a picture of the code.'));
     }
     var box = el('textarea', '');
     box.placeholder = 'Or paste the phone\'s code here';

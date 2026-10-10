@@ -1,4 +1,10 @@
 // tree-pool.js v-tree-pool-v0.1, layered by v-tree-pool-room-v0.2 (019a), and by
+// v-tree-pool-honest-heals-v0.1 (030): (1) where BarcodeDetector is missing, a vendored
+// jsQR 1.4.0 (Apache-2.0, docs/lib/jsqr, pinned by sha256 and loaded only after a tap) reads
+// picture codes from the camera, and "Read a picture of the code" reads one from a photo or
+// screenshot. (2) Honest reasons arrive: a hello to trusted kin carries one state word
+// (helping, paused, off, asleep), so an asking device hears why, not only that no one helps.
+// And by
 // v-tree-no-install-mind-v0.1 (028): an awake in-browser mind (tree-browser-mind.js,
 // WebLLM in this page) can be lent through the same door, kin only, Pause wins. It is
 // asked in the page (TreeBrowserMind.chat), never fetched. The loopback-only rule for
@@ -486,6 +492,11 @@
         inBrowser: (Array.isArray(msg.inBrowser) ? msg.inBrowser : []).slice(0, MAX_MODELS).map(function (m) { return line(m, 120); }).filter(Boolean), // v-tree-no-install-mind-v0.1
         at: Date.now()
       };
+      // v-tree-pool-honest-heals-v0.1: the state word, and the minds this connection has heard of
+      // (kept in memory on this connection only), so a pause or a sleep can be named honestly.
+      p.hello.state = HELP_STATES.indexOf(msg.state) !== -1 ? msg.state : (p.hello.helping ? 'helping' : 'off');
+      p.knew = mergeNames(p.knew, p.hello.models);
+      p.knewInBrowser = mergeNames(p.knewInBrowser, p.hello.inBrowser);
       bump('hellosTaken');
       paintList();
       paintChat(); // v-tree-pool-room-v0.2: the minds Chat can ask follow the hellos
@@ -513,6 +524,15 @@
     try { return !!(p && p.proved && p.kh && kin() && kin().trustedKeyHash(p.kh)); } catch (e) { return false; }
   }
   // Hellos go to connected trusted kin only: rough memory, cores and model names while helping; nothing else.
+  // v-tree-pool-honest-heals-v0.1: one state word for trusted kin. Nothing else new is sent.
+  function helpState() {
+    var m = mode();
+    if (m === 'pause') return 'paused';
+    if (m !== 'kin') return 'off';
+    var r = remembered(), b = browserMind();
+    if (r && b && b.isEntry(r) && !browserModels().length) return 'asleep';
+    return 'helping';
+  }
   function hello(p) {
     if (!isKin(p)) return false;
     var helping = mode() === 'kin';
@@ -520,9 +540,51 @@
     // before v-tree-pool-room-v0.2: { type: 'hello', v: 1, helping, mem, cores, models }
     // v-tree-no-install-mind-v0.1: inBrowser names which of those models run inside this browser.
     var ok = sendRaw(p, { type: 'hello', v: 1, helping: helping, mem: info.mem, cores: info.cores, models: info.models,
-      busy: helping ? liveCount() : 0, max: MAX_CONCURRENT, inBrowser: helping ? browserModels() : [] });
+      busy: helping ? liveCount() : 0, max: MAX_CONCURRENT, inBrowser: helping ? browserModels() : [],
+      state: helpState() }); // v-tree-pool-honest-heals-v0.1
     if (ok) bump('hellosSent');
     return ok;
+  }
+  var HELP_STATES = ['helping', 'paused', 'off', 'asleep']; // v-tree-pool-honest-heals-v0.1
+  function mergeNames(a, b) {
+    var out = (a || []).slice();
+    (b || []).forEach(function (n) { if (out.indexOf(n) === -1) out.push(n); });
+    return out.slice(-MAX_MODELS);
+  }
+  // Where a known helper is, in the words of its trusted card: "Kirk's computer".
+  // A stopped card can keep the same key. Prefer the card that is trusted now.
+  function passForKey(kh) {
+    var K = kin(), first = null, trusted = null;
+    try {
+      var all = K && K.passes ? K.passes() : {};
+      Object.keys(all).forEach(function (fp) {
+        var x = all[fp];
+        if (!x || x.keyHash !== kh) return;
+        if (!first) first = x;
+        if (x.grantedAt && !x.revokedAt && !trusted) trusted = x;
+      });
+    } catch (e) {}
+    return trusted || first;
+  }
+  function peerPlace(p) {
+    // before v-tree-pool-honest-heals-v0.1: the first pass with this key, even a stopped card with no keeper name
+    var x = passForKey(p.kh);
+    return (x && x.keeperName) ? line(x.keeperName, 40) + '\'s computer' : '';
+  }
+  // Why no trusted kin device answers for this mind, from the state words it sent. Kin only.
+  function whyNone(model) {
+    var best = null, rank = { paused: 3, asleep: 2, off: 1 };
+    Object.keys(_peers).forEach(function (id) {
+      var p = _peers[id];
+      if (p.state !== 'proved' || !isKin(p) || !p.hello || (p.knew || []).indexOf(model) === -1) return;
+      var st = p.hello.state;
+      if (st === 'helping' && (p.knewInBrowser || []).indexOf(model) !== -1 && p.hello.models.indexOf(model) === -1) st = 'asleep';
+      if (st === 'asleep' && (p.knewInBrowser || []).indexOf(model) === -1) st = '';
+      if (rank[st] && (!best || rank[st] > rank[best.st])) best = { st: st, p: p };
+    });
+    if (!best) return null;
+    // The reason stays no-helper (so every caller still reads it the same); why and where say more.
+    return { ok: false, reason: 'no-helper', why: best.st, where: peerPlace(best.p) };
   }
   function helloAll() { Object.keys(_peers).forEach(function (id) { hello(_peers[id]); }); }
 
@@ -636,6 +698,12 @@
     }).then(function (r) { if (r.ok) bump('answersTaken'); return r; });
   }
   function reasonWords(r) {
+    // v-tree-pool-honest-heals-v0.1: the reason that arrived, with the place its trusted card names.
+    var where = line(r && r.where, 60);
+    var why = r && r.reason === 'no-helper' ? r.why : '';
+    if (why === 'paused') return (where || 'That device') + ' is paused. Its keeper can tap Resume for trusted kin.';
+    if (why === 'asleep') return 'The in-browser mind on ' + (where || 'that device') + ' is asleep.';
+    if (why === 'off') return (where || 'That device') + ' is not helping right now.';
     var w = {
       paused: 'That device is paused. Its keeper can tap Resume for trusted kin.',
       off: 'That device is not helping right now.',
@@ -718,16 +786,10 @@
     note('This browser would not copy. Select the code above and copy it by hand.');
   }
   function peerName(p) {
-    var K = kin(), name = '';
-    try {
-      var all = K && K.passes ? K.passes() : {};
-      Object.keys(all).some(function (fp) {
-        var x = all[fp];
-        if (x && x.keyHash === p.kh) { name = (x.keeperName ? x.keeperName + '\'s computer' : 'A computer') + (x.name ? ' (' + x.name + ')' : ''); return true; }
-        return false;
-      });
-    } catch (e) {}
-    return name || ('A device (ID ' + String(p.meshId || '').replace(/^mesh:/, '').slice(0, 8) + ')');
+    // before v-tree-pool-honest-heals-v0.1: the first pass with this key, even a stopped one
+    var x = passForKey(p.kh);
+    if (x) return (x.keeperName ? x.keeperName + '\'s computer' : 'A computer') + (x.name ? ' (' + x.name + ')' : '');
+    return 'A device (ID ' + String(p.meshId || '').replace(/^mesh:/, '').slice(0, 8) + ')';
   }
 
   function paintState() {
@@ -830,6 +892,7 @@
         }));
         c.appendChild(scanSpot);
       }
+      pictureInto(c, function (got) { rbox.value = got; f.text = got; finishBtn.click(); }); // v-tree-pool-honest-heals-v0.1
       c.appendChild(button('Cancel', function () { if (_pending) disconnect(_pending.id); reset(); }));
       return;
     }
@@ -872,6 +935,7 @@
         }));
         c.appendChild(scanSpotJ);
       }
+      pictureInto(c, function (got) { ibox.value = got; f.text = got; joinBtn.click(); }); // v-tree-pool-honest-heals-v0.1
       c.appendChild(button('Cancel', reset));
       return;
     }
@@ -1388,7 +1452,8 @@
     var Q = root.qrcodegen, d = root.document;
     if (!Q || !Q.QrCode || !d || !d.createElement) return false;
     var qr = null;
-    try { qr = Q.QrCode.encodeText(String(text), Q.QrCode.Ecc.LOW); } catch (e) { qr = null; }
+    // before v-tree-pool-honest-heals-v0.1: try { qr = Q.QrCode.encodeText(String(text), Q.QrCode.Ecc.LOW); } catch (e) { qr = null; }
+    qr = makeQr(Q, text);
     if (!qr) { where.appendChild(el('p', 'tree-pool-quiet', 'This code is too long for a picture code. Copy it instead.')); return false; }
     var c = d.createElement('canvas'), scale = 4, border = 4, size = (qr.size + border * 2) * scale;
     var g = c.getContext ? c.getContext('2d') : null;
@@ -1405,8 +1470,125 @@
     bump('pictureCodes');
     return true;
   }
+  // v-tree-pool-honest-heals-v0.1: jsQR 1.4.0 cannot read QR version 23 (109 modules; every other
+  // size from 1 to 40 read back in the test), so a code that would be version 23 is drawn as 24.
+  function makeQr(Q, text) {
+    var qr = null;
+    try { qr = Q.QrCode.encodeText(String(text), Q.QrCode.Ecc.LOW); } catch (e) { return null; }
+    if (qr && qr.version === 23 && Q.QrSegment && Q.QrSegment.makeSegments) {
+      try { qr = Q.QrCode.encodeSegments(Q.QrSegment.makeSegments(String(text)), Q.QrCode.Ecc.LOW, 24, 40); } catch (e2) {}
+    }
+    return qr;
+  }
   function canScan() {
-    try { return !!(root.BarcodeDetector && root.navigator && root.navigator.mediaDevices && root.navigator.mediaDevices.getUserMedia); } catch (e) { return false; }
+    // before v-tree-pool-honest-heals-v0.1: BarcodeDetector and a camera. Now a camera is enough:
+    // where BarcodeDetector is missing, the vendored jsQR reads the frames (loaded after the tap).
+    try { return !!(root.navigator && root.navigator.mediaDevices && root.navigator.mediaDevices.getUserMedia && (root.BarcodeDetector || canRead())); } catch (e) { return false; }
+  }
+  // ---- v-tree-pool-honest-heals-v0.1: the picture-code reader (029b) ----
+  // jsQR 1.4.0 (Apache-2.0, Cosmo Wolfe), kept on this site at docs/lib/jsqr/jsQR-1.4.0.js and
+  // checked by the browser against its sha256 (Subresource Integrity). It loads only after a tap,
+  // reads pixels in this page, and sends nothing anywhere.
+  var JSQR_PATH = 'lib/jsqr/jsQR-1.4.0.js';
+  var JSQR_SRI = 'sha256-vEDIoVGWI2sjFNsIVvcsoLSZgM1UE7jIUqc0n1/uCFk=';
+  var _reader = null;
+  function canRead() {
+    try { var d = root.document; return !!(d && d.createElement && d.head && (root.createImageBitmap || root.Image)); } catch (e) { return false; }
+  }
+  function readerUrl() {
+    try { return new root.URL(JSQR_PATH, root.document.baseURI || root.location.href).href; } catch (e) { return JSQR_PATH; }
+  }
+  function loadReader() {
+    if (root.jsQR) return Promise.resolve(root.jsQR);
+    if (_reader) return _reader;
+    _reader = new Promise(function (resolve, reject) {
+      var s = root.document.createElement('script');
+      s.src = readerUrl();
+      s.integrity = JSQR_SRI;
+      s.crossOrigin = 'anonymous';
+      s.addEventListener('load', function () { if (root.jsQR) { bump('readerLoads'); resolve(root.jsQR); } else reject(new Error('no-reader')); });
+      s.addEventListener('error', function () { reject(new Error('no-reader')); });
+      root.document.head.appendChild(s);
+    });
+    _reader.catch(function () { _reader = null; });
+    return _reader;
+  }
+  // Pixels in, the code out (or ''). BarcodeDetector first where it exists, then jsQR.
+  function readPixels(g, w, h, Q) {
+    var img = g.getImageData(0, 0, w, h);
+    var hit = Q(img.data, w, h, { inversionAttempts: 'attemptBoth' });
+    return hit && typeof hit.data === 'string' ? codeFrom(hit.data) : '';
+  }
+  function decodeImage(src) {
+    return loadReader().then(function (Q) {
+      var w0 = src.width || src.naturalWidth || 0, h0 = src.height || src.naturalHeight || 0;
+      if (!w0 || !h0) return '';
+      // Try the picture whole, then smaller (a big photo reads better a little smaller).
+      var sizes = [1, 0.5, 0.25].map(function (k) { var m = Math.min(1, 2000 / Math.max(w0, h0)) * k; return [Math.max(1, Math.round(w0 * m)), Math.max(1, Math.round(h0 * m))]; });
+      var c = root.document.createElement('canvas'), got = '';
+      sizes.some(function (wh) {
+        if (wh[0] < 60) return false;
+        c.width = wh[0]; c.height = wh[1];
+        var g = c.getContext('2d', { willReadFrequently: true });
+        g.drawImage(src, 0, 0, wh[0], wh[1]);
+        got = readPixels(g, wh[0], wh[1], Q);
+        return !!got;
+      });
+      return got;
+    });
+  }
+  function openPicture(file) {
+    if (root.createImageBitmap) return root.createImageBitmap(file);
+    return new Promise(function (resolve, reject) {
+      var u = root.URL.createObjectURL(file), im = new root.Image();
+      im.onload = function () { resolve(im); };
+      im.onerror = function () { reject(new Error('not-a-picture')); };
+      im.src = u;
+    });
+  }
+  // A photo or screenshot of a picture code, chosen by a human tap. Read here, never sent.
+  function readPicture(file) {
+    if (!file || !/^image\//.test(String(file.type || 'image/'))) return Promise.resolve({ ok: false, reason: 'not-a-picture' });
+    if (file.size > 25 * 1024 * 1024) return Promise.resolve({ ok: false, reason: 'too-big' });
+    return openPicture(file).then(function (im) {
+      return decodeImage(im).then(function (code) {
+        try { if (im.close) im.close(); } catch (e) {}
+        bump(code ? 'picturesRead' : 'picturesUnread');
+        return code ? { ok: true, code: code } : { ok: false, reason: 'no-code' };
+      });
+    }, function () { return { ok: false, reason: 'not-a-picture' }; }).catch(function (e) {
+      return { ok: false, reason: e && e.message === 'no-reader' ? 'no-reader' : 'no-code' };
+    });
+  }
+  function pictureWords(r) {
+    if (r.ok) return 'Read the picture code.';
+    return {
+      'not-a-picture': 'That file is not a picture. Choose a photo or a screenshot of the code.',
+      'too-big': 'That picture is too big (25 MB at most).',
+      'no-reader': 'The picture-code reader did not load on this page. Paste the code instead.',
+      'no-code': 'No picture code was found in that picture. Try a closer photo, or a screenshot with the whole code.'
+    }[r.reason] || 'No picture code was read.';
+  }
+  // "Read a picture of the code": one button, and a file box that opens only after the tap.
+  function pictureInto(where, onCode, say) {
+    say = say || note;
+    var f = el('input', 'tree-pool-file');
+    f.type = 'file';
+    f.setAttribute('accept', 'image/*');
+    f.setAttribute('aria-label', 'A picture of the code');
+    f.hidden = true;
+    f.setAttribute('hidden', '');
+    f.addEventListener('change', function () {
+      var file = f.files && f.files[0];
+      f.value = '';
+      if (!file) return;
+      say('Reading the picture on this device...');
+      readPicture(file).then(function (r) { say(pictureWords(r)); if (r.ok) onCode(r.code); });
+    });
+    var b = button('Read a picture of the code', function () { f.click(); });
+    where.appendChild(b);
+    where.appendChild(f);
+    return b;
   }
   function codeFrom(v) {
     var s = String(v == null ? '' : v), i = s.indexOf('#treepool=');
@@ -1427,6 +1609,8 @@
     stopScan();
     var det = null;
     try { det = new root.BarcodeDetector({ formats: ['qr_code'] }); } catch (e) { det = null; }
+    // before v-tree-pool-honest-heals-v0.1: if (!det) { note('This browser cannot read picture codes here. Paste the code instead.'); return; }
+    if (!det && canRead()) { startScanJs(where, onCode); return; }
     if (!det) { note('This browser cannot read picture codes here. Paste the code instead.'); return; }
     var video = el('video', 'tree-pool-scan');
     video.muted = true;
@@ -1450,6 +1634,40 @@
         }, function () {});
       }, 300);
     }, function () { stopScan(); note('The camera did not open (it may need permission). Paste the code instead.'); });
+  }
+
+  // v-tree-pool-honest-heals-v0.1: the same camera view, read by jsQR where BarcodeDetector is missing.
+  function startScanJs(where, onCode) {
+    note('Getting the picture-code reader ready...');
+    loadReader().then(function (Q) {
+      var video = el('video', 'tree-pool-scan');
+      video.muted = true;
+      video.setAttribute('playsinline', '');
+      video.setAttribute('aria-label', 'Camera view, to read a picture code');
+      note('Hold the picture code up to this camera. The camera view stays on this page.');
+      return root.navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false }).then(function (stream) {
+        var sc = { stream: stream, video: video, timer: null, until: Date.now() + 90000 };
+        _scan = sc;
+        where.appendChild(video);
+        video.srcObject = stream;
+        try { var pl = video.play && video.play(); if (pl && pl.catch) pl.catch(function () {}); } catch (e) {}
+        bump('scans');
+        var c = el('canvas', '');
+        sc.timer = root.setInterval(function () {
+          if (_scan !== sc) return;
+          if (Date.now() > sc.until) { stopScan(); note('No picture code was read. Paste the code, read a picture of it, or tap Scan again.'); return; }
+          var w = video.videoWidth, h = video.videoHeight;
+          if (!w || !h) return;
+          var k = Math.min(1, 960 / Math.max(w, h));
+          c.width = Math.round(w * k); c.height = Math.round(h * k);
+          var g = c.getContext('2d', { willReadFrequently: true });
+          g.drawImage(video, 0, 0, c.width, c.height);
+          var hit = '';
+          try { hit = readPixels(g, c.width, c.height, Q); } catch (e) { hit = ''; }
+          if (hit && _scan === sc) { stopScan(); note('Read the picture code.'); onCode(hit); }
+        }, 300);
+      }, function () { stopScan(); note('The camera did not open (it may need permission). Paste the code, or read a picture of it.'); });
+    }, function () { note('The picture-code reader did not load on this page. Paste the code instead.'); });
   }
 
   // ---- asking the pool: each question goes whole to the freest trusted kin device that holds the mind ----
@@ -1508,7 +1726,8 @@
   function askBest(model, turns, tried) {
     tried = tried || [];
     var p = bestFor(line(model, 120), tried);
-    if (!p) return Promise.resolve({ ok: false, reason: tried.lastReason || 'no-helper' });
+    // before v-tree-pool-honest-heals-v0.1: if (!p) return Promise.resolve({ ok: false, reason: tried.lastReason || 'no-helper' });
+    if (!p) return Promise.resolve(whyNone(line(model, 120)) || { ok: false, reason: tried.lastReason || 'no-helper' });
     tried.push(p.id);
     return askTurns(p.id, model, turns).then(function (r) {
       if (r.ok) { r.peerId = p.id; r.label = model + ' on ' + peerName(p); return r; }
@@ -1624,7 +1843,8 @@
     });
   }
   function currentInvite() { return _flow.step === 'invited' && _pending ? _flow.code : ''; }
-  function peerState(peerId) { var p = _peers[peerId]; return p ? { state: p.state, kin: isKin(p), helping: !!(p.hello && p.hello.helping), models: p.hello ? p.hello.models.slice() : [] } : null; }
+  // before v-tree-pool-honest-heals-v0.1: peerState returned { state, kin, helping, models }
+  function peerState(peerId) { var p = _peers[peerId]; return p ? { state: p.state, kin: isKin(p), helping: !!(p.hello && p.hello.helping), models: p.hello ? p.hello.models.slice() : [], helpState: p.hello ? p.hello.state || '' : '' } : null; }
 
   root.TreePool = {
     VERSION: VERSION,
@@ -1692,6 +1912,15 @@
     peerState: peerState,
     canScan: canScan,
     scanInto: startScan,
-    stopScan: stopScan
+    stopScan: stopScan,
+    // v-tree-pool-honest-heals-v0.1
+    readPicture: readPicture,
+    makeQr: makeQr,
+    pictureInto: pictureInto,
+    pictureWords: pictureWords,
+    whyNone: whyNone,
+    helpState: helpState,
+    JSQR_PATH: JSQR_PATH,
+    JSQR_SRI: JSQR_SRI
   };
 })(typeof window !== 'undefined' ? window : this);

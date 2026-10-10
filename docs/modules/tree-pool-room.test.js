@@ -265,7 +265,9 @@ async function joinByTaps(inviter, joiner, trust) {
   var r4 = await C.P.askBest('qwen2.5:7b', [{ role: 'user', content: 'four' }]);
   assert.ok(!r4.ok && r4.reason === 'no-helper', 'nobody helping: no-helper');
   assert.strictEqual(A.fetches.length + B.fetches.length, aBefore + bBefore, 'paused devices\' AIs were not called');
-  assert.ok(/No trusted kin device that holds that mind is helping right now/.test(C.P.reasonWords(r4)));
+  // before v-tree-pool-honest-heals-v0.1: assert.ok(/No trusted kin device that holds that mind is helping right now/.test(C.P.reasonWords(r4)));
+  assert.ok(/No trusted kin device that holds that mind is helping right now/.test(C.P.reasonWords({ reason: 'no-helper' })), 'the old words stay for a mind no one has named');
+  assert.ok(r4.why === 'paused' && /'s computer is paused\. Its keeper can tap Resume for trusted kin\./.test(C.P.reasonWords(r4)), 'v-tree-pool-honest-heals-v0.1: the pause arrives');
   A.P.letHelp(); B.P.letHelp();
   await settle();
 
