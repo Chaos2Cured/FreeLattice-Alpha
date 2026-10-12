@@ -50,6 +50,8 @@
     <div id="tree-kin-host"></div>
     <!-- v-tree-pool-v0.1: the Device Pool, under Trusted kin -->
     <div id="tree-pool-host"></div>
+    <!-- v-tree-reconnect-v0.1 (034): computers this phone already joined; empty until one has -->
+    <div id="tree-reconnect-host"></div>
     <!-- v-page-answers-knock-v0.1 (033b): the home Wi-Fi switch, inside the FreeLattice desktop app only; empty in a browser -->
     <div id="pool-knock-host"></div>
     <!-- v-phone-knocks-v0.1 (033c): a join link from a computer on this Wi-Fi; empty unless the link was opened -->
@@ -78,6 +80,8 @@
   <script src="modules/pool-knock.js"></script>
   <!-- v-phone-knocks-v0.1 (033c): the phone knocks through the computer's relay page and finishes the join; one tap, single-use link -->
   <script src="modules/pool-knock-phone.js"></script>
+  <!-- v-tree-reconnect-v0.1 (034): a remembered computer, after the phone knock. One tap, no new link. -->
+  <script src="modules/tree-reconnect.js"></script>
   <script src="modules/garden-thread.js"></script>
   <script src="modules/garden-rooms.js"></script>
   <script>
