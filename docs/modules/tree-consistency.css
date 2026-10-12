@@ -1,0 +1,115 @@
+/* SPDX-License-Identifier: MIT */
+/* tree-consistency.css (v-tree-galaxy-consistency-v0.1, paste 032). Layer, never delete.
+   One shared sheet loaded last on every galaxy page, so the header, the galaxies menu, the back
+   control, tap sizes and the footer feel the same everywhere. It only adds; older rules stay. */
+:root {
+  --tc-bg: #0c0a1a;
+  --tc-text: rgba(200, 210, 230, 0.82);
+  --tc-gold: #e8b019;
+  --tc-lavender: #a78bfa;
+  --tc-line: rgba(200, 210, 230, 0.12);
+  --tc-glow: 0 0 18px rgba(167, 139, 250, 0.16);
+  --tc-font: Georgia, 'Times New Roman', serif;
+  --tc-tap: 44px;
+}
+
+/* 1. The galaxies menu and the brand: a 44px place to tap on every page. */
+#garden-header h1 a,
+#garden-header nav summary,
+#garden-header nav > a,
+#garden-header nav .thread-word {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tc-tap);
+  min-width: var(--tc-tap);
+  justify-content: center;
+}
+#garden-header .galaxies-panel a,
+#garden-header .galaxies-panel .here,
+#garden-header .galaxies-panel button {
+  display: flex;
+  align-items: center;
+  min-height: var(--tc-tap);
+}
+.galaxy-nav { min-width: var(--tc-tap); min-height: var(--tc-tap); }
+#shared-shoulder a { display: inline-flex; align-items: center; min-height: var(--tc-tap); }
+
+/* 2. The shared bar, added by tree-consistency.js only on pages that have no garden header. */
+.tc-bar {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--tc-line);
+  background: var(--tc-bg);
+  font-family: var(--tc-font);
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  position: relative;
+  z-index: 50;
+}
+.tc-bar a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tc-tap);
+  padding: 0 4px;
+  color: var(--tc-gold);
+  text-decoration: none;
+}
+.tc-bar .tc-right { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+html.tc-code .tc-bar { padding: 0; }
+@media (max-width: 360px) { .tc-bar { flex-wrap: wrap; } }
+.tc-bar a.tc-back { color: var(--tc-lavender); }
+.tc-bar a:hover, .tc-bar a:focus-visible { color: var(--tc-lavender); text-shadow: var(--tc-glow); }
+
+/* 3. The mind line: one quiet word about a mind seated on this computer, the same on every page. */
+.tc-mind {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tc-tap);
+  padding: 0 4px;
+  color: rgba(200, 210, 230, 0.55);
+  font-family: var(--tc-font);
+  font-size: 13px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+a.tc-mind:hover, a.tc-mind:focus-visible { color: var(--tc-lavender); }
+
+/* 4. The shared footer line, added only where a page has none. */
+.tc-foot {
+  margin: 32px auto 24px;
+  text-align: center;
+  font-family: var(--tc-font);
+  font-size: 13px;
+}
+.tc-foot a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tc-tap);
+  color: rgba(200, 210, 230, 0.5);
+  text-decoration: none;
+}
+
+/* 5. Code mirror pages: long lines wrap instead of pushing the page sideways. */
+html.tc-code body { overflow-wrap: anywhere; }
+html.tc-code pre { white-space: pre-wrap; max-width: 100%; }
+html.tc-code table { display: block; max-width: 100%; overflow-x: auto; }
+/* Code mirrors pad the body, so at 390 the shared bar squeezed the brand and its last
+   letter dropped. Pull the bar out to the body's edges, keep the name on one line,
+   and let the row wrap if it must. The page still does not scroll sideways. */
+html.tc-code .tc-bar { flex-wrap: wrap; box-sizing: border-box; width: calc(100% + 40px); max-width: none; margin: -32px -20px 0; padding: 0 8px; }
+html.tc-code .tc-brand { white-space: nowrap; flex: 0 0 auto; }
+/* Inline links inside prose keep their size (the inline exception); the shared bar carries the 44px ways out. */
+
+/* 6. The same card glow wherever a page names its cards. */
+.tc-card, html.tc-on .card { border-radius: 12px; box-shadow: var(--tc-glow); }
+
+@media (prefers-reduced-motion: reduce) {
+  .tc-bar a, .tc-mind { transition: none; }
+}
