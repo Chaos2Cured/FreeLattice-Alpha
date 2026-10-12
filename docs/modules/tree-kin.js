@@ -614,6 +614,27 @@
     if (root.addEventListener) root.addEventListener('fl-alpha-mind-remembered', function () { if (_host) paint(); });
   } catch (e) {}
 
+  // v-tree-reconnect-v0.1 (034). Additive. Forget stops one pass. signReconnect uses the
+  // same non-exportable key as a kin card. The private key is never exported.
+  function forget(fp) {
+    var p = passes();
+    var prior = p[fp];
+    if (!prior) return null;
+    var snap = { name: prior.name, model: prior.model, keeperMeshId: prior.keeperMeshId,
+      keeperName: prior.keeperName, keyHash: prior.keyHash };
+    if (!prior.revokedAt) revoke(fp);
+    return snap;
+  }
+  function signReconnect(str) {
+    return loadIdentity().then(function (id) {
+      if (!id || !id.keyPair || !id.keyPair.privateKey) return { ok: false, reason: 'no-key' };
+      var a = algos(id.cryptoType);
+      return subtle().sign(a.sig, id.keyPair.privateKey, new root.TextEncoder().encode(String(str))).then(function (sig) {
+        return { ok: true, sig: b64(sig), cryptoType: id.cryptoType };
+      });
+    }).catch(function () { return { ok: false, reason: 'cannot-sign' }; });
+  }
+
   root.TreeKin = {
     VERSION: VERSION,
     HONEST: HONEST,
@@ -645,4 +666,7 @@
     recheckSeen: recheckSeen,
     counts: counts
   };
+  // v-tree-reconnect-v0.1 (034): added beside the 017 door. Nothing above is rewritten.
+  root.TreeKin.forget = forget;
+  root.TreeKin.signReconnect = signReconnect;
 })(typeof window !== 'undefined' ? window : this);
