@@ -553,6 +553,7 @@
       var dy = last.getBoundingClientRect().top - list.getBoundingClientRect().top;
       if (dy < 0) list.scrollTop = Math.max(0, list.scrollTop + dy);
     }
+    if (window.FLClay && typeof FLClay.onReply === 'function' && messages.length && messages[messages.length - 1].role === 'mind') FLClay.onReply(messages[messages.length - 1].text, messages);
   }
 
   messages = loadHistory();
