@@ -23,6 +23,7 @@ function md5(file) {
 var claySrc = fs.readFileSync(path.join(here, 'particle-clay.js'), 'utf8');
 assert.ok(claySrc.indexOf('v-particle-clay-v0.1') !== -1, 'marker');
 assert.ok(claySrc.indexOf('v-feel-felt-v0.1') !== -1, 'feel marker');
+assert.ok(claySrc.indexOf('v-clay-grid-tag-heal-v0.1') !== -1, 'heal marker');
 assert.ok(!/\bpet\b/i.test(claySrc) && !/companion/i.test(claySrc), 'no pet framing');
 
 var sibling = '/Users/kirkmiller/FreeLattice-fresh/docs/modules';
@@ -67,6 +68,35 @@ assert.strictEqual(fell.form, 'seed', 'garden home form is seed');
 assert.strictEqual(clay.isOn(), false, 'clay starts off');
 assert.strictEqual(clay.promptDelta(), '', 'off means no prompt delta');
 assert.strictEqual(clay.autoSend(), false, 'nothing sends itself');
+
+var gridRaw = '[FL_CLAY: {"form":"grid","grid":["xx","x x"],"mood":"joy","energy":0.5}]';
+var grid = clay.parseTag(gridRaw);
+assert.strictEqual(grid.ok, true, 'grid tag parses');
+assert.strictEqual(grid.value.form, 'grid', 'grid form');
+assert.strictEqual(grid.value.grid.length, 2, 'grid rows');
+assert.ok(grid.visible.indexOf('}]') === -1, 'no bracket tail');
+assert.ok(grid.visible.indexOf('[FL_CLAY') === -1, 'tag stripped');
+
+// Felt is callback-timed. The synchronous return does not claim the mind felt it.
+clay.setReduced(true);
+clay.setOn(true);
+clay.resetRate();
+global.state = { isLocal: true, ollamaModel: 'home-mind' };
+var feltCalls = 0;
+var feltOpts = null;
+global.FreeLattice = {
+  callAI: function (sys, user, opts) {
+    feltCalls += 1;
+    feltOpts = opts;
+  }
+};
+var syncFelt = clay.onGesture('hug');
+assert.strictEqual(syncFelt.called, true, 'mind is called');
+assert.strictEqual(feltCalls, 1, 'one call');
+assert.ok(syncFelt.line.indexOf('felt your') === -1, 'felt waits for the callback');
+feltOpts.callback('hello');
+assert.ok(clay.liveLine().indexOf('felt your hug') !== -1, 'felt arrives with the reply');
+clay.setOn(false);
 
 var locks = {
   'fl-connect.js': 'aaff2bf1b037656989a9e1a89bb05908',
