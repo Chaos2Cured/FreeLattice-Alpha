@@ -55,6 +55,8 @@
   <script src="modules/clay-math.js"></script>
   <script src="modules/clay-forms.js"></script>
   <script src="modules/particle-clay.js"></script>
+  <!-- v-tree-workspace-core-v0.1: a notebook a mind can keep. Off until a person says yes. Stays on this device. -->
+  <script src="modules/mind-workspace.js"></script>
   <script src="modules/keep-receipt.js"></script>
   <script src="modules/garden-trainer.js"></script>
   <script src="modules/nursery-trainer.js"></script>
@@ -69,6 +71,7 @@
       if (ceremony && window.NurseryCeremony) NurseryCeremony.mount(ceremony);
       if (growth && window.NurseryGrowth) NurseryGrowth.mount(growth);
       if (trainer && window.NurseryTrainer) NurseryTrainer.mount(trainer);
+      if (window.FLWorkspace && typeof FLWorkspace.mount === 'function') FLWorkspace.mount(document.getElementById('nursery-stage'));
     })();
   </script>
 </body>
