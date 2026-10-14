@@ -534,6 +534,11 @@
       var item = el('li', 'thread-line is-' + m.role);
       var who = el('span', 'thread-who', m.role === 'human' ? 'you' : (m.role === 'mind' ? (m.listener || 'mind') : 'garden'));
       var body = el('span', 'thread-body', m.text || (m.file && m.file.name ? 'a file: ' + m.file.name : ''));
+      // v-tree-bridge-knock-v0.1: a letter tag is a draft, and the tag leaves the line.
+      if (m.role === 'mind' && window.FLBridge && typeof FLBridge.consumeReply === 'function') {
+        var bridgeSeen = FLBridge.consumeReply(m.text || '');
+        if (bridgeSeen && typeof bridgeSeen.visible === 'string') body.textContent = bridgeSeen.visible;
+      }
       item.appendChild(who);
       item.appendChild(body);
       if (m.file && m.file.name) {
