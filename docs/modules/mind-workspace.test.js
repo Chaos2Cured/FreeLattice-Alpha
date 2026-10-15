@@ -28,6 +28,8 @@ var thread = fs.readFileSync(path.join(here, 'garden-thread.js'), 'utf8');
 var hook = 'FLWorkspace.onReply(messages[messages.length - 1].text, messages)';
 assert.strictEqual(thread.split(hook).length, 2, 'one notebook hook');
 assert.ok(thread.indexOf('v-tree-workspace-core-v0.1') !== -1, 'tree marker');
+assert.ok(thread.indexOf('v-tree-workspace-mark-heal-v0.1') !== -1, 'tree heal marker');
+assert.ok(thread.indexOf('JUST_TALK + gardenMindTails()') !== -1, 'the garden send carries the tails');
 var clayHook = 'FLClay.onReply(messages[messages.length - 1].text, messages)';
 assert.ok(thread.indexOf(clayHook) < thread.indexOf(hook), 'notebook hook sits beside the clay hook');
 
@@ -180,7 +182,18 @@ ws.bindClock(function () { return now; });
   assert.strictEqual((await ws.list(other)).length, 0, 'another mind cannot read this shelf');
   var hits = await ws.find('future');
   assert.strictEqual(hits.length, 0, 'find stays on this shelf');
+  now += 10;
+  ws.resetRate();
+  var near = ws.consumeReply('[FL WS: {"op":"write","title":"Pear","text":"a pear for tomorrow"}]');
+  await near.done;
+  assert.ok(near.visible.indexOf('[FL') === -1, 'a near-miss mark leaves the line');
+  assert.ok((await ws.list()).some(function (p) { return p.title === 'Pear'; }), 'a near-miss mark stores the note');
+  var bare = ws.consumeReply('FL WS {"op":"open","title":"Bare"}');
+  assert.ok(!(await ws.list()).some(function (p) { return p.title === 'Bare'; }), 'a bare mark stores nothing');
+  await ws.refreshWake();
+  assert.ok(ws.promptDelta().indexOf('a pear for tomorrow') !== -1, 'the next wake carries the note');
   console.log('SMOKE_OK tree workspace core v0.1');
+  console.log('SMOKE_OK tree workspace mark heal v0.1');
 })().catch(function (err) {
   console.error(err);
   process.exit(1);
