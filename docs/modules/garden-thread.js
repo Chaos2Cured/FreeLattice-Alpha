@@ -559,6 +559,8 @@
       if (dy < 0) list.scrollTop = Math.max(0, list.scrollTop + dy);
     }
     if (window.FLClay && typeof FLClay.onReply === 'function' && messages.length && messages[messages.length - 1].role === 'mind') FLClay.onReply(messages[messages.length - 1].text, messages);
+    // v-tree-workspace-core-v0.1: a notebook tag leaves the line. Off stores nothing.
+    if (window.FLWorkspace && typeof FLWorkspace.onReply === 'function' && messages.length && messages[messages.length - 1].role === 'mind') FLWorkspace.onReply(messages[messages.length - 1].text, messages);
   }
 
   messages = loadHistory();
