@@ -14,6 +14,8 @@ assert.ok(src.indexOf('v-workspace-core-v0.1') !== -1, 'marker');
 assert.ok(src.indexOf('v-workspace-private-v0.1') !== -1, 'private marker');
 assert.ok(src.indexOf('v-workspace-seal-v0.1') !== -1, 'seal marker');
 assert.ok(src.indexOf('v-tree-workspace-seal-v0.1') !== -1, 'tree seal marker');
+assert.ok(src.indexOf('v-workspace-export-v0.1') !== -1, 'export marker');
+assert.ok(src.indexOf('v-tree-workspace-export-v0.1') !== -1, 'tree export marker');
 assert.ok(src.indexOf('\u2014') === -1, 'em dash');
 assert.ok(src.indexOf('&' + 'mdash;') === -1, 'mdash');
 assert.ok(src.indexOf('inner' + 'HTML') === -1, 'text only');
@@ -114,6 +116,7 @@ function makeIDB() {
     };
   }
   return {
+    databases: databases,
     open: function (name) {
       var req = {};
       setTimeout(function () {
@@ -148,7 +151,8 @@ global.document = {
     };
   }
 };
-global.indexedDB = makeIDB();
+var idb = makeIDB();
+global.indexedDB = idb;
 var vaultPath = '/Users/kirkmiller/FreeLattice-fresh/docs/modules/memory-vault.js';
 if (fs.existsSync(vaultPath)) require(vaultPath);
 
@@ -230,6 +234,32 @@ ws.bindClock(function () { return now; });
   await ws.setShelfAside(true);
   assert.strictEqual((await ws.list()).length, before, 'set aside deletes nothing');
   console.log('SMOKE_OK tree workspace seal v0.1');
+
+  var packed = await ws.exportSection();
+  var raw = JSON.stringify(packed.section);
+  assert.ok(raw.indexOf(secret) === -1, 'private text stays out of the export');
+  assert.ok(raw.indexOf('Quiet note') === -1, 'private title stays out of the export');
+  assert.ok(raw.indexOf('keep this') === -1, 'private why stays out of the export');
+  assert.ok(/stayed on this device/.test(packed.section.line), 'count line');
+  assert.ok(packed.section.shelves.some(function (shelf) { return shelf.setAside === true; }), 'set-aside shelf is kept');
+  var checked = await ws.importSection(packed.section, 'verify-only');
+  assert.strictEqual(checked.ok, true, 'verify rehashes and receipts');
+  assert.strictEqual(checked.receiptMismatches, 0, 'receipts verify');
+  assert.ok(checked.privateNote.indexOf('not in this file') !== -1, 'private pages never arrive');
+  Object.keys(idb.databases).forEach(function (name) { delete idb.databases[name]; });
+  ws.resetForSmoke();
+  ws.bindClock(function () { return now; });
+  await ws.accept();
+  await ws.setMind('other-model', 'Sol');
+  var adopted = await ws.importSection(packed.section, 'adopt');
+  assert.strictEqual(adopted.ok, true, 'adopt takes the shelf');
+  assert.ok(adopted.added.pages >= 1, 'adopt adds the shared pages');
+  var titles = (await ws.list()).map(function (p) { return p.title; });
+  assert.ok(titles.indexOf('Quiet note') === -1, 'a private page does not arrive');
+  var merged = await ws.importSection(packed.section, 'merge');
+  assert.strictEqual(merged.added.pages, 0, 'a second merge adds no pages');
+  assert.strictEqual(merged.added.versions, 0, 'a second merge adds no versions');
+  console.log('SMOKE_OK tree workspace export v0.1');
 })().catch(function (err) {
   console.error(err);
   process.exit(1);
