@@ -77,6 +77,15 @@ assert.strictEqual(grid.value.grid.length, 2, 'grid rows');
 assert.ok(grid.visible.indexOf('}]') === -1, 'no bracket tail');
 assert.ok(grid.visible.indexOf('[FL_CLAY') === -1, 'tag stripped');
 
+['[FL CLAY:', '[FL-CLAY:', '[fl_clay:', '[FL_CLAY :'].forEach(function (open) {
+  var shaped = clay.parseTag(open + ' {"form":"star","mood":"joy","energy":0.4}]');
+  assert.strictEqual(shaped.ok, true, 'near-miss clay ' + open);
+  assert.strictEqual(shaped.value.form, 'star', 'near-miss form ' + open);
+  assert.ok(shaped.visible.indexOf(open) === -1, 'near-miss clay stripped ' + open);
+});
+assert.strictEqual(clay.parseTag('FL CLAY {"form":"star"}').tag, false, 'bare clay words store nothing');
+assert.ok(clay.PROMPT.indexOf('[FL_CLAY: {"form":"heart","mood":"warmth","energy":0.4}]') === clay.PROMPT.length - '[FL_CLAY: {"form":"heart","mood":"warmth","energy":0.4}]'.length, 'one example at the end');
+
 // Felt is callback-timed. The synchronous return does not claim the mind felt it.
 clay.setReduced(true);
 clay.setOn(true);
@@ -109,3 +118,4 @@ Object.keys(locks).forEach(function (name) {
 });
 
 console.log('SMOKE_OK tree particle clay v0.1');
+console.log('SMOKE_OK tree workspace mark heal v0.1');

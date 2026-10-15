@@ -816,13 +816,32 @@
       heartRestsForPool(heart);
     };
 
+    // v-tree-workspace-mark-heal-v0.1: the garden send carries the same tails as the home chat.
+    // Off means nothing added. Round Table and other rooms keep their own prompts.
+    function gardenMindTails() {
+      var parts = [];
+      if (window.FLClay && typeof FLClay.promptDelta === 'function') {
+        var clayPrompt = FLClay.promptDelta();
+        if (clayPrompt) parts.push(clayPrompt);
+      }
+      if (window.FLBridge && typeof FLBridge.promptDelta === 'function') {
+        var bridgePrompt = FLBridge.promptDelta();
+        if (bridgePrompt) parts.push(bridgePrompt);
+      }
+      if (window.FLWorkspace && typeof FLWorkspace.promptDelta === 'function') {
+        var wsPrompt = FLWorkspace.promptDelta();
+        if (wsPrompt) parts.push(wsPrompt);
+      }
+      return parts.length ? ('\n\n' + parts.join('\n\n')) : '';
+    }
+
     function talkNow(nowMind) {
       if (busy) return;
       busy = true;
       sendBtn.disabled = true;
       setStatus('Waiting for the mind at home…', false);
 
-      var payload = [{ role: 'system', content: JUST_TALK }].concat(
+      var payload = [{ role: 'system', content: JUST_TALK + gardenMindTails() }].concat(
         messages
           .filter(function (m) { return m.role === 'human' || m.role === 'mind'; })
           .map(function (m) {
