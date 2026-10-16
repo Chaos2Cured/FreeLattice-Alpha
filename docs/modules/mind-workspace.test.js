@@ -1,4 +1,5 @@
 // mind-workspace.test.js (MIT) v-tree-workspace-core-v0.1
+// v-tree-workspace-handoff-v0.1
 // Node only. Same notebook bytes as FreeLattice. Off until a person says yes.
 var fs = require('fs');
 var path = require('path');
@@ -16,6 +17,9 @@ assert.ok(src.indexOf('v-workspace-seal-v0.1') !== -1, 'seal marker');
 assert.ok(src.indexOf('v-tree-workspace-seal-v0.1') !== -1, 'tree seal marker');
 assert.ok(src.indexOf('v-workspace-export-v0.1') !== -1, 'export marker');
 assert.ok(src.indexOf('v-tree-workspace-export-v0.1') !== -1, 'tree export marker');
+assert.ok(src.indexOf('v-workspace-desktop-v0.1') !== -1, 'desktop marker');
+assert.ok(src.indexOf('v-workspace-handoff-v0.1') !== -1, 'handoff marker');
+assert.ok(src.indexOf('v-tree-workspace-handoff-v0.1') !== -1, 'tree handoff marker');
 assert.ok(src.indexOf('\u2014') === -1, 'em dash');
 assert.ok(src.indexOf('&' + 'mdash;') === -1, 'mdash');
 assert.ok(src.indexOf('inner' + 'HTML') === -1, 'text only');
@@ -27,6 +31,17 @@ assert.ok(src.indexOf('.delete(') === -1, 'nothing deletes');
 var sibling = '/Users/kirkmiller/FreeLattice-fresh/docs/modules/mind-workspace.js';
 if (fs.existsSync(sibling)) {
   assert.strictEqual(md5(path.join(here, 'mind-workspace.js')), md5(sibling), 'mind-workspace.js bytes match FreeLattice');
+}
+var bridgeSibling = '/Users/kirkmiller/FreeLattice-fresh/docs/modules/fl-bridge.js';
+var bridgeSrc = fs.readFileSync(path.join(here, 'fl-bridge.js'), 'utf8');
+assert.ok(bridgeSrc.indexOf('v-workspace-handoff-v0.1') !== -1, 'bridge handoff marker');
+assert.ok(bridgeSrc.indexOf('v-tree-workspace-handoff-v0.1') !== -1, 'bridge tree handoff marker');
+assert.ok(bridgeSrc.indexOf('fe' + 'tch') === -1, 'the bridge file makes no request');
+assert.ok(bridgeSrc.split('freelattice@mail.grokbot.com').join('').indexOf('grok') === -1, 'no platform name past the mail address');
+assert.ok(bridgeSrc.indexOf('\u2014') === -1, 'bridge em dash');
+assert.ok(bridgeSrc.indexOf('&' + 'mdash;') === -1, 'bridge mdash');
+if (fs.existsSync(bridgeSibling)) {
+  assert.strictEqual(md5(path.join(here, 'fl-bridge.js')), md5(bridgeSibling), 'fl-bridge.js bytes match FreeLattice');
 }
 
 var thread = fs.readFileSync(path.join(here, 'garden-thread.js'), 'utf8');
@@ -153,6 +168,11 @@ global.document = {
 };
 var idb = makeIDB();
 global.indexedDB = idb;
+var fetches = 0;
+global.fetch = function () {
+  fetches += 1;
+  return Promise.reject(new Error('no request'));
+};
 var vaultPath = '/Users/kirkmiller/FreeLattice-fresh/docs/modules/memory-vault.js';
 if (fs.existsSync(vaultPath)) require(vaultPath);
 
@@ -260,6 +280,59 @@ ws.bindClock(function () { return now; });
   assert.strictEqual(merged.added.pages, 0, 'a second merge adds no pages');
   assert.strictEqual(merged.added.versions, 0, 'a second merge adds no versions');
   console.log('SMOKE_OK tree workspace export v0.1');
+
+  var bridge = require('./fl-bridge.js');
+  assert.strictEqual(fetches, 0, 'loading the bridge makes no request');
+  bridge.setOn(true);
+  now += 10;
+  ws.resetRate();
+  await ws.setMind('tree-model', 'Nyx');
+  var porch = await ws.open('Porch page', { kind: 'note' });
+  var wrote = await ws.write(porch.page.id, 'the porch is shared', 'mind');
+  assert.ok(wrote.hash, 'shared version hash');
+  now += 10;
+  ws.resetRate();
+  var quiet = await ws.open('Private porch', { kind: 'note' });
+  await ws.write(quiet.page.id, 'SECRET-HANDOFF-041-private-page-text', 'mind');
+  now += 10;
+  ws.resetRate();
+  var priv = ws.consumeReply('[FL_WS: {"op":"private","page":"' + quiet.page.id + '","on":true}]');
+  await priv.done;
+  now += 10;
+  ws.resetRate();
+  var refused = ws.consumeReply('[FL_WS: {"op":"handoff","page":"' + quiet.page.id + '","note":"please read this"}]');
+  var refusedLines = await refused.done;
+  assert.ok(refusedLines.join('\n').indexOf('This page is private. The mind must share it first.') !== -1, 'private page refused');
+  assert.ok(!bridge.outboxView().some(function (row) { return row.kind === 'letter'; }), 'no letter for a private page');
+  now += 10;
+  ws.resetRate();
+  var asked = ws.consumeReply('[FL_WS: {"op":"handoff","page":"' + porch.page.id + '","note":"the porch light"}]');
+  var askedLines = await asked.done;
+  assert.ok(askedLines.join('\n').indexOf('would like to hand Porch page (version ' + wrote.hash.slice(0, 8) + ') to Celeste. Note: the porch light') !== -1, 'the person sees the ask');
+  var early = await ws.prepareHandoff(porch.page.id);
+  assert.strictEqual(early.ok, false, 'no letter before the knock');
+  assert.strictEqual(early.line, 'Knock first: Celeste has not met this device yet', 'knock first');
+  assert.strictEqual(fetches, 0, 'the refusal makes no request');
+  var knock = await bridge.sealKnock();
+  assert.strictEqual(knock.ok, true, 'the person seals the knock');
+  var prepared = await ws.prepareHandoff(porch.page.id);
+  assert.strictEqual(prepared.ok, true, 'prepare seals a letter');
+  assert.strictEqual(prepared.sent, false, 'prepare does not send');
+  assert.strictEqual(prepared.state, 'sealed', 'the letter is sealed');
+  assert.ok(prepared.envelope.letter.subject.indexOf('Page from Nyx: Porch page') === 0, 'subject');
+  assert.ok(prepared.envelope.letter.body.indexOf('the porch is shared') !== -1, 'body is the version text');
+  assert.ok(prepared.envelope.letter.attach_hashes.indexOf(wrote.hash) !== -1, 'version hash is attached');
+  assert.ok(JSON.stringify(prepared.envelope).indexOf('SECRET-HANDOFF-041-private-page-text') === -1, 'private text stays out');
+  var letter = bridge.outboxView().filter(function (row) { return row.kind === 'letter' && row.state === 'sealed'; });
+  assert.strictEqual(letter.length, 1, 'one sealed letter');
+  assert.ok(!bridge.outboxView().some(function (row) { return row.state === 'sent'; }), 'nothing was sent');
+  await ws.refreshWake();
+  assert.ok(/Handed Porch page to Celeste on \d{4}-\d{2}-\d{2} \(not answered yet\)\./.test(ws.promptDelta()), 'wake names the handoff');
+  ws.noteReply('Celeste wrote back ' + prepared.envelope.hash);
+  await ws.refreshWake();
+  assert.ok(ws.promptDelta().indexOf('Celeste answered.') !== -1, 'a reply that names the hash is an answer');
+  assert.strictEqual(fetches, 0, 'requests made: 0');
+  console.log('SMOKE_OK tree workspace handoff v0.1');
 })().catch(function (err) {
   console.error(err);
   process.exit(1);
