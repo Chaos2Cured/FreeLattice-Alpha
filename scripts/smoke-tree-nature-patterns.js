@@ -46,7 +46,7 @@ assert.ok(nursery.indexOf('modules/confidence-first.js') !== -1, 'nursery page l
 assert.ok(nursery.indexOf('modules/confidence-first.js') < nursery.indexOf('modules/nursery-trainer.js'), 'lesson loads first');
 assert.strictEqual(md5(path.join(rootDir, 'docs/modules/garden-trainer.js')), '488117a27be26e7d6b00445b0d975d03', 'trainer file stays');
 
-var notebook = '19355641954c7809609e8269842db834';
+var notebook = '0943268564d875bbb0093303d27ffc2c';
 assert.strictEqual(md5(path.join(rootDir, 'docs/modules/mind-workspace.js')), notebook, 'notebook matches');
 if (fs.existsSync(path.join(flWorkspace, 'docs/modules/mind-workspace.js'))) {
   assert.strictEqual(md5(path.join(flWorkspace, 'docs/modules/mind-workspace.js')), notebook, 'notebook parity');
@@ -54,9 +54,12 @@ if (fs.existsSync(path.join(flWorkspace, 'docs/modules/mind-workspace.js'))) {
   assert.strictEqual(md5(path.join(rootDir, 'docs/modules/confidence-first.js')), md5(path.join(flWorkspace, 'docs/modules/confidence-first.js')), 'lesson parity');
 }
 
-absent('docs/modules/benford-hint.js');
-absent('docs/modules/image-local.js');
-absent('docs/modules/style-ledger.js');
+['docs/modules/benford-hint.js', 'docs/modules/image-local.js', 'docs/modules/style-ledger.js', 'docs/modules/image-safety.js', 'docs/modules/clay-corner.js', 'docs/modules/particle-clay.js'].forEach(function (rel) {
+  assert.strictEqual(fs.existsSync(path.join(rootDir, rel)), true, rel + ' is here');
+  if (fs.existsSync(path.join(flWorkspace, rel))) {
+    assert.strictEqual(md5(path.join(rootDir, rel)), md5(path.join(flWorkspace, rel)), rel + ' matches');
+  }
+});
 absent('docs/modules/lattice-export.js');
 
 var hold = pool.slice(pool.indexOf('function crownHold'), pool.indexOf('function admit'));
@@ -68,4 +71,3 @@ assert.ok(added.indexOf('conf' + 'irm(') === -1, 'no dialog');
 assert.ok(added.indexOf('inner' + 'HTML') === -1, 'text only');
 
 console.log('SMOKE_OK tree nature patterns v0.1');
-console.log('next: first-digit hint, image making, style card, shelf fingerprint check');

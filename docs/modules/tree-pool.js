@@ -657,14 +657,51 @@
       return { ok: true, id: id, door: door, messages: messages };
     });
   }
+  // v-heals-043-v0.1: a served slot frees once, on the answer or when the answer clock runs out.
+  function releaseServeSlot(token) {
+    if (!token || token.freed) return false;
+    token.freed = true;
+    try { if (token.timer) root.clearTimeout(token.timer); } catch (e) {}
+    if (_inflight[token.key] === token) delete _inflight[token.key];
+    helloAll();
+    paint();
+    return true;
+  }
+  function armServeWatch(key) {
+    var ctrl = { abort: function () { ctrl.aborted = true; }, aborted: false };
+    var token = { key: key, freed: false, ctrl: ctrl, peerId: 'watch', why: '', timer: 0 };
+    _inflight[key] = token;
+    token.timer = root.setTimeout(function () {
+      if (_inflight[key] === token) token.why = 'local-ai-quiet';
+      try { ctrl.abort(); } catch (e) {}
+      releaseServeSlot(token);
+    }, ANSWER_MS);
+    return {
+      release: function () { return releaseServeSlot(token); },
+      aborted: function () { return ctrl.aborted === true; }
+    };
+  }
   function serve(p, msg) {
     return admit(p, msg).then(function (a) {
       if (!a.ok) { paint(); return a; }
       var key = p.id + '|' + a.id;
       var ctrl = typeof root.AbortController === 'function' ? new root.AbortController() : null;
-      _inflight[key] = { ctrl: ctrl, peerId: p.id, why: '' };
+      var token = { key: key, freed: false, ctrl: ctrl, peerId: p.id, why: '', timer: 0 };
+      _inflight[key] = token;
       helloAll(); // v-tree-pool-room-v0.2: kin learn this device is busier, so the pool can pick a freer one
-      var timer = root.setTimeout(function () { if (_inflight[key]) { _inflight[key].why = 'local-ai-quiet'; try { ctrl && ctrl.abort(); } catch (e) {} } }, ANSWER_MS);
+      var settled = false;
+      var turned = false;
+      function turnOnce(why) {
+        if (turned || !why || why === 'closed') return;
+        turned = true;
+        turnAway(p, a.id, why);
+      }
+      token.timer = root.setTimeout(function () {
+        if (_inflight[key] === token) token.why = 'local-ai-quiet';
+        try { ctrl && ctrl.abort(); } catch (e) {}
+        if (!settled) turnOnce('local-ai-quiet');
+        releaseServeSlot(token);
+      }, ANSWER_MS);
       paintState();
       var body = { model: a.door.model, stream: false, messages: a.messages }; // the same shape for Ollama and OpenAI-style doors
       var opts = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) };
@@ -678,7 +715,7 @@
       return asked.then(function (j) {
         var text = (j && j.message && j.message.content) ||
           (j && j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || '';
-        var why = _inflight[key] ? _inflight[key].why : 'closed';
+        var why = token.why || '';
         if (why) throw new Error(why);
         if (mode() !== 'kin') throw new Error(mode() === 'pause' ? 'paused' : 'off'); // pause wins, even at the last moment
         if (!isKin(p)) throw new Error('not-kin');
@@ -686,15 +723,13 @@
         bump('answered');
         return { ok: true };
       }).catch(function (e) {
-        var why = (_inflight[key] && _inflight[key].why) || String((e && e.message) || '');
+        var why = token.why || String((e && e.message) || '');
         if (['paused', 'off', 'not-kin', 'closed'].indexOf(why) === -1) why = 'local-ai-quiet';
-        if (why !== 'closed') turnAway(p, a.id, why);
+        turnOnce(why);
         return { ok: false, reason: why };
       }).then(function (res) {
-        try { root.clearTimeout(timer); } catch (e) {}
-        delete _inflight[key];
-        helloAll(); // v-tree-pool-room-v0.2
-        paint();
+        settled = true;
+        releaseServeSlot(token);
         return res;
       });
     });
@@ -1920,6 +1955,9 @@
       });
     },
     liveCount: liveCount,
+    // v-heals-043-v0.1: the same once-only free the serve clock uses.
+    armServeWatch: armServeWatch,
+    ANSWER_MS: ANSWER_MS,
     counts: counts,
     // v-tree-pool-room-v0.2
     startRoom: startRoom,
