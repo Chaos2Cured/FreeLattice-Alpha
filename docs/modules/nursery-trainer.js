@@ -496,7 +496,20 @@
   }
 
   function mount(el) {
-    return renderFace(el);
+    var face = renderFace(el);
+    // v-confidence-first-v0.1: the same lesson words, layered beside this face.
+    try {
+      if (el && window.FLConfidence && typeof window.FLConfidence.mount === 'function' && window.document) {
+        var host = window.document.getElementById('fl-confidence-host');
+        if (!host) {
+          host = window.document.createElement('div');
+          host.id = 'fl-confidence-host';
+          el.appendChild(host);
+        }
+        window.FLConfidence.mount(host);
+      }
+    } catch (eConf) {}
+    return face;
   }
 
   window.NurseryTrainer = {
