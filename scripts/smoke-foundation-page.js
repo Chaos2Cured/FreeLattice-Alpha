@@ -1,15 +1,26 @@
 // smoke-foundation-page.js (MIT) v-foundation-page-v0.1
+// v-tree-foundation-heal-v0.1
 // Node only. Pins docs/foundation.html to the files it quotes.
 // The Tree copy prints SMOKE_OK tree foundation page v0.1 and reads
 // FreeLattice sources from the sibling checkout when this tree has none.
+// FL_FRESH names that checkout. The old path is the fallback.
+// When neither is there, the sibling checks are skipped.
 var fs = require('fs');
 var path = require('path');
 var crypto = require('crypto');
 
 var root = path.join(__dirname, '..');
-var sibling = '/Users/kirkmiller/FreeLattice-fresh';
+function chosenSibling() {
+  var env = process.env.FL_FRESH;
+  if (env && fs.existsSync(env)) return env;
+  var fallback = '/Users/kirkmiller/FreeLattice-fresh';
+  if (fs.existsSync(fallback)) return fallback;
+  return '';
+}
+var sibling = chosenSibling();
 var isTree = fs.existsSync(path.join(root, 'AUTONOMY.md'))
   && !fs.existsSync(path.join(root, 'docs/library/AUTONOMY.md'));
+var skipSibling = isTree && !sibling;
 
 var EXPECTED = {
   'docs/specs.html': '0a380439354218330c4d9ba5c6d79bbf',
@@ -162,6 +173,8 @@ function snap(rel) {
   if (before[rel] !== EXPECTED[rel]) moved(rel);
 }
 
+if (skipSibling) console.log('skip: sibling sources not beside this tree');
+
 var shaRe = /<p class="source" data-sha256="([0-9a-f]{64})" data-source="([^"]+)">([\s\S]*?)<\/p>/g;
 var shaCount = 0;
 var shaMatch;
@@ -170,6 +183,7 @@ while ((shaMatch = shaRe.exec(html))) {
   var full = shaMatch[1];
   var rel = shaMatch[2];
   var body = shaMatch[3];
+  if (skipSibling && rel !== 'AUTONOMY.md') continue;
   snap(rel);
   var fileHash = sha256(readSource(rel));
   if (fileHash !== full) moved(rel);
@@ -192,6 +206,7 @@ var preMatch;
 while ((preMatch = preRe.exec(html))) {
   preCount += 1;
   var src = preMatch[1];
+  if (skipSibling && src !== 'AUTONOMY.md') continue;
   snap(src);
   var quoted = norm(preMatch[2]);
   if (!quoted || sourceNorm(src).indexOf(quoted) < 0) moved(src);
@@ -211,4 +226,12 @@ Object.keys(before).forEach(function (rel) {
 });
 
 var ok = isTree ? 'SMOKE_OK tree foundation page v0.1' : 'SMOKE_OK foundation page v0.1';
+if (isTree) {
+  if (html.indexOf('v-tree-foundation-heal-v0.1') < 0) fail('heal marker');
+  var blob = 'https://github.com/Chaos2Cured/FreeLattice-Alpha/blob/main/AUTONOMY.md';
+  var blobCount = html.split(blob).length - 1;
+  if (blobCount !== 3) fail('autonomy blob ' + blobCount);
+  if (html.indexOf('../AUTONOMY.md') !== -1) fail('dead autonomy link');
+  console.log('SMOKE_OK tree foundation heal v0.1');
+}
 console.log(ok);
