@@ -104,6 +104,7 @@
   var _pending = null;     // the inviter's peer waiting for a reply
   var _flow = { step: '', text: '', code: '', check: null, sdp: '', card: '' };
   var _inflight = {};      // key -> { ctrl, peerId, why }
+  var _crownWait = {};     // v-crown-shyness-v0.1: peers held back while another question is open
   var _asks = {};          // askId -> { peerId, resolve, timer }
   var _drafts = {};        // peerId|model -> text being typed
   var _answers = {};       // peerId -> { model, text } shown this visit only
@@ -605,6 +606,33 @@
     return out;
   }
   function charCount(list) { return list.reduce(function (n, x) { return n + x.content.length; }, 0); }
+  function crownHold(p) {
+    var crown = null;
+    try { crown = root.FLCrown; } catch (e) { crown = null; }
+    if (!crown || typeof crown.decide !== 'function') return '';
+    var counts = {};
+    Object.keys(_inflight).forEach(function (k) {
+      var peerId = _inflight[k] && _inflight[k].peerId;
+      if (peerId) counts[peerId] = (counts[peerId] || 0) + 1;
+    });
+    var waiting = [];
+    Object.keys(_crownWait).forEach(function (id) { if (_crownWait[id]) waiting.push(id); });
+    var gate = crown.decide({
+      capacity: MAX_CONCURRENT,
+      peer: p && p.id,
+      counts: counts,
+      waiting: waiting,
+      kin: true,
+      paused: mode() === 'pause',
+      totalInflight: liveCount()
+    });
+    if (!gate.ok) {
+      if (p && p.id) _crownWait[p.id] = true;
+      return gate.reason === 'pause' ? 'paused' : 'busy';
+    }
+    if (p && p.id) _crownWait[p.id] = false;
+    return '';
+  }
   function admit(p, msg) {
     var id = typeof msg.id === 'string' ? msg.id.slice(0, 64) : '';
     var m = mode();
@@ -618,10 +646,14 @@
     var door = localDoor(line(msg.model, 120));
     if (!door.ok) return Promise.resolve(turnAway(p, id, door.reason));
     if (liveCount() >= MAX_CONCURRENT) return Promise.resolve(turnAway(p, id, 'busy'));
+    var held = crownHold(p);
+    if (held) return Promise.resolve(turnAway(p, id, held));
     return batteryOk().then(function (okBat) {
       if (!okBat) return turnAway(p, id, 'unplugged');
       if (mode() !== 'kin') return turnAway(p, id, mode() === 'pause' ? 'paused' : 'off');
       if (liveCount() >= MAX_CONCURRENT) return turnAway(p, id, 'busy');
+      var heldLater = crownHold(p);
+      if (heldLater) return turnAway(p, id, heldLater);
       return { ok: true, id: id, door: door, messages: messages };
     });
   }
@@ -731,7 +763,7 @@
     '.tree-pool{max-width:40rem;margin:1rem auto 0;padding:1rem 1.1rem;background:rgba(12,10,26,0.78);border:1px solid rgba(232,176,25,0.32);border-radius:12px;color:rgba(226,232,240,0.94);font-family:Georgia,"Times New Roman",serif;font-size:1rem;line-height:1.55;text-align:left;}',
     '.tree-pool h3{margin:0 0 0.4rem;font-size:1.08rem;font-weight:600;color:rgba(232,176,25,0.95);}',
     '.tree-pool p{margin:0.45rem 0;}',
-    '.tree-pool-quiet{color:rgba(200,210,230,0.82);font-size:0.95rem;}',
+    '.tree-pool-quiet,.tree-pool-crown{color:rgba(200,210,230,0.82);font-size:0.95rem;overflow-wrap:anywhere;}',
     '.tree-pool-state{color:#fff;font-weight:600;}',
     '.tree-pool button{min-height:44px;min-width:44px;margin:0.35rem 0.5rem 0.35rem 0;padding:10px 16px;border-radius:10px;border:1px solid rgba(232,176,25,0.5);background:rgba(232,176,25,0.12);color:#fff;font-family:inherit;font-size:1rem;cursor:pointer;}',
     '.tree-pool button.tree-pool-main{background:#e8b019;border-color:#e8b019;color:#0e0c1e;font-weight:600;}',
@@ -1080,6 +1112,10 @@
     wrap.appendChild(el('p', '', 'A classroom lab, or the old laptops at home, can each hold a mind. Connect the devices, trust each other\'s cards, ' +
       'tap Let this device help on each one that should answer, then ask from any of them.'));
     wrap.appendChild(el('p', 'tree-pool-quiet', HONEST));
+    // v-crown-shyness-v0.1: same gap as FreeLattice. Kin skip the third. Headroom stays.
+    var crownWords = 'Keeps a small gap: no one helper takes more than a third, and 20% stays yours.';
+    try { if (root.FLCrown && root.FLCrown.LINE) crownWords = root.FLCrown.LINE; } catch (eCrown) {}
+    wrap.appendChild(el('p', 'tree-pool-crown', crownWords));
     var state = el('div', 'tree-pool-part');
     state.setAttribute('aria-live', 'polite');
     var door = el('div', '');
