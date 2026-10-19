@@ -140,7 +140,8 @@ messages.appendChild(reply);
 clay.consumeReply('[FL_CLAY: {"form":"fractal","mood":"reverence","motion":"settle","energy":0.4}]', []);
 var canvas = documentStub.getElementById('fl-clay-canvas');
 ok(canvas && reply.nextSibling === canvas && clay.canvasCount() === 1, 'tree canvas follows the reply');
-ok(String(canvas.style.width).indexOf('320px') !== -1 && canvas.style.maxWidth === '100%', 'tree canvas fits the column');
+// v-seal-ask-heal-v0.1: width used to contain 320px. The canvas now fills the column. The height ceiling keeps 320px.
+ok(canvas.style.width === '100%' && String(canvas.style.height).indexOf('320px') !== -1 && canvas.style.maxWidth === '100%', 'tree canvas fits the column');
 clay.ensurePill();
 var pill = documentStub.getElementById('fl-clay-pill');
 var pause = documentStub.getElementById('fl-clay-pause');

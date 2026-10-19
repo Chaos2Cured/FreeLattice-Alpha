@@ -260,7 +260,8 @@ ws.bindClock(function () { return now; });
   assert.ok(raw.indexOf(secret) === -1, 'private text stays out of the export');
   assert.ok(raw.indexOf('Quiet note') === -1, 'private title stays out of the export');
   assert.ok(raw.indexOf('keep this') === -1, 'private why stays out of the export');
-  assert.ok(/stayed on this device/.test(packed.section.line), 'count line');
+  // v-seal-ask-heal-v0.1: /stayed on this device/ now requires this browser.
+  assert.ok(/stayed on this browser/.test(packed.section.line), 'count line');
   assert.ok(packed.section.shelves.some(function (shelf) { return shelf.setAside === true; }), 'set-aside shelf is kept');
   var checked = await ws.importSection(packed.section, 'verify-only');
   assert.strictEqual(checked.ok, true, 'verify rehashes and receipts');
@@ -302,7 +303,8 @@ ws.bindClock(function () { return now; });
   ws.resetRate();
   var refused = ws.consumeReply('[FL_WS: {"op":"handoff","page":"' + quiet.page.id + '","note":"please read this"}]');
   var refusedLines = await refused.done;
-  assert.ok(refusedLines.join('\n').indexOf('This page is private. The mind must share it first.') !== -1, 'private page refused');
+  // v-seal-ask-heal-v0.1: "This page is private. The mind must share it first." now names this browser.
+  assert.ok(refusedLines.join('\n').indexOf('This page is private on this browser. The mind must share it first.') !== -1, 'private page refused');
   assert.ok(!bridge.outboxView().some(function (row) { return row.kind === 'letter'; }), 'no letter for a private page');
   now += 10;
   ws.resetRate();

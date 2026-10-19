@@ -6665,3 +6665,10 @@ html:has(#place-veil.is-core.is-open) #shared-shoulder a {
   color: rgba(214, 222, 238, 0.64);
   font-size: 0.72rem;
 }
+
+/* v-seal-ask-heal-v0.1: the same 2px focus ring the app uses, on buttons and links. */
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #e8b019;
+  outline-offset: 2px;
+}
