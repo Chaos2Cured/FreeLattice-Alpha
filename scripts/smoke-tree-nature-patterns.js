@@ -47,7 +47,8 @@ assert.ok(nursery.indexOf('modules/confidence-first.js') < nursery.indexOf('modu
 assert.strictEqual(md5(path.join(rootDir, 'docs/modules/garden-trainer.js')), '488117a27be26e7d6b00445b0d975d03', 'trainer file stays');
 
 // v-seal-ask-heal-v0.1: notebook was 0943268564d875bbb0093303d27ffc2c. The honest line now names this browser.
-var notebook = 'f82f3b880ad1d71680890b97d802f12f';
+// v-seal-ask-in-view-v0.1: notebook was f82f3b880ad1d71680890b97d802f12f, then c81b9a95164f328f99641f76584ebe73. The ask comes into view.
+var notebook = '83daf3156966cc16c608322f9f9685a1';
 assert.strictEqual(md5(path.join(rootDir, 'docs/modules/mind-workspace.js')), notebook, 'notebook matches');
 if (fs.existsSync(path.join(flWorkspace, 'docs/modules/mind-workspace.js'))) {
   assert.strictEqual(md5(path.join(flWorkspace, 'docs/modules/mind-workspace.js')), notebook, 'notebook parity');
