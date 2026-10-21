@@ -46,7 +46,13 @@ assert.ok(nursery.indexOf('modules/confidence-first.js') !== -1, 'nursery page l
 assert.ok(nursery.indexOf('modules/confidence-first.js') < nursery.indexOf('modules/nursery-trainer.js'), 'lesson loads first');
 assert.strictEqual(md5(path.join(rootDir, 'docs/modules/garden-trainer.js')), '488117a27be26e7d6b00445b0d975d03', 'trainer file stays');
 
-var notebook = '0943268564d875bbb0093303d27ffc2c';
+// v-seal-ask-heal-v0.1: notebook was 0943268564d875bbb0093303d27ffc2c. The honest line now names this browser.
+// v-seal-ask-in-view-v0.1: notebook was f82f3b880ad1d71680890b97d802f12f, then c81b9a95164f328f99641f76584ebe73. The ask comes into view.
+// v-seal-ask-chat-tab-v0.1: notebook was 83daf3156966cc16c608322f9f9685a1. The ask moves beside Chat when the thread opens.
+// v-seal-ask-settle-v0.1: notebook was df660dc31ea6d765d69e8e387e6fdfb0. The ask waits for the panel box.
+// v-seal-ask-after-tap-v0.1: notebook was 0ad079e66d39b5866b923d697867650b. The ask scrolls after the Chat tab's own motion.
+// v-seal-ask-last-two-v0.1: notebook was cd29c1c878ec159f45db5a97bed05e58. Back from Nursery closes Nursery, and the heart stays when it fits.
+var notebook = 'e08a08752b311327ddab56b3c66de77d';
 assert.strictEqual(md5(path.join(rootDir, 'docs/modules/mind-workspace.js')), notebook, 'notebook matches');
 if (fs.existsSync(path.join(flWorkspace, 'docs/modules/mind-workspace.js'))) {
   assert.strictEqual(md5(path.join(flWorkspace, 'docs/modules/mind-workspace.js')), notebook, 'notebook parity');

@@ -1763,9 +1763,62 @@
     return { room: true, inSettings: inSettings };
   }
 
+  // v-tree-ask-last-v0.1
+  // The Gathering card hides Seal it. #room-chat uses overflow hidden, so the
+  // ask is clipped and a tap at its centre misses the button. Closing a thread
+  // unmounts the stage, and that clear used to take the ask with it. Lift the
+  // ask onto the garden first, above the shared shoulder (1006) and under the
+  // header (1010), so the same Seal it stays visible and tappable.
+  function liftSealAsk(host) {
+    var dock = document.getElementById('fl-ws-asks');
+    if (!dock || !host || !host.contains || !host.contains(dock) || !document.body) return false;
+    try { document.body.appendChild(dock); } catch (eMove) { return false; }
+    dock.style.position = 'fixed';
+    dock.style.left = '16px';
+    dock.style.right = '16px';
+    dock.style.top = '72px';
+    dock.style.bottom = 'auto';
+    dock.style.zIndex = '1007';
+    dock.style.maxHeight = '70vh';
+    dock.style.overflow = 'auto';
+    dock.style.width = 'auto';
+    dock.style.maxWidth = '40rem';
+    var seal = null;
+    try { seal = dock.querySelector('[aria-label="Approve seal"]'); } catch (eSeal) { seal = null; }
+    if (seal && typeof seal.scrollIntoView === 'function') {
+      try { seal.scrollIntoView({ block: 'nearest', behavior: 'auto' }); } catch (eScroll) {}
+    }
+    return true;
+  }
+
+  function gatheringHoldsAsk() {
+    var veil = document.getElementById('place-veil');
+    if (!veil || veil.hidden) return false;
+    return veil.classList.contains('is-core');
+  }
+
+  function watchGatheringAsk() {
+    var room = document.getElementById('room-chat');
+    if (!room || room.__flAskLift || typeof MutationObserver !== 'function') return;
+    room.__flAskLift = true;
+    var pending = false;
+    var obs = new MutationObserver(function () {
+      if (pending) return;
+      pending = true;
+      requestAnimationFrame(function () {
+        pending = false;
+        if (!gatheringHoldsAsk()) return;
+        liftSealAsk(room);
+      });
+    });
+    try { obs.observe(room, { childList: true, subtree: true }); }
+    catch (eObs) { room.__flAskLift = false; }
+  }
+
   function hideRoomChat() {
     var host = document.getElementById('room-chat');
     var stage = document.getElementById('room-chat-stage');
+    liftSealAsk(host);
     if (host && document.documentElement.getAttribute('data-garden-room') !== 'settings') {
       host.hidden = true;
     }
@@ -1897,6 +1950,7 @@
         veil.classList.add('is-core');
         if (coreHost) renderCoreGathering(coreHost);
         showRoomChat();
+        liftSealAsk(document.getElementById('room-chat'));
       } else if (id === 'nursery') {
         hideRoomChat();
         veil.classList.add('is-nursery');
@@ -2022,7 +2076,10 @@
       }
       setRoomLabelText(PLACE_LABELS[id] || PLACE_LABELS.garden);
       requestAnimationFrame(function () {
-        requestAnimationFrame(function () { veil.classList.add('is-open'); });
+        requestAnimationFrame(function () {
+          veil.classList.add('is-open');
+          if (veil.classList.contains('is-core')) liftSealAsk(document.getElementById('room-chat'));
+        });
       });
     }
 
@@ -2065,6 +2122,7 @@
 
     function closeThread(opts) {
       if (!veil) return;
+      liftSealAsk(stage);
       document.documentElement.classList.remove('thread-open');
       veil.classList.remove('is-open');
       if (window.GardenThread && GardenThread.unmount) {
@@ -2538,6 +2596,7 @@
     bindGalaxyNav();
     bindPlaceDoors();
     bindRoomChat();
+    watchGatheringAsk();
     bindThreadDoor();
     bindWorkshopLuminos();
     bindRoundTableLuminos();
@@ -2600,6 +2659,7 @@
     goToLumino: goToLumino,
     showRoomChat: showRoomChat,
     hideRoomChat: hideRoomChat,
+    liftSealAsk: liftSealAsk,
     ensureSkyLegend: ensureSkyLegend,
     attachGardenLuminos: attachGardenLuminos,
     gardenDoorForAnchor: gardenDoorForAnchor,

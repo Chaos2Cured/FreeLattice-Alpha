@@ -533,7 +533,14 @@
     messages.forEach(function (m) {
       var item = el('li', 'thread-line is-' + m.role);
       var who = el('span', 'thread-who', m.role === 'human' ? 'you' : (m.role === 'mind' ? (m.listener || 'mind') : 'garden'));
-      var body = el('span', 'thread-body', m.text || (m.file && m.file.name ? 'a file: ' + m.file.name : ''));
+      var rawMind = m.text || '';
+      var shown = rawMind || (m.file && m.file.name ? 'a file: ' + m.file.name : '');
+      // v-seal-ask-heal-v0.1: strip a notebook mark before the first paint. The stored line stays whole.
+      if (m.role === 'mind' && rawMind && window.FLWorkspace && typeof window.FLWorkspace.strip === 'function') {
+        try { shown = window.FLWorkspace.strip(rawMind); } catch (eStrip) { shown = rawMind; }
+        if (!shown && m.file && m.file.name) shown = 'a file: ' + m.file.name;
+      }
+      var body = el('span', 'thread-body', shown);
       // v-tree-bridge-knock-v0.1: a letter tag is a draft, and the tag leaves the line.
       if (m.role === 'mind' && window.FLBridge && typeof FLBridge.consumeReply === 'function') {
         var bridgeSeen = FLBridge.consumeReply(m.text || '');
