@@ -52,7 +52,8 @@ assert.strictEqual(md5(path.join(rootDir, 'docs/modules/garden-trainer.js')), '4
 // v-seal-ask-settle-v0.1: notebook was df660dc31ea6d765d69e8e387e6fdfb0. The ask waits for the panel box.
 // v-seal-ask-after-tap-v0.1: notebook was 0ad079e66d39b5866b923d697867650b. The ask scrolls after the Chat tab's own motion.
 // v-seal-ask-last-two-v0.1: notebook was cd29c1c878ec159f45db5a97bed05e58. Back from Nursery closes Nursery, and the heart stays when it fits.
-var notebook = 'e08a08752b311327ddab56b3c66de77d';
+// v-pool-honest-heals-v0.1: notebook was e08a08752b311327ddab56b3c66de77d. Back when Chat was already open keeps the ask.
+var notebook = 'f1c88664d3e99362e02c625defb241bc';
 assert.strictEqual(md5(path.join(rootDir, 'docs/modules/mind-workspace.js')), notebook, 'notebook matches');
 if (fs.existsSync(path.join(flWorkspace, 'docs/modules/mind-workspace.js'))) {
   assert.strictEqual(md5(path.join(flWorkspace, 'docs/modules/mind-workspace.js')), notebook, 'notebook parity');
