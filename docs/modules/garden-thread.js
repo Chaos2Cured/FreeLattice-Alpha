@@ -177,6 +177,9 @@
       clean.file = file;
     }
     if (row.ts) clean.ts = String(row.ts);
+    // v-pool-honest-label-v0.1: a pooled reply keeps its small note, and Just me keeps its mark.
+    if (row.poolNote) clean.poolNote = String(row.poolNote).slice(0, 180);
+    if (row.justMe) clean.justMe = true;
     return stripForbidden(clean, 0);
   }
 
@@ -548,6 +551,9 @@
       }
       item.appendChild(who);
       item.appendChild(body);
+      // v-pool-honest-label-v0.1
+      if (m.justMe) item.appendChild(el('span', 'thread-file', 'Just me'));
+      if (m.poolNote) item.appendChild(el('span', 'thread-file', m.poolNote));
       if (m.file && m.file.name) {
         var fileNote = el('span', 'thread-file', 'a file · ' + m.file.name);
         item.appendChild(fileNote);
@@ -711,7 +717,14 @@
     tools.appendChild(importBtn);
     tools.appendChild(importInput);
     form.appendChild(tools);
+    // v-pool-honest-label-v0.1: Just me sits outside the form. A closed thread marks the form inert.
+    var justHost = el('div', 'thread-just-host');
+    justHost.setAttribute('data-thread-just-host', '1');
+    root.appendChild(justHost);
     root.appendChild(form);
+    if (window.FLPoolHonest && typeof FLPoolHonest.mountThread === 'function') {
+      FLPoolHonest.mountThread(root, { chatId: 'tree-thread', sendBtn: sendBtn, justHost: justHost });
+    }
 
     function setComposeOpen(open) {
       if (open) {
@@ -807,7 +820,14 @@
         sendBtn.disabled = false;
         if (r && r.ok) {
           setStatus('', false);
-          messages.push({ role: 'mind', text: r.text || '', listener: r.label || route.model });
+          var poolNote = '';
+          if (window.FLPoolHonest && typeof FLPoolHonest.replyNote === 'function') {
+            poolNote = FLPoolHonest.replyNote(r.peerName || r.label || route.model);
+            if (typeof FLPoolHonest.rememberReply === 'function') {
+              FLPoolHonest.rememberReply('tree-thread', { id: r.peerId || r.peerName || route.model, name: r.peerName || r.label || "another person's" });
+            }
+          }
+          messages.push({ role: 'mind', text: r.text || '', listener: r.label || route.model, poolNote: poolNote });
         } else {
           setStatus('', true);
           messages.push({ role: 'garden', text: TreePool.reasonWords(r) + ' Nothing was invented.' });
@@ -907,8 +927,16 @@
       ev.preventDefault();
       if (busy) return;
       // v-tree-pool-room-v0.2: a chosen pool route answers instead of this computer's mind.
+      // v-pool-honest-label-v0.1: Keep this chat, Just me, and Pause never call the pool.
       var route = poolRoute();
-      if (route && !form.classList.contains('is-closed')) {
+      var nowMind = listener();
+      var gate = { pool: true, via: 'pool', line: '', just: false };
+      if (window.FLPoolHonest && typeof FLPoolHonest.beginSend === 'function') {
+        FLPoolHonest.setActive('tree-thread');
+        gate = FLPoolHonest.beginSend('tree-thread', { hasLocal: !!nowMind });
+        if (typeof FLPoolHonest.refresh === 'function') FLPoolHonest.refresh();
+      }
+      if (route && !form.classList.contains('is-closed') && gate.pool) {
         var said = (input.value || '').trim();
         if (said) {
           messages.push({ role: 'human', text: said, ts: new Date().toISOString() });
@@ -921,19 +949,46 @@
         talkPool(route);
         return;
       }
-      var nowMind = listener();
+      if (route && !form.classList.contains('is-closed') && !gate.pool) {
+        var kept = (input.value || '').trim();
+        if (kept) {
+          var row = { role: 'human', text: kept, ts: new Date().toISOString() };
+          if (gate.just) row.justMe = true;
+          messages.push(row);
+          input.value = '';
+          saveHistory();
+          renderMessages(list);
+        } else if (!lastIsHuman()) {
+          return;
+        } else if (gate.just && messages.length) {
+          messages[messages.length - 1].justMe = true;
+        }
+        if (gate.via === 'local' && nowMind) {
+          talkNow(nowMind);
+          return;
+        }
+        messages.push({ role: 'garden', text: gate.line || 'No mind on this device right now. This chat stays here, so nothing was sent.' });
+        saveHistory();
+        renderMessages(list);
+        setStatus(gate.line || '', true);
+        return;
+      }
       if (!nowMind || form.classList.contains('is-closed')) {
         setComposeOpen(false);
         return;
       }
       var text = (input.value || '').trim();
       if (text) {
-        messages.push({ role: 'human', text: text, ts: new Date().toISOString() });
+        var humanRow = { role: 'human', text: text, ts: new Date().toISOString() };
+        if (gate.just) humanRow.justMe = true;
+        messages.push(humanRow);
         input.value = '';
         saveHistory();
         renderMessages(list);
       } else if (!lastIsHuman()) {
         return;
+      } else if (gate.just && messages.length) {
+        messages[messages.length - 1].justMe = true;
       }
       talkNow(nowMind);
     });
