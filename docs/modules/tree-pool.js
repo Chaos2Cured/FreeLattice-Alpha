@@ -1962,6 +1962,16 @@
     });
   }
   function currentInvite() { return _flow.step === 'invited' && _pending ? _flow.code : ''; }
+  // v-leave-cut-heal-v0.1: a helper who left is not a holder. Nothing new is sent.
+  function markNotHelping(peerId) {
+    var p = _peers[peerId];
+    if (!p || !p.hello || p.hello.helping !== true) return false;
+    p.hello.helping = false;
+    p.hello.state = 'off';
+    try { paintList(); } catch (e) {}
+    try { paintChat(); } catch (e2) {}
+    return true;
+  }
   // before v-tree-pool-honest-heals-v0.1: peerState returned { state, kin, helping, models }
   function peerState(peerId) { var p = _peers[peerId]; return p ? { state: p.state, kin: isKin(p), helping: !!(p.hello && p.hello.helping), models: p.hello ? p.hello.models.slice() : [], helpState: p.hello ? p.hello.state || '' : '' } : null; }
 
@@ -2002,6 +2012,7 @@
         return { id: id, state: p.state, proved: p.proved, kin: isKin(p), helping: !!(p.hello && p.hello.helping), models: p.hello ? p.hello.models.slice() : [] };
       });
     },
+    markNotHelping: markNotHelping, // v-leave-cut-heal-v0.1
     liveCount: liveCount,
     // v-heals-043-v0.1: the same once-only free the serve clock uses.
     armServeWatch: armServeWatch,
