@@ -95,6 +95,17 @@
       if (!safetyReady()) return resting();
       var prompt = String(words.value || '').trim();
       if (!prompt) { say('Write a few image words first. Nothing was sent.'); return; }
+      // v-likeness-line-v0.1: the same hard line, before a local look or a token call. No off switch.
+      // before 047b: the next lines chose a local look, a token call, or the resting sentence.
+      if (root.FLLikeness && typeof root.FLLikeness.assess === 'function') {
+        var likeDoor = null;
+        try { likeDoor = root.FLLikeness.assess(prompt); }
+        catch (eLikeDoor) { likeDoor = { ok: false }; }
+        if (!likeDoor || likeDoor.ok === false) {
+          say((root.FLLikeness && root.FLLikeness.LINE) || (likeDoor && likeDoor.words) || '');
+          return;
+        }
+      }
       var local = root.FLImageLocal;
       if (!local) { say(REST_LINE); return; }
       var job = null;
