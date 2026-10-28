@@ -154,6 +154,17 @@
       // v-tree-grandmother-door-v0.1
       var tdoor = document.getElementById('tree-door-host');
       if (tdoor && window.TreeDoor && typeof TreeDoor.mountRelaunch === 'function') TreeDoor.mountRelaunch(tdoor);
+      // v-soft-polish-052-v0.1: the bridge card inserts itself after the mount. Also connect follows the mount.
+      function flSoft052AlsoFollows() {
+        var mount = document.getElementById('fl-connect-mount');
+        var also = document.getElementById('fl-also-connect');
+        if (!mount || !also || !mount.parentNode) return;
+        if (mount.nextElementSibling !== also) mount.parentNode.insertBefore(also, mount.nextSibling);
+        also.classList.add('v-soft-polish-052-v0.1');
+        also.setAttribute('data-soft-polish', 'v-soft-polish-052-v0.1');
+      }
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', flSoft052AlsoFollows);
+      else flSoft052AlsoFollows();
     })();
   </script>
 </body>
