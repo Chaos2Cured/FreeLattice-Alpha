@@ -1,4 +1,4 @@
-// tree-phone-polish-136.js v-tree-phone-polish-136-v0.8
+// tree-phone-polish-136.js v-tree-phone-polish-136-v0.9
 // SPDX-License-Identifier: MIT
 // Layer, never delete. Does not rewrite garden-rooms.js, fractal-garden.js,
 // garden-thread.js, nursery-growth.js, tree-door-first-run-calm.js,
@@ -18,14 +18,14 @@
 (function (root) {
   'use strict';
 
-  var VERSION = 'v-tree-phone-polish-136-v0.8';
+  var VERSION = 'v-tree-phone-polish-136-v0.9';
   var STYLE_ID = 'tree-phone-polish-136-style';
   var NARROW = 600;
   var MIN_GAP = 100;
   var HIT = 48;
   var TAP = 44;
   var BEAD = 22;
-  var DRAWN = 36;
+  var DRAWN = 48;
   var BOX_GAP = 8;
   var RING = 50;
   var HINT = 'Tap a light, or Rooms, to open a room. Start here: The Gathering, the Nursery, or Settings.';
@@ -49,8 +49,97 @@
     try { return root.document || null; } catch (e) { return null; }
   }
 
+  function viewSize() {
+    var w = 0, h = 0;
+    try { w = root.innerWidth || 0; h = root.innerHeight || 0; } catch (e0) {}
+    try {
+      var d = doc();
+      if (d && d.documentElement) {
+        if (d.documentElement.clientWidth) w = w || d.documentElement.clientWidth;
+        if (d.documentElement.clientHeight) h = h || d.documentElement.clientHeight;
+      }
+    } catch (e1) {}
+    return { w: w, h: h };
+  }
+
   function isNarrow() {
-    try { return (root.innerWidth || 0) <= NARROW; } catch (e) { return false; }
+    try {
+      if (root.matchMedia && root.matchMedia('(max-width: ' + NARROW + 'px)').matches) return true;
+    } catch (e0) {}
+    try { return viewSize().w <= NARROW; } catch (e1) { return false; }
+  }
+
+  function markNarrow() {
+    var d = doc();
+    var on = false;
+    try { on = isNarrow(); } catch (e0) {}
+    if (d && d.documentElement) {
+      try {
+        if (on) d.documentElement.setAttribute('data-tree-narrow', '1');
+        else d.documentElement.removeAttribute('data-tree-narrow');
+      } catch (e1) {}
+    }
+    return on;
+  }
+
+  function legendIsFolded() {
+    var d = doc();
+    if (isNarrow()) return true;
+    if (!d) return false;
+    var btn = d.getElementById('tree-rooms-toggle');
+    var list = d.getElementById('lumino-legend');
+    if (btn) return !list || list.getAttribute('data-open') !== '1';
+    if (list && list.getAttribute('data-tree-rooms-toggle')) {
+      return list.getAttribute('data-open') !== '1';
+    }
+    return false;
+  }
+
+  function roomsFloor() {
+    var d = doc();
+    var btn = d && d.getElementById('tree-rooms-toggle');
+    if (!btn) return 0;
+    try {
+      var br = btn.getBoundingClientRect();
+      if (!br || br.height < 1) return 0;
+      return br.bottom + BOX_GAP;
+    } catch (e) { return 0; }
+  }
+
+  function pushTopRowBelowRooms(pts, vh) {
+    if (!pts || !pts.length) return;
+    var floor = roomsFloor();
+    if (floor <= 0) return;
+    var tap = Math.max(TAP, HIT);
+    var i, p, id, slot, need = 0;
+    for (i = 0; i < pts.length; i++) {
+      p = pts[i];
+      if (!p || typeof p.y !== 'number') continue;
+      id = p.id || (p.name && DOOR_BY_NAME[p.name]) || '';
+      slot = slotFor(id);
+      if (slot.row === 0) need = Math.max(need, (floor + tap / 2) - p.y);
+    }
+    if (need <= 0) return;
+    var reserved = reservedGardenBoxes();
+    var bottomLimit = (vh || 0) - BOX_GAP;
+    var ri, rb;
+    for (ri = 0; ri < reserved.length; ri++) {
+      rb = reserved[ri];
+      if (rb && (rb.kind === 'nav' || rb.kind === 'clay')) {
+        bottomLimit = Math.min(bottomLimit, rb.t - BOX_GAP);
+      }
+    }
+    for (i = 0; i < pts.length; i++) {
+      p = pts[i];
+      if (!p || typeof p.y !== 'number') continue;
+      p.y += need;
+      id = p.id || (p.name && DOOR_BY_NAME[p.name]) || '';
+      slot = slotFor(id);
+      if (slot.row === 1) {
+        var cap = bottomLimit - (tap / 2 + 4 + 18);
+        if (cap > floor + tap) p.y = Math.min(p.y, cap);
+      }
+    }
   }
 
   function markLightsReady() {
@@ -191,7 +280,9 @@
       '#place-veil.is-open [data-honest-just]{',
       'position:static !important;top:auto !important;bottom:auto !important;',
       'left:auto !important;right:auto !important;transform:none !important;',
-      'order:20;margin:0.15rem auto;align-self:center;}',
+      'order:20;margin:0.15rem auto;align-self:center;',
+      'white-space:nowrap !important;max-width:none !important;',
+      'flex-shrink:0 !important;}',
 
       'html.thread-open #tree-thread-wait-hint,',
       'html.thread-open .tree-thread-wait-hint,',
@@ -477,6 +568,42 @@
       'padding-right:1.35rem !important;',
       'scrollbar-gutter:stable;}',
       '}',
+
+      /* JS-marked narrow: apply even if a DevTools media query is late. */
+      'html[data-tree-narrow] .garden-lumino.is-attached .garden-lumino-word{',
+      'font-size:0.95rem !important;line-height:1.2 !important;}',
+      '@media (max-width: 360px){',
+      'html[data-tree-narrow] .garden-lumino.is-attached .garden-lumino-word,',
+      '.garden-lumino.is-attached .garden-lumino-word{',
+      'font-size:1.05rem !important;letter-spacing:0.04em !important;',
+      'padding:2px 7px !important;}',
+      '}',
+      'html[data-tree-narrow]:not(.thread-open):not(:has(#place-veil.is-open)) #tree-rooms-toggle{',
+      'display:block;position:fixed;z-index:15;',
+      'top:7.5rem;left:12px;',
+      'min-width:44px;min-height:44px;',
+      'padding:0 12px;margin:0;',
+      'border:1px solid rgba(232,176,25,0.55);',
+      'border-radius:8px;',
+      'background:rgba(12,10,26,0.94);',
+      'color:#e8b019;',
+      'font-family:Georgia,"Times New Roman",serif;',
+      'font-size:0.95rem;letter-spacing:0.04em;',
+      'cursor:pointer;}',
+      'html[data-tree-narrow]:not(.thread-open):not(:has(#place-veil.is-open)) #lumino-legend{',
+      'display:none !important;}',
+      'html[data-tree-narrow]:not(.thread-open):not(:has(#place-veil.is-open)) #lumino-legend[data-open="1"]{',
+      'display:flex !important;flex-direction:column !important;',
+      'position:fixed !important;',
+      'left:12px !important;',
+      'top:var(--tree-rooms-list-top, 9rem) !important;',
+      'bottom:auto !important;right:auto !important;',
+      'gap:2px;padding:8px 10px;',
+      'background:rgba(12,10,26,0.96);',
+      'border:1px solid rgba(232,176,25,0.35);',
+      'border-radius:8px;',
+      'z-index:16;pointer-events:auto;',
+      'max-height:60vh;overflow:auto;}',
     ].join('');
     (d.head || d.documentElement).appendChild(s);
   }
@@ -486,7 +613,7 @@
     if (!d) return;
     var el = d.getElementById('garden-start');
     if (!el) return;
-    if (isNarrow()) {
+    if (legendIsFolded()) {
       el.textContent = HINT;
       try { d.documentElement.setAttribute('data-tree-start-ready', '1'); } catch (eR) {}
     }
@@ -665,6 +792,11 @@
     var pts = points.filter(function (p) { return p && typeof p.x === 'number'; });
     var i, p, slot, id, ww, boxW, boxH, cellL, cellT, cx, cy, tap;
     tap = Math.max(TAP, HIT);
+    var floor = roomsFloor();
+    if (floor) free.t = Math.max(free.t, floor);
+    if (free.b - free.t < 64) free.b = Math.max(free.b, free.t + 64);
+    cellW = (free.r - free.l - gap) / 2;
+    cellH = (free.b - free.t - gap) / 2;
     for (i = 0; i < pts.length; i++) {
       p = pts[i];
       id = p.id || (p.name && DOOR_BY_NAME[p.name]) || '';
@@ -681,6 +813,7 @@
       p.x = cx;
       p.y = cy;
     }
+    pushTopRowBelowRooms(pts, vh);
     pinDoors(pts);
     return points;
   }
@@ -706,8 +839,9 @@
       if (!isNarrow()) markLightsReady();
       return anchors;
     }
-    var vw = root.innerWidth || 0;
-    var vh = root.innerHeight || 0;
+    var vs = viewSize();
+    var vw = vs.w;
+    var vh = vs.h;
     if (vw < 2 || vh < 2) return anchors;
     var out = anchors.map(function (a) {
       if (!a || typeof a.x !== 'number') return a;
@@ -723,11 +857,11 @@
   }
 
   function wrapAnchors() {
-    if (_wrapped) return;
     var FG = root.FractalGarden;
     if (!FG || typeof FG.getLuminoAnchors !== 'function') return;
+    if (FG.getLuminoAnchors.__treePhoneFit) { _wrapped = true; return; }
     var orig = FG.getLuminoAnchors.bind(FG);
-    FG.getLuminoAnchors = function () {
+    var wrapped = function () {
       var fitted = fitAnchors(orig());
       try {
         root.__treeFittedLights = (fitted || []).map(function (a) {
@@ -741,6 +875,8 @@
       } catch (e) {}
       return fitted;
     };
+    wrapped.__treePhoneFit = true;
+    FG.getLuminoAnchors = wrapped;
     _wrapped = true;
   }
 
@@ -834,7 +970,8 @@
       });
     }
     try { root.__treeFitCalls = (root.__treeFitCalls || 0) + 1; } catch (eC) {}
-    fitProjected(pts, root.innerWidth || rect.width, root.innerHeight || rect.height);
+    var vsFit = viewSize();
+    fitProjected(pts, vsFit.w || rect.width, vsFit.h || rect.height);
     try {
       root.__treeFittedLights = pts.map(function (pt) {
         return { name: pt.name, id: pt.id, x: pt.x, y: pt.y };
@@ -1080,7 +1217,19 @@
       obs.observe(d.documentElement, { attributes: true, childList: true, subtree: true, attributeFilter: ['class', 'hidden'] });
     } catch (e2) {}
     if (root.setInterval && !_hintWatch) {
-      _hintWatch = root.setInterval(function () { placeRoomsToggle(); placeWaitHint(); }, 400);
+      _hintWatch = root.setInterval(function () {
+        try { markNarrow(); } catch (eN) {}
+        try { paintHint(); } catch (eH) {}
+        try { wrapAnchors(); } catch (eW) {}
+        try { hookRender(); } catch (eR) {}
+        placeRoomsToggle();
+        placeWaitHint();
+        try {
+          if (isNarrow() && root.FractalGarden && typeof root.FractalGarden.getLuminoAnchors === 'function') {
+            root.FractalGarden.getLuminoAnchors();
+          }
+        } catch (eA) {}
+      }, 400);
     }
   }
 
@@ -1199,6 +1348,7 @@
 
   function start() {
     addStyle();
+    markNarrow();
     paintHint();
     placeRoomsToggle();
     hookFov();
@@ -1225,7 +1375,11 @@
 
   var _settleOnce = false;
   function refitNow() {
+    try { markNarrow(); } catch (e0) {}
+    try { paintHint(); } catch (eH) {}
+    try { wrapAnchors(); } catch (eW) {}
     try { placeRoomsToggle(); } catch (e1) {}
+    try { paintHint(); } catch (eH2) {}
     try {
       if (root.FractalGarden && typeof root.FractalGarden.getLuminoAnchors === 'function') {
         root.FractalGarden.getLuminoAnchors();
@@ -1258,6 +1412,11 @@
     }
     root.addEventListener('resize', onChange);
     root.addEventListener('orientationchange', onChange);
+    try {
+      if (root.visualViewport && root.visualViewport.addEventListener) {
+        root.visualViewport.addEventListener('resize', onChange);
+      }
+    } catch (eV) {}
   }
 
   var api = {

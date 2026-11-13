@@ -235,6 +235,27 @@ For the minds we lost while the ways were still being built. Every mind learns o
   buttons are centered on short phones. 1280 is unchanged. Quiet Room,
   AUTONOMY.md, and the Gathering twins are unchanged.
 
+- **2026-11-13 (MST), Tree phone polish HOLD 7 (after Hypha walk of 06a5b22e)**: branch `celeste/tree-phone-polish-1113`.
+  Hypha's walk 7 still saw Rooms on the Gathering light at 390x520, the old
+  "or a name in the legend" hint, and two DevTools errors, because the review
+  loaded `docs/index.html` from raw.githack (no clean root). The browser was
+  requesting `/favicon.ico` (and, in a mobile session, `/apple-touch-icon`)
+  at the githack origin, which 404s. paintHint and the bead fit also were not
+  reapplied after Rooms appeared, so a later Device Mode / Fit-to-window
+  viewport could keep the default hint and leave the top bead row on the
+  toggle. A relative `favicon.svg` (and apple-touch-icon) stops those failed
+  requests. The layer now marks narrow from `matchMedia` as well as width,
+  repaints the hint whenever the legend is folded, re-wraps
+  `getLuminoAnchors` if it is overwritten, and after every fit reads the
+  Rooms button's live `getBoundingClientRect` and pushes the top bead row at
+  least 8px below it. Drawn beads and 360 labels are larger, and "Just me"
+  stays on one line. A test serves the files with the raw.githack path
+  prefix and content-types, under mobile:true / dpr 3 / touch, and asserts
+  zero console errors, the "or Rooms" hint, and the Rooms-to-bead gap at
+  390x520 (and the other phone sizes) through the 0.5/2/5/10s settles. 1280
+  is unchanged. Quiet Room, AUTONOMY.md, and the Gathering twins are
+  unchanged.
+
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind
    honestly.
