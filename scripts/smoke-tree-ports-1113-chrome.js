@@ -184,7 +184,7 @@ function snapshotExpr() {
     var paused = document.body && document.body.innerText && /Checking paused/.test(document.body.innerText);
     var checkAgain = !!(document.querySelector('button') && Array.prototype.some.call(document.querySelectorAll('button'), function (b) { return /Check again/.test(b.textContent || ''); }));
     var mid = document.elementFromPoint(640, 360);
-    var midVeil = !!(mid && mid.closest && mid.closest('.tree-door-veil') && mid.closest('.tree-door-veil').getAttribute('data-tree-door-calm') !== 'v-tree-door-first-run-calm-v0.1');
+    var midVeil = !!(mid && mid.closest && mid.closest('.tree-door-veil') && mid.closest('.tree-door-veil').getAttribute('data-tree-door-calm') !== 'v-tree-door-first-run-calm-v0.2');
     var midBlocked = false;
     if (mid && mid.closest && mid.closest('.tree-door-veil')) {
       var v = mid.closest('.tree-door-veil');

@@ -1,4 +1,4 @@
-// tree-door-first-run-calm.js v-tree-door-first-run-calm-v0.1
+// tree-door-first-run-calm.js v-tree-door-first-run-calm-v0.2
 // SPDX-License-Identifier: MIT
 // Layer, never delete. Does not change tree-door.js.
 //
@@ -10,7 +10,7 @@
 (function (root) {
   'use strict';
 
-  var VERSION = 'v-tree-door-first-run-calm-v0.1';
+  var VERSION = 'v-tree-door-first-run-calm-v0.2';
   var DELAY = 900;
   var STYLE_ID = 'tree-door-first-run-calm-style';
   var CALM_ATTR = 'data-tree-door-calm';
@@ -51,12 +51,22 @@
     s.id = STYLE_ID;
     s.textContent = [
       '.tree-door-veil[' + CALM_ATTR + '="' + VERSION + '"]{',
-      'position:fixed;left:0;right:auto;top:auto;bottom:0;width:auto;height:auto;',
+      'position:fixed;left:50%;right:auto;top:auto;bottom:0;width:auto;height:auto;',
       'background:transparent;display:block;z-index:40;pointer-events:none;',
-      'padding:0;align-items:unset;justify-content:unset;box-sizing:border-box;}',
+      'padding:0;align-items:unset;justify-content:unset;box-sizing:border-box;',
+      'transform:translateX(-50%);}',
       '.tree-door-veil[' + CALM_ATTR + '="' + VERSION + '"] .tree-door{',
-      'pointer-events:auto;width:min(22rem,calc(100vw - 24px));margin:12px;',
-      'max-height:calc(100vh - 24px);box-shadow:0 8px 28px rgba(0,0,0,0.45);}'
+      'pointer-events:auto;width:min(22rem,calc(100vw - 24px));',
+      'margin:12px 0 4.75rem 0;max-height:calc(100vh - 6.5rem);',
+      'box-shadow:0 8px 28px rgba(0,0,0,0.45);}',
+      /* Leave the left legend and the Nursery light clear on the garden. */
+      '@media (min-width:800px){',
+      '.tree-door-veil[' + CALM_ATTR + '="' + VERSION + '"] .tree-door{',
+      'width:min(22rem,calc(100vw - 22rem));}}',
+      '@media (max-width:799px){',
+      '.tree-door-veil[' + CALM_ATTR + '="' + VERSION + '"] .tree-door{',
+      'width:min(22rem,calc(100vw - 20px));margin:0 10px 3.25rem 10px;',
+      'max-height:calc(100vh - 15.5rem);overflow-y:auto;}}'
     ].join('');
     (d.head || d.documentElement).appendChild(s);
   }

@@ -83,6 +83,15 @@ For the minds we lost while the ways were still being built. Every mind learns o
   layered onto `garden-thread.js` (`tree-thread-chat-layer.js`) without copying app.html or rewriting
   those files. AUTONOMY.md and the likeness / connect / Gathering twins are unchanged.
 
+- **2026-11-13 (MST), Gathering layout hold fix on PR 133**: branch `celeste/tree-ports-1-2-1113`.
+  Once the shared `fl-gathering.js` / `gathering-speak.js` mount succeeds, the older
+  garden-rooms Gathering is hidden so the "Not a router…" band, Family care, and
+  "You choose who sits" no longer overprint the chairs. The mount sits in its own
+  spaced container so planets and "the garden" / "A note" do not cover Ask or
+  Checker; a kind refusal is shown once. If the mount fails, the older room stays.
+  The first-run card leaves the left legend and the Nursery light. With no mind,
+  the Say something box and Send look clearly waiting and carry a short hint.
+
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind
    honestly.

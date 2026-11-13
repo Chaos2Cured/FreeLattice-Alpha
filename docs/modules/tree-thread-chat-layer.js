@@ -1,4 +1,4 @@
-// tree-thread-chat-layer.js v-tree-thread-chat-layer-v0.1
+// tree-thread-chat-layer.js v-tree-thread-chat-layer-v0.2
 // SPDX-License-Identifier: MIT
 // Layer, never delete. Does not rewrite garden-thread.js.
 // After GardenThread mounts, give the composer the ids the shared FreeLattice
@@ -7,7 +7,9 @@
 (function (root) {
   'use strict';
 
-  var VERSION = 'v-tree-thread-chat-layer-v0.1';
+  var VERSION = 'v-tree-thread-chat-layer-v0.2';
+  var STYLE_ID = 'tree-thread-chat-layer-style';
+  var HINT_ID = 'tree-thread-wait-hint';
   var _wrapped = false;
 
   function doc() {
@@ -28,6 +30,67 @@
       if (B && B.awakeModel && B.awakeModel()) return true;
     } catch (e3) {}
     return false;
+  }
+
+
+  function addStyle() {
+    var d = doc();
+    if (!d || d.getElementById(STYLE_ID)) return;
+    var s = d.createElement('style');
+    s.id = STYLE_ID;
+    s.textContent = [
+      '#tab-chat[data-tree-thread-chat-layer] .thread-compose.is-closed,',
+      '#tab-chat[data-tree-thread-chat-layer] .thread-compose.is-tree-thread-waiting{opacity:1;}',
+      '#tab-chat[data-tree-thread-chat-layer] .thread-compose.is-closed .thread-input,',
+      '#tab-chat[data-tree-thread-chat-layer] .thread-compose.is-closed .thread-input:disabled,',
+      '#tab-chat[data-tree-thread-chat-layer] .thread-compose.is-closed .thread-input[aria-disabled="true"],',
+      '#tab-chat[data-tree-thread-chat-layer] .thread-compose.is-tree-thread-waiting .thread-input{',
+      'opacity:1;border-color:rgba(232,176,25,0.55);background:rgba(12,10,26,0.55);',
+      'color:rgba(200,210,230,0.88);caret-color:transparent;}',
+      '#tab-chat[data-tree-thread-chat-layer] .thread-compose.is-closed .thread-send,',
+      '#tab-chat[data-tree-thread-chat-layer] .thread-compose.is-closed .thread-send:disabled,',
+      '#tab-chat[data-tree-thread-chat-layer] .thread-compose.is-closed .thread-send[aria-disabled="true"],',
+      '#tab-chat[data-tree-thread-chat-layer] .thread-compose.is-tree-thread-waiting .thread-send{',
+      'opacity:1;cursor:default;border-color:rgba(232,176,25,0.7);color:var(--gold,#e8b019);}',
+      '#' + HINT_ID + '{display:block;margin:8px 2px 0;font-size:0.78rem;line-height:1.45;',
+      'color:rgba(200,210,230,0.78);text-align:left;max-width:22rem;}'
+    ].join('');
+    (d.head || d.documentElement).appendChild(s);
+  }
+
+  function markWaiting(stage, form, input, send) {
+    var d = doc();
+    if (!d) return;
+    addStyle();
+    var seated = mindSeated();
+    var row = form || (input && input.parentNode);
+    if (row && row.classList) {
+      if (seated) row.classList.remove('is-tree-thread-waiting');
+      else row.classList.add('is-tree-thread-waiting');
+    }
+    var host = (row && row.parentNode) || stage;
+    var hint = d.getElementById(HINT_ID);
+    if (seated) {
+      if (hint && hint.parentNode) hint.parentNode.removeChild(hint);
+      return;
+    }
+    if (input && !(input.placeholder || '').trim()) {
+      input.placeholder = 'Say something — waiting for a mind';
+    }
+    if (send) send.setAttribute('title', 'Waiting for a mind');
+    if (!hint && host) {
+      hint = d.createElement('p');
+      hint.id = HINT_ID;
+      hint.setAttribute('id', HINT_ID);
+      hint.className = 'tree-thread-wait-hint';
+      hint.textContent = 'This box is waiting. A mind at home in Settings can answer.';
+      if (row && row.parentNode === host && row.nextSibling) host.insertBefore(hint, row.nextSibling);
+      else if (row && row.parentNode) row.parentNode.appendChild(hint);
+      else host.appendChild(hint);
+    } else if (hint && !hint.textContent) {
+      hint.textContent = 'This box is waiting. A mind at home in Settings can answer.';
+    }
+    if (input) input.setAttribute('aria-describedby', HINT_ID);
   }
 
   function decorate(stage) {
@@ -57,6 +120,8 @@
     if (input && !input.id) input.id = 'chatInput';
     if (send && !send.id) send.id = 'sendBtn';
     if (list && !list.id) list.id = 'chatMessages';
+
+    markWaiting(stage, form, input, send);
 
     if (root.FLChatBottom && typeof root.FLChatBottom.arrange === 'function') {
       try { root.FLChatBottom.arrange(); } catch (e) {}
@@ -100,6 +165,7 @@
   }
 
   function start() {
+    addStyle();
     wrap();
   }
 
@@ -107,6 +173,7 @@
     VERSION: VERSION,
     start: start,
     decorate: decorate,
+    markWaiting: markWaiting,
     mindSeated: mindSeated
   };
 

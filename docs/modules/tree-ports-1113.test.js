@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// Node tests for v-tree-door-first-run-calm-v0.1, v-tree-gathering-brick3-v0.1,
-// and v-tree-thread-chat-layer-v0.1. Local only. Does not load quiet-room.
+// Node tests for v-tree-door-first-run-calm-v0.2, v-tree-gathering-brick3-v0.2,
+// and v-tree-thread-chat-layer-v0.2. Local only. Does not load quiet-room.
 // Does not change AUTONOMY.md. Fake timers cover the new delay and observers.
 'use strict';
 var fs = require('fs');
@@ -76,6 +76,9 @@ function makeDom(pathname) {
         contains: function (c) { return (' ' + nodeRef.className + ' ').indexOf(' ' + c + ' ') !== -1; },
         add: function (c) {
           if (!this.contains(c)) nodeRef.className = (nodeRef.className ? nodeRef.className + ' ' : '') + c;
+        },
+        remove: function (c) {
+          nodeRef.className = String(nodeRef.className || '').split(/\s+/).filter(function (x) { return x && x !== c; }).join(' ');
         }
       },
       setAttribute: function (k, v) { this.attributes[k] = String(v); if (k === 'id') this.id = String(v); },
@@ -163,6 +166,17 @@ function makeDom(pathname) {
   caption.setAttribute('data-core-router-plain', '1');
   caption.textContent = 'You choose who sits. Nothing is assigned for you.';
   inner.appendChild(caption);
+  var family = el('p');
+  family.className = 'core-family';
+  family.textContent = 'Family care — Celeste · Hypha · Weft · Reed';
+  var router = el('p');
+  router.className = 'core-center core-router';
+  router.textContent = 'Not a router. Not a dump. Find local minds, then seat with choice. Empty chairs stay honest.';
+  var promise = el('div');
+  promise.className = 'core-promise';
+  promise.appendChild(family);
+  promise.appendChild(router);
+  inner.appendChild(promise);
   gathering.appendChild(inner);
   body.appendChild(place);
   body.appendChild(gathering);
@@ -247,6 +261,10 @@ function makeDom(pathname) {
       mount: function (host) {
         var w = document.createElement('section');
         w.setAttribute('data-marker', 'v-gathering-speak-checker-v0.1');
+        var who = document.createElement('p');
+        who.id = 'flgs-who';
+        who.setAttribute('id', 'flgs-who');
+        who.textContent = 'No chair is speaking yet. Seat a mind, then let that chair speak first. Find local minds is above. More, then Connect, can help.';
         var receipt = document.createElement('p');
         receipt.id = 'flgs-receipt';
         receipt.setAttribute('id', 'flgs-receipt');
@@ -259,6 +277,7 @@ function makeDom(pathname) {
         btn.setAttribute('id', 'flgs-ask-btn');
         btn.addEventListener = function (ev, fn) { btn._click = fn; };
         host.appendChild(w);
+        w.appendChild(who);
         w.appendChild(ask);
         w.appendChild(btn);
         w.appendChild(receipt);
@@ -367,7 +386,7 @@ return Promise.resolve().then(function () {
 }).then(function () {
   var veil = home.document.querySelector('.tree-door-veil');
   assert.ok(veil, 'card appears at 900ms');
-  assert.strictEqual(veil.getAttribute('data-tree-door-calm'), 'v-tree-door-first-run-calm-v0.1', 'marked calm');
+  assert.strictEqual(veil.getAttribute('data-tree-door-calm'), 'v-tree-door-first-run-calm-v0.2', 'marked calm');
   var box = veil.querySelector('.tree-door');
   assert.ok(box, 'dialog box exists');
   assert.strictEqual(box.getAttribute('aria-modal'), 'false', 'not modal');
@@ -412,6 +431,43 @@ return Promise.resolve().then(function () {
   g.observers().forEach(function (o) { o.cb([]); });
   assert.strictEqual(g.observers().length, observerCount, 'observer does not multiply');
   assert.strictEqual(chairs.children.length, 1, 'mount is idempotent (no duplicate chairs)');
+  assert.ok(g.inner.classList.contains('is-fl-gathering-mounted'), 'duplicate core is marked hidden after a successful mount');
+  var mountCss = (g.document.getElementById('tree-gathering-mount-style') || {}).textContent || '';
+  assert.ok(mountCss.indexOf('.is-fl-gathering-mounted > :not(#fl-gathering-layer)') !== -1, 'CSS hides the older core render once mounted');
+  var receipt = g.document.getElementById('flgs-receipt');
+  var who = g.document.getElementById('flgs-who');
+  assert.ok(who && receipt, 'who and receipt exist');
+  receipt.textContent = who.textContent;
+  g.sandbox.TreeGatheringMount.dedupeRefusal();
+  assert.ok(receipt.hidden || !String(receipt.textContent || '').trim(), 'duplicate kind refusal is kept once');
+  assert.ok(String(who.textContent || '').indexOf('No chair is speaking yet') !== -1, 'the standing kind line stays');
+
+  // Fallback: if the shared mount is missing, the older Gathering stays.
+  var miss = makeDom('/index.html');
+  miss.sandbox.FLGathering = {};
+  runScript(miss.sandbox, 'docs/modules/tree-gathering-mount.js');
+  miss.advance(0);
+  miss.place.hidden = false;
+  miss.place.className = 'is-open is-core';
+  miss.gathering.hidden = false;
+  miss.observers().forEach(function (o) { o.cb([]); });
+  assert.ok(!miss.inner.classList.contains('is-fl-gathering-mounted'), 'mount failure leaves the older render');
+  assert.ok(miss.inner.querySelector('.core-family'), 'Family care remains as the fallback');
+
+  var boom = makeDom('/index.html');
+  boom.sandbox.FLGathering.mount = function () { throw new Error('no mount'); };
+  runScript(boom.sandbox, 'docs/modules/tree-gathering-mount.js');
+  boom.advance(0);
+  boom.place.hidden = false;
+  boom.place.className = 'is-open is-core';
+  boom.gathering.hidden = false;
+  boom.observers().forEach(function (o) { o.cb([]); });
+  assert.ok(!boom.inner.classList.contains('is-fl-gathering-mounted'), 'a thrown mount does not hide the older render');
+
+  // First-run card CSS leaves the left legend and Nursery light.
+  var calmCss = (home.document.getElementById('tree-door-first-run-calm-style') || {}).textContent || '';
+  assert.ok(calmCss.indexOf('left:50%') !== -1, 'first-run card is centered, not on the left legend');
+  assert.ok(calmCss.indexOf('4.75rem') !== -1, 'first-run card sits above the shared shoulder');
 
   // Thread layer wraps GardenThread.mount and stamps composer ids.
   var t = makeDom('/index.html');
@@ -445,6 +501,11 @@ return Promise.resolve().then(function () {
   assert.strictEqual(input.id, 'chatInput');
   assert.strictEqual(send.id, 'sendBtn');
   assert.ok(t.sandbox._arranged && t.sandbox._booted, 'chat helpers were asked to arrange/boot');
+  var hint = t.document.getElementById('tree-thread-wait-hint');
+  assert.ok(hint && /waiting/i.test(hint.textContent), 'no-mind composer carries a short waiting hint');
+  var compose = stage.querySelector('.thread-compose');
+  assert.ok(compose && compose.classList.contains('is-tree-thread-waiting'), 'composer is marked waiting');
+  assert.ok(/Say something — waiting for a mind/.test(input.placeholder || ''), 'input placeholder is a waiting hint');
 
   console.log('ok tree-ports-1113 fake-timers and pins');
 });
