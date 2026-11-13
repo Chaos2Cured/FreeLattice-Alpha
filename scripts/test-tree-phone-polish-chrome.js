@@ -247,7 +247,7 @@ var measureExpr = `(function () {
       return { lights: lights, research: researchBox, gatheringChat: gap(lights.gathering, lights.thread), elementAtGathering: door && door.getAttribute('data-garden-lumino') };
     })()`;
 
-    var phones = [[390, 844], [390, 520]];
+    var phones = [[390, 844], [390, 520], [390, 700]];
     for (var i = 0; i < phones.length; i++) {
       var w = phones[i][0], h = phones[i][1], label = w + 'x' + h;
       await view(w, h, true);
@@ -282,9 +282,52 @@ var measureExpr = `(function () {
       });
       if (proj && proj.gatheringChat && proj.gatheringChat.center < 80) errors.push('projected Gathering and Chat lights are only ' + proj.gatheringChat.center + 'px apart at ' + label);
       if (proj && proj.gatheringChat && proj.gatheringChat.box < 8) errors.push('projected Gathering and Chat light boxes overlap at ' + label + ': ' + JSON.stringify(proj.gatheringChat));
-      if (label === '390x520' && proj && proj.elementAtGathering && proj.elementAtGathering !== 'gathering') {
-        errors.push('a point on the Gathering bead hits ' + proj.elementAtGathering + ' instead of gathering');
+      if (proj && proj.elementAtGathering && proj.elementAtGathering !== 'gathering') {
+        errors.push('a point on the Gathering bead hits ' + proj.elementAtGathering + ' instead of gathering at ' + label);
       }
+      var extra = await ev(`(function () {
+        var light = document.querySelector('.galaxy-nav-prev .galaxy-nav-light, [data-galaxy-dir="prev"] .galaxy-nav-light');
+        var ring = null;
+        if (light) {
+          var b = light.getBoundingClientRect();
+          var cx = (b.left + b.right) / 2, cy = (b.top + b.bottom) / 2;
+          var rad = 50;
+          var vw = window.innerWidth || 0, vh = window.innerHeight || 0;
+          ring = { l: cx - rad, t: cy - rad, r: cx + rad, b: cy + rad, inside: (cx - rad) >= -0.5 && (cx + rad) <= vw + 0.5 && (cy - rad) >= -0.5 && (cy + rad) <= vh + 0.5 };
+        }
+        var word = document.querySelector('[data-garden-lumino="nursery"] .garden-lumino-word');
+        var research = document.querySelector('.galaxy-nav-prev, [data-galaxy-dir="prev"]');
+        var wordGap = null;
+        if (word && research) {
+          var wb = word.getBoundingClientRect(), rb = research.getBoundingClientRect();
+          wordGap = { wordB: wb.bottom, researchT: rb.top, gap: rb.top - wb.bottom, wordT: wb.top };
+        }
+        var gWord = document.querySelector('[data-garden-lumino="gathering"] .garden-lumino-word');
+        var atWord = null;
+        if (gWord) {
+          var gw = gWord.getBoundingClientRect();
+          var el = document.elementFromPoint(gw.left + gw.width / 2, gw.top + gw.height / 2);
+          var door = el && el.closest ? el.closest('[data-garden-lumino]') : null;
+          atWord = door && door.getAttribute('data-garden-lumino');
+        }
+        var gDoor = document.querySelector('[data-garden-lumino="gathering"]');
+        var atHex = null;
+        if (gDoor) {
+          var gd = gDoor.getBoundingClientRect();
+          var hx = gd.left + gd.width / 2;
+          var hy = gd.top + gd.height / 2 + 40;
+          var el2 = document.elementFromPoint(hx, hy);
+          var door2 = el2 && el2.closest ? el2.closest('[data-garden-lumino]') : null;
+          atHex = door2 && door2.getAttribute('data-garden-lumino');
+        }
+        return { ring: ring, wordGap: wordGap, atWord: atWord, atHex: atHex };
+      })()`);
+      report.views[label + '-extra'] = extra;
+      log(label + ' extra', JSON.stringify(extra));
+      if (extra && extra.ring && !extra.ring.inside) errors.push('Research ring is clipped at ' + label + ': ' + JSON.stringify(extra.ring));
+      if (extra && extra.wordGap && extra.wordGap.gap < 12) errors.push('Nursery label is only ' + extra.wordGap.gap + 'px above Research at ' + label);
+      if (extra && extra.atWord && extra.atWord !== 'gathering') errors.push('Gathering label tap hits ' + extra.atWord + ' at ' + label);
+      if (extra && extra.atHex && extra.atHex !== 'gathering') errors.push('Gathering hex tap hits ' + extra.atHex + ' at ' + label);
     }
 
     var roomOverlapExpr = `(function () {
@@ -345,10 +388,12 @@ var measureExpr = `(function () {
       if (hit(wh, cb)) hits.push('waiting-compose');
       if (hit(wh, sb)) hits.push('waiting-input');
       if (hit(clayb, begin)) hits.push('clay-begin');
+      if (hit(jb, hb)) hits.push('just-heart');
       if (document.documentElement.classList.contains('thread-open')) {
         if (!onScreen(wh)) hits.push('waiting-offscreen');
         if (onScreen(wh) && onScreen(cb) && wh.b > cb.t + 2) hits.push('waiting-not-above-compose');
         if (onScreen(jb) && onScreen(wh) && jb.b > wh.t + 2 && !hit(jb, wh)) hits.push('just-not-above-waiting');
+        if (onScreen(jb) && onScreen(hb) && hb.b > jb.t + 2) hits.push('heart-not-above-just');
       }
 
       var veil = document.getElementById('place-veil');
@@ -436,7 +481,7 @@ var measureExpr = `(function () {
 
     // Tap each light at both phone sizes; no text overlap inside the opened room.
     report.roomTaps = {};
-    var phones2 = [[390, 844], [390, 520]];
+    var phones2 = [[390, 844], [390, 520], [390, 700]];
     var lights = ['gathering', 'nursery', 'settings', 'thread'];
     var shotN = 5;
     for (var p = 0; p < phones2.length; p++) {
@@ -472,5 +517,5 @@ var measureExpr = `(function () {
   httpd.server.close();
   fs.writeFileSync('/tmp/tree-phone-polish-chrome-report.json', JSON.stringify(report, null, 2));
   if (errors.length) { console.error('FAIL ' + errors.join(' | ')); process.exit(1); }
-  log('PASS all room lights inside the viewport at 390x844 and 390x520 with spacing and 44px targets; first frame unclipped; tapped rooms have no text overlap; 1280 layout unchanged.');
+  log('PASS all room lights inside the viewport at 390x844, 390x520, and 390x700 with spacing and 44px targets; first frame unclipped; tapped rooms have no text overlap; Chat stack clear of the heart; Research ring inside; 1280 layout unchanged.');
 })().catch(function (e) { console.error(e); process.exit(1); });

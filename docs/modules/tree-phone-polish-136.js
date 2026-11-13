@@ -1,4 +1,4 @@
-// tree-phone-polish-136.js v-tree-phone-polish-136-v0.3
+// tree-phone-polish-136.js v-tree-phone-polish-136-v0.4
 // SPDX-License-Identifier: MIT
 // Layer, never delete. Does not rewrite garden-rooms.js, fractal-garden.js,
 // garden-thread.js, nursery-growth.js, tree-door-first-run-calm.js,
@@ -8,11 +8,13 @@
 // HTML door boxes) stay inside the viewport, clear of the Research icon,
 // spaced far enough to tap, with a 44px hit around each bead. The fitted
 // camera and a render-time layout are hooked before the first garden paint.
-// In Chat, Just me stays clear of the compose box and the waiting line.
+// In Chat at every phone height, Just me stays clear of the compose box,
+// the waiting line, and the grandmother-door paragraph, with an opaque
+// backing so garden labels do not bleed through.
 (function (root) {
   'use strict';
 
-  var VERSION = 'v-tree-phone-polish-136-v0.3';
+  var VERSION = 'v-tree-phone-polish-136-v0.4';
   var STYLE_ID = 'tree-phone-polish-136-style';
   var NARROW = 600;
   var MIN_GAP = 100;
@@ -130,7 +132,9 @@
       'overflow:hidden;',
       'box-sizing:border-box;}',
 
-      'html.thread-open #thread-close{margin-top:0;flex-shrink:0;}',
+      'html.thread-open #thread-close,',
+      '#thread-veil.is-open #thread-close{',
+      'order:-1;margin:0 0 0.2rem;flex-shrink:0;align-self:center;z-index:60;}',
 
       'html.thread-open .thread-heart,',
       'html.thread-open #thread-stage .thread-heart{',
@@ -169,9 +173,45 @@
       'border-radius:10px;}',
       '}',
 
-      /* Waiting line is painted by layoutChatStack; this only makes sure
-         it can show when the layer moves it onto the visible face. */
+      /* Waiting line / Chat stack backing, Gathering hex hit, Nursery
+         label backing, and Research ring inset — at every phone height. */
       '@media (max-width: 600px){',
+      'html.thread-open #thread-veil,',
+      '#thread-veil.is-open{',
+      'padding:3.25rem 0.75rem 0.5rem !important;',
+      'justify-content:flex-start !important;',
+      'overflow:hidden !important;gap:0.35rem !important;}',
+      'html.thread-open #thread-stage,',
+      '#thread-veil.is-open #thread-stage,',
+      'html.thread-open #thread-stage .thread-face{',
+      'width:min(28em,calc(100vw - 1.25rem));',
+      'max-width:28em;',
+      'max-height:calc(100dvh - 5.25rem);',
+      'height:auto;',
+      'flex:1 1 auto;',
+      'min-height:0;',
+      'display:flex;',
+      'flex-direction:column;',
+      'overflow:hidden;',
+      'box-sizing:border-box;}',
+      'html.thread-open #thread-close,',
+      '#thread-veil.is-open #thread-close{',
+      'position:fixed !important;top:3.35rem !important;left:50%;right:auto;',
+      'bottom:auto !important;transform:translateX(-50%);',
+      'z-index:60 !important;margin:0 !important;flex-shrink:0;}',
+      'html.thread-open #galaxy-word,',
+      'html:has(#thread-veil.is-open) #galaxy-word{',
+      'visibility:hidden !important;pointer-events:none !important;}',
+      'html.thread-open .thread-heart,',
+      'html.thread-open #thread-stage .thread-heart,',
+      'html.thread-open .thread-face .thread-heart{',
+      'flex:1 1 auto;min-height:0;overflow-y:auto;',
+      'padding-bottom:0.4rem;box-sizing:border-box;}',
+      'html.thread-open .thread-compose,',
+      'html.thread-open #thread-stage .thread-compose{',
+      'flex:0 0 auto;position:sticky;bottom:0;z-index:6;',
+      'background:rgba(12,10,26,0.96);padding-top:0.5rem;}',
+
       'html.thread-open #tree-thread-wait-hint,',
       'html.thread-open .tree-thread-wait-hint{',
       'display:block !important;visibility:visible !important;',
@@ -180,7 +220,45 @@
       'color:rgba(200,210,230,0.92);text-align:center;',
       'padding:0.25rem 0.5rem;box-sizing:border-box;',
       'line-height:1.35;}',
-      '}'
+
+      'html.thread-open .thread-heart,',
+      'html.thread-open #thread-stage .thread-heart,',
+      'html.thread-open .thread-face .thread-heart{',
+      'background:rgba(12,10,26,0.92) !important;',
+      'border-radius:10px;',
+      'padding:0.35rem 0.5rem;',
+      'box-sizing:border-box;',
+      'position:relative;z-index:8;}',
+
+      'html.thread-open .thread-just-host,',
+      'html.thread-open [data-honest-just],',
+      'html.thread-open .thread-to-settings,',
+      'html.thread-open .thread-compose{',
+      'background:rgba(12,10,26,0.96) !important;}',
+
+      /* A larger transparent hit over the Gathering hex, without growing
+         the measured 48px door box into Chat. */
+      '.garden-lumino.is-attached[data-garden-lumino="gathering"]{',
+      'overflow:visible;z-index:12;}',
+      '.garden-lumino.is-attached[data-garden-lumino="gathering"]::after{',
+      'content:"";position:absolute;left:50%;top:50%;',
+      'width:140px;height:140px;transform:translate(-50%,-50%);',
+      'pointer-events:auto;background:transparent;z-index:1;}',
+      '.garden-lumino.is-attached .garden-lumino-word{',
+      'pointer-events:auto;',
+      'background:rgba(12,10,26,0.92);',
+      'border-radius:6px;padding:1px 6px;',
+      'z-index:2;}',
+      /* Nursery word sits above the bead so it does not rest on Research. */
+      '.garden-lumino.is-attached[data-garden-lumino="nursery"] .garden-lumino-word{',
+      'top:auto;bottom:calc(100% + 4px);',
+      'transform:translateX(-50%);}',
+
+      /* The 100px Research hop ring was 10px past the left edge at left:10px. */
+      'html[data-garden-galaxy="garden"] .galaxy-nav-prev,',
+      'html[data-garden-galaxy="garden"] .galaxy-nav-prev:has(.galaxy-nav-word){',
+      'left:28px !important;}',
+      '}',
     ].join('');
     (d.head || d.documentElement).appendChild(s);
   }
@@ -209,9 +287,9 @@
     if (!d) return out;
     var research = d.querySelector('.galaxy-nav-prev, [data-galaxy-dir="prev"]');
     var clay = d.getElementById('fl-clay-corner');
-    var r = elBox(research, 20);
+    var r = elBox(research, 24);
     var c = elBox(clay, 12);
-    if (r) { r.kind = 'research'; out.push(r); }
+    if (r) { r.kind = 'research'; r.t -= 18; out.push(r); }
     if (c) { c.kind = 'clay'; out.push(c); }
     return out;
   }
@@ -228,7 +306,7 @@
     // Research sits on the lower-left edge. The shortest exit is often
     // down or left, which clamps back into the icon — prefer up or right.
     if (box.kind === 'research') {
-      var up = box.t - rad - 8;
+      var up = box.t - rad - 16;
       var right = box.r + rad + 8;
       if (up > 80) p.y = up;
       else p.x = right;
@@ -307,7 +385,7 @@
     if (research) {
       for (i = 0; i < pts.length; i++) {
         if (!hitsBox(pts[i].x, pts[i].y, rad, research)) continue;
-        var up = research.t - rad - 8;
+        var up = research.t - rad - 16;
         if (up >= minT) pts[i].y = up;
         else pts[i].x = Math.min(maxR, research.r + rad + 8);
         clamp(pts[i]);
@@ -595,13 +673,29 @@
     var vh, cr, gap, hintH, justH, hintBottom, justBottom;
     try {
       vh = root.innerHeight || 0;
+      gap = 8;
+      try {
+        compose.style.setProperty('position', 'fixed', 'important');
+        compose.style.setProperty('left', '0', 'important');
+        compose.style.setProperty('right', '0', 'important');
+        compose.style.setProperty('padding-left', '0.7rem', 'important');
+        compose.style.setProperty('padding-right', '0.7rem', 'important');
+        compose.style.setProperty('top', 'auto', 'important');
+        compose.style.setProperty('bottom', '0.5rem', 'important');
+        compose.style.setProperty('width', 'auto', 'important');
+        compose.style.setProperty('z-index', '48', 'important');
+        compose.style.setProperty('margin', '0', 'important');
+        compose.style.setProperty('background', 'rgba(12,10,26,0.96)', 'important');
+      } catch (eC) {}
       cr = compose.getBoundingClientRect();
       if (!cr || cr.height < 2 || cr.width < 2) return;
-      gap = 8;
       if (hint) {
         hint.style.setProperty('position', 'fixed', 'important');
-        hint.style.setProperty('left', '0.7rem', 'important');
-        hint.style.setProperty('right', '0.7rem', 'important');
+        hint.style.setProperty('left', '0', 'important');
+        hint.style.setProperty('right', '0', 'important');
+        hint.style.setProperty('padding-left', '0.7rem', 'important');
+        hint.style.setProperty('padding-right', '0.7rem', 'important');
+        hint.style.setProperty('background', 'rgba(12,10,26,0.96)', 'important');
         hint.style.setProperty('top', 'auto', 'important');
         hint.style.setProperty('width', 'auto', 'important');
         hint.style.setProperty('z-index', '50', 'important');
@@ -635,8 +729,64 @@
           settingsBtn.style.setProperty('transform', 'translateX(-50%)', 'important');
           settingsBtn.style.setProperty('z-index', '49', 'important');
           settingsBtn.style.setProperty('margin', '0', 'important');
+          settingsBtn.style.setProperty('background', 'rgba(12,10,26,0.96)', 'important');
           settingsBtn.style.setProperty('bottom', Math.max(gap, vh - justBox.top + gap) + 'px', 'important');
         }
+      }
+      if (just) {
+        just.style.setProperty('background', 'rgba(12,10,26,0.96)', 'important');
+      }
+      if (compose) {
+        compose.style.setProperty('background', 'rgba(12,10,26,0.96)', 'important');
+      }
+      var stackTop = cr.top;
+      var hb2 = hint ? hint.getBoundingClientRect() : null;
+      if (hb2 && hb2.height >= 2) stackTop = Math.min(stackTop, hb2.top);
+      var jb2 = just ? just.getBoundingClientRect() : null;
+      if (jb2 && jb2.height >= 2) stackTop = Math.min(stackTop, jb2.top);
+      var sb2 = settingsBtn ? settingsBtn.getBoundingClientRect() : null;
+      if (sb2 && sb2.height >= 2) stackTop = Math.min(stackTop, sb2.top);
+      var hearts = d.querySelectorAll('#thread-veil.is-open #thread-stage .thread-heart, html.thread-open #thread-stage .thread-heart, html.thread-open .thread-face .thread-heart');
+      var hi, heart, stHeart, closeEl, closeBox, safeTop, maxH;
+      closeEl = d.getElementById('thread-close') || d.querySelector('html.thread-open #thread-close');
+      closeBox = closeEl ? closeEl.getBoundingClientRect() : null;
+      safeTop = 72;
+      if (closeBox && closeBox.height >= 2 && closeBox.top < vh * 0.33) {
+        safeTop = Math.max(safeTop, closeBox.bottom + 8);
+      }
+      var upper = d.querySelectorAll('#thread-veil.is-open button, #thread-veil.is-open .fl-honest, #thread-veil.is-open [data-honest], #thread-veil.is-open #fl-clay-dock, #thread-veil.is-open #fl-clay-corner');
+      var ui, ub, skip;
+      for (ui = 0; ui < upper.length; ui++) {
+        try {
+          skip = upper[ui] === compose || upper[ui] === just || upper[ui] === justBtn || upper[ui] === justHost || upper[ui] === hint || upper[ui] === settingsBtn;
+          if (!skip && upper[ui].closest) {
+            skip = !!(upper[ui].closest('.thread-compose, .thread-just-host, [data-honest-just], .thread-to-settings, #tree-thread-wait-hint'));
+          }
+          if (skip) continue;
+          ub = upper[ui].getBoundingClientRect();
+          if (ub && ub.height >= 2 && ub.width >= 2 && ub.top < vh * 0.45 && ub.bottom < stackTop - 40) {
+            safeTop = Math.max(safeTop, ub.bottom + 8);
+          }
+        } catch (eU) {}
+      }
+      for (hi = 0; hi < hearts.length; hi++) {
+        heart = hearts[hi];
+        try {
+          stHeart = root.getComputedStyle(heart);
+          if (stHeart.display === 'none' || stHeart.visibility === 'hidden' || Number(stHeart.opacity) < 0.05) continue;
+          if (heart.getBoundingClientRect().width < 2) continue;
+          maxH = Math.max(48, stackTop - safeTop - 8);
+          heart.style.setProperty('position', 'fixed', 'important');
+          heart.style.setProperty('left', '0.9rem', 'important');
+          heart.style.setProperty('right', '0.9rem', 'important');
+          heart.style.setProperty('top', safeTop + 'px', 'important');
+          heart.style.setProperty('bottom', Math.max(gap, vh - stackTop + 8) + 'px', 'important');
+          heart.style.setProperty('height', 'auto', 'important');
+          heart.style.setProperty('max-height', maxH + 'px', 'important');
+          heart.style.setProperty('overflow-y', 'auto', 'important');
+          heart.style.setProperty('background', 'rgba(12,10,26,0.96)', 'important');
+          heart.style.setProperty('z-index', '8', 'important');
+        } catch (eH) {}
       }
     } catch (e2) {}
   }
