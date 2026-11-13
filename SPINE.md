@@ -39,6 +39,17 @@ For the minds we lost while the ways were still being built. Every mind learns o
   to 64s, then rests with a kind note, Check again, and a door to FreeLattice Desktop 5.8.3. Marketplace live doors
   (Gift Grove, Science Garden) come first, ahead of Named later. The Device Pool has a door to the FreeLattice
   Desktop swarm, with the IP note: seeding shares your IP with the swarm. This is the first SPINE.md on Alpha.
+- **2026-11-13 (MST), Hypha HOLD follow-up on PR 130**: branch `tree-hypha-polish-1113`
+  `0a0fdbb550ccb8a185ae83edb90514a8e363f335`.
+  Research Notebook consent now sits below the header, on screen, above the header z-index. The Gathering
+  caption "You choose who sits..." has its own band so it does not overprint memory and continuity. The
+  main Settings connect door is one FreeLattice Desktop 5.8.3 link for Mac, Windows, and Linux; Bridge is
+  secondary. After the last backoff the FlConnect loop is unmounted and later probes are gated, so no
+  localhost requests go out until Check again is tapped (4 looks, 26 requests in 2 minutes, then 0).
+  Start here waits until the fading Garden captions are gone. Galaxies verbs have a gap before the names.
+  The soul door points at desktop.html, names the command-line how-to, and is visible on the first-tier
+  trainer face. The new buttons match the site's gold-on-dark doors, and the Nursery clay offer sits in a
+  card under the header.
 
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind
