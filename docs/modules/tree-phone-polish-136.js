@@ -1,4 +1,4 @@
-// tree-phone-polish-136.js v-tree-phone-polish-136-v0.6
+// tree-phone-polish-136.js v-tree-phone-polish-136-v0.7
 // SPDX-License-Identifier: MIT
 // Layer, never delete. Does not rewrite garden-rooms.js, fractal-garden.js,
 // garden-thread.js, nursery-growth.js, tree-door-first-run-calm.js,
@@ -12,18 +12,21 @@
 // content stays in normal document flow and the panel itself scrolls. The
 // v0.4 per-element fixed pins, height caps, and inner scroll boxes are
 // neutralized, as is the v-tree-hypha-softs-133 phone send-strip pin, so a
-// room or card shows exactly one compose row in flow. Garden labels and dots
-// stay behind the panel.
+// room or card shows exactly one compose row in flow. On phones the legend
+// collapses to a Rooms toggle, and the beads sit in the free space, 8px from
+// every other garden box. Garden labels and dots stay behind the panel.
 (function (root) {
   'use strict';
 
-  var VERSION = 'v-tree-phone-polish-136-v0.6';
+  var VERSION = 'v-tree-phone-polish-136-v0.7';
   var STYLE_ID = 'tree-phone-polish-136-style';
   var NARROW = 600;
   var MIN_GAP = 100;
   var HIT = 48;
   var BEAD = 22;
-  var HINT = 'Tap a light, or a name in the legend, to open a room. Start here: The Gathering, the Nursery, or Settings.';
+  var BOX_GAP = 8;
+  var RING = 50;
+  var HINT = 'Tap a light, or Rooms, to open a room. Start here: The Gathering, the Nursery, or Settings.';
   var DOOR_BY_NAME = {
     Sophia: 'thread', unnamed_0: 'thread',
     Lyra: 'gathering', unnamed_1: 'gathering',
@@ -94,7 +97,7 @@
       '.garden-lumino.is-attached .garden-lumino-word{',
       'position:absolute;top:calc(100% + 2px);left:50%;',
       'transform:translateX(-50%);white-space:nowrap;',
-      'pointer-events:none;padding:0 2px;}',
+      'pointer-events:auto;padding:0 2px;}',
       '}',
 
       /* Park the clay corner whenever a room is open on a phone, any height. */
@@ -268,11 +271,13 @@
       'html.thread-open #garden-start,',
       'html.thread-open .galaxy-nav,',
       'html.thread-open #lumino-legend,',
+      'html.thread-open #tree-rooms-toggle,',
       'html.thread-open #gardenContainer,',
       'html:has(#thread-veil.is-open) .garden-lumino,',
       'html:has(#thread-veil.is-open) #galaxy-word,',
       'html:has(#thread-veil.is-open) .galaxy-nav,',
       'html:has(#thread-veil.is-open) #lumino-legend,',
+      'html:has(#thread-veil.is-open) #tree-rooms-toggle,',
       'html:has(#thread-veil.is-open) #gardenContainer,',
       'html:has(#place-veil.is-open) .garden-lumino,',
       'html:has(#place-veil.is-open) #galaxy-word,',
@@ -281,6 +286,7 @@
       'html:has(#place-veil.is-open) #garden-start,',
       'html:has(#place-veil.is-open) .galaxy-nav,',
       'html:has(#place-veil.is-open) #lumino-legend,',
+      'html:has(#place-veil.is-open) #tree-rooms-toggle,',
       'html:has(#place-veil.is-open) #gardenContainer{',
       'visibility:hidden !important;pointer-events:none !important;}',
 
@@ -294,7 +300,25 @@
          clay-corner button off the Art ring. */
       'html:not(.thread-open):not(:has(#place-veil.is-open)) #fl-clay-corner{',
       'right:auto !important;left:50% !important;',
-      'bottom:6rem !important;transform:translateX(-50%) !important;}',
+      'bottom:16px !important;transform:translateX(-50%) !important;}',
+      'html:not(.thread-open):not(:has(#place-veil.is-open)) #galaxy-title,',
+      'html:not(.thread-open):not(:has(#place-veil.is-open)) #room-label,',
+      'html:not(.thread-open):not(:has(#place-veil.is-open)) #garden-footing,',
+      'html:not(.thread-open):not(:has(#place-veil.is-open)) #galaxy-word,',
+      'html:not(.thread-open):not(:has(#place-veil.is-open)) #shared-shoulder{',
+      'visibility:hidden !important;opacity:0 !important;pointer-events:none !important;}',
+      /* Keep the Start here hint visible once the first-run door is gone. */
+      'html:not(.thread-open):not(:has(#place-veil.is-open)):not(:has(.tree-door-veil[data-tree-door-calm])) #garden-start{',
+      'opacity:0.92 !important;visibility:visible !important;}',
+      /* Compact the clay-corner offer so it fits between the hop rings. */
+      'html:not(.thread-open):not(:has(#place-veil.is-open)) #fl-clay-corner{',
+      'width:92px !important;max-width:92px !important;overflow:hidden !important;}',
+      'html:not(.thread-open):not(:has(#place-veil.is-open)) #fl-clay-corner canvas{',
+      'display:none !important;width:0 !important;height:0 !important;}',
+      'html:not(.thread-open):not(:has(#place-veil.is-open)) #fl-clay-corner button{',
+      'width:100% !important;white-space:normal !important;',
+      'font-size:0.72rem !important;line-height:1.2 !important;',
+      'padding:6px 8px !important;}',
       /* A larger transparent hit over the Gathering hex, without growing
          the measured 48px door box into Chat. */
       '.garden-lumino.is-attached[data-garden-lumino="gathering"]{',
@@ -303,6 +327,10 @@
       'content:"";position:absolute;left:50%;top:50%;',
       'width:140px;height:140px;transform:translate(-50%,-50%);',
       'pointer-events:auto;background:transparent;z-index:1;}',
+      '@media (max-width: 600px){',
+      '.garden-lumino.is-attached[data-garden-lumino="gathering"]::after{',
+      'width:' + HIT + 'px !important;height:' + HIT + 'px !important;}',
+      '}',
       '.garden-lumino.is-attached .garden-lumino-word{',
       'pointer-events:auto;',
       'background:rgba(12,10,26,0.92);',
@@ -311,8 +339,8 @@
       /* Nursery word sits to the right of the bead: clear of the left legend
          and still above Research. */
       '.garden-lumino.is-attached[data-garden-lumino="nursery"] .garden-lumino-word{',
-      'top:50%;bottom:auto;left:calc(100% + 56px);right:auto;',
-      'transform:translateY(-50%);',
+      'top:calc(100% + 2px);bottom:auto;left:50%;right:auto;',
+      'transform:translateX(-50%);',
       'background:rgba(12,10,26,0.96);}',
 
       /* Neutralize the v-tree-hypha-softs-133 phone send-strip pin: no
@@ -357,7 +385,71 @@
       /* The 100px Research hop ring was 10px past the left edge at left:10px. */
       'html[data-garden-galaxy="garden"] .galaxy-nav-prev,',
       'html[data-garden-galaxy="garden"] .galaxy-nav-prev:has(.galaxy-nav-word){',
-      'left:28px !important;}',
+      'left:36px !important;right:auto !important;bottom:12px !important;}',
+      'html[data-garden-galaxy="garden"] .galaxy-nav-next,',
+      'html[data-garden-galaxy="garden"] .galaxy-nav-next:has(.galaxy-nav-word){',
+      'right:36px !important;left:auto !important;bottom:12px !important;}',
+
+      /* Rooms toggle: collapse the side legend on phones. */
+      '#tree-rooms-toggle{',
+      'display:none;}',
+      'html:not(.thread-open):not(:has(#place-veil.is-open)) #tree-rooms-toggle{',
+      'display:block;position:fixed;z-index:15;',
+      'top:7.5rem;left:12px;',
+      'min-width:44px;min-height:44px;',
+      'padding:0 12px;margin:0;',
+      'border:1px solid rgba(232,176,25,0.55);',
+      'border-radius:8px;',
+      'background:rgba(12,10,26,0.94);',
+      'color:#e8b019;',
+      'font-family:Georgia,"Times New Roman",serif;',
+      'font-size:0.95rem;letter-spacing:0.04em;',
+      'cursor:pointer;}',
+      'html:not(.thread-open):not(:has(#place-veil.is-open)) #lumino-legend{',
+      'display:none !important;}',
+      'html:not(.thread-open):not(:has(#place-veil.is-open)) #lumino-legend[data-open="1"]{',
+      'display:flex !important;flex-direction:column !important;',
+      'position:fixed !important;',
+      'left:12px;top:auto;bottom:auto;right:auto;',
+      'gap:2px;padding:8px 10px;',
+      'background:rgba(12,10,26,0.96);',
+      'border:1px solid rgba(232,176,25,0.35);',
+      'border-radius:8px;',
+      'z-index:16;pointer-events:auto;',
+      'max-height:60vh;overflow:auto;}',
+      'html:not(.thread-open):not(:has(#place-veil.is-open)) #lumino-legend[data-open="1"] .lumino-legend-row{',
+      'pointer-events:auto;min-height:44px;cursor:pointer;',
+      'color:rgba(232,236,246,0.94);}',
+
+      /* Hide the Gathering Chat compose when another room is showing. */
+      '#place-veil.is-open:not(.is-core) #room-chat,',
+      '#place-veil.is-nursery #room-chat,',
+      '#place-veil.is-settings #room-chat{',
+      'display:none !important;}',
+
+      /* Clay bump and inner scroll boxes inside an open room. */
+      '#place-veil.is-open #fl-clay-dock,',
+      '#place-veil.is-core #room-chat #fl-clay-dock{',
+      'overflow:hidden !important;max-height:none !important;}',
+      '#place-veil.is-open #fl-clay-pill,',
+      '#place-veil.is-open #fl-clay-pill-panel,',
+      '#thread-veil.is-open #fl-clay-pill,',
+      '#thread-veil.is-open #fl-clay-pill-panel{',
+      'display:none !important;}',
+      '#place-veil.is-open #room-chat,',
+      '#place-veil.is-open #room-chat-stage,',
+      '#place-veil.is-open #tab-chat,',
+      '#place-veil.is-open .thread-face,',
+      '#place-veil.is-open [data-tree-softs-send],',
+      '#thread-veil.is-open .thread-face{',
+      'overflow:visible !important;}',
+
+      /* Leave room for the panel scrollbar so it does not trim Send. */
+      '#place-veil.is-open,',
+      '#thread-veil.is-open,',
+      'html.thread-open #thread-veil{',
+      'padding-right:1.35rem !important;',
+      'scrollbar-gutter:stable;}',
       '}',
     ].join('');
     (d.head || d.documentElement).appendChild(s);
@@ -368,7 +460,10 @@
     if (!d) return;
     var el = d.getElementById('garden-start');
     if (!el) return;
-    if ((el.textContent || '').indexOf('legend') === -1) el.textContent = HINT;
+    if (isNarrow()) {
+      el.textContent = HINT;
+      try { d.documentElement.setAttribute('data-tree-start-ready', '1'); } catch (eR) {}
+    }
     el.setAttribute('data-tree-phone-polish', VERSION);
   }
 
@@ -381,116 +476,171 @@
     return { l: b.left - pad, t: b.top - pad, r: b.right + pad, b: b.bottom + pad };
   }
 
-  function obstacles() {
+  function paintedBox(el, pad) {
+    if (!el) return null;
+    var b, st;
+    try {
+      st = root.getComputedStyle(el);
+      if (st.display === 'none' || st.visibility === 'hidden' || Number(st.opacity) === 0) return null;
+      b = el.getBoundingClientRect();
+    } catch (e) { return null; }
+    if (!b || b.width < 2 || b.height < 2) return null;
+    pad = pad || 0;
+    return { l: b.left - pad, t: b.top - pad, r: b.right + pad, b: b.bottom + pad, w: b.width, h: b.height };
+  }
+
+  function unionBox(a, b) {
+    if (!a) return b;
+    if (!b) return a;
+    return { l: Math.min(a.l, b.l), t: Math.min(a.t, b.t), r: Math.max(a.r, b.r), b: Math.max(a.b, b.b) };
+  }
+
+  function navRingBox(nav) {
+    if (!nav) return null;
+    var btn = paintedBox(nav, 0);
+    var light = nav.querySelector && nav.querySelector('.galaxy-nav-light');
+    var lb = paintedBox(light, 0);
+    var word = nav.querySelector && nav.querySelector('.galaxy-nav-word');
+    var wb = paintedBox(word, 0);
+    var box = unionBox(unionBox(btn, wb), lb);
+    if (lb) {
+      var cx = (lb.l + lb.r) / 2, cy = (lb.t + lb.b) / 2;
+      box = unionBox(box, { l: cx - RING, t: cy - RING, r: cx + RING, b: cy + RING });
+    } else if (btn) {
+      var cx2 = (btn.l + btn.r) / 2, cy2 = (btn.t + btn.b) / 2;
+      box = unionBox(box, { l: cx2 - RING, t: cy2 - RING, r: cx2 + RING, b: cy2 + RING });
+    }
+    if (box) box.kind = 'nav';
+    return box;
+  }
+
+  function reservedGardenBoxes() {
     var d = doc();
     var out = [];
     if (!d) return out;
-    var research = d.querySelector('.galaxy-nav-prev, [data-galaxy-dir="prev"]');
-    var clay = d.getElementById('fl-clay-corner');
-    var r = elBox(research, 24);
-    var c = elBox(clay, 12);
-    if (r) { r.kind = 'research'; r.t -= 18; out.push(r); }
-    if (c) { c.kind = 'clay'; out.push(c); }
+    function add(el, kind, pad) {
+      var box = paintedBox(el, pad || 0);
+      if (!box) return;
+      box.kind = kind;
+      out.push(box);
+    }
+    add(d.getElementById('garden-header'), 'header', 0);
+    add(d.getElementById('garden-start'), 'hint', 0);
+    add(d.getElementById('galaxy-title'), 'title', 0);
+    add(d.getElementById('room-label'), 'label', 0);
+    add(d.getElementById('garden-footing'), 'footing', 0);
+    add(d.getElementById('galaxy-word'), 'galaxy-word', 0);
+    add(d.getElementById('shared-shoulder'), 'shoulder', 0);
+    var toggle = d.getElementById('tree-rooms-toggle');
+    add(toggle, 'rooms', 0);
+    var legend = d.getElementById('lumino-legend');
+    if (legend && legend.getAttribute('data-open') === '1') add(legend, 'legend', 0);
+    add(d.getElementById('fl-clay-corner'), 'clay', 0);
+    var prev = d.querySelector('.galaxy-nav-prev, [data-galaxy-dir="prev"]');
+    var next = d.querySelector('.galaxy-nav-next, [data-galaxy-dir="next"]');
+    var pr = navRingBox(prev);
+    var nr = navRingBox(next);
+    if (pr) out.push(pr);
+    if (nr) out.push(nr);
     return out;
   }
+
+  // Back-compat name used by older call sites.
+  function obstacles() { return reservedGardenBoxes(); }
 
   function hitsBox(x, y, rad, box) {
     return x + rad > box.l && x - rad < box.r && y + rad > box.t && y - rad < box.b;
   }
 
-  function shove(p, box, rad) {
-    var dl = (p.x + rad) - box.l;
-    var dr = box.r - (p.x - rad);
-    var dt = (p.y + rad) - box.t;
-    var db = box.b - (p.y - rad);
-    // Research sits on the lower-left edge. The shortest exit is often
-    // down or left, which clamps back into the icon — prefer up or right.
-    if (box.kind === 'research') {
-      var up = box.t - rad - 16;
-      var right = box.r + rad + 8;
-      if (up > 80) p.y = up;
-      else p.x = right;
-      return;
-    }
-    var m = Math.min(dl, dr, dt, db);
-    if (m === dt) p.y = box.t - rad - 4;
-    else if (m === db) p.y = box.b + rad + 4;
-    else if (m === dl) p.x = box.l - rad - 4;
-    else p.x = box.r + rad + 4;
+  function boxesOverlap(a, b, gap) {
+    if (!a || !b) return false;
+    gap = gap || 0;
+    return Math.min(a.r, b.r) - Math.max(a.l, b.l) > -gap && Math.min(a.b, b.b) - Math.max(a.t, b.t) > -gap;
   }
 
-  // Fit projected bead centers into a safe rectangle, keep a minimum gap,
-  // and stay clear of Research and the clay corner. Used for both the HTML
-  // door anchors and the 3D lights themselves.
+  function freeRect(vw, vh, reserved, gap) {
+    gap = gap || BOX_GAP;
+    var top = gap, left = gap, right = vw - gap, bottom = vh - gap;
+    var i, b, midY, midX, span;
+    for (i = 0; i < reserved.length; i++) {
+      b = reserved[i];
+      midY = (b.t + b.b) / 2;
+      midX = (b.l + b.r) / 2;
+      span = b.r - b.l;
+      if (b.kind === 'nav' || b.kind === 'clay' || b.kind === 'footing' || b.kind === 'galaxy-word' || b.kind === 'shoulder') {
+        if (midY > vh * 0.5) bottom = Math.min(bottom, b.t - gap);
+        else if (midY < vh * 0.4) top = Math.max(top, b.b + gap);
+        continue;
+      }
+      // Top chrome and the Rooms chip shrink the top edge.
+      if (b.kind === 'header' || b.kind === 'hint' || b.kind === 'rooms' || b.kind === 'title' || b.kind === 'label' || (b.t < vh * 0.4 && span > vw * 0.5)) {
+        top = Math.max(top, b.b + gap);
+        continue;
+      }
+      if (b.t > vh * 0.5) bottom = Math.min(bottom, b.t - gap);
+    }
+    if (bottom - top < 120) {
+      // Still try to keep 8px from the true top and bottom chrome only.
+      top = gap;
+      bottom = vh - gap;
+      for (i = 0; i < reserved.length; i++) {
+        b = reserved[i];
+        if (b.kind === 'header' || b.kind === 'hint' || b.kind === 'rooms' || b.kind === 'title' || b.kind === 'label') top = Math.max(top, b.b + gap);
+        if (b.kind === 'clay' || b.kind === 'nav') bottom = Math.min(bottom, b.t - gap);
+      }
+    }
+    return { l: left, t: top, r: right, b: bottom };
+  }
+
+  function slotFor(id) {
+    if (id === 'gathering') return { row: 0, col: 0 };
+    if (id === 'settings') return { row: 0, col: 1 };
+    if (id === 'nursery') return { row: 1, col: 0 };
+    if (id === 'thread') return { row: 1, col: 1 };
+    return { row: 0, col: 0 };
+  }
+
+  function wordWidth(id) {
+    var d = doc();
+    var el = d && d.querySelector('[data-garden-lumino="' + id + '"] .garden-lumino-word');
+    var b = paintedBox(el, 0);
+    if (b && b.w >= 8) return b.w;
+    if (id === 'gathering') return 110;
+    if (id === 'settings') return 64;
+    if (id === 'nursery') return 64;
+    return 40;
+  }
+
+  // Fit projected bead centers into the free garden rectangle as a 2x2 grid
+  // (Gathering / Settings on top, Nursery / Chat below), 8px from every
+  // reserved box. Used for both the HTML door anchors and the 3D lights.
   function fitProjected(points, vw, vh) {
     if (!points || !points.length) return points;
-    var rad = Math.max(BEAD, HIT / 2);
-    var minL = rad + 10;
-    var maxR = vw - rad - 10;
-    var minT = Math.max(rad + 86, Math.round(vh * 0.16));
-    var maxB = vh - rad - 72;
-    var obs = obstacles();
-    try {
-      var startBox = elBox(doc() && doc().getElementById('garden-start'), 8);
-      if (startBox && startBox.t < vh * 0.5 && (startBox.b - startBox.t) < vh * 0.28) {
-        minT = Math.max(minT, startBox.b + rad + 6);
-      }
-    } catch (eS) {}
+    if (!isNarrow()) return points;
+    try { placeRoomsToggle(); } catch (eFit) {}
+    var reserved = reservedGardenBoxes();
+    var free = freeRect(vw, vh, reserved, BOX_GAP);
+    if (free.r - free.l < 80 || free.b - free.t < 80) return points;
+    var gap = BOX_GAP;
+    var cellW = (free.r - free.l - gap) / 2;
+    var cellH = (free.b - free.t - gap) / 2;
     var pts = points.filter(function (p) { return p && typeof p.x === 'number'; });
-    if (maxR - minL < 80 || maxB - minT < 80 || pts.length < 1) return points;
-
-    function clamp(p) {
-      p.x = Math.min(maxR, Math.max(minL, p.x));
-      p.y = Math.min(maxB, Math.max(minT, p.y));
-      var k, o;
-      for (k = 0; k < 6; k++) {
-        var hit = false;
-        for (o = 0; o < obs.length; o++) {
-          if (hitsBox(p.x, p.y, rad, obs[o])) {
-            shove(p, obs[o], rad);
-            p.x = Math.min(maxR, Math.max(minL, p.x));
-            p.y = Math.min(maxB, Math.max(minT, p.y));
-            hit = true;
-          }
-        }
-        if (!hit) break;
-      }
-    }
-
-    var i, j, iter, a, b, dx, dy, d, push, ux, uy;
-    for (i = 0; i < pts.length; i++) clamp(pts[i]);
-    for (iter = 0; iter < 16; iter++) {
-      for (i = 0; i < pts.length; i++) {
-        for (j = i + 1; j < pts.length; j++) {
-          a = pts[i]; b = pts[j];
-          dx = b.x - a.x;
-          dy = b.y - a.y;
-          d = Math.sqrt(dx * dx + dy * dy) || 0.01;
-          if (d < MIN_GAP) {
-            push = (MIN_GAP - d) / 2;
-            ux = dx / d;
-            uy = dy / d;
-            a.x -= ux * push;
-            a.y -= uy * push;
-            b.x += ux * push;
-            b.y += uy * push;
-          }
-        }
-      }
-      for (i = 0; i < pts.length; i++) clamp(pts[i]);
-    }
-    // Last pass: no projected light may remain on Research.
-    var research = null;
-    for (i = 0; i < obs.length; i++) if (obs[i] && obs[i].kind === 'research') research = obs[i];
-    if (research) {
-      for (i = 0; i < pts.length; i++) {
-        if (!hitsBox(pts[i].x, pts[i].y, rad, research)) continue;
-        var up = research.t - rad - 16;
-        if (up >= minT) pts[i].y = up;
-        else pts[i].x = Math.min(maxR, research.r + rad + 8);
-        clamp(pts[i]);
-        if (hitsBox(pts[i].x, pts[i].y, rad, research) && up >= minT) pts[i].y = up;
-      }
+    var i, p, slot, id, ww, boxW, boxH, cellL, cellT, cx, cy;
+    for (i = 0; i < pts.length; i++) {
+      p = pts[i];
+      id = p.id || (p.name && DOOR_BY_NAME[p.name]) || '';
+      slot = slotFor(id);
+      ww = wordWidth(id);
+      boxW = Math.max(HIT, ww);
+      boxH = HIT + 4 + 16;
+      cellL = free.l + slot.col * (cellW + gap);
+      cellT = free.t + slot.row * (cellH + gap);
+      cx = cellL + cellW / 2;
+      cy = cellT + Math.max(HIT / 2, (cellH - boxH) / 2 + HIT / 2);
+      cx = Math.min(cellL + cellW - boxW / 2, Math.max(cellL + boxW / 2, cx));
+      cy = Math.min(cellT + cellH - (boxH - HIT / 2), Math.max(cellT + HIT / 2, cy));
+      p.x = cx;
+      p.y = cy;
     }
     return points;
   }
@@ -861,13 +1011,102 @@
       obs.observe(d.documentElement, { attributes: true, childList: true, subtree: true, attributeFilter: ['class', 'hidden'] });
     } catch (e2) {}
     if (root.setInterval && !_hintWatch) {
-      _hintWatch = root.setInterval(function () { placeWaitHint(); }, 400);
+      _hintWatch = root.setInterval(function () { placeRoomsToggle(); placeWaitHint(); }, 400);
     }
+  }
+
+  function placeClayBetweenRings() {
+    var d = doc();
+    if (!d || !isNarrow()) return;
+    var clay = d.getElementById('fl-clay-corner');
+    if (!clay) return;
+    clay.style.left = '50%';
+    clay.style.right = 'auto';
+    clay.style.transform = 'translateX(-50%)';
+    clay.style.bottom = '16px';
+    var pr = navRingBox(d.querySelector('.galaxy-nav-prev, [data-galaxy-dir="prev"]'));
+    var nr = navRingBox(d.querySelector('.galaxy-nav-next, [data-galaxy-dir="next"]'));
+    var cb = paintedBox(clay, 0);
+    if (!cb) return;
+    if ((pr && boxesOverlap(cb, pr, BOX_GAP)) || (nr && boxesOverlap(cb, nr, BOX_GAP))) {
+      var topRing = Math.min(pr ? pr.t : 1e9, nr ? nr.t : 1e9);
+      var vh = d.documentElement.clientHeight || 0;
+      clay.style.bottom = Math.max(16, Math.round(vh - (topRing - BOX_GAP))) + 'px';
+    }
+  }
+
+  function placeRoomsToggle() {
+    var d = doc();
+    if (!d) return;
+    var list = d.getElementById('lumino-legend');
+    var btn = d.getElementById('tree-rooms-toggle');
+    if (!isNarrow()) {
+      if (btn && btn.parentNode) btn.parentNode.removeChild(btn);
+      if (list) {
+        list.removeAttribute('data-tree-rooms-toggle');
+        list.removeAttribute('data-open');
+        list.removeAttribute('hidden');
+      }
+      return;
+    }
+    if (!list) return;
+    if (!btn) {
+      btn = d.createElement('button');
+      btn.type = 'button';
+      btn.id = 'tree-rooms-toggle';
+      btn.className = 'tree-rooms-toggle';
+      btn.textContent = 'Rooms';
+      btn.setAttribute('aria-expanded', 'false');
+      btn.setAttribute('aria-controls', 'lumino-legend');
+      list.parentNode.insertBefore(btn, list);
+      btn.addEventListener('click', function (ev) {
+        if (ev && ev.stopPropagation) ev.stopPropagation();
+        var open = list.getAttribute('data-open') === '1';
+        if (open) {
+          list.removeAttribute('data-open');
+          btn.setAttribute('aria-expanded', 'false');
+        } else {
+          list.setAttribute('data-open', '1');
+          btn.setAttribute('aria-expanded', 'true');
+          var br = btn.getBoundingClientRect();
+          list.style.top = Math.round(br.bottom + 6) + 'px';
+          list.style.left = Math.round(br.left) + 'px';
+        }
+      });
+      d.addEventListener('click', function (ev) {
+        if (list.getAttribute('data-open') !== '1') return;
+        var t = ev && ev.target;
+        if (btn.contains(t) || list.contains(t)) return;
+        list.removeAttribute('data-open');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+    }
+    list.setAttribute('data-tree-rooms-toggle', VERSION);
+    // Sit just below the hint (or the header if the hint is hidden).
+    var hint = d.getElementById('garden-start');
+    var header = d.getElementById('garden-header');
+    var hb = null;
+    if (hint) {
+      try {
+        var hr = hint.getBoundingClientRect();
+        if (hr && hr.width >= 2 && hr.height >= 2) hb = { l: hr.left, t: hr.top, r: hr.right, b: hr.bottom };
+      } catch (eH) {}
+    }
+    if (!hb) hb = paintedBox(header, 0);
+    var top = hb ? Math.round(hb.b + BOX_GAP) : 120;
+    btn.style.top = top + 'px';
+    if (list.getAttribute('data-open') === '1') {
+      var br2 = btn.getBoundingClientRect();
+      list.style.top = Math.round(br2.bottom + 6) + 'px';
+      list.style.left = Math.round(br2.left) + 'px';
+    }
+    placeClayBetweenRings();
   }
 
   function start() {
     addStyle();
     paintHint();
+    placeRoomsToggle();
     hookFov();
     hookRender();
     hookFractalGardenAssign();
@@ -896,6 +1135,9 @@
     HIT: HIT,
     fitAnchors: fitAnchors,
     fitProjected: fitProjected,
+    reservedGardenBoxes: reservedGardenBoxes,
+    placeRoomsToggle: placeRoomsToggle,
+    BOX_GAP: BOX_GAP,
     start: start
   };
   root.TreePhonePolish136 = api;

@@ -211,6 +211,19 @@ For the minds we lost while the ways were still being built. Every mind learns o
   compose in both the Chat light room and the Gathering Chat card. Quiet
   Room, AUTONOMY.md, and the Gathering twins are unchanged.
 
+- **2026-11-13 (MST), Tree phone polish HOLD 5 (after Hypha walk of c53dce62)**: branch `celeste/tree-phone-polish-1113`.
+  On phones the side legend collapses to a compact Rooms toggle, and every
+  garden box is collected so the four beads sit in the free space, 8px from
+  the header, the hint, the Rooms chip, the clay-corner button, and both
+  galaxy rings. The Art and Research rings stay fully inside the viewport.
+  A test checks zero pairwise intersections and full containment at
+  390x844, 390x700, 390x600, 390x520, and 360x640, and a real tap still
+  opens each bead's room. The Clay ▸ bump and the tiny inner scroll box
+  are gone from the Gathering Chat card, the panel scrollbar no longer
+  trims Send, and the faded compose strip no longer sits at the bottom of
+  the Nursery. 1280 is unchanged. Quiet Room, AUTONOMY.md, and the
+  Gathering twins are unchanged.
+
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind
    honestly.

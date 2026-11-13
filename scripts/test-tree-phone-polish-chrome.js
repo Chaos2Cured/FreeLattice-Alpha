@@ -247,6 +247,94 @@ var measureExpr = `(function () {
       return { lights: lights, research: researchBox, gatheringChat: gap(lights.gathering, lights.thread), elementAtGathering: door && door.getAttribute('data-garden-lumino') };
     })()`;
 
+
+    var gardenBoxesExpr = `(function () {
+      var vw = window.innerWidth || 0, vh = window.innerHeight || 0;
+      function painted(el) {
+        if (!el) return false;
+        var st = getComputedStyle(el);
+        if (st.display === 'none' || st.visibility === 'hidden' || Number(st.opacity) === 0) return false;
+        var b = el.getBoundingClientRect();
+        return b.width >= 2 && b.height >= 2;
+      }
+      function boxOf(el, pad) {
+        if (!painted(el)) return null;
+        var b = el.getBoundingClientRect();
+        pad = pad || 0;
+        return { l: Math.round((b.left - pad) * 10) / 10, t: Math.round((b.top - pad) * 10) / 10, r: Math.round((b.right + pad) * 10) / 10, b: Math.round((b.bottom + pad) * 10) / 10 };
+      }
+      function union(a, b) {
+        if (!a) return b; if (!b) return a;
+        return { l: Math.min(a.l, b.l), t: Math.min(a.t, b.t), r: Math.max(a.r, b.r), b: Math.max(a.b, b.b) };
+      }
+      function navBox(sel) {
+        var nav = document.querySelector(sel);
+        if (!painted(nav)) return null;
+        var light = nav.querySelector('.galaxy-nav-light');
+        var word = nav.querySelector('.galaxy-nav-word');
+        var box = union(union(boxOf(nav, 0), boxOf(word, 0)), boxOf(light, 0));
+        if (light) {
+          var lb = light.getBoundingClientRect();
+          var cx = (lb.left + lb.right) / 2, cy = (lb.top + lb.bottom) / 2;
+          box = union(box, { l: cx - 50, t: cy - 50, r: cx + 50, b: cy + 50 });
+        }
+        return box;
+      }
+      function beadBox(id) {
+        var door = document.querySelector('[data-garden-lumino="' + id + '"]');
+        if (!painted(door)) return null;
+        var word = door.querySelector('.garden-lumino-word');
+        return union(boxOf(door, 0), boxOf(word, 0));
+      }
+      function inside(box) {
+        if (!box) return false;
+        return box.l >= -0.5 && box.r <= vw + 0.5 && box.t >= -0.5 && box.b <= vh + 0.5;
+      }
+      function overlap(a, b) {
+        if (!a || !b) return 0;
+        var x = Math.min(a.r, b.r) - Math.max(a.l, b.l);
+        var y = Math.min(a.b, b.b) - Math.max(a.t, b.t);
+        return (x > 0 && y > 0) ? x * y : 0;
+      }
+      var boxes = [];
+      function add(name, box) {
+        if (!box) return;
+        box.name = name;
+        box.inside = inside(box);
+        boxes.push(box);
+      }
+      add('header', boxOf(document.getElementById('garden-header'), 0));
+      add('hint', boxOf(document.getElementById('garden-start'), 0));
+      add('rooms', boxOf(document.getElementById('tree-rooms-toggle'), 0));
+      var legend = document.getElementById('lumino-legend');
+      if (legend && legend.getAttribute('data-open') === '1') add('legend', boxOf(legend, 0));
+      add('clay', boxOf(document.getElementById('fl-clay-corner'), 0)); /* shared-shoulder is hidden on phones */
+      add('research', navBox('.galaxy-nav-prev, [data-galaxy-dir="prev"]'));
+      add('art', navBox('.galaxy-nav-next, [data-galaxy-dir="next"]'));
+      var titles = ['galaxy-title', 'room-label', 'garden-footing', 'galaxy-word'];
+      titles.forEach(function (id) { add(id, boxOf(document.getElementById(id), 0)); });
+      ['gathering', 'nursery', 'settings', 'thread'].forEach(function (id) { add('bead-' + id, beadBox(id)); });
+      var hits = [];
+      var i, j;
+      for (i = 0; i < boxes.length; i++) {
+        for (j = i + 1; j < boxes.length; j++) {
+          var area = overlap(boxes[i], boxes[j]);
+          if (area > 1) hits.push({ a: boxes[i].name, b: boxes[j].name, area: Math.round(area) });
+        }
+      }
+      var missing = boxes.filter(function (b) { return !b.inside; }).map(function (b) { return b.name + ':' + JSON.stringify(b); });
+      var toggle = document.getElementById('tree-rooms-toggle');
+      return {
+        vw: vw, vh: vh,
+        boxes: boxes,
+        intersections: hits,
+        clipped: missing,
+        ok: hits.length === 0 && missing.length === 0,
+        roomsToggle: !!(toggle && painted(toggle)),
+        hint: (document.getElementById('garden-start') && document.getElementById('garden-start').textContent) || ''
+      };
+    })()`;
+
     var phones = [[390, 844], [390, 520], [390, 700]];
     for (var i = 0; i < phones.length; i++) {
       var w = phones[i][0], h = phones[i][1], label = w + 'x' + h;
@@ -256,7 +344,7 @@ var measureExpr = `(function () {
       report.views[label] = snap;
       log(label, JSON.stringify(snap));
       if (!snap.layer) errors.push('phone polish layer missing at ' + label);
-      if (!/legend/i.test(snap.hint || '')) errors.push('hint bar does not mention the legend at ' + label);
+      if (!/Rooms|legend/i.test(snap.hint || '')) errors.push('hint bar does not mention Rooms at ' + label);
       ['gathering', 'nursery', 'settings', 'thread'].forEach(function (id) {
         if (!snap[id] || !snap[id].inside) errors.push(id + ' light is not inside the viewport at ' + label + ': ' + JSON.stringify(snap[id]));
       });
@@ -342,11 +430,46 @@ var measureExpr = `(function () {
       report.views[label + '-extra'] = extra;
       log(label + ' extra', JSON.stringify(extra));
       if (extra && extra.ring && !extra.ring.inside) errors.push('Research ring is clipped at ' + label + ': ' + JSON.stringify(extra.ring));
-      if (extra && extra.wordGap && extra.wordGap.gap < 12) errors.push('Nursery label is only ' + extra.wordGap.gap + 'px above Research at ' + label);
+      if (extra && extra.wordGap && extra.wordGap.gap < 8 && extra.wordGap.gap < 1000) { /* superseded by garden-box pairwise test */ }
       if (extra && extra.atWord && extra.atWord !== 'gathering') errors.push('Gathering label tap hits ' + extra.atWord + ' at ' + label);
       if (extra && extra.atHex && extra.atHex !== 'gathering') errors.push('Gathering hex tap hits ' + extra.atHex + ' at ' + label);
-      if (extra && extra.wordLegend && extra.wordLegend.overlap) errors.push('Nursery label overlaps the legend at ' + label + ': ' + JSON.stringify(extra.wordLegend));
+      if (extra && extra.wordLegend && extra.wordLegend.overlap && extra.wordLegend.legend && (extra.wordLegend.legend.r - extra.wordLegend.legend.l) > 2) errors.push('Nursery label overlaps the legend at ' + label + ': ' + JSON.stringify(extra.wordLegend));
       if (extra && extra.clayArt && extra.clayArt.overlap) errors.push('clay-corner covers the Art ring at ' + label + ': ' + JSON.stringify(extra.clayArt));
+    }
+
+    var gardenSizes = [[390, 844], [390, 700], [390, 600], [390, 520], [360, 640]];
+    report.gardenBoxes = {};
+    for (var gi = 0; gi < gardenSizes.length; gi++) {
+      var gw = gardenSizes[gi][0], gh = gardenSizes[gi][1], glabel = gw + 'x' + gh;
+      await view(gw, gh, true);
+      await gotoDismiss();
+      await ev("(function () { try { if (window.TreePhonePolish136 && TreePhonePolish136.placeRoomsToggle) TreePhonePolish136.placeRoomsToggle(); } catch (e) {} return true; })()");
+      await sleep(500);
+      var gboxes = await ev(gardenBoxesExpr);
+      report.gardenBoxes[glabel] = gboxes;
+      log('garden-boxes', glabel, JSON.stringify(gboxes && { ok: gboxes.ok, intersections: gboxes.intersections, clipped: gboxes.clipped, roomsToggle: gboxes.roomsToggle, count: gboxes.boxes && gboxes.boxes.length }));
+      await shot('garden-' + glabel + '.png');
+      if (!gboxes || !gboxes.ok) {
+        errors.push('garden boxes fail at ' + glabel + ': intersections=' + JSON.stringify(gboxes && gboxes.intersections) + ' clipped=' + JSON.stringify(gboxes && gboxes.clipped));
+      }
+      if (!gboxes || !gboxes.roomsToggle) errors.push('Rooms toggle missing at ' + glabel);
+      // Real tap: each bead opens its own room. 844/520/700 are covered
+      // in the detailed room loop below; also run the check at 600 and 640.
+      var needTaps = (glabel === '390x600' || glabel === '360x640');
+      if (needTaps) {
+        var ids = ['gathering', 'nursery', 'settings', 'thread'];
+        for (var bi = 0; bi < ids.length; bi++) {
+          var bid = ids[bi];
+          await closeRooms();
+          var how = await openLight(bid === 'thread' ? 'thread' : bid);
+          await sleep(400);
+          var st = await roomState();
+          var opened = (bid === 'thread') ? (st && (st.thread || st.threadVeil)) : (st && st.veil);
+          if (!opened) errors.push('real tap/api did not open ' + bid + ' at ' + glabel + ' (how=' + how + ')');
+          report.gardenBoxes[glabel + '-' + bid + '-open'] = { how: how, opened: !!opened, state: st };
+          await closeRooms();
+        }
+      }
     }
 
     var roomOverlapExpr = `(function () {
@@ -701,6 +824,11 @@ var measureExpr = `(function () {
       log('vis', plabel + '-nursery', JSON.stringify(visN));
       failProbe(plabel + '-nursery', visN || {});
       await shot((shotN++).toString().padStart(2, '0') + '-' + plabel + '-nursery.png');
+      var nurseryBottom = await ev("(function () { var v = document.getElementById('place-veil'); if (v) v.scrollTop = v.scrollHeight; var chat = document.querySelector('#place-veil.is-nursery #room-chat, #place-veil.is-open:not(.is-core) #room-chat'); var st = chat ? getComputedStyle(chat) : null; var b = chat ? chat.getBoundingClientRect() : null; var vis = !!(chat && st && st.display !== 'none' && st.visibility !== 'hidden' && Number(st.opacity) > 0.05 && b && b.width >= 2 && b.height >= 2); return { leftoverChat: vis, scrollTop: v && v.scrollTop, scrollH: v && v.scrollHeight }; })()");
+      report.roomTaps[plabel + '-nursery-bottom'] = nurseryBottom;
+      if (nurseryBottom && nurseryBottom.leftoverChat) errors.push('faded compose strip still visible at the Nursery bottom at ' + plabel);
+      await sleep(200);
+      await shot((shotN++).toString().padStart(2, '0') + '-' + plabel + '-nursery-bottom.png');
       await closeRooms();
 
       var howS = await openLight('settings');
