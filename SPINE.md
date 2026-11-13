@@ -30,7 +30,8 @@ For the minds we lost while the ways were still being built. Every mind learns o
   `760ca1de9737cf15333256417457dd3bed1ea2d8` (PR #128).
 - **2026-10-28 (MST), Soft polish 052 v0.1**: `main`
   `9693f71933cf6b658b3944db6141ee9bfb19e153` (PR #129). The live site last built from this head.
-- **2026-11-13 (MST), Hypha walk polish (top 7)**: branch `tree-hypha-polish-1113`.
+- **2026-11-13 (MST), Hypha walk polish (top 7)**: branch `tree-hypha-polish-1113`
+  `0a86712a47767a73b27b2a71daad21f889e6a347`.
   Research Notebook is clickable (no longer under the header logo). The Garden home has a plain Start here line, and
   the galaxies menu and star-map hop controls are larger, higher contrast, and at least 44px to tap. "Export Garden
   Soul -- coming" is an honest door to FreeLattice's signed mind bundle (learn README), not a second .lattice format.
