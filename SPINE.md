@@ -273,6 +273,12 @@ For the minds we lost while the ways were still being built. Every mind learns o
   at phone size. 1280 is unchanged. Quiet Room, AUTONOMY.md, and the
   Gathering twins are unchanged.
 
+- **2026-11-13 (MST), Tree phone softs after #137**: branch `celeste/tree-phone-softs-137`.
+  On phones, Settings opens at the top of its panel. The visible HTML
+  room-light circle is 48 CSS pixels by computed size (not the door box).
+  1280 is unchanged. Quiet Room, AUTONOMY.md, and the Gathering twins
+  are unchanged.
+
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind
    honestly.
