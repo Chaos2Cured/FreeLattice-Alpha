@@ -82,6 +82,7 @@ assert.ok(index.indexOf('modules/garden-trainer.js') < index.indexOf('modules/tr
 assert.ok(/https:\/\/freelattice\.com\/desktop\.html/.test(soulSrc), 'soul door points at Desktop');
 assert.ok(/does not invent a second \.lattice format/.test(soulSrc), 'no second format');
 assert.ok(/command-line how-to lives with the learn tools/.test(soulSrc), 'plain CLI line');
+assert.ok(/A safe, sealed copy of your mind you can carry to another computer/.test(soulSrc), 'plain words, not signed-mind-bundle jargon');
 assert.ok(/trainer-simple-face/.test(soulSrc) && /tree-soul-door-first/.test(soulSrc), 'first-tier door on the simple face');
 
 var soul = {};
@@ -181,8 +182,12 @@ assert.ok(/takeRecords/.test(calmSrc) && /disconnect/.test(calmSrc), 'observer i
 assert.ok(/data-garden-room="settings"/.test(cssTc) === false || /\[data-garden-room="settings"\] #shared-shoulder/.test(cssTc), 'settings shoulder rule present');
 assert.ok(/html\.room-page\[data-garden-room="settings"\] #shared-shoulder/.test(cssTc), 'settings shoulder is not fixed over One-click');
 assert.ok(/position: relative;/.test(cssTc) && /#shared-shoulder/.test(cssTc), 'shoulder becomes in-flow on Settings');
-assert.ok(/top: 6\.75rem;/.test(cssTc), 'nursery clay offer sits below the room caption');
-assert.ok(/max-width: 20rem;/.test(cssTc), 'nursery clay offer stays a compact card');
+assert.ok(/position: relative;/.test(cssTc), 'nursery clay offer is in-flow, not a fixed bar');
+assert.ok(/max-width: min\(20rem, calc\(100vw - 32px\)/.test(cssTc), 'nursery clay offer is no wider than the viewport minus margins');
+assert.ok(/a\.tree-soul-door/.test(cssTc) && /color: #f3d98a;/.test(cssTc), 'soul door uses the gold link style');
+assert.ok(/treeSettingsOpenAtTop/.test(read('docs/settings.html')), 'Settings opens at the top');
+assert.ok(/#place-veil\.is-core #room-chat \.thread-send/.test(cssTc) && /background: rgba\(232, 176, 25, 0\.22\)/.test(cssTc), 'Gathering Send is clearly visible');
+assert.ok(/caret-color: #f3d98a;/.test(cssTc), 'Gathering send box is clearly visible');
 assert.ok(/\.fl-honest-btn \{/.test(cssTc), 'Gathering chat buttons are styled');
 assert.ok(/#place-veil\.is-core #room-chat \.thread-input/.test(cssTc), 'Gathering send box contrast');
 assert.ok(/a\.flc-btn\.tree-desktop-door/.test(cssTc) && /align-items: center;/.test(cssTc) && /line-height: 1\.2;/.test(cssTc), 'Desktop label is vertically centered');

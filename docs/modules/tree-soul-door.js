@@ -13,7 +13,7 @@
   var MARK = 'Export Garden Soul';
   var BUNDLE_HREF = 'https://freelattice.com/desktop.html';
   var DOOR_LABEL = 'FreeLattice Desktop 5.8.3';
-  var DOOR_LINE = 'A signed mind bundle can travel with you. The simple door is FreeLattice Desktop. A command-line how-to lives with the learn tools.';
+  var DOOR_LINE = 'A safe, sealed copy of your mind you can carry to another computer. The simple door is FreeLattice Desktop. A command-line how-to lives with the learn tools.';
 
   function doc() {
     try { return root.document || null; } catch (e) { return null; }
@@ -41,6 +41,11 @@
       a.style.minWidth = '44px';
       a.style.boxSizing = 'border-box';
       a.style.textDecoration = 'none';
+      a.style.color = '#f3d98a';
+      a.style.background = 'rgba(12, 10, 26, 0.86)';
+      a.style.border = '1px solid rgba(232, 176, 25, 0.45)';
+      a.style.borderRadius = '10px';
+      a.style.padding = '10px 14px';
     } catch (e) {}
   }
 
