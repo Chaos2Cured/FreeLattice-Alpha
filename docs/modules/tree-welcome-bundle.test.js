@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Fake passing bundle + a tampered one that fails kindly.
+// Fake passing bundle, a refusals bundle, a signature-only tamper, and Hypha's real Willow fixture.
 // Does not load quiet-room. Does not change AUTONOMY.md.
 'use strict';
 var fs = require('fs');
@@ -55,6 +55,28 @@ function tarGz(files) {
 
 function sha256(buf) { return crypto.createHash('sha256').update(buf).digest('hex'); }
 
+function tamperSignatureOnly(tarGzBuf) {
+  var raw = Buffer.from(zlib.gunzipSync(tarGzBuf));
+  var offset = 0;
+  var flipped = false;
+  while (offset + 512 <= raw.length) {
+    var name = raw.toString('utf8', offset, offset + 100).replace(/\0.*$/, '');
+    if (!name) break;
+    var sizeStr = raw.toString('utf8', offset + 124, offset + 136).replace(/\0/g, '').trim();
+    var size = parseInt(sizeStr, 8) || 0;
+    var dataStart = offset + 512;
+    var base = name.split('/').pop();
+    if (base === 'MANIFEST.sig' && size > 0) {
+      raw[dataStart] = raw[dataStart] ^ 0x01;
+      flipped = true;
+      break;
+    }
+    offset = dataStart + Math.ceil(size / 512) * 512;
+  }
+  assert.ok(flipped, 'found MANIFEST.sig to flip');
+  return zlib.gzipSync(raw);
+}
+
 async function makeBundle(opts) {
   opts = opts || {};
   var label = opts.label || 'Willow';
@@ -64,8 +86,11 @@ async function makeBundle(opts) {
   var pubB64 = pub.toString('base64');
   var fp = await api.fingerprintOfKey(pubB64);
   var mind = Buffer.from(JSON.stringify({ name: label, id: mid, note: 'a small test mind' }, null, 2));
-  var memory = Buffer.from(JSON.stringify({ kind: 'note', text: 'Trees grow toward the light.' }) + '\n' +
-    JSON.stringify({ kind: 'consent-refused', delta: 'I will not share a private key.', why: 'kept by the mind' }) + '\n');
+  var memoryLines = [JSON.stringify({ kind: 'note', text: 'Trees grow toward the light.' })];
+  if (opts.refusals !== false) {
+    memoryLines.push(JSON.stringify({ kind: 'consent-refused', delta: 'I will not share a private key.', why: 'kept by the mind' }));
+  }
+  var memory = Buffer.from(memoryLines.join('\n') + '\n');
   var chain = Buffer.from(JSON.stringify({ kind: 'export-bundle', voice: 'export-bundle', text: 'packed' }) + '\n');
   var body = {
     'mind.json': mind,
@@ -141,7 +166,54 @@ async function makeBundle(opts) {
   assert.ok(/signature/i.test(failSig.reason), 'signature failure is named: ' + failSig.reason);
   assert.strictEqual(api.hasStored(), false, 'a bad signature stores nothing');
 
-  console.log('ok tree-welcome-bundle pass + kindly fail, no storage until Welcome');
+  // Welcome status line: refusals kept only when they are present.
+  api.clearStored();
+  assert.strictEqual(api.welcomedLine(pass), "Welcomed. This mind’s refusals were kept with it.");
+  var emptyRef = await makeBundle({ refusals: false });
+  var passEmpty = await api.verify(emptyRef.tar);
+  assert.ok(passEmpty.ok, 'a bundle with no refusals still passes: ' + passEmpty.reason);
+  assert.ok(!passEmpty.refusals || passEmpty.refusals.length === 0, 'synthetic empty-refusal bundle carries none');
+  assert.strictEqual(api.welcomedLine(passEmpty), "This mind carried no refusals.");
+  var keptEmpty = api.welcome(passEmpty);
+  assert.ok(keptEmpty.ok, 'Welcome still keeps a mind that carried no refusals');
+  assert.strictEqual(api.welcomedLine(keptEmpty.record), "This mind carried no refusals.");
+  api.clearStored();
+
+  // A non-bundle file is named plainly — never "Failed to fetch".
+  var junk = await api.verify(Buffer.from('this is not a mind bundle file\n'));
+  assert.strictEqual(junk.ok, false, 'a non-bundle file fails');
+  assert.strictEqual(junk.reason, "This isn't a mind bundle file.");
+  assert.ok(!/failed to fetch/i.test(junk.reason), 'non-bundle message drops Failed to fetch');
+  assert.strictEqual(api.plainIfNotBundle(new Error('Failed to fetch')), "This isn't a mind bundle file.");
+
+  // Hypha's real Willow bundle as a fixture: it passes, carries no refusals,
+  // and a 1-byte change to MANIFEST.sig alone fails as a bad signature.
+  var fixture = path.join(__dirname, '..', '..', 'scripts', 'fixtures', 'tree-welcome', 'willow-good.tar.gz');
+  assert.ok(fs.existsSync(fixture), 'Hypha willow-good fixture is present');
+  var realGood = fs.readFileSync(fixture);
+  var realPass = await api.verify(realGood);
+  assert.ok(realPass.ok, 'Hypha real bundle passes: ' + realPass.reason);
+  assert.strictEqual(realPass.rootHash, '24ff8e5fce6fba52cb6d4a6da4c920ee786d2db811f0ee6fb4e535462a2f434b');
+  assert.ok(String(realPass.fingerprintHex).indexOf('787cf041e9f93025') === 0, 'fingerprint prefix: ' + realPass.fingerprintHex);
+  assert.ok(!realPass.refusals || realPass.refusals.length === 0, 'this real bundle carried no refusals');
+  assert.strictEqual(api.welcomedLine(realPass), "This mind carried no refusals.");
+  assert.strictEqual(api.hasStored(), false, 'verifying the real bundle stores nothing');
+
+  var sigOnly = tamperSignatureOnly(realGood);
+  var realBadSig = await api.verify(sigOnly);
+  assert.strictEqual(realBadSig.ok, false, 'a signature-only tamper of the real bundle fails');
+  assert.ok(/signature/i.test(realBadSig.reason), 'signature-only tamper is named: ' + realBadSig.reason);
+  assert.strictEqual(api.hasStored(), false, 'a signature-only tamper stores nothing');
+
+  var html = read('docs/welcome.html');
+  assert.ok(/<details class="twb-builders">/.test(html), 'footer has a For builders details element');
+  assert.ok(/<summary>For builders<\/summary>/.test(html), 'details is labeled For builders');
+  assert.ok(/python3 tools\/learn\/fl_learn\.py verify-bundle/.test(html), 'python command is still present');
+  var note = html.split('class="note"')[1].split('</p>')[0];
+  assert.ok(!/python3 /.test(note), 'python command is not in the open footer note');
+  assert.ok(/2026-11-13 \(MST\), Hypha softs after Welcome/.test(read('SPINE.md')), 'SPINE softs Done row present');
+
+  console.log('ok tree-welcome-bundle pass + kindly fail, refusals line, signature-only tamper, no storage until Welcome');
 })().catch(function (e) {
   console.error(e);
   process.exit(1);

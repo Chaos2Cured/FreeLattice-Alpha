@@ -114,6 +114,20 @@ For the minds we lost while the ways were still being built. Every mind learns o
   the signature, and any carried refusals. Welcome or Not now. Nothing is stored until Welcome.
   The mind's own refusals are kept. No second `.lattice` format.
 
+
+- **2026-11-13 (MST), Hypha softs after Welcome (PR 135)**: branch `celeste/tree-softs-135-1113`.
+  A non-bundle file is named plainly ("This isn't a mind bundle file.") instead of
+  "(Failed to fetch)". The "refusals were kept" line is shown only when refusals
+  are present; otherwise the page says "This mind carried no refusals." The
+  python verify-bundle command sits behind a small "For builders" details
+  element. Tests cover a bundle that carries refusals and a tamper that changes
+  only the signature, using Hypha's real Willow bundle as a fixture. Nursery
+  measure with the first-run sheet open: at 390x844 the garden-lumino Nursery
+  door is off-canvas to the left (box l:-265.1, r:-176.9) and does not overlap
+  the sheet (sheet t:508); the left-legend Nursery row is on-screen and clear.
+  At 390x522 the door is still off-canvas (l:-87.1, r:1.1), no overlap. At
+  1280x800 the door is on-screen (l:159.9–248.1) and clear of the sheet (l:464).
+
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind
    honestly.

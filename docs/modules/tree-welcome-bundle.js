@@ -1,4 +1,4 @@
-// tree-welcome-bundle.js v-tree-welcome-bundle-v0.1
+// tree-welcome-bundle.js v-tree-welcome-bundle-v0.2
 // SPDX-License-Identifier: MIT
 // Layer, never delete. Verifies a FreeLattice signed mind bundle
 // (fl-learn-mind-bundle-v0.1, the same contract as tools/learn/fl_learn.py
@@ -7,7 +7,7 @@
 (function (root) {
   'use strict';
 
-  var VERSION = 'v-tree-welcome-bundle-v0.1';
+  var VERSION = 'v-tree-welcome-bundle-v0.2';
   var STORE_KEY = 'tree-welcome-bundle-v0.1';
   var DOMAIN = 'lattice.pair.v1';
   var BUNDLE_KIND = 'fl-learn-mind-bundle-v0.1';
@@ -275,11 +275,29 @@
     return out;
   }
 
+  var NOT_A_BUNDLE = "This isn't a mind bundle file.";
+
+  function plainIfNotBundle(err) {
+    var msg = String(err && err.message || err || '');
+    if (/failed to fetch/i.test(msg) || /incorrect header check/i.test(msg) ||
+        /not a readable tar\.gz/i.test(msg) || /invalid gzip|unknown compression|ERR_ZLIB/i.test(msg) ||
+        /gzip is not available/i.test(msg)) {
+      return NOT_A_BUNDLE;
+    }
+    return msg || NOT_A_BUNDLE;
+  }
+
+  function welcomedLine(result) {
+    var refusals = (result && result.refusals) || [];
+    if (refusals.length) return "Welcomed. This mind’s refusals were kept with it.";
+    return "This mind carried no refusals.";
+  }
+
   function parseTarGz(bytes) {
     return gunzip(bytes).then(function (raw) {
       return { ok: true, members: parseTar(raw) };
     }).catch(function (e) {
-      return { ok: false, reason: 'not a readable tar.gz (' + (e && e.message || e) + ')' };
+      return fail(NOT_A_BUNDLE);
     });
   }
 
@@ -485,7 +503,7 @@
         setStatus(result.ok ? 'The checks passed. Nothing is stored yet.' : 'The check stopped. Nothing was stored.');
         return result;
       }).catch(function (e) {
-        lastResult = fail(String(e && e.message || e));
+        lastResult = fail(plainIfNotBundle(e));
         renderResult(out, lastResult);
         setStatus('The check stopped. Nothing was stored.');
         return lastResult;
@@ -520,7 +538,7 @@
       if (btn.getAttribute('data-tree-welcome') === 'yes') {
         var kept = welcome(lastResult);
         if (kept.ok) {
-          setStatus('Welcomed. This mind’s refusals were kept with it.');
+          setStatus(welcomedLine(lastResult));
           var yes = out.querySelector('.twb-actions');
           if (yes) yes.innerHTML = '<p class="twb-kept">Welcomed on this device.</p>';
         } else {
@@ -544,6 +562,9 @@
     verify: verify,
     collectRefusals: collectRefusals,
     welcome: welcome,
+    welcomedLine: welcomedLine,
+    NOT_A_BUNDLE: NOT_A_BUNDLE,
+    plainIfNotBundle: plainIfNotBundle,
     paint: function (doc, result) {
       var d = doc || root.document;
       if (!d) return;
