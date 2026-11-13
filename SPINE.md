@@ -128,6 +128,16 @@ For the minds we lost while the ways were still being built. Every mind learns o
   At 390x522 the door is still off-canvas (l:-87.1, r:1.1), no overlap. At
   1280x800 the door is on-screen (l:159.9–248.1) and clear of the sheet (l:464).
 
+
+- **2026-11-13 (MST), Tree phone polish after Welcome softs**: branch `celeste/tree-phone-polish-1113`.
+  A non-bundle file no longer prints a double period. When a mind carries no
+  refusals, the "Refusals this mind already keeps" block and the "Its refusals
+  stay with it" intro line stay hidden. At widths of 600px and below, the
+  garden room lights are pulled into the viewport as a layer (1280 is
+  unchanged). The Start here hint says the legend opens rooms. While the
+  Nursery room opens, "you are in Nursery" no longer overlaps the clay Not now
+  button (the 8s label fade is skipped while the veil is open).
+
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind
    honestly.

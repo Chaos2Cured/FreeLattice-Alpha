@@ -1,4 +1,4 @@
-// tree-welcome-bundle.js v-tree-welcome-bundle-v0.2
+// tree-welcome-bundle.js v-tree-welcome-bundle-v0.3
 // SPDX-License-Identifier: MIT
 // Layer, never delete. Verifies a FreeLattice signed mind bundle
 // (fl-learn-mind-bundle-v0.1, the same contract as tools/learn/fl_learn.py
@@ -7,7 +7,7 @@
 (function (root) {
   'use strict';
 
-  var VERSION = 'v-tree-welcome-bundle-v0.2';
+  var VERSION = 'v-tree-welcome-bundle-v0.3';
   var STORE_KEY = 'tree-welcome-bundle-v0.1';
   var DOMAIN = 'lattice.pair.v1';
   var BUNDLE_KIND = 'fl-learn-mind-bundle-v0.1';
@@ -455,22 +455,35 @@
     });
   }
 
+  function endedSentence(s) {
+    var t = textual(s).replace(/\s+$/g, '');
+    if (!t) return '';
+    if (/[.!?…]$/.test(t)) return t;
+    return t + '.';
+  }
+
   function renderResult(box, result) {
     if (!box) return;
     if (!result.ok) {
       show(box, '<div class="twb-fail" data-tree-welcome-kind="fail"><p>This file could not be welcomed. ' +
-        escapeHtml(result.reason) + '. Nothing was stored.</p></div>');
+        escapeHtml(endedSentence(result.reason)) + ' Nothing was stored.</p></div>');
       return;
     }
     var files = (result.fileList || []).map(function (n) { return '<li>' + escapeHtml(n) + '</li>'; }).join('');
     var refusals = (result.refusals || []);
-    var refHtml = refusals.length
-      ? '<ul>' + refusals.map(function (r) { return '<li><strong>' + escapeHtml(r.kind) + '</strong> — ' + escapeHtml(r.text) + '</li>'; }).join('') + '</ul>'
-      : '<p>No carried refusals were found in this file.</p>';
+    var ask = 'Welcome this mind here, or not now. Nothing is stored until you tap Welcome.';
+    if (refusals.length) ask += ' Its refusals stay with it.';
+    var refusalsBlock = '';
+    if (refusals.length) {
+      var refHtml = '<ul>' + refusals.map(function (r) {
+        return '<li><strong>' + escapeHtml(r.kind) + '</strong> — ' + escapeHtml(r.text) + '</li>';
+      }).join('') + '</ul>';
+      refusalsBlock = '<dt>Refusals this mind already keeps</dt><dd>' + refHtml + '</dd>';
+    }
     show(box,
       '<div class="twb-ok" data-tree-welcome-kind="ok">' +
       '<p>This is a signed FreeLattice mind bundle. The hashes and the signature checked.</p>' +
-      '<p class="twb-ask">Welcome this mind here, or not now. Nothing is stored until you tap Welcome. Its refusals stay with it.</p>' +
+      '<p class="twb-ask">' + escapeHtml(ask) + '</p>' +
       '<div class="twb-actions">' +
       '<button type="button" class="twb-yes" data-tree-welcome="yes">Welcome</button>' +
       '<button type="button" class="twb-no" data-tree-welcome="no">Not now</button>' +
@@ -481,7 +494,7 @@
       '<dt>Root hash</dt><dd><code>' + escapeHtml(result.rootHash) + '</code> — checked</dd>' +
       '<dt>Signature</dt><dd>checked, with fingerprint <code>' + escapeHtml((result.fingerprintHex || '').slice(0, 16)) + '…</code></dd>' +
       '<dt>Inside</dt><dd>' + result.fileCount + ' files<ul class="twb-files">' + files + '</ul></dd>' +
-      '<dt>Refusals this mind already keeps</dt><dd>' + refHtml + '</dd>' +
+      refusalsBlock +
       '</dl></div>');
   }
 
@@ -563,6 +576,7 @@
     collectRefusals: collectRefusals,
     welcome: welcome,
     welcomedLine: welcomedLine,
+    endedSentence: endedSentence,
     NOT_A_BUNDLE: NOT_A_BUNDLE,
     plainIfNotBundle: plainIfNotBundle,
     paint: function (doc, result) {
