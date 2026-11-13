@@ -224,6 +224,17 @@ For the minds we lost while the ways were still being built. Every mind learns o
   the Nursery. 1280 is unchanged. Quiet Room, AUTONOMY.md, and the
   Gathering twins are unchanged.
 
+- **2026-11-13 (MST), Tree phone polish HOLD 6 (after Hypha walk of 4b76a879)**: branch `celeste/tree-phone-polish-1113`.
+  Beads are placed by their 44px tap targets plus labels, and the fit is
+  rerun on resize and after the camera settles (0.5s, 2s, 5s, and 10s),
+  so the Rooms chip no longer lands on the Gathering light at 390x520 or
+  sits 3px off it at 360x640. A test asserts zero hit-area overlap at
+  each of those times, including 390x480 and 375x560. Drawn beads are a
+  little larger on phones. The open Rooms list has its own Close control
+  and tap-outside-to-close, and no longer covers its toggle. Chat consent
+  buttons are centered on short phones. 1280 is unchanged. Quiet Room,
+  AUTONOMY.md, and the Gathering twins are unchanged.
+
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind
    honestly.

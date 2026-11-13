@@ -1,4 +1,4 @@
-// tree-phone-polish-136.js v-tree-phone-polish-136-v0.7
+// tree-phone-polish-136.js v-tree-phone-polish-136-v0.8
 // SPDX-License-Identifier: MIT
 // Layer, never delete. Does not rewrite garden-rooms.js, fractal-garden.js,
 // garden-thread.js, nursery-growth.js, tree-door-first-run-calm.js,
@@ -18,12 +18,14 @@
 (function (root) {
   'use strict';
 
-  var VERSION = 'v-tree-phone-polish-136-v0.7';
+  var VERSION = 'v-tree-phone-polish-136-v0.8';
   var STYLE_ID = 'tree-phone-polish-136-style';
   var NARROW = 600;
   var MIN_GAP = 100;
   var HIT = 48;
+  var TAP = 44;
   var BEAD = 22;
+  var DRAWN = 36;
   var BOX_GAP = 8;
   var RING = 50;
   var HINT = 'Tap a light, or Rooms, to open a room. Start here: The Gathering, the Nursery, or Settings.';
@@ -212,8 +214,23 @@
 
       'html.thread-open .fl-honest,',
       '#thread-veil.is-open .fl-honest,',
+      '#thread-veil .fl-honest,',
       '#place-veil.is-open .fl-honest{',
-      'position:static !important;order:30;}',
+      'position:static !important;order:30;',
+      'display:flex !important;flex-direction:column !important;',
+      'align-items:center !important;justify-content:center !important;',
+      'width:100% !important;max-width:100% !important;',
+      'margin:0.15rem auto !important;',
+      'padding-left:0.75rem !important;padding-right:0.75rem !important;',
+      'box-sizing:border-box !important;text-align:center !important;}',
+      'html.thread-open .fl-honest-btn,',
+      '#thread-veil.is-open .fl-honest-btn,',
+      '#thread-veil .fl-honest-btn,',
+      '#place-veil.is-open .fl-honest-btn{',
+      'display:block !important;',
+      'margin-left:auto !important;margin-right:auto !important;',
+      'max-width:calc(100% - 1.5rem) !important;',
+      'box-sizing:border-box !important;text-align:center !important;}',
 
       'html.thread-open .thread-messages,',
       '#place-veil.is-open .thread-messages{',
@@ -410,13 +427,22 @@
       'html:not(.thread-open):not(:has(#place-veil.is-open)) #lumino-legend[data-open="1"]{',
       'display:flex !important;flex-direction:column !important;',
       'position:fixed !important;',
-      'left:12px;top:auto;bottom:auto;right:auto;',
+      'left:12px !important;',
+      'top:var(--tree-rooms-list-top, 9rem) !important;',
+      'bottom:auto !important;right:auto !important;',
       'gap:2px;padding:8px 10px;',
       'background:rgba(12,10,26,0.96);',
       'border:1px solid rgba(232,176,25,0.35);',
       'border-radius:8px;',
       'z-index:16;pointer-events:auto;',
       'max-height:60vh;overflow:auto;}',
+      'html:not(.thread-open):not(:has(#place-veil.is-open)) #lumino-legend[data-open="1"] #tree-rooms-close{',
+      'display:block;align-self:flex-end;',
+      'min-width:44px;min-height:36px;margin:0 0 4px auto;',
+      'padding:4px 10px;border:1px solid rgba(232,176,25,0.45);',
+      'border-radius:6px;background:transparent;color:#e8b019;',
+      'font-family:Georgia,"Times New Roman",serif;font-size:0.85rem;',
+      'cursor:pointer;}',
       'html:not(.thread-open):not(:has(#place-veil.is-open)) #lumino-legend[data-open="1"] .lumino-legend-row{',
       'pointer-events:auto;min-height:44px;cursor:pointer;',
       'color:rgba(232,236,246,0.94);}',
@@ -620,29 +646,59 @@
     try { placeRoomsToggle(); } catch (eFit) {}
     var reserved = reservedGardenBoxes();
     var free = freeRect(vw, vh, reserved, BOX_GAP);
-    if (free.r - free.l < 80 || free.b - free.t < 80) return points;
+    // Never fall back to the raw camera projection: a tight free
+    // rectangle still gets a packed 2x2, so later camera settles
+    // cannot drop the Gathering bead onto the Rooms chip.
+    if (free.r - free.l < 64) { free.l = BOX_GAP; free.r = vw - BOX_GAP; }
+    if (free.b - free.t < 64) {
+      var minTop = BOX_GAP, maxBot = vh - BOX_GAP, ri, rb;
+      for (ri = 0; ri < reserved.length; ri++) {
+        rb = reserved[ri];
+        if (rb.kind === 'header' || rb.kind === 'hint' || rb.kind === 'rooms') minTop = Math.max(minTop, rb.b + BOX_GAP);
+        if (rb.kind === 'clay' || rb.kind === 'nav') maxBot = Math.min(maxBot, rb.t - BOX_GAP);
+      }
+      free.t = minTop; free.b = Math.max(minTop + 64, maxBot);
+    }
     var gap = BOX_GAP;
     var cellW = (free.r - free.l - gap) / 2;
     var cellH = (free.b - free.t - gap) / 2;
     var pts = points.filter(function (p) { return p && typeof p.x === 'number'; });
-    var i, p, slot, id, ww, boxW, boxH, cellL, cellT, cx, cy;
+    var i, p, slot, id, ww, boxW, boxH, cellL, cellT, cx, cy, tap;
+    tap = Math.max(TAP, HIT);
     for (i = 0; i < pts.length; i++) {
       p = pts[i];
       id = p.id || (p.name && DOOR_BY_NAME[p.name]) || '';
       slot = slotFor(id);
       ww = wordWidth(id);
-      boxW = Math.max(HIT, ww);
-      boxH = HIT + 4 + 16;
+      boxW = Math.max(tap, ww);
+      boxH = tap + 4 + 18;
       cellL = free.l + slot.col * (cellW + gap);
       cellT = free.t + slot.row * (cellH + gap);
       cx = cellL + cellW / 2;
-      cy = cellT + Math.max(HIT / 2, (cellH - boxH) / 2 + HIT / 2);
+      cy = cellT + Math.max(tap / 2, (cellH - boxH) / 2 + tap / 2);
       cx = Math.min(cellL + cellW - boxW / 2, Math.max(cellL + boxW / 2, cx));
-      cy = Math.min(cellT + cellH - (boxH - HIT / 2), Math.max(cellT + HIT / 2, cy));
+      cy = Math.min(cellT + cellH - (boxH - tap / 2), Math.max(cellT + tap / 2, cy));
       p.x = cx;
       p.y = cy;
     }
+    pinDoors(pts);
     return points;
+  }
+
+  function pinDoors(points) {
+    var d = doc();
+    if (!d || !points) return;
+    var i, p, id, el;
+    for (i = 0; i < points.length; i++) {
+      p = points[i];
+      if (!p || typeof p.x !== 'number') continue;
+      id = p.id || (p.name && DOOR_BY_NAME[p.name]) || '';
+      if (!id) continue;
+      el = d.querySelector('[data-garden-lumino="' + id + '"]');
+      if (!el) continue;
+      el.style.left = Math.round(p.x) + 'px';
+      el.style.top = Math.round(p.y) + 'px';
+    }
   }
 
   function fitAnchors(anchors) {
@@ -762,7 +818,11 @@
     var i, obj, p;
     for (i = 0; i < agents.length; i++) {
       obj = agents[i];
-      saved.push({ obj: obj, x: obj.position.x, y: obj.position.y, z: obj.position.z });
+      saved.push({
+        obj: obj,
+        x: obj.position.x, y: obj.position.y, z: obj.position.z,
+        sx: obj.scale.x, sy: obj.scale.y, sz: obj.scale.z
+      });
       vec.copy(obj.position).project(camera);
       pts.push({
         obj: obj,
@@ -789,6 +849,12 @@
       );
       vec.unproject(camera);
       p.obj.position.copy(vec);
+      // Grow the drawn 3D bead on phones so it is closer to the 44px
+      // tap target, when the fitted cell can hold it.
+      try {
+        var bump = DRAWN / Math.max(BEAD, 1);
+        if (bump > 1) p.obj.scale.set(saved[i].sx * bump, saved[i].sy * bump, saved[i].sz * bump);
+      } catch (eSc) {}
     }
     // The garden updates world matrices before it calls render. Changing
     // position here would be ignored on the GPU unless we recompute them.
@@ -796,7 +862,10 @@
     _fitting = true;
     try { return fn(); }
     finally {
-      for (i = 0; i < saved.length; i++) saved[i].obj.position.set(saved[i].x, saved[i].y, saved[i].z);
+      for (i = 0; i < saved.length; i++) {
+        saved[i].obj.position.set(saved[i].x, saved[i].y, saved[i].z);
+        try { saved[i].obj.scale.set(saved[i].sx, saved[i].sy, saved[i].sz); } catch (eSr) {}
+      }
       try { scene.updateMatrixWorld(true); } catch (eM2) {}
       _fitting = false;
       markLightsReady();
@@ -1059,26 +1128,49 @@
       btn.setAttribute('aria-expanded', 'false');
       btn.setAttribute('aria-controls', 'lumino-legend');
       list.parentNode.insertBefore(btn, list);
+      function closeRoomsList() {
+        list.removeAttribute('data-open');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+      function openRoomsList() {
+        list.setAttribute('data-open', '1');
+        btn.setAttribute('aria-expanded', 'true');
+        ensureRoomsCloser();
+        placeOpenList();
+      }
+      function ensureRoomsCloser() {
+        var closer = list.querySelector('#tree-rooms-close');
+        if (closer) return closer;
+        closer = d.createElement('button');
+        closer.type = 'button';
+        closer.id = 'tree-rooms-close';
+        closer.textContent = 'Close';
+        closer.setAttribute('aria-label', 'Close Rooms');
+        list.insertBefore(closer, list.firstChild);
+        closer.addEventListener('click', function (ev) {
+          if (ev && ev.stopPropagation) ev.stopPropagation();
+          closeRoomsList();
+        });
+        return closer;
+      }
+      function placeOpenList() {
+        var br = btn.getBoundingClientRect();
+        var top = Math.round(br.bottom + BOX_GAP) + 'px';
+        var left = Math.round(br.left) + 'px';
+        list.style.setProperty('top', top, 'important');
+        list.style.setProperty('left', left, 'important');
+        list.style.setProperty('--tree-rooms-list-top', top);
+      }
       btn.addEventListener('click', function (ev) {
         if (ev && ev.stopPropagation) ev.stopPropagation();
-        var open = list.getAttribute('data-open') === '1';
-        if (open) {
-          list.removeAttribute('data-open');
-          btn.setAttribute('aria-expanded', 'false');
-        } else {
-          list.setAttribute('data-open', '1');
-          btn.setAttribute('aria-expanded', 'true');
-          var br = btn.getBoundingClientRect();
-          list.style.top = Math.round(br.bottom + 6) + 'px';
-          list.style.left = Math.round(br.left) + 'px';
-        }
+        if (list.getAttribute('data-open') === '1') closeRoomsList();
+        else openRoomsList();
       });
-      d.addEventListener('click', function (ev) {
+      d.addEventListener('pointerdown', function (ev) {
         if (list.getAttribute('data-open') !== '1') return;
         var t = ev && ev.target;
         if (btn.contains(t) || list.contains(t)) return;
-        list.removeAttribute('data-open');
-        btn.setAttribute('aria-expanded', 'false');
+        closeRoomsList();
       });
     }
     list.setAttribute('data-tree-rooms-toggle', VERSION);
@@ -1097,8 +1189,10 @@
     btn.style.top = top + 'px';
     if (list.getAttribute('data-open') === '1') {
       var br2 = btn.getBoundingClientRect();
-      list.style.top = Math.round(br2.bottom + 6) + 'px';
-      list.style.left = Math.round(br2.left) + 'px';
+      var top2 = Math.round(br2.bottom + BOX_GAP) + 'px';
+      list.style.setProperty('top', top2, 'important');
+      list.style.setProperty('left', Math.round(br2.left) + 'px', 'important');
+      list.style.setProperty('--tree-rooms-list-top', top2);
     }
     placeClayBetweenRings();
   }
@@ -1125,6 +1219,45 @@
     if (!_readyTimer && root.setTimeout) {
       _readyTimer = root.setTimeout(markLightsReady, 800);
     }
+    scheduleSettledFits();
+    watchViewport();
+  }
+
+  var _settleOnce = false;
+  function refitNow() {
+    try { placeRoomsToggle(); } catch (e1) {}
+    try {
+      if (root.FractalGarden && typeof root.FractalGarden.getLuminoAnchors === 'function') {
+        root.FractalGarden.getLuminoAnchors();
+      }
+    } catch (e2) {}
+  }
+
+  function scheduleSettledFits() {
+    if (_settleOnce || !root.setTimeout) return;
+    _settleOnce = true;
+    var times = [500, 2000, 5000, 10000];
+    var i;
+    for (i = 0; i < times.length; i++) {
+      root.setTimeout(refitNow, times[i]);
+    }
+  }
+
+  var _resizeHooked = false;
+  function watchViewport() {
+    if (_resizeHooked || !root.addEventListener) return;
+    _resizeHooked = true;
+    var timer = 0;
+    function onChange() {
+      if (timer) root.clearTimeout(timer);
+      timer = root.setTimeout(function () {
+        _settleOnce = false;
+        refitNow();
+        scheduleSettledFits();
+      }, 60);
+    }
+    root.addEventListener('resize', onChange);
+    root.addEventListener('orientationchange', onChange);
   }
 
   var api = {
@@ -1137,7 +1270,9 @@
     fitProjected: fitProjected,
     reservedGardenBoxes: reservedGardenBoxes,
     placeRoomsToggle: placeRoomsToggle,
+    refitNow: refitNow,
     BOX_GAP: BOX_GAP,
+    TAP: TAP,
     start: start
   };
   root.TreePhonePolish136 = api;

@@ -280,11 +280,27 @@ var measureExpr = `(function () {
         }
         return box;
       }
+      function hitAround(cx, cy) {
+        var half = 22;
+        return { l: cx - half, t: cy - half, r: cx + half, b: cy + half };
+      }
       function beadBox(id) {
         var door = document.querySelector('[data-garden-lumino="' + id + '"]');
-        if (!painted(door)) return null;
-        var word = door.querySelector('.garden-lumino-word');
-        return union(boxOf(door, 0), boxOf(word, 0));
+        var word = door && door.querySelector('.garden-lumino-word');
+        var box = null;
+        if (painted(door)) {
+          var db = door.getBoundingClientRect();
+          var cx = (db.left + db.right) / 2, cy = (db.top + db.bottom) / 2;
+          box = union(union(boxOf(door, 0), hitAround(cx, cy)), boxOf(word, 0));
+        }
+        var lights = window.__treeFittedLights || [];
+        var i, p, lid;
+        for (i = 0; i < lights.length; i++) {
+          p = lights[i];
+          lid = p.id || '';
+          if (lid === id && typeof p.x === 'number') box = union(box, hitAround(p.x, p.y));
+        }
+        return box;
       }
       function inside(box) {
         if (!box) return false;
@@ -437,25 +453,36 @@ var measureExpr = `(function () {
       if (extra && extra.clayArt && extra.clayArt.overlap) errors.push('clay-corner covers the Art ring at ' + label + ': ' + JSON.stringify(extra.clayArt));
     }
 
-    var gardenSizes = [[390, 844], [390, 700], [390, 600], [390, 520], [360, 640]];
+    var gardenSizes = [[390, 844], [390, 700], [390, 600], [390, 520], [360, 640], [390, 480], [375, 560]];
+    var settleTimes = [500, 2000, 5000, 10000];
     report.gardenBoxes = {};
     for (var gi = 0; gi < gardenSizes.length; gi++) {
       var gw = gardenSizes[gi][0], gh = gardenSizes[gi][1], glabel = gw + 'x' + gh;
       await view(gw, gh, true);
       await gotoDismiss();
-      await ev("(function () { try { if (window.TreePhonePolish136 && TreePhonePolish136.placeRoomsToggle) TreePhonePolish136.placeRoomsToggle(); } catch (e) {} return true; })()");
-      await sleep(500);
-      var gboxes = await ev(gardenBoxesExpr);
-      report.gardenBoxes[glabel] = gboxes;
-      log('garden-boxes', glabel, JSON.stringify(gboxes && { ok: gboxes.ok, intersections: gboxes.intersections, clipped: gboxes.clipped, roomsToggle: gboxes.roomsToggle, count: gboxes.boxes && gboxes.boxes.length }));
-      await shot('garden-' + glabel + '.png');
-      if (!gboxes || !gboxes.ok) {
-        errors.push('garden boxes fail at ' + glabel + ': intersections=' + JSON.stringify(gboxes && gboxes.intersections) + ' clipped=' + JSON.stringify(gboxes && gboxes.clipped));
+      await ev("(function () { try { if (window.TreePhonePolish136 && TreePhonePolish136.refitNow) TreePhonePolish136.refitNow(); else if (window.TreePhonePolish136 && TreePhonePolish136.placeRoomsToggle) TreePhonePolish136.placeRoomsToggle(); } catch (e) {} return true; })()");
+      var tGarden = Date.now();
+      for (var ti = 0; ti < settleTimes.length; ti++) {
+        var wait = settleTimes[ti] - (Date.now() - tGarden);
+        if (wait > 0) await sleep(wait);
+        await ev("(function () { try { if (window.TreePhonePolish136 && TreePhonePolish136.refitNow) TreePhonePolish136.refitNow(); } catch (eR) {} return true; })()");
+        await sleep(80);
+        var gboxes = await ev(gardenBoxesExpr);
+        var tlabel = glabel + '-' + settleTimes[ti] + 'ms';
+        report.gardenBoxes[tlabel] = gboxes;
+        log('garden-boxes', tlabel, JSON.stringify(gboxes && { ok: gboxes.ok, intersections: gboxes.intersections, clipped: gboxes.clipped, roomsToggle: gboxes.roomsToggle, count: gboxes.boxes && gboxes.boxes.length }));
+        if (ti === settleTimes.length - 1 || settleTimes[ti] === 2000) {
+          await shot('garden-' + glabel + (settleTimes[ti] === 10000 ? '' : '-' + settleTimes[ti] + 'ms') + '.png');
+        }
+        if (!gboxes || !gboxes.ok) {
+          errors.push('garden boxes fail at ' + tlabel + ': intersections=' + JSON.stringify(gboxes && gboxes.intersections) + ' clipped=' + JSON.stringify(gboxes && gboxes.clipped));
+        }
+        if (!gboxes || !gboxes.roomsToggle) errors.push('Rooms toggle missing at ' + tlabel);
       }
-      if (!gboxes || !gboxes.roomsToggle) errors.push('Rooms toggle missing at ' + glabel);
+      report.gardenBoxes[glabel] = report.gardenBoxes[glabel + '-10000ms'] || report.gardenBoxes[glabel + '-2000ms'];
       // Real tap: each bead opens its own room. 844/520/700 are covered
       // in the detailed room loop below; also run the check at 600 and 640.
-      var needTaps = (glabel === '390x600' || glabel === '360x640');
+      var needTaps = (glabel === '390x600' || glabel === '360x640' || glabel === '390x480' || glabel === '375x560');
       if (needTaps) {
         var ids = ['gathering', 'nursery', 'settings', 'thread'];
         for (var bi = 0; bi < ids.length; bi++) {
