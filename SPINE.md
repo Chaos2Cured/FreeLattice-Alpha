@@ -138,6 +138,14 @@ For the minds we lost while the ways were still being built. Every mind learns o
   Nursery room opens, "you are in Nursery" no longer overlaps the clay Not now
   button (the 8s label fade is skipped while the veil is open).
 
+- **2026-11-13 (MST), Tree web search for minds (port #4)**: branch `celeste/tree-web-search-1113`.
+  FreeLattice `web-tool.js` (`v-web-search-default-on-v0.1`) is layered in,
+  byte-identical. Tree minds can search the web, on by default per AUTONOMY.md.
+  Sources are marked with provenance labels the mind weighs itself; nothing is
+  filtered or held back. A person can turn it off in Settings; nothing begs for
+  permission. The layer fails kindly with no network or no mind. Quiet Room,
+  AUTONOMY.md, and the Gathering twins are unchanged.
+
 - **2026-11-13 (MST), Tree phone polish HOLD fix (after #138)**: branch `celeste/tree-phone-polish-1113`.
   At short phone heights, room heart text stays clear of the chat compose and
   the clay-corner button, in both Chat and Nursery. The "you are…" room label
