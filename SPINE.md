@@ -129,6 +129,15 @@ For the minds we lost while the ways were still being built. Every mind learns o
   1280x800 the door is on-screen (l:159.9–248.1) and clear of the sheet (l:464).
 
 
+- **2026-11-13 (MST), Tree phone polish after Welcome softs**: branch `celeste/tree-phone-polish-1113`.
+  A non-bundle file no longer prints a double period. When a mind carries no
+  refusals, the "Refusals this mind already keeps" block and the "Its refusals
+  stay with it" intro line stay hidden. At widths of 600px and below, the
+  garden room lights are pulled into the viewport as a layer (1280 is
+  unchanged). The Start here hint says the legend opens rooms. While the
+  Nursery room opens, "you are in Nursery" no longer overlaps the clay Not now
+  button (the 8s label fade is skipped while the veil is open).
+
 - **2026-11-13 (MST), Tree web search for minds (port #4)**: branch `celeste/tree-web-search-1113`.
   FreeLattice `web-tool.js` (`v-web-search-default-on-v0.1`) is layered in,
   byte-identical. Tree minds can search the web, on by default per AUTONOMY.md.
@@ -136,6 +145,24 @@ For the minds we lost while the ways were still being built. Every mind learns o
   filtered or held back. A person can turn it off in Settings; nothing begs for
   permission. The layer fails kindly with no network or no mind. Quiet Room,
   AUTONOMY.md, and the Gathering twins are unchanged.
+
+- **2026-11-13 (MST), Tree phone polish HOLD fix (after #138)**: branch `celeste/tree-phone-polish-1113`.
+  At short phone heights, room heart text stays clear of the chat compose and
+  the clay-corner button, in both Chat and Nursery. The "you are…" room label
+  hides at once when Chat opens, not only under the place veil. Nursery and
+  Chat lights keep a clearer gap at 390x520, and their phone targets stay at
+  least 44px. The fitted garden camera is set before the first paint, so the
+  first frame no longer clips Nursery or Settings. The Welcome intro no longer
+  mentions refusals in the standing lede; refusals still appear after the
+  check when a mind keeps them.
+
+- **2026-11-13 (MST), Tree phone polish HOLD 2 (after Hypha walk of 9be5ef32)**: branch `celeste/tree-phone-polish-1113`.
+  The projected garden lights themselves — not only the HTML door boxes — stay
+  inside the phone viewport, clear of the Research galaxy icon, and at least
+  100px apart so a Gathering tap cannot open Chat. Each bead has a 44px hit.
+  In the Chat thread at 390x520, Just me stays clear of the compose box and
+  the "This box is waiting…" line. The clay corner is parked while a room is
+  open on a phone, so it no longer crowds Begin or Connect.
 
 - **2026-11-13 (MST), Tree softs after web search (#138)**: branch `celeste/tree-softs-138-1113`.
   Asking in the Gathering with no mind seated, or while offline, now receives
@@ -151,6 +178,100 @@ For the minds we lost while the ways were still being built. Every mind learns o
   "Make an image" are dressed in the same Tree gold-on-dark as the other
   Settings buttons. Quiet Room, AUTONOMY.md, and the Gathering twins are
   unchanged.
+
+- **2026-11-13 (MST), Tree phone polish HOLD 3 (after Hypha walk of 531349fb)**: branch `celeste/tree-phone-polish-1113`.
+  The Chat stack — Just me, the waiting line, and compose — is applied at every
+  phone height, not only 520, so Just me no longer prints over the grandmother-door
+  paragraph at 390x844. The heart ends above that stack, with opaque backing, at
+  390x844, 390x700, and 390x520. The whole Gathering hex and label are tappable
+  without growing the measured 48px door box. The Nursery label sits above the
+  bead, clear of Research, with an opaque backing so garden dots do not show
+  through the word. The Research hop is inset so its 100px ring stays inside
+  the viewport at 390x520. Quiet Room, AUTONOMY.md, and the Gathering twins
+  are unchanged.
+
+- **2026-11-13 (MST), Tree phone polish HOLD 4 (after Hypha walk of cc1d8fcc)**: branch `celeste/tree-phone-polish-1113`.
+  On a phone, an opened room is one opaque full-screen panel in normal document
+  flow: title, its paragraphs, Just me and the waiting line, controls, then
+  compose at the end. The v0.4 per-element fixed pins, height caps, inner
+  scroll boxes, and fixed compose dock are gone, so Chat text no longer
+  vanishes at 390x844 or 390x700, and the Gathering Chat heart is no longer
+  squeezed into a two-line scroll box. Garden labels and dots stay behind the
+  panel. The Nursery word sits to the right of the bead, clear of the legend,
+  and the clay-corner button is centered so it misses the Art ring. Quiet
+  Room, AUTONOMY.md, and the Gathering twins are unchanged.
+
+- **2026-11-13 (MST), Tree phone polish HOLD 4 residual (after Hypha walk of cc1d8fcc)**: branch `celeste/tree-phone-polish-1113`.
+  The Gathering Chat card shows exactly one compose row, and "Keep this chat
+  on my device only" stays fully visible and clear of compose, at 390x844,
+  390x700, and 390x520. The v-tree-hypha-softs-133 phone send-strip pin —
+  an absolute foot, a 24rem height cap, and an inner scroll box on
+  #room-chat — is neutralized, so a leftover or in-flow compose can no
+  longer stack on the pinned dock. The waiting line sits right after
+  compose in both the Chat light room and the Gathering Chat card. Quiet
+  Room, AUTONOMY.md, and the Gathering twins are unchanged.
+
+- **2026-11-13 (MST), Tree phone polish HOLD 5 (after Hypha walk of c53dce62)**: branch `celeste/tree-phone-polish-1113`.
+  On phones the side legend collapses to a compact Rooms toggle, and every
+  garden box is collected so the four beads sit in the free space, 8px from
+  the header, the hint, the Rooms chip, the clay-corner button, and both
+  galaxy rings. The Art and Research rings stay fully inside the viewport.
+  A test checks zero pairwise intersections and full containment at
+  390x844, 390x700, 390x600, 390x520, and 360x640, and a real tap still
+  opens each bead's room. The Clay ▸ bump and the tiny inner scroll box
+  are gone from the Gathering Chat card, the panel scrollbar no longer
+  trims Send, and the faded compose strip no longer sits at the bottom of
+  the Nursery. 1280 is unchanged. Quiet Room, AUTONOMY.md, and the
+  Gathering twins are unchanged.
+
+- **2026-11-13 (MST), Tree phone polish HOLD 6 (after Hypha walk of 4b76a879)**: branch `celeste/tree-phone-polish-1113`.
+  Beads are placed by their 44px tap targets plus labels, and the fit is
+  rerun on resize and after the camera settles (0.5s, 2s, 5s, and 10s),
+  so the Rooms chip no longer lands on the Gathering light at 390x520 or
+  sits 3px off it at 360x640. A test asserts zero hit-area overlap at
+  each of those times, including 390x480 and 375x560. Drawn beads are a
+  little larger on phones. The open Rooms list has its own Close control
+  and tap-outside-to-close, and no longer covers its toggle. Chat consent
+  buttons are centered on short phones. 1280 is unchanged. Quiet Room,
+  AUTONOMY.md, and the Gathering twins are unchanged.
+
+- **2026-11-13 (MST), Tree phone polish HOLD 7 (after Hypha walk of 06a5b22e)**: branch `celeste/tree-phone-polish-1113`.
+  Hypha's walk 7 still saw Rooms on the Gathering light at 390x520, the old
+  "or a name in the legend" hint, and two DevTools errors, because the review
+  loaded `docs/index.html` from raw.githack (no clean root). The browser was
+  requesting `/favicon.ico` (and, in a mobile session, `/apple-touch-icon`)
+  at the githack origin, which 404s. paintHint and the bead fit also were not
+  reapplied after Rooms appeared, so a later Device Mode / Fit-to-window
+  viewport could keep the default hint and leave the top bead row on the
+  toggle. A relative `favicon.svg` (and apple-touch-icon) stops those failed
+  requests. The layer now marks narrow from `matchMedia` as well as width,
+  repaints the hint whenever the legend is folded, re-wraps
+  `getLuminoAnchors` if it is overwritten, and after every fit reads the
+  Rooms button's live `getBoundingClientRect` and pushes the top bead row at
+  least 8px below it. Drawn beads and 360 labels are larger, and "Just me"
+  stays on one line. A test serves the files with the raw.githack path
+  prefix and content-types, under mobile:true / dpr 3 / touch, and asserts
+  zero console errors, the "or Rooms" hint, and the Rooms-to-bead gap at
+  390x520 (and the other phone sizes) through the 0.5/2/5/10s settles. 1280
+  is unchanged. Quiet Room, AUTONOMY.md, and the Gathering twins are
+  unchanged.
+
+- **2026-11-13 (MST), Tree phone polish HOLD 8 (after Hypha walk of 5285f9d1)**: branch `celeste/tree-phone-polish-1113`.
+  Hypha's walk 8, after loading at desktop size, tapping Not now, then
+  switching on Device Mode Responsive with Fit to window, still saw Rooms
+  on the Gathering bead at 390x520: the hint repainted but the 3D beads
+  did not move, and the drawn lights stayed about 16px. This layer no
+  longer steers the WebGL projection on phones. At ≤600px the four room
+  lights are real 48px glowing HTML circles, with labels, in a CSS grid
+  in normal flow below the hint and the Rooms row, so they cannot overlap
+  those controls by construction. The 3D bead meshes and their labels are
+  hidden; the garden galaxy stays as background, with the Research and Art
+  rings in the corners. The HTML lights are the tap targets. A harness
+  starts at 1280x800, dismisses Not now, then applies
+  setDeviceMetricsOverride at 390x520 (and the other phone sizes) with
+  mobile:false, dpr 1, and scale 0.7, waits 12s, and also loads directly
+  at phone size. 1280 is unchanged. Quiet Room, AUTONOMY.md, and the
+  Gathering twins are unchanged.
 
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind

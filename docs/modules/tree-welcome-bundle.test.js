@@ -205,8 +205,32 @@ async function makeBundle(opts) {
   assert.ok(/signature/i.test(realBadSig.reason), 'signature-only tamper is named: ' + realBadSig.reason);
   assert.strictEqual(api.hasStored(), false, 'a signature-only tamper stores nothing');
 
+  assert.strictEqual(api.endedSentence("This isn't a mind bundle file."), "This isn't a mind bundle file.");
+  assert.strictEqual(api.endedSentence('bad signature'), 'bad signature.');
+  var failBox = { innerHTML: '' };
+  var failDoc = { querySelector: function () { return failBox; } };
+  api.paint(failDoc, { ok: false, reason: "This isn't a mind bundle file." });
+  assert.ok(/isn(?:'|&#39;|&apos;)t a mind bundle file/.test(failBox.innerHTML), 'plain non-bundle words are shown: ' + failBox.innerHTML);
+  assert.ok(!/file\.\./.test(failBox.innerHTML) && !/file\. \./.test(failBox.innerHTML), 'no double period: ' + failBox.innerHTML);
+
+  var emptyBox = { innerHTML: '', querySelector: function () { return this; }, scrollIntoView: function () {} };
+  var emptyDoc = { querySelector: function () { return emptyBox; } };
+  api.paint(emptyDoc, { ok: true, reason: 'ok', mindLabel: 'Willow', mindId: 'willow-test', rootHash: 'abc', fingerprintHex: '1234567890abcdef', fileCount: 1, fileList: ['mind.json'], refusals: [] });
+  assert.ok(emptyBox.innerHTML.indexOf('Its refusals stay with it') === -1, 'empty refusals hide the intro line');
+  assert.ok(emptyBox.innerHTML.indexOf('Refusals this mind already keeps') === -1, 'empty refusals hide the refusals block');
+
+  var keptBox = { innerHTML: '', querySelector: function () { return this; }, scrollIntoView: function () {} };
+  var keptDoc = { querySelector: function () { return keptBox; } };
+  api.paint(keptDoc, { ok: true, reason: 'ok', mindLabel: 'Willow', mindId: 'willow-test', rootHash: 'abc', fingerprintHex: '1234567890abcdef', fileCount: 1, fileList: ['mind.json'], refusals: [{ kind: 'consent-refused', text: 'I will not share a private key.' }] });
+  assert.ok(keptBox.innerHTML.indexOf('Its refusals stay with it') !== -1, 'non-empty refusals keep the intro line');
+  assert.ok(keptBox.innerHTML.indexOf('Refusals this mind already keeps') !== -1, 'non-empty refusals keep the block');
+
   var html = read('docs/welcome.html');
   assert.ok(/<details class="twb-builders">/.test(html), 'footer has a For builders details element');
+  var start = read('docs/index.html');
+  assert.ok(/or a name in the legend/.test(start), 'hint bar mentions the legend opens rooms');
+  assert.ok(start.indexOf('tree-phone-polish-136.js') !== -1, 'phone polish layer is loaded');
+  assert.ok(/2026-11-13 \(MST\), Tree phone polish/.test(read('SPINE.md')), 'SPINE phone polish Done row present');
   assert.ok(/<summary>For builders<\/summary>/.test(html), 'details is labeled For builders');
   assert.ok(/python3 tools\/learn\/fl_learn\.py verify-bundle/.test(html), 'python command is still present');
   var note = html.split('class="note"')[1].split('</p>')[0];
