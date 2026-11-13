@@ -1,4 +1,4 @@
-// tree-softs-138.js v-tree-softs-138-v0.1
+// tree-softs-138.js v-tree-softs-138-v0.2
 // SPDX-License-Identifier: MIT
 // Layer, never delete. Does not rewrite gathering-speak.js, fl-gathering.js,
 // tree-gathering-mount.js, image-local.js, style-ledger.js, AUTONOMY.md,
@@ -11,7 +11,7 @@
 (function (root) {
   'use strict';
 
-  var VERSION = 'v-tree-softs-138-v0.1';
+  var VERSION = 'v-tree-softs-138-v0.2';
   var STYLE_ID = 'tree-softs-138-style';
   var NO_MIND = [
     'The chairs are empty just now. Seat a mind first, and this table will listen with you.',
@@ -52,9 +52,11 @@
     s.id = STYLE_ID;
     s.textContent = [
       '#tree-image-local-host button.fl-image-local-yes,',
-      '#tree-style-ledger-host button{',
+      '#tree-style-ledger-host button,',
+      '.fl-tree-image-door button,',
+      '#tree-image-door-host button{',
       'display:inline-flex;align-items:center;justify-content:center;',
-      'min-height:44px;min-width:44px;margin:8px 0;padding:10px 16px;',
+      'min-height:44px;min-width:44px;margin:8px 8px 8px 0;padding:10px 16px;',
       'box-sizing:border-box;',
       "font-family:Georgia,'Times New Roman',serif;font-size:0.95rem;",
       'color:#e8b019;background:rgba(12,10,26,0.92);',
@@ -63,7 +65,11 @@
       '#tree-image-local-host button.fl-image-local-yes:hover,',
       '#tree-image-local-host button.fl-image-local-yes:focus-visible,',
       '#tree-style-ledger-host button:hover,',
-      '#tree-style-ledger-host button:focus-visible{',
+      '#tree-style-ledger-host button:focus-visible,',
+      '.fl-tree-image-door button:hover,',
+      '.fl-tree-image-door button:focus-visible,',
+      '#tree-image-door-host button:hover,',
+      '#tree-image-door-host button:focus-visible{',
       'background:rgba(232,176,25,0.16);border-color:#e8b019;color:#f3d98a;',
       'outline:none;}'
     ].join('');
@@ -107,17 +113,44 @@
     paintReceipt(line);
   }
 
+  function isAskButton(el) {
+    if (!el) return null;
+    if (el.id === 'flgs-ask-btn') return el;
+    if (el.closest) {
+      var c = el.closest('#flgs-ask-btn');
+      if (c) return c;
+    }
+    var p = el.parentNode;
+    while (p && p !== (doc() && doc().documentElement)) {
+      if (p.id === 'flgs-ask-btn') return p;
+      p = p.parentNode;
+    }
+    return null;
+  }
+
+  function onAskClick(ev) {
+    if (!isAskButton(ev && ev.target)) return;
+    try { root.setTimeout(afterAsk, 30); } catch (e) { afterAsk(); }
+  }
+
   function hookAsk() {
     var d = doc();
     if (!d) return;
     var btn = d.getElementById('flgs-ask-btn');
-    if (!btn || _bound) return;
-    if (btn.getAttribute && btn.getAttribute('data-tree-softs-138-bound')) return;
-    if (btn.setAttribute) btn.setAttribute('data-tree-softs-138-bound', VERSION);
-    if (btn.addEventListener) {
-      btn.addEventListener('click', function () {
-        try { root.setTimeout(afterAsk, 30); } catch (e) { afterAsk(); }
-      }, false);
+    if (btn && !(btn.getAttribute && btn.getAttribute('data-tree-softs-138-bound'))) {
+      if (btn.setAttribute) btn.setAttribute('data-tree-softs-138-bound', VERSION);
+      if (btn.addEventListener) btn.addEventListener('click', onAskClick, false);
+    }
+    if (_bound) return;
+    if (d.addEventListener) d.addEventListener('click', onAskClick, false);
+    if (d.documentElement && d.documentElement.setAttribute) {
+      d.documentElement.setAttribute('data-tree-softs-138-delegated', VERSION);
+    }
+    if (typeof MutationObserver === 'function') {
+      try {
+        var obs = new MutationObserver(function () { hookAsk(); });
+        if (d.body || d.documentElement) obs.observe(d.body || d.documentElement, { childList: true, subtree: true });
+      } catch (e2) {}
     }
     _bound = true;
   }
@@ -125,14 +158,6 @@
   function start() {
     addStyle();
     hookAsk();
-    if (!_bound && root.setInterval) {
-      var n = 0;
-      var wait = root.setInterval(function () {
-        hookAsk();
-        n += 1;
-        if (_bound || n > 80) root.clearInterval(wait);
-      }, 50);
-    }
   }
 
   var api = {

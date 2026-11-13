@@ -25,7 +25,11 @@ El.prototype.addEventListener = function (type, fn) {
   (this.listeners[type] || (this.listeners[type] = [])).push(fn);
 };
 El.prototype.click = function () {
-  (this.listeners.click || []).forEach(function (fn) { fn({ type: 'click' }); });
+  var ev = { type: 'click', target: this };
+  (this.listeners.click || []).forEach(function (fn) { fn(ev); });
+  if (typeof document !== 'undefined' && document._listeners && document._listeners.click) {
+    document._listeners.click.forEach(function (fn) { fn(ev); });
+  }
 };
 El.prototype.appendChild = function (c) { this.children.push(c); return c; };
 El.prototype.querySelector = function () { return null; };
@@ -51,7 +55,10 @@ var document = {
     return byId[id] || null;
   },
   createElement: function (tag) { return new El('', tag); },
-  addEventListener: function () {}
+  addEventListener: function (type, fn) {
+    (this._listeners || (this._listeners = {}));
+    (this._listeners[type] || (this._listeners[type] = [])).push(fn);
+  }
 };
 
 var online = true;
@@ -77,6 +84,7 @@ assert(styleHost.children.some(function (c) { return c.id === 'tree-softs-138-st
 var css = styleHost.children.filter(function (c) { return c.id === 'tree-softs-138-style'; })[0].textContent;
 assert(/fl-image-local-yes/.test(css) && /tree-style-ledger-host button/.test(css), 'button CSS missing');
 assert(/min-height:44px/.test(css) && /Georgia/.test(css) && /#e8b019/.test(css), 'Tree gold / 44px / Georgia missing');
+assert(/fl-tree-image-door button/.test(css) && /tree-image-door-host button/.test(css), 'image door button CSS missing');
 
 function askLikeSpeakThenLayer(receiptText, hide) {
   receipt.textContent = receiptText;

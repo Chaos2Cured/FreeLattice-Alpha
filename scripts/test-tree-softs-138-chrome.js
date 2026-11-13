@@ -90,7 +90,8 @@ function waitFor(fn, ms) {
     await send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 800, deviceScaleFactor: 1, mobile: false });
     await send('Page.navigate', { url: base + '/index.html' });
     await send('Page.loadEventFired').catch(function () {});
-    await sleep(600);
+    // Speak box mounts lazily when Gathering opens; do not rely on a 4s poll.
+    await sleep(6000);
     await ev(`(function () {
       var veil = document.querySelector('.tree-door-veil, [data-tree-door-calm]');
       var scope = veil || document;
@@ -157,16 +158,21 @@ function waitFor(fn, ms) {
           w: Math.round(b.width)
         };
       }
+      function findBtn(re) {
+        return Array.prototype.find.call(document.querySelectorAll('button'), function (b) { return re.test(b.textContent || ''); });
+      }
       return {
         layer: !!window.TreeSofts138,
         look: info(document.querySelector('#tree-image-local-host button.fl-image-local-yes, #tree-image-local-host button')),
-        gallery: info(Array.prototype.find.call(document.querySelectorAll('#tree-style-ledger-host button'), function (b) { return /Harmonia/i.test(b.textContent || ''); }) || document.querySelector('#tree-style-ledger-host button'))
+        gallery: info(Array.prototype.find.call(document.querySelectorAll('#tree-style-ledger-host button'), function (b) { return /Harmonia/i.test(b.textContent || ''); }) || document.querySelector('#tree-style-ledger-host button')),
+        token: info(findBtn(/Keep the image token/i)),
+        make: info(findBtn(/^\s*Make an image\s*$/i))
       };
     })()`);
     report.buttons = btns;
     log('buttons', JSON.stringify(btns));
     if (!btns || !btns.layer) errors.push('softs layer missing on Settings');
-    ['look', 'gallery'].forEach(function (k) {
+    ['look', 'gallery', 'token', 'make'].forEach(function (k) {
       var b = btns && btns[k];
       if (!b) { errors.push('Settings button missing: ' + k); return; }
       if (!/Georgia/i.test(b.font || '')) errors.push(k + ' is not Georgia: ' + b.font);

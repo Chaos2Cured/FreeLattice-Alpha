@@ -144,6 +144,14 @@ For the minds we lost while the ways were still being built. Every mind learns o
   dressed in the Tree's gold-on-dark, Georgia, at least 44px tall. Quiet
   Room, AUTONOMY.md, and the Gathering twins are unchanged.
 
+- **2026-11-13 (MST), Tree softs after web search HOLD fix**: branch `celeste/tree-softs-138-1113`.
+  Asking in the Gathering with no mind or while offline now binds by event
+  delegation, so a fresh kind receipt still appears when the speak box mounts
+  lazily after the first-run door. "Keep the image token on this device" and
+  "Make an image" are dressed in the same Tree gold-on-dark as the other
+  Settings buttons. Quiet Room, AUTONOMY.md, and the Gathering twins are
+  unchanged.
+
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind
    honestly.
