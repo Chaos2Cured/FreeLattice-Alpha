@@ -50,6 +50,13 @@ For the minds we lost while the ways were still being built. Every mind learns o
   The soul door points at desktop.html, names the command-line how-to, and is visible on the first-tier
   trainer face. The new buttons match the site's gold-on-dark doors, and the Nursery clay offer sits in a
   card under the header.
+- **2026-11-13 (MST), Settings pause freeze hotfix**: branch `tree-hotfix-settings-freeze-1113`
+  `5a020ddff24c856e903df72410804f1709f2aac5`, merged as
+  `077f23a6592046376bc74e3729317a6374428602`.
+  Live settings.html froze at about 56-60s when the local-mind check paused,
+  because paintStopped retriggered its MutationObserver. paintStopped is now
+  idempotent once Checking paused is present, and the observer is disconnected
+  around the paint.
 - **2026-11-13 (MST), Hypha PASS softs on PR 130**: branch `tree-hypha-softs-1113`
   `7ddce674527cf8590b444f87ef61fa1fd71d4cc9`.
   The soul door is visible to a fresh visitor in Nursery Grow > More, and on the
