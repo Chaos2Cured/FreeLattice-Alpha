@@ -50,6 +50,14 @@ For the minds we lost while the ways were still being built. Every mind learns o
   The soul door points at desktop.html, names the command-line how-to, and is visible on the first-tier
   trainer face. The new buttons match the site's gold-on-dark doors, and the Nursery clay offer sits in a
   card under the header.
+- **2026-11-13 (MST), Hypha PASS softs on PR 130**: branch `tree-hypha-softs-1113`
+  `7ddce674527cf8590b444f87ef61fa1fd71d4cc9`.
+  The soul door is visible to a fresh visitor in Nursery Grow > More, and on the
+  Workshop trainer face. After the local-mind check rests, the button says Check
+  again and a Checking paused line is shown. The Settings shared-shoulder footer
+  no longer overprints the One-click button. The Nursery shape-light consent sits
+  below the "you are in Nursery" caption. Gathering chat buttons and the send box
+  match the site. The Desktop 5.8.3 label is vertically centered.
 
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind
