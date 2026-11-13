@@ -1,5 +1,9 @@
 // SPDX-License-Identifier: MIT
 // tree-mind-check-calm.js (v-hypha-walk-polish-v0.2). Layer, never delete.
+// v-hypha-settings-freeze-v0.1: paintStopped is idempotent. If
+// [data-tree-checking-paused] is already present it returns early, and the
+// host MutationObserver is disconnected / takeRecords() around the paint so
+// its own mutations cannot retrigger it after _painting is cleared.
 // Does not change fl-connect.js. After the first look for a mind on this
 // computer, this layer stops FlConnect's own 8s loop, backs off (8s, 16s,
 // 32s, then 64s), and then rests with a kind note, a Check again button, and
@@ -15,6 +19,7 @@
   var DESKTOP_HREF = 'https://freelattice.com/desktop.html';
   var DESKTOP_LABEL = 'FreeLattice Desktop 5.8.3';
   var KIND_LINE = 'No local mind on this computer yet.';
+  var PAUSED_LINE = 'Checking paused.';
   var DOOR_LINE = 'A clear door is FreeLattice Desktop 5.8.3, which can wake a mind on this computer.';
   var BRIDGE_LINE = 'Or the Bridge, if you already use it.';
   var LEDE_LINE = 'One door. FreeLattice Desktop 5.8.3 works on Mac, Windows, and Linux.';
@@ -29,6 +34,7 @@
   var _armed = false;
   var _painting = false;
   var _visBound = false;
+  var _obs = null;
   var _orig = {};
 
   function connect() { return root.FlConnect || null; }
@@ -169,6 +175,27 @@
     return box;
   }
 
+
+  function pausedPresent(host) {
+    return !!(host && host.querySelector && host.querySelector('[data-tree-checking-paused]'));
+  }
+
+  function observerQuiet(fn) {
+    var host = hostEl();
+    if (_obs) {
+      try { _obs.disconnect(); } catch (e0) {}
+      try { _obs.takeRecords(); } catch (e1) {}
+    }
+    try {
+      return fn();
+    } finally {
+      if (_obs && host) {
+        try { _obs.takeRecords(); } catch (e2) {}
+        try { _obs.observe(host, { childList: true, subtree: true }); } catch (e3) {}
+      }
+    }
+  }
+
   function paintWaiting(host, sec) {
     if (!host) return;
     _painting = true;
@@ -188,30 +215,37 @@
 
   function paintStopped(host) {
     if (!host) return;
-    _painting = true;
-    try {
-      var status = host.querySelector ? host.querySelector('.flc-status') : null;
-      if (status) {
-        status.textContent = KIND_LINE;
-      }
-      var box = ensureCalmBox(host);
-      if (!box) return;
-      while (box.firstChild) box.removeChild(box.firstChild);
-      box.appendChild(el('p', 'tree-mind-check-kind', KIND_LINE));
-      var door = el('p', 'tree-mind-check-door', '');
-      door.appendChild(root.document.createTextNode(DOOR_LINE + ' '));
-      var a = el('a', 'tree-mind-check-link', DESKTOP_LABEL);
-      a.setAttribute('href', DESKTOP_HREF);
-      a.setAttribute('rel', 'noopener noreferrer');
-      door.appendChild(a);
-      box.appendChild(door);
-      var again = el('button', 'flc-btn flc-primary tree-mind-check-again', 'Check again');
-      again.type = 'button';
-      again.setAttribute('data-tree-mind-check-again', '1');
-      again.addEventListener('click', onCheckAgain);
-      box.appendChild(again);
-      honorDownloadCard(host);
-    } finally { _painting = false; }
+    if (pausedPresent(host)) return;
+    observerQuiet(function () {
+      if (pausedPresent(host)) return;
+      _painting = true;
+      try {
+        var status = host.querySelector ? host.querySelector('.flc-status') : null;
+        if (status) {
+          status.textContent = KIND_LINE;
+        }
+        var box = ensureCalmBox(host);
+        if (!box) return;
+        while (box.firstChild) box.removeChild(box.firstChild);
+        box.appendChild(el('p', 'tree-mind-check-kind', KIND_LINE));
+        var door = el('p', 'tree-mind-check-door', '');
+        door.appendChild(root.document.createTextNode(DOOR_LINE + ' '));
+        var a = el('a', 'tree-mind-check-link', DESKTOP_LABEL);
+        a.setAttribute('href', DESKTOP_HREF);
+        a.setAttribute('rel', 'noopener noreferrer');
+        door.appendChild(a);
+        box.appendChild(door);
+        var paused = el('p', 'tree-checking-paused', PAUSED_LINE);
+        paused.setAttribute('data-tree-checking-paused', '1');
+        box.appendChild(paused);
+        var again = el('button', 'flc-btn flc-primary tree-mind-check-again', 'Check again');
+        again.type = 'button';
+        again.setAttribute('data-tree-mind-check-again', '1');
+        again.addEventListener('click', onCheckAgain);
+        box.appendChild(again);
+        honorDownloadCard(host);
+      } finally { _painting = false; }
+    });
   }
 
   function finish() {
@@ -284,6 +318,10 @@
       var obs = new MutationObserver(function () {
         if (_painting) return;
         if (hasMind()) { clearTimer(); return; }
+        if (_stopped && pausedPresent(host)) {
+          try { obs.takeRecords(); } catch (eRec) {}
+          return;
+        }
         stopTheirs();
         honorDownloadCard(host);
         if (_stopped) {
@@ -293,6 +331,7 @@
         paintWaiting(host, Math.round(_delayMs / 1000));
       });
       obs.observe(host, { childList: true, subtree: true });
+      _obs = obs;
     }
   }
 
@@ -369,6 +408,7 @@
     DESKTOP_HREF: DESKTOP_HREF,
     DESKTOP_LABEL: DESKTOP_LABEL,
     KIND_LINE: KIND_LINE,
+    PAUSED_LINE: PAUSED_LINE,
     FIRST_MS: FIRST_MS,
     STOP_AT_MS: STOP_AT_MS,
     wrap: wrap,

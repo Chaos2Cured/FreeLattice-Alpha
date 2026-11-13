@@ -153,6 +153,9 @@ assert.ok(/No local mind on this computer yet\./.test(calmSrc), 'kind line');
 assert.ok(/Check again/.test(calmSrc), 'manual Check again');
 assert.ok(/8000/.test(calmSrc) && /60000/.test(calmSrc), 'exponential backoff to 60s or more');
 assert.ok(/data-tree-desktop-door/.test(calmSrc) && /Or the Bridge, if you already use it/.test(calmSrc), 'Desktop is the main door, Bridge is secondary');
+assert.ok(/pausedPresent/.test(calmSrc) && /data-tree-checking-paused/.test(calmSrc), 'paintStopped is idempotent once paused');
+assert.ok(/takeRecords/.test(calmSrc) && /disconnect/.test(calmSrc), 'observer is quieted around the paint');
+assert.ok(/Checking paused\./.test(calmSrc), 'Checking paused line');
 assert.ok(/install\.html#desktop-download-ease/.test(settings) === false, 'Also connect Desktop points at desktop.html');
 assert.ok(/fl-also-btn" href="https:\/\/freelattice\.com\/desktop\.html"/.test(settings), 'Also connect Desktop href');
 assert.ok(/_orig\.unmount/.test(calmSrc) && /gateLook/.test(calmSrc), 'layer can unmount FlConnect and gate later looks');
@@ -251,9 +254,235 @@ step().then(function () {
       assert.strictEqual(calls.probes, probesAtStop, 'no more probe after stop');
       assert.ok(calls.refresh <= 5, 'at most about 5 looks in the backoff');
       console.log('SMOKE_OK hypha walk polish v0.2 looks=' + calls.refresh + ' stops=' + calls.stop + ' unmounts=' + calls.unmounts);
+      return runFreezeDomTest();
     });
   });
 }).catch(function (err) {
   console.error(err);
   process.exit(1);
 });
+
+// v-hypha-settings-freeze-v0.1: past the pause, a real DOM + MutationObserver
+// must not loop forever, and Check again plus Checking paused must render.
+function runFreezeDomTest() {
+  var observerFires = 0;
+  var scheduled = false;
+  var observed = null;
+  var records = [];
+  var LOOP_CAP = 40;
+
+  function notify(target) {
+    if (!observed || !observed.cb || !observed.connected) return;
+    records.push({ type: 'childList', target: target });
+    if (scheduled) return;
+    scheduled = true;
+    Promise.resolve().then(function () {
+      scheduled = false;
+      if (!observed || !observed.cb || !observed.connected) { records = []; return; }
+      observerFires += 1;
+      if (observerFires > LOOP_CAP) {
+        throw new Error('infinite MutationObserver loop (' + observerFires + ' deliveries)');
+      }
+      var batch = records.slice();
+      records = [];
+      if (batch.length) observed.cb(batch, observed);
+    });
+  }
+
+  function matches(node, sel) {
+    if (!node || !sel) return false;
+    if (sel.charAt(0) === '#') return node.id === sel.slice(1);
+    if (sel.charAt(0) === '.') {
+      return (' ' + String(node.className || '') + ' ').indexOf(' ' + sel.slice(1) + ' ') !== -1;
+    }
+    if (sel.charAt(0) === '[') {
+      var m = sel.match(/^\[([\w-]+)(?:="([^"]*)")?\]$/);
+      if (!m) return false;
+      var val = node.getAttribute(m[1]);
+      if (m[2] == null) return val != null && val !== '';
+      return val === m[2];
+    }
+    return String(node.tagName || '').toLowerCase() === sel.toLowerCase();
+  }
+
+  function walk(node, sel, out, one) {
+    if (!node) return null;
+    var kids = node.childNodes || node.children || [];
+    var i;
+    for (i = 0; i < kids.length; i++) {
+      if (matches(kids[i], sel)) {
+        if (one) return kids[i];
+        out.push(kids[i]);
+      }
+      var hit = walk(kids[i], sel, out, one);
+      if (one && hit) return hit;
+    }
+    return one ? null : out;
+  }
+
+  function el(tag) {
+    var kids = [];
+    var attrs = {};
+    var node = {
+      tagName: String(tag || 'div').toUpperCase(),
+      className: '',
+      id: '',
+      textContent: '',
+      type: '',
+      style: {},
+      parentNode: null,
+      childNodes: kids,
+      children: kids,
+      get firstChild() { return kids[0] || null; },
+      setAttribute: function (k, v) {
+        attrs[k] = String(v);
+        if (k === 'id') this.id = String(v);
+        if (k === 'class' || k === 'className') this.className = String(v);
+      },
+      getAttribute: function (k) {
+        if (k === 'id') return this.id || attrs[k] || null;
+        if (k === 'class') return this.className || attrs[k] || null;
+        return Object.prototype.hasOwnProperty.call(attrs, k) ? attrs[k] : null;
+      },
+      removeAttribute: function (k) { delete attrs[k]; if (k === 'id') this.id = ''; },
+      appendChild: function (c) {
+        if (c.parentNode && c.parentNode.removeChild) c.parentNode.removeChild(c);
+        kids.push(c);
+        c.parentNode = this;
+        notify(this);
+        return c;
+      },
+      removeChild: function (c) {
+        var i = kids.indexOf(c);
+        if (i >= 0) kids.splice(i, 1);
+        c.parentNode = null;
+        notify(this);
+        return c;
+      },
+      insertBefore: function (c, sib) {
+        if (c.parentNode && c.parentNode.removeChild) c.parentNode.removeChild(c);
+        var i = sib ? kids.indexOf(sib) : -1;
+        if (i < 0) kids.push(c);
+        else kids.splice(i, 0, c);
+        c.parentNode = this;
+        notify(this);
+        return c;
+      },
+      addEventListener: function () {},
+      querySelector: function (sel) { return walk(this, sel, [], true); },
+      querySelectorAll: function (sel) { return walk(this, sel, [], false); }
+    };
+    return node;
+  }
+
+  var mount = el('div');
+  mount.id = 'fl-connect-mount';
+  mount.setAttribute('id', 'fl-connect-mount');
+  var status = el('p');
+  status.className = 'flc-status';
+  status.setAttribute('class', 'flc-status');
+  status.textContent = 'Looking';
+  mount.appendChild(status);
+  var download = el('div');
+  download.className = 'flc-download';
+  download.setAttribute('class', 'flc-download');
+  var tag = el('p');
+  tag.className = 'flc-tag';
+  tag.setAttribute('class', 'flc-tag');
+  tag.textContent = 'No local mind yet';
+  download.appendChild(tag);
+  mount.appendChild(download);
+
+  var doc = {
+    body: { appendChild: function () {} },
+    readyState: 'complete',
+    createElement: function (tag) { return el(tag); },
+    createTextNode: function (text) { var n = el('#text'); n.textContent = text; return n; },
+    getElementById: function (id) { return id === 'fl-connect-mount' ? mount : (mount.querySelector('#' + id)); },
+    querySelector: function (sel) { return mount.querySelector(sel); },
+    querySelectorAll: function (sel) { return mount.querySelectorAll(sel); },
+    addEventListener: function () {}
+  };
+
+  var timeouts2 = [];
+  var next2 = 1;
+  var calls2 = { stop: 0, refresh: 0, mounts: 0, unmounts: 0 };
+  var sb = {
+    Promise: Promise,
+    window: {},
+    globalThis: {},
+    module: { exports: {} },
+    document: doc,
+    MutationObserver: function (cb) {
+      var api = {
+        cb: cb,
+        connected: false,
+        observe: function () { this.connected = true; observed = this; },
+        disconnect: function () { this.connected = false; },
+        takeRecords: function () { var out = records.slice(); records = []; return out; }
+      };
+      observed = api;
+      return api;
+    },
+    FlConnect: {
+      hasLocalMind: function () { return false; },
+      stopLoop: function () { calls2.stop += 1; },
+      refresh: function () { calls2.refresh += 1; return Promise.resolve({}); },
+      probe: function () { return Promise.resolve({ models: [] }); },
+      lookAgain: function () {},
+      mount: function (el) { calls2.mounts += 1; },
+      unmount: function () { calls2.unmounts += 1; }
+    },
+    setTimeout: function (fn, ms) { var id = next2++; timeouts2.push({ id: id, fn: fn, ms: ms }); return id; },
+    clearTimeout: function (id) { timeouts2 = timeouts2.filter(function (x) { return x.id !== id; }); }
+  };
+  sb.window = sb;
+  sb.globalThis = sb;
+  vm.runInNewContext(calmSrc, sb);
+  var C = sb.TreeMindCheckCalm;
+  assert.ok(C, 'freeze-test calm API');
+  assert.strictEqual(C.PAUSED_LINE, 'Checking paused.');
+  C.wrap();
+  C.startCycle(false);
+
+  function fire2() {
+    var x = timeouts2.shift();
+    if (x) x.fn();
+  }
+  function step2() {
+    if (C.stopped()) return Promise.resolve();
+    if (!timeouts2.length) return Promise.reject(new Error('expected a timer before pause'));
+    fire2();
+    return Promise.resolve().then(function () { return Promise.resolve(); }).then(function () {
+      if (!C.stopped()) return step2();
+    });
+  }
+
+  return step2().then(function () {
+    assert.ok(C.stopped(), 'freeze-test reached the pause');
+    // Drain observer microtasks well past the pause. A loop would hit LOOP_CAP.
+    var n = 0;
+    function drain() {
+      n += 1;
+      if (n > 12) return Promise.resolve();
+      return Promise.resolve().then(drain);
+    }
+    return drain();
+  }).then(function () {
+    assert.ok(observerFires <= LOOP_CAP, 'observer did not loop forever (' + observerFires + ')');
+    assert.ok(observerFires < 20, 'observer deliveries stay small after pause: ' + observerFires);
+    var paused = mount.querySelector('[data-tree-checking-paused]');
+    var again = mount.querySelector('[data-tree-mind-check-again]');
+    assert.ok(paused, 'Checking paused marker is in the DOM');
+    assert.strictEqual(String(paused.textContent || ''), 'Checking paused.');
+    assert.ok(again, 'Check again button is in the DOM');
+    assert.strictEqual(String(again.textContent || ''), 'Check again');
+    // The page still accepts a DOM write after the pause (still responsive).
+    var ping = el('span');
+    ping.id = 'freeze-ping';
+    ping.setAttribute('id', 'freeze-ping');
+    mount.appendChild(ping);
+    assert.ok(mount.querySelector('#freeze-ping'), 'DOM still responds after the pause');
+    console.log('SMOKE_OK settings freeze guard observerFires=' + observerFires);
+  });
+}
