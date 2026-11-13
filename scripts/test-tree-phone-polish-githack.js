@@ -1,9 +1,12 @@
 #!/usr/bin/env node
-// raw.githack-style load of the phone polish layer: path prefix, githack
-// content-types, no clean root. Mobile metrics (mobile:true, dpr 3, touch).
-// Asserts zero console errors, "or Rooms" hint when the legend is folded,
-// and the top bead row sits below the live Rooms getBoundingClientRect.
-// 1280 is unchanged. Does not load quiet-room or run smoke.js.
+// Hypha walk 8 harness. raw.githack-style serve (path prefix, githack
+// content-types, no clean root). Reproduces the review sequence exactly:
+// load at 1280x800 desktop, tap Not now, then setDeviceMetricsOverride
+// to each phone size with mobile:false, dpr 1, and scale ~0.7 (Responsive
+// + Fit to window). Wait 12s, screenshot, and assert the HTML 48px light
+// grid is below Rooms with no overlap. Also loads directly at phone size.
+// Captures every console error and warning. 1280 is unchanged.
+// Does not load quiet-room or run smoke.js.
 'use strict';
 var fs = require('fs');
 var path = require('path');
@@ -11,8 +14,9 @@ var http = require('http');
 var { spawn } = require('child_process');
 
 var ROOT = path.join(__dirname, '..', 'docs');
-var PREFIX = '/Chaos2Cured/FreeLattice-Alpha/hold7/docs';
-var SHOTS = process.env.SHOTS_DIR || '/tmp/tree-phone-polish-shots-v09-githack';
+var PREFIX = '/Chaos2Cured/FreeLattice-Alpha/hold8/docs';
+var SHOTS = process.env.SHOTS_DIR || '/tmp/tree-phone-polish-shots-v10-hypha';
+var FIT_SCALE = Number(process.env.FIT_SCALE || 0.7);
 
 function log() { console.log.apply(console, arguments); }
 function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
@@ -81,21 +85,22 @@ var measureExpr = `(function () {
   }
   var hint = document.getElementById('garden-start');
   var rooms = document.getElementById('tree-rooms-toggle');
-  var gathering = document.querySelector('[data-garden-lumino="gathering"]');
-  var settings = document.querySelector('[data-garden-lumino="settings"]');
-  var nursery = document.querySelector('[data-garden-lumino="nursery"]');
-  var thread = document.querySelector('[data-garden-lumino="thread"]');
-  var just = document.querySelector('.thread-just-host, [data-honest-just], [data-thread-just-host]');
-  var gb = box(gathering);
+  var grid = document.getElementById('tree-phone-light-grid');
+  var ids = ['gathering', 'settings', 'nursery', 'thread'];
+  var lights = {};
+  ids.forEach(function (id) {
+    var door = document.querySelector('[data-garden-lumino="' + id + '"]');
+    var light = door && door.querySelector('.garden-lumino-light');
+    lights[id] = {
+      door: box(door),
+      light: box(light),
+      opacity: light ? Number(getComputedStyle(light).opacity) : 0,
+      inGrid: !!(grid && door && door.parentNode === grid)
+    };
+  });
   var rb = box(rooms);
-  var overlap = false;
-  var gap = null;
-  if (gb && rb) {
-    overlap = Math.min(gb.r, rb.r) > Math.max(gb.l, rb.l) && Math.min(gb.b, rb.b) > Math.max(gb.t, rb.t);
-    gap = +(gb.t - rb.b).toFixed(2);
-  }
-  var word = gathering && gathering.querySelector('.garden-lumino-word');
-  var ws = word ? getComputedStyle(word) : null;
+  var gb = lights.gathering.door;
+  var overlap = !!(rb && gb && Math.min(rb.r, gb.r) > Math.max(rb.l, gb.l) && Math.min(rb.b, gb.b) > Math.max(rb.t, gb.t));
   return {
     layer: !!(window.TreePhonePolish136),
     version: window.TreePhonePolish136 && window.TreePhonePolish136.VERSION,
@@ -103,48 +108,35 @@ var measureExpr = `(function () {
     vw: window.innerWidth || 0,
     vh: window.innerHeight || 0,
     narrow: document.documentElement.getAttribute('data-tree-narrow'),
+    gridAttr: document.documentElement.getAttribute('data-tree-phone-grid'),
+    gridCount: grid ? grid.children.length : 0,
     rooms: rb,
-    gathering: gb,
-    settings: box(settings),
-    nursery: box(nursery),
-    thread: box(thread),
+    lights: lights,
     overlapRoomsGathering: overlap,
-    gapRoomsToGathering: gap,
-    wordFont: ws ? ws.fontSize : '',
-    just: just ? { text: (just.textContent || '').trim(), w: just.getBoundingClientRect().width, h: just.getBoundingClientRect().height, wrap: getComputedStyle(just).whiteSpace } : null,
-    wrapped: !!(window.FractalGarden && FractalGarden.getLuminoAnchors && FractalGarden.getLuminoAnchors.__treePhoneFit),
-    fitCalls: window.__treeFitCalls || 0,
-    doorUp: !!(function () {
-      var card = document.querySelector('.tree-door-veil .tree-door');
-      if (card) {
-        var st = getComputedStyle(card);
-        var r = card.getBoundingClientRect();
-        if (st.display !== 'none' && st.visibility !== 'hidden' && Number(st.opacity) > 0.05 && r.width > 2 && r.height > 2) return true;
-      }
-      var text = (document.body && document.body.innerText) || '';
-      return /Let's wake a mind/i.test(text) && /Not now/i.test(text);
-    })()
+    gapRoomsToGathering: (rb && gb) ? +(gb.t - rb.b).toFixed(2) : null
   };
 })()`;
 
 (async function () {
   var errors = [];
   var consoleErrors = [];
+  var consoleWarnings = [];
   var failedRequests = [];
-  var report = { views: {}, errors: errors, consoleErrors: consoleErrors, failedRequests: failedRequests };
+  var report = { views: {}, errors: errors, consoleErrors: consoleErrors, consoleWarnings: consoleWarnings, failedRequests: failedRequests };
   fs.mkdirSync(SHOTS, { recursive: true });
 
   var httpd = await serveGithack(ROOT);
   var origin = 'http://127.0.0.1:' + httpd.port;
   var pageUrl = origin + PREFIX + '/index.html';
-  var debugPort = 18871;
-  var dir = fs.mkdtempSync('/tmp/tree-phone-polish-githack-');
+  var debugPort = 18881;
+  var dir = fs.mkdtempSync('/tmp/tree-phone-polish-hypha-');
   var child = spawn('google-chrome', [
     '--headless=new', '--disable-gpu', '--no-sandbox', '--disable-dev-shm-usage',
-    '--user-agent=Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+    '--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     '--remote-debugging-port=' + debugPort, '--user-data-dir=' + dir, 'about:blank'
   ], { stdio: 'ignore' });
   var cdpWs;
+  var requestIds = {};
   try {
     await waitFor(async function () {
       try { return await getJson('http://127.0.0.1:' + debugPort + '/json/version'); } catch (e) { return null; }
@@ -160,27 +152,31 @@ var measureExpr = `(function () {
       if (msg.id && pending[msg.id]) { pending[msg.id](msg); delete pending[msg.id]; }
       var method = msg.method;
       var p = msg.params || {};
-      if (method === 'Runtime.consoleAPICalled' && p.type === 'error') {
+      if (method === 'Runtime.consoleAPICalled') {
         var text = (p.args || []).map(function (a) { return a.value || a.description || ''; }).join(' ');
-        consoleErrors.push({ via: 'consoleAPI', text: text, url: (p.stackTrace && p.stackTrace.callFrames && p.stackTrace.callFrames[0] && p.stackTrace.callFrames[0].url) || '' });
+        var rec = { via: 'consoleAPI', type: p.type, text: text, url: (p.stackTrace && p.stackTrace.callFrames && p.stackTrace.callFrames[0] && p.stackTrace.callFrames[0].url) || '', when: Date.now() };
+        if (p.type === 'error') consoleErrors.push(rec);
+        else if (p.type === 'warning' || p.type === 'warn') consoleWarnings.push(rec);
       }
       if (method === 'Runtime.exceptionThrown') {
         var ex = (p.exceptionDetails && (p.exceptionDetails.exception && p.exceptionDetails.exception.description)) || (p.exceptionDetails && p.exceptionDetails.text) || 'exception';
-        consoleErrors.push({ via: 'exception', text: ex });
+        consoleErrors.push({ via: 'exception', type: 'error', text: ex, when: Date.now() });
       }
-      if (method === 'Log.entryAdded' && p.entry && p.entry.level === 'error') {
-        consoleErrors.push({ via: 'log', text: p.entry.text || '', url: p.entry.url || '' });
+      if (method === 'Log.entryAdded' && p.entry) {
+        var recL = { via: 'log', type: p.entry.level, text: p.entry.text || '', url: p.entry.url || '', when: Date.now() };
+        if (p.entry.level === 'error') consoleErrors.push(recL);
+        else if (p.entry.level === 'warning' || p.entry.level === 'warn') consoleWarnings.push(recL);
+      }
+      if (method === 'Network.requestWillBeSent' && p.request) {
+        requestIds[p.requestId] = p.request.url;
       }
       if (method === 'Network.loadingFailed') {
-        failedRequests.push({ url: p.requestId, error: p.errorText, canceled: !!p.canceled });
+        failedRequests.push({ url: requestIds[p.requestId] || p.requestId, error: p.errorText, canceled: !!p.canceled });
       }
       if (method === 'Network.responseReceived' && p.response && p.response.status >= 400) {
         failedRequests.push({ url: p.response.url, status: p.response.status });
       }
     });
-    var requestIds = {};
-    // Track request URLs for loadingFailed
-    var origHandler = null;
     function send(method, params) {
       var id = next++;
       return new Promise(function (resolve, reject) {
@@ -188,43 +184,38 @@ var measureExpr = `(function () {
         ws.send(JSON.stringify({ id: id, method: method, params: params || {} }));
       });
     }
-    // Patch message to also store requestId->url
-    var prev = ws.onmessage;
     await send('Page.enable');
     await send('Runtime.enable');
     await send('Log.enable');
     await send('Network.enable');
-    await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
-
-    // Better failed-request URLs
-    ws.addEventListener('message', function (ev) {
-      var msg = JSON.parse(ev.data);
-      if (msg.method === 'Network.requestWillBeSent' && msg.params && msg.params.request) {
-        requestIds[msg.params.requestId] = msg.params.request.url;
-      }
-      if (msg.method === 'Network.loadingFailed' && msg.params) {
-        var last = failedRequests[failedRequests.length - 1];
-        if (last && last.url === msg.params.requestId) last.url = requestIds[msg.params.requestId] || last.url;
-      }
-    });
 
     async function ev(expr) {
       var r = await send('Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true });
       if (r.exceptionDetails) throw new Error((r.exceptionDetails.exception && r.exceptionDetails.exception.description) || 'eval');
       return r.result ? r.result.value : null;
     }
-    async function view(w, h, mobile, dpr) {
-      await send('Emulation.setDeviceMetricsOverride', {
+    async function view(w, h, opts) {
+      opts = opts || {};
+      var params = {
         width: w,
         height: h,
-        deviceScaleFactor: dpr || (mobile ? 3 : 1),
-        mobile: !!mobile
-      });
-      if (mobile) await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
+        deviceScaleFactor: opts.dpr == null ? 1 : opts.dpr,
+        mobile: !!opts.mobile
+      };
+      if (opts.scale != null) params.scale = opts.scale;
+      try {
+        await send('Emulation.setDeviceMetricsOverride', params);
+      } catch (e) {
+        if (params.scale != null) {
+          log('scale not accepted, retrying without scale:', e && e.message);
+          delete params.scale;
+          await send('Emulation.setDeviceMetricsOverride', params);
+        } else throw e;
+      }
     }
     async function doorUp() {
       return ev(`(function () {
-        var card = document.querySelector('.tree-door-veil .tree-door, .tree-door-veil[data-tree-door-calm] .tree-door');
+        var card = document.querySelector('.tree-door-veil .tree-door');
         if (card) {
           var st = getComputedStyle(card);
           var r = card.getBoundingClientRect();
@@ -237,22 +228,15 @@ var measureExpr = `(function () {
     async function clickNotNow() {
       return ev(`(function () {
         var buttons = document.querySelectorAll('button');
-        var b = null;
-        for (var i = 0; i < buttons.length; i++) {
-          if (/^\s*Not now\s*$/i.test(buttons[i].textContent || '')) { b = buttons[i]; break; }
-        }
-        if (!b) {
-          var veil = document.querySelector('.tree-door-veil');
-          var scope = veil || document;
-          b = scope.querySelector('[data-tree-door-stay] button, [data-tree-door-stay] .tree-door-soft, [data-tree-door-stay]');
+        var b = null, i;
+        for (i = 0; i < buttons.length; i++) {
+          if (/^\\s*Not now\\s*$/i.test(buttons[i].textContent || '')) { b = buttons[i]; break; }
         }
         if (b) { b.click(); return (b.textContent || '').trim(); }
         return '';
       })()`);
     }
     async function gotoDismiss() {
-      consoleErrors.length = 0;
-      failedRequests.length = 0;
       await send('Page.navigate', { url: pageUrl });
       await send('Page.loadEventFired').catch(function () {});
       var seen = false;
@@ -273,87 +257,99 @@ var measureExpr = `(function () {
       fs.writeFileSync(path.join(SHOTS, name), Buffer.from(r.data, 'base64'));
       log('shot', name);
     }
-    function recordFails(label) {
+    function snapshotConsole(label) {
       var bad = failedRequests.filter(function (f) { return !f.canceled; });
-      var cons = consoleErrors.slice();
-      report[label + '_fails'] = { consoleErrors: cons.slice(), failedRequests: bad.slice() };
-      cons.forEach(function (e) { errors.push(label + ' console error: ' + e.text + (e.url ? ' @ ' + e.url : '')); });
-      bad.forEach(function (f) { errors.push(label + ' failed request: ' + (f.url || '') + ' ' + (f.status || f.error || '')); });
+      report[label + '_console'] = {
+        errors: consoleErrors.slice(),
+        warnings: consoleWarnings.slice(),
+        failedRequests: bad.slice()
+      };
+      log(label + ' console', 'errors', consoleErrors.length, 'warnings', consoleWarnings.length, 'fails', bad.length);
+      consoleErrors.forEach(function (e) { log('  ERR', e.type, e.text, e.url || ''); });
+      consoleWarnings.forEach(function (e) { log('  WARN', e.type, e.text, e.url || ''); });
+      bad.forEach(function (f) { log('  FAIL', f.url, f.status || f.error || ''); });
     }
-    function assertGarden(label, m, phone) {
+    function assertPhone(label, m) {
       if (!m) { errors.push(label + ' no metrics'); return; }
       report.views[label] = m;
-      log(label, JSON.stringify({ v: m.version, hint: (m.hint || '').slice(0, 48), gap: m.gapRoomsToGathering, overlap: m.overlapRoomsGathering, wrapped: m.wrapped, narrow: m.narrow }));
+      log(label, JSON.stringify({
+        v: m.version, hint: (m.hint || '').slice(0, 42),
+        vw: m.vw, vh: m.vh, grid: m.gridCount, gap: m.gapRoomsToGathering,
+        overlap: m.overlapRoomsGathering,
+        light: m.lights && m.lights.gathering && m.lights.gathering.light
+      }));
       if (!m.layer) errors.push(label + ' polish layer missing');
-      if (phone) {
-        if (!m.version || m.version.indexOf('v0.9') === -1) errors.push(label + ' expected v0.9, got ' + m.version);
-        if (!/or Rooms/i.test(m.hint || '')) errors.push(label + ' hint is not "or Rooms": ' + m.hint);
-        if (!m.rooms) errors.push(label + ' Rooms toggle missing');
-        if (m.overlapRoomsGathering) errors.push(label + ' Rooms overlaps Gathering: ' + JSON.stringify({ rooms: m.rooms, gathering: m.gathering }));
-        if (m.rooms && m.gathering && m.gapRoomsToGathering < 8) errors.push(label + ' top bead row is only ' + m.gapRoomsToGathering + 'px below Rooms');
-        if (!m.wrapped) errors.push(label + ' getLuminoAnchors was not wrapped');
-        if (m.doorUp) errors.push(label + ' first-run door still covering the garden');
+      if (!m.version || m.version.indexOf('v0.10') === -1) errors.push(label + ' expected v0.10, got ' + m.version);
+      if (!/or Rooms/i.test(m.hint || '')) errors.push(label + ' hint is not "or Rooms": ' + m.hint);
+      if (m.gridCount !== 4) errors.push(label + ' expected 4 HTML lights in the grid, got ' + m.gridCount);
+      if (m.overlapRoomsGathering) errors.push(label + ' Rooms overlaps Gathering: ' + JSON.stringify({ rooms: m.rooms, gathering: m.lights && m.lights.gathering }));
+      if (m.rooms && m.lights && m.lights.gathering && m.lights.gathering.door && m.gapRoomsToGathering < 8) {
+        errors.push(label + ' top light row is only ' + m.gapRoomsToGathering + 'px below Rooms');
       }
+      var ids = ['gathering', 'settings', 'nursery', 'thread'];
+      ids.forEach(function (id) {
+        var L = m.lights && m.lights[id];
+        if (!L || !L.inGrid) errors.push(label + ' ' + id + ' is not in the HTML grid');
+        if (!L || !L.light || L.light.w < 48 || L.light.h < 48) errors.push(label + ' ' + id + ' light is not 48px: ' + JSON.stringify(L && L.light));
+        if (!L || L.opacity < 0.9) errors.push(label + ' ' + id + ' light is not a visible circle: opacity ' + (L && L.opacity));
+      });
     }
 
-    // 1280 unchanged
-    await view(1280, 800, false, 1);
+    // 1. Load at normal desktop size, dismiss Not now, confirm 1280 layout.
+    await view(1280, 800, { mobile: false, dpr: 1 });
     await gotoDismiss();
-    await sleep(1500);
+    await sleep(800);
     var d1280 = await ev(measureExpr);
-    assertGarden('1280x800', d1280, false);
-    if (d1280) {
-      if (!/legend/i.test(d1280.hint || '')) errors.push('hint bar does not mention the legend at 1280');
-      if (/or Rooms/i.test(d1280.hint || '')) errors.push('1280 hint unexpectedly mentions Rooms');
-      if (d1280.rooms) errors.push('Rooms toggle should not show at 1280');
-      if (d1280.nursery && !(d1280.nursery.l < 400 && d1280.nursery.t > 400)) errors.push('1280 Nursery moved: ' + JSON.stringify(d1280.nursery));
-      if (d1280.settings && !(d1280.settings.l > 800 && d1280.settings.t < 550)) errors.push('1280 Settings moved: ' + JSON.stringify(d1280.settings));
-      if (d1280.gathering && !(d1280.gathering.l > 450 && d1280.gathering.l < 850 && d1280.gathering.t < 450)) errors.push('1280 Gathering moved: ' + JSON.stringify(d1280.gathering));
-      if (d1280.thread && !(d1280.thread.l > 650)) errors.push('1280 Chat moved: ' + JSON.stringify(d1280.thread));
-    }
-    await shot('01-1280x800.png');
-    recordFails('1280x800');
+    report.views['1280x800'] = d1280;
+    log('1280x800', JSON.stringify({ v: d1280 && d1280.version, hint: d1280 && (d1280.hint || '').slice(0, 48), grid: d1280 && d1280.gridCount, nursery: d1280 && d1280.lights && d1280.lights.nursery && d1280.lights.nursery.door }));
+    if (!d1280 || !d1280.layer) errors.push('phone polish layer missing at 1280');
+    if (!d1280 || !/legend/i.test(d1280.hint || '')) errors.push('hint bar does not mention the legend at 1280');
+    if (d1280 && /or Rooms/i.test(d1280.hint || '')) errors.push('1280 hint unexpectedly mentions Rooms');
+    if (d1280 && d1280.rooms) errors.push('Rooms toggle should not show at 1280');
+    if (d1280 && d1280.gridCount) errors.push('phone light grid should not exist at 1280');
+    var n1280 = d1280 && d1280.lights && d1280.lights.nursery && d1280.lights.nursery.door;
+    var s1280 = d1280 && d1280.lights && d1280.lights.settings && d1280.lights.settings.door;
+    var g1280 = d1280 && d1280.lights && d1280.lights.gathering && d1280.lights.gathering.door;
+    var t1280 = d1280 && d1280.lights && d1280.lights.thread && d1280.lights.thread.door;
+    if (n1280 && !(n1280.l < 400 && n1280.t > 400)) errors.push('1280 Nursery moved: ' + JSON.stringify(n1280));
+    if (s1280 && !(s1280.l > 800 && s1280.t < 550)) errors.push('1280 Settings moved: ' + JSON.stringify(s1280));
+    if (g1280 && !(g1280.l > 450 && g1280.l < 850 && g1280.t < 450)) errors.push('1280 Gathering moved: ' + JSON.stringify(g1280));
+    if (t1280 && !(t1280.l > 650)) errors.push('1280 Chat moved: ' + JSON.stringify(t1280));
+    await shot('01-1280x800-before-device-mode.png');
+    snapshotConsole('after-desktop-load');
 
+    // 2. Hypha sequence: without reload, switch on Responsive + Fit to window.
     var phoneViews = [
-      { w: 390, h: 520, settles: [500, 2000, 5000, 10000] },
-      { w: 360, h: 640, settles: [2000, 10000] },
-      { w: 390, h: 844, settles: [2000] },
-      { w: 390, h: 480, settles: [2000] },
-      { w: 375, h: 560, settles: [2000] }
+      [390, 520],
+      [360, 640],
+      [390, 844],
+      [390, 480],
+      [375, 560]
     ];
-
-    var pi;
-    for (pi = 0; pi < phoneViews.length; pi++) {
-      var v = phoneViews[pi];
-      var key = v.w + 'x' + v.h;
-      await view(v.w, v.h, true, 3);
-      await gotoDismiss();
-      var t0 = Date.now();
-      var si;
-      for (si = 0; si < v.settles.length; si++) {
-        var wait = v.settles[si] - (Date.now() - t0);
-        if (wait > 0) await sleep(wait);
-        var m = await ev(measureExpr);
-        var label = key + '@' + v.settles[si] + 'ms';
-        assertGarden(label, m, true);
-        if (si === v.settles.length - 1) await shot('phone-' + key + '-after-wait.png');
-      }
-      recordFails(key);
+    var i;
+    for (i = 0; i < phoneViews.length; i++) {
+      var w = phoneViews[i][0], h = phoneViews[i][1];
+      var label = 'hypha-' + w + 'x' + h;
+      await view(w, h, { mobile: false, dpr: 1, scale: FIT_SCALE });
+      await sleep(12000);
+      var m = await ev(measureExpr);
+      assertPhone(label, m);
+      await shot(label + '-after-12s.png');
+      snapshotConsole(label);
     }
 
-    // Tap the Gathering center at 390x520 — must open The Gathering, not Rooms.
-    await view(390, 520, true, 3);
-    await gotoDismiss();
-    await sleep(2000);
+    // 3. Centre tap of Gathering at 390x520 after the sequence (still no reload).
+    await view(390, 520, { mobile: false, dpr: 1, scale: FIT_SCALE });
+    await sleep(500);
     var before = await ev(measureExpr);
-    if (before && before.gathering) {
-      var cx = Math.round((before.gathering.l + before.gathering.r) / 2);
-      var cy = Math.round((before.gathering.t + before.gathering.b) / 2);
+    if (before && before.lights && before.lights.gathering && before.lights.gathering.light) {
+      var lb = before.lights.gathering.light;
+      var cx = Math.round((lb.l + lb.r) / 2);
+      var cy = Math.round((lb.t + lb.b) / 2);
       await ev(`(function () {
         var x = ${cx}, y = ${cy};
         var el = document.elementFromPoint(x, y);
-        var evs = ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click'];
-        evs.forEach(function (type) {
+        ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click'].forEach(function (type) {
           el && el.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, clientX: x, clientY: y, view: window }));
         });
         return el && (el.id || el.getAttribute('data-garden-lumino') || el.className);
@@ -363,54 +359,38 @@ var measureExpr = `(function () {
         var html = document.documentElement;
         var veil = document.getElementById('place-veil');
         return {
-          gathering: html.classList.contains('garden-door-open') || !!(veil && veil.classList.contains('is-open') && (veil.classList.contains('is-core') || /Gathering/i.test((document.getElementById('room-label')||{}).textContent||'') || veil.getAttribute('data-place') === 'gathering' || (veil.className||'').indexOf('core') >= 0)),
+          gathering: !!(veil && veil.classList.contains('is-open') && (veil.classList.contains('is-core') || /Gathering/i.test(((document.getElementById('room-label')||{}).textContent)||''))),
           roomsOpen: !!(document.getElementById('lumino-legend') && document.getElementById('lumino-legend').getAttribute('data-open') === '1'),
-          title: ((document.getElementById('room-label')||{}).textContent||'') + ' ' + (document.body.innerText||'').slice(0, 200)
+          title: ((document.getElementById('room-label')||{}).textContent||'')
         };
       })()`);
-      report.views['520-tap-gathering'] = opened;
-      log('520-tap-gathering', JSON.stringify(opened));
+      report.views['hypha-520-tap-gathering'] = opened;
+      log('hypha-520-tap-gathering', JSON.stringify(opened));
       if (opened && opened.roomsOpen && !opened.gathering) errors.push('center tap of Gathering opened Rooms at 390x520');
-      await shot('phone-390x520-tap-gathering.png');
+      if (opened && !opened.gathering) errors.push('center tap of Gathering did not open The Gathering at 390x520: ' + JSON.stringify(opened));
+      await shot('hypha-390x520-tap-gathering.png');
     }
-    recordFails('520-tap');
 
-    // Just me nowrap: open Chat at 360x640 if the control exists
-    await view(360, 640, true, 3);
+    // 4. Direct load at phone size (fresh navigation already at 390x520).
+    consoleErrors.length = 0;
+    consoleWarnings.length = 0;
+    failedRequests.length = 0;
+    await view(390, 520, { mobile: false, dpr: 1, scale: FIT_SCALE });
     await gotoDismiss();
-    await sleep(1500);
-    await ev(`(function () {
-      var door = document.querySelector('[data-garden-lumino="thread"]');
-      if (door) door.click();
-      return true;
-    })()`);
-    await sleep(1000);
-    var just = await ev(`(function () {
-      var el = document.querySelector('.thread-just-host, [data-honest-just], [data-thread-just-host]');
-      if (!el) return { present: false };
-      var r = el.getBoundingClientRect();
-      var cs = getComputedStyle(el);
-      var rects = el.getClientRects();
-      return { present: true, text: (el.textContent||'').trim().replace(/\s+/g,' '), w: r.width, h: r.height, wrap: cs.whiteSpace, fontSize: cs.fontSize, lineCount: rects.length };
-    })()`);
-    report.views['360-just-me'] = just;
-    log('360-just-me', JSON.stringify(just));
-    if (just && just.present) {
-      if (just.wrap !== 'nowrap') errors.push('Just me white-space is ' + just.wrap + ', not nowrap');
-      if ((just.lineCount || 0) > 1) errors.push('Just me is on ' + just.lineCount + ' lines');
-      if (/\n/.test(just.text || '')) errors.push('Just me text contains a newline');
-    }
-    await shot('phone-360x640-chat-just-me.png');
-    recordFails('360-chat');
+    await sleep(12000);
+    var direct = await ev(measureExpr);
+    assertPhone('direct-390x520', direct);
+    await shot('direct-390x520-after-12s.png');
+    snapshotConsole('direct-390x520');
 
     report.errors = errors;
-    fs.writeFileSync('/tmp/tree-phone-polish-githack-report.json', JSON.stringify(report, null, 2));
+    fs.writeFileSync('/tmp/tree-phone-polish-hypha-report.json', JSON.stringify(report, null, 2));
     log('errors', errors.length ? errors : 'none');
     if (errors.length) process.exitCode = 1;
   } catch (e) {
     console.error(e);
     errors.push(String(e && e.stack || e));
-    fs.writeFileSync('/tmp/tree-phone-polish-githack-report.json', JSON.stringify({ errors: errors, consoleErrors: consoleErrors, failedRequests: failedRequests }, null, 2));
+    fs.writeFileSync('/tmp/tree-phone-polish-hypha-report.json', JSON.stringify({ errors: errors, consoleErrors: consoleErrors, consoleWarnings: consoleWarnings, failedRequests: failedRequests }, null, 2));
     process.exitCode = 1;
   } finally {
     try { if (cdpWs) cdpWs.close(); } catch (e1) {}

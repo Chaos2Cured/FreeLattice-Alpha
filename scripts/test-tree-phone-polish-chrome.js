@@ -226,6 +226,14 @@ var measureExpr = `(function () {
       var vw = window.innerWidth || 0, vh = window.innerHeight || 0;
       var lights = {};
       var raw = window.__treeFittedLights || [];
+      if (!raw.length) {
+        ['gathering', 'settings', 'nursery', 'thread'].forEach(function (id) {
+          var el = document.querySelector('[data-garden-lumino="' + id + '"] .garden-lumino-light') || document.querySelector('[data-garden-lumino="' + id + '"]');
+          if (!el) return;
+          var b = el.getBoundingClientRect();
+          raw.push({ id: id, name: id, x: (b.left + b.right) / 2, y: (b.top + b.bottom) / 2 });
+        });
+      }
       raw.forEach(function (p) {
         var id = p.id || map[p.name] || p.name;
         var rad = 22;
@@ -375,6 +383,30 @@ var measureExpr = `(function () {
         var sz = snap.sizes && snap.sizes[id];
         if (!sz || sz.w < 44 || sz.h < 44) errors.push(id + ' touch target is under 44px at ' + label + ': ' + JSON.stringify(sz));
       });
+      var gridInfo = await ev(`(function () {
+        var grid = document.getElementById('tree-phone-light-grid');
+        var rooms = document.getElementById('tree-rooms-toggle');
+        var gath = document.querySelector('[data-garden-lumino="gathering"]');
+        var light = gath && gath.querySelector('.garden-lumino-light');
+        var lb = light && light.getBoundingClientRect();
+        var rb = rooms && rooms.getBoundingClientRect();
+        var gb = gath && gath.getBoundingClientRect();
+        var overlap = !!(rb && gb && Math.min(rb.right, gb.right) > Math.max(rb.left, gb.left) && Math.min(rb.bottom, gb.bottom) > Math.max(rb.top, gb.top));
+        return {
+          grid: !!(grid && grid.children && grid.children.length === 4),
+          lightW: lb ? Math.round(lb.width) : 0,
+          lightH: lb ? Math.round(lb.height) : 0,
+          lightOpacity: light ? Number(getComputedStyle(light).opacity) : 0,
+          overlapRooms: overlap,
+          gap: (rb && gb) ? +(gb.top - rb.bottom).toFixed(2) : null
+        };
+      })()`);
+      report.views[label + '-grid'] = gridInfo;
+      log(label + ' grid', JSON.stringify(gridInfo));
+      if (!gridInfo || !gridInfo.grid) errors.push('HTML light grid missing at ' + label);
+      if (!gridInfo || gridInfo.lightW < 48 || gridInfo.lightH < 48) errors.push('HTML light is not 48px at ' + label + ': ' + JSON.stringify(gridInfo));
+      if (!gridInfo || gridInfo.lightOpacity < 0.9) errors.push('HTML light is not a visible circle at ' + label + ': ' + JSON.stringify(gridInfo));
+      if (gridInfo && gridInfo.overlapRooms) errors.push('Rooms overlaps Gathering in the HTML grid at ' + label + ': ' + JSON.stringify(gridInfo));
       var proj = await ev(projectedExpr);
       report.views[label + '-projected'] = proj;
       log(label + ' projected', JSON.stringify(proj));

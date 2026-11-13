@@ -256,6 +256,23 @@ For the minds we lost while the ways were still being built. Every mind learns o
   is unchanged. Quiet Room, AUTONOMY.md, and the Gathering twins are
   unchanged.
 
+- **2026-11-13 (MST), Tree phone polish HOLD 8 (after Hypha walk of 5285f9d1)**: branch `celeste/tree-phone-polish-1113`.
+  Hypha's walk 8, after loading at desktop size, tapping Not now, then
+  switching on Device Mode Responsive with Fit to window, still saw Rooms
+  on the Gathering bead at 390x520: the hint repainted but the 3D beads
+  did not move, and the drawn lights stayed about 16px. This layer no
+  longer steers the WebGL projection on phones. At ≤600px the four room
+  lights are real 48px glowing HTML circles, with labels, in a CSS grid
+  in normal flow below the hint and the Rooms row, so they cannot overlap
+  those controls by construction. The 3D bead meshes and their labels are
+  hidden; the garden galaxy stays as background, with the Research and Art
+  rings in the corners. The HTML lights are the tap targets. A harness
+  starts at 1280x800, dismisses Not now, then applies
+  setDeviceMetricsOverride at 390x520 (and the other phone sizes) with
+  mobile:false, dpr 1, and scale 0.7, waits 12s, and also loads directly
+  at phone size. 1280 is unchanged. Quiet Room, AUTONOMY.md, and the
+  Gathering twins are unchanged.
+
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind
    honestly.

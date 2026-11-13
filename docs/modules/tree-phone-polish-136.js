@@ -1,24 +1,21 @@
-// tree-phone-polish-136.js v-tree-phone-polish-136-v0.9
+// tree-phone-polish-136.js v-tree-phone-polish-136-v0.10
 // SPDX-License-Identifier: MIT
 // Layer, never delete. Does not rewrite garden-rooms.js, fractal-garden.js,
 // garden-thread.js, nursery-growth.js, tree-door-first-run-calm.js,
 // AUTONOMY.md, or the Gathering twins.
 //
-// At narrow widths, the projected garden lights themselves (not only the
-// HTML door boxes) stay inside the viewport, clear of the Research icon,
-// spaced far enough to tap, with a 44px hit around each bead. The fitted
-// camera and a render-time layout are hooked before the first garden paint.
-// On phones (≤600px), an opened room is one opaque full-screen panel whose
-// content stays in normal document flow and the panel itself scrolls. The
-// v0.4 per-element fixed pins, height caps, and inner scroll boxes are
-// neutralized, as is the v-tree-hypha-softs-133 phone send-strip pin, so a
-// room or card shows exactly one compose row in flow. On phones the legend
-// collapses to a Rooms toggle, and the beads sit in the free space, 8px from
-// every other garden box. Garden labels and dots stay behind the panel.
+// On phones (≤600px) the four room lights are real HTML 48px glowing
+// circles in a CSS grid, in normal flow below the hint and the Rooms row,
+// so they cannot overlap those controls by construction. The 3D bead
+// meshes and their labels are hidden; the garden galaxy stays as
+// background, with the Research and Art rings in the corners. The HTML
+// lights are the tap targets. This layer no longer steers the WebGL
+// projection or packs 3D beads on phones. 1280 is unchanged. An opened
+// room is still one opaque full-screen panel in normal flow.
 (function (root) {
   'use strict';
 
-  var VERSION = 'v-tree-phone-polish-136-v0.9';
+  var VERSION = 'v-tree-phone-polish-136-v0.10';
   var STYLE_ID = 'tree-phone-polish-136-style';
   var NARROW = 600;
   var MIN_GAP = 100;
@@ -604,6 +601,83 @@
       'border-radius:8px;',
       'z-index:16;pointer-events:auto;',
       'max-height:60vh;overflow:auto;}',
+
+      /* Phone garden: hint, Rooms, and a 2x2 of real 48px HTML lights
+         in one flow column, so the lights cannot sit on Rooms. */
+      'html[data-tree-phone-grid] #tree-phone-stack{',
+      'position:fixed;left:0;right:0;top:44px;bottom:0;',
+      'z-index:14;display:flex;flex-direction:column;align-items:stretch;',
+      'box-sizing:border-box;padding:0 10px 0;pointer-events:none;}',
+      'html[data-tree-phone-grid] #tree-phone-stack > *{pointer-events:auto;}',
+      'html.thread-open #tree-phone-stack,',
+      'html:has(#place-veil.is-open) #tree-phone-stack,',
+      'html:has(#thread-veil.is-open) #tree-phone-stack,',
+
+      'html[data-tree-phone-grid] #tree-phone-stack #garden-start{',
+      'position:static !important;left:auto !important;right:auto !important;',
+      'top:auto !important;bottom:auto !important;width:auto !important;',
+      'margin:8px 0 0 !important;padding:0 4px !important;}',
+      'html[data-tree-phone-grid] #tree-phone-rooms-row{',
+      'display:flex;flex-direction:row;align-items:center;',
+      'margin:8px 0;min-height:44px;flex:0 0 auto;}',
+      'html[data-tree-phone-grid] #tree-phone-stack #tree-rooms-toggle{',
+      'position:static !important;top:auto !important;left:auto !important;',
+      'display:block;}',
+      'html[data-tree-phone-grid] #tree-phone-light-grid{',
+      'flex:1 1 auto;min-height:0;display:grid;',
+      'grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;',
+      'place-items:center;pointer-events:none;',
+      'padding:4px 0 120px;}',
+      'html[data-tree-phone-grid] #tree-phone-light-grid .garden-lumino,',
+      'html[data-tree-phone-grid] #tree-phone-light-grid .garden-lumino.is-attached{',
+      'pointer-events:auto;position:relative !important;',
+      'left:auto !important;top:auto !important;',
+      'right:auto !important;bottom:auto !important;',
+      'transform:none !important;translate:0 !important;',
+      'width:auto !important;height:auto !important;',
+      'min-width:' + HIT + 'px !important;min-height:' + HIT + 'px !important;',
+      'display:flex !important;flex-direction:column !important;',
+      'align-items:center;justify-content:center;',
+      'gap:6px;padding:0;margin:0;border:0;background:transparent;',
+      'overflow:visible !important;z-index:2;}',
+      'html[data-tree-phone-grid] #tree-phone-light-grid .garden-lumino-light,',
+      'html[data-tree-phone-grid] #tree-phone-light-grid .garden-lumino.is-attached .garden-lumino-light{',
+      'width:' + HIT + 'px !important;height:' + HIT + 'px !important;',
+      'min-width:' + HIT + 'px !important;min-height:' + HIT + 'px !important;',
+      'opacity:1 !important;border-radius:50% !important;',
+      'display:block !important;flex:0 0 ' + HIT + 'px;',
+      'animation:none !important;}',
+      'html[data-tree-phone-grid] #tree-phone-light-grid .is-gathering .garden-lumino-light{',
+      'background:#e8b019 !important;',
+      'box-shadow:0 0 18px rgba(232,176,25,0.95),0 0 4px #e8b019 !important;}',
+      'html[data-tree-phone-grid] #tree-phone-light-grid .is-settings .garden-lumino-light{',
+      'background:#2dd4bf !important;',
+      'box-shadow:0 0 18px rgba(45,212,191,0.9),0 0 4px #2dd4bf !important;}',
+      'html[data-tree-phone-grid] #tree-phone-light-grid .is-nursery .garden-lumino-light{',
+      'background:#34d399 !important;',
+      'box-shadow:0 0 18px rgba(52,211,153,0.9),0 0 4px #34d399 !important;}',
+      'html[data-tree-phone-grid] #tree-phone-light-grid .is-thread .garden-lumino-light{',
+      'background:#a78bfa !important;',
+      'box-shadow:0 0 18px rgba(167,139,250,0.9),0 0 4px #a78bfa !important;}',
+      'html[data-tree-phone-grid] #tree-phone-light-grid .garden-lumino-word,',
+      'html[data-tree-phone-grid] #tree-phone-light-grid .garden-lumino.is-attached .garden-lumino-word{',
+      'position:static !important;left:auto !important;top:auto !important;',
+      'right:auto !important;bottom:auto !important;',
+      'transform:none !important;width:auto !important;height:auto !important;',
+      'overflow:visible !important;clip:auto !important;clip-path:none !important;',
+      'white-space:nowrap !important;font-size:0.95rem !important;',
+      'line-height:1.2 !important;padding:2px 6px !important;',
+      'pointer-events:auto;background:rgba(12,10,26,0.92);',
+      'border-radius:6px;}',
+      '@media (max-width: 360px){',
+      'html[data-tree-phone-grid] #tree-phone-light-grid .garden-lumino-word{',
+      'font-size:1.05rem !important;}',
+      '}',
+      'html[data-tree-phone-grid] #tree-phone-light-grid .garden-lumino.is-attached[data-garden-lumino="gathering"]::after{',
+      'content:none !important;display:none !important;width:0 !important;height:0 !important;}',
+      'html[data-tree-phone-grid] #tend-center,',
+      'html[data-tree-phone-grid] .tend-center{',
+      'display:none !important;visibility:hidden !important;pointer-events:none !important;}',
     ].join('');
     (d.head || d.documentElement).appendChild(s);
   }
@@ -768,6 +842,8 @@
   // (Gathering / Settings on top, Nursery / Chat below), 8px from every
   // reserved box. Used for both the HTML door anchors and the 3D lights.
   function fitProjected(points, vw, vh) {
+    /* v0.10: no JS packing of 3D or HTML beads on phones. */
+    return points;
     if (!points || !points.length) return points;
     if (!isNarrow()) return points;
     try { placeRoomsToggle(); } catch (eFit) {}
@@ -857,6 +933,8 @@
   }
 
   function wrapAnchors() {
+    /* v0.10: phone lights are an HTML grid; do not wrap projection. */
+    return;
     var FG = root.FractalGarden;
     if (!FG || typeof FG.getLuminoAnchors !== 'function') return;
     if (FG.getLuminoAnchors.__treePhoneFit) { _wrapped = true; return; }
@@ -902,6 +980,8 @@
   }
 
   function hookFov() {
+    /* v0.10: do not steer the camera FOV on phones. */
+    return;
     if (_fovHooked) return;
     var THREE = root.THREE;
     if (!THREE || !THREE.PerspectiveCamera || !THREE.PerspectiveCamera.prototype) return;
@@ -935,6 +1015,26 @@
 
   var _fitting = false;
   function withFittedAgents(scene, camera, renderer, fn) {
+    /* v0.10: hide the 3D room beads (and their labels) on phones
+       instead of reprojecting them. The CSS grid is the tap target. */
+    if (!isNarrow() || !scene) return fn();
+    var hidden = [];
+    try {
+      scene.traverse(function (obj) {
+        if (!isAgent(obj)) return;
+        hidden.push({ obj: obj, vis: obj.visible });
+        obj.visible = false;
+      });
+    } catch (eH) { return fn(); }
+    try { return fn(); }
+    finally {
+      var i;
+      for (i = 0; i < hidden.length; i++) {
+        try { hidden[i].obj.visible = hidden[i].vis; } catch (eR) {}
+      }
+    }
+  }
+  function withFittedAgents_removed(scene, camera, renderer, fn) {
     var THREE = root.THREE;
     if (_fitting || !isNarrow() || !scene || !camera || !THREE || !THREE.Vector3) return fn();
     var agents = [];
@@ -1220,15 +1320,10 @@
       _hintWatch = root.setInterval(function () {
         try { markNarrow(); } catch (eN) {}
         try { paintHint(); } catch (eH) {}
-        try { wrapAnchors(); } catch (eW) {}
         try { hookRender(); } catch (eR) {}
         placeRoomsToggle();
+        try { ensurePhoneGrid(); } catch (eG) {}
         placeWaitHint();
-        try {
-          if (isNarrow() && root.FractalGarden && typeof root.FractalGarden.getLuminoAnchors === 'function') {
-            root.FractalGarden.getLuminoAnchors();
-          }
-        } catch (eA) {}
       }, 400);
     }
   }
@@ -1334,8 +1429,13 @@
       } catch (eH) {}
     }
     if (!hb) hb = paintedBox(header, 0);
-    var top = hb ? Math.round(hb.b + BOX_GAP) : 120;
-    btn.style.top = top + 'px';
+    if (d.getElementById('tree-phone-stack')) {
+      btn.style.removeProperty('top');
+      btn.style.removeProperty('left');
+    } else {
+      var top = hb ? Math.round(hb.b + BOX_GAP) : 120;
+      btn.style.top = top + 'px';
+    }
     if (list.getAttribute('data-open') === '1') {
       var br2 = btn.getBoundingClientRect();
       var top2 = Math.round(br2.bottom + BOX_GAP) + 'px';
@@ -1346,30 +1446,119 @@
     placeClayBetweenRings();
   }
 
+
+  var _homes = null;
+  function rememberHome(el) {
+    if (!el || !_homes) return;
+    if (_homes[el.id || el.getAttribute('data-garden-lumino') || '']) return;
+    _homes[el.id || el.getAttribute('data-garden-lumino') || ''] = {
+      parent: el.parentNode,
+      next: el.nextSibling
+    };
+  }
+  function sendHome(el) {
+    if (!el || !_homes) return;
+    var key = el.id || el.getAttribute('data-garden-lumino') || '';
+    var home = _homes[key];
+    if (!home || !home.parent) return;
+    if (home.next && home.next.parentNode === home.parent) home.parent.insertBefore(el, home.next);
+    else home.parent.appendChild(el);
+  }
+
+  function teardownPhoneGrid() {
+    var d = doc();
+    if (!d) return;
+    try { d.documentElement.removeAttribute('data-tree-phone-grid'); } catch (e0) {}
+    var hint = d.getElementById('garden-start');
+    var btn = d.getElementById('tree-rooms-toggle');
+    var ids = ['gathering', 'settings', 'nursery', 'thread'];
+    var i, el;
+    if (hint) sendHome(hint);
+    if (btn) sendHome(btn);
+    for (i = 0; i < ids.length; i++) {
+      el = d.querySelector('[data-garden-lumino="' + ids[i] + '"]');
+      if (el) sendHome(el);
+    }
+    var stack = d.getElementById('tree-phone-stack');
+    if (stack && stack.parentNode) stack.parentNode.removeChild(stack);
+  }
+
+  function ensurePhoneGrid() {
+    var d = doc();
+    if (!d || !d.body) return;
+    markNarrow();
+    if (!isNarrow()) {
+      teardownPhoneGrid();
+      return;
+    }
+    var galaxy = '';
+    try { galaxy = d.documentElement.getAttribute('data-garden-galaxy') || ''; } catch (eG) {}
+    if (galaxy && galaxy !== 'garden') {
+      teardownPhoneGrid();
+      return;
+    }
+    if (!_homes) _homes = {};
+    var header = d.getElementById('garden-header');
+    var stack = d.getElementById('tree-phone-stack');
+    if (!stack) {
+      stack = d.createElement('div');
+      stack.id = 'tree-phone-stack';
+      if (header && header.parentNode) header.parentNode.insertBefore(stack, header.nextSibling);
+      else d.body.insertBefore(stack, d.body.firstChild);
+    }
+    var hint = d.getElementById('garden-start');
+    if (hint) {
+      rememberHome(hint);
+      if (hint.parentNode !== stack) stack.appendChild(hint);
+    }
+    var roomsRow = d.getElementById('tree-phone-rooms-row');
+    if (!roomsRow) {
+      roomsRow = d.createElement('div');
+      roomsRow.id = 'tree-phone-rooms-row';
+    }
+    if (roomsRow.parentNode !== stack) stack.appendChild(roomsRow);
+    var btn = d.getElementById('tree-rooms-toggle');
+    if (btn) {
+      rememberHome(btn);
+      if (btn.parentNode !== roomsRow) roomsRow.appendChild(btn);
+      btn.style.removeProperty('top');
+      btn.style.removeProperty('left');
+    }
+    var grid = d.getElementById('tree-phone-light-grid');
+    if (!grid) {
+      grid = d.createElement('div');
+      grid.id = 'tree-phone-light-grid';
+    }
+    if (grid.parentNode !== stack) stack.appendChild(grid);
+    var ids = ['gathering', 'settings', 'nursery', 'thread'];
+    var i, el;
+    for (i = 0; i < ids.length; i++) {
+      el = d.querySelector('[data-garden-lumino="' + ids[i] + '"]');
+      if (!el) continue;
+      rememberHome(el);
+      try {
+        el.style.removeProperty('left');
+        el.style.removeProperty('top');
+        el.style.removeProperty('transform');
+      } catch (eS) {}
+      if (el.parentNode !== grid) grid.appendChild(el);
+    }
+    try { d.documentElement.setAttribute('data-tree-phone-grid', '1'); } catch (eA) {}
+  }
+
   function start() {
     addStyle();
     markNarrow();
     paintHint();
-    placeRoomsToggle();
-    hookFov();
     hookRender();
-    hookFractalGardenAssign();
-    wrapAnchors();
+    placeRoomsToggle();
+    ensurePhoneGrid();
     watchRooms();
     keepNurseryTextInView();
     placeWaitHint();
-    if (!_wrapped) {
-      var n = 0;
-      var wait = root.setInterval(function () {
-        wrapAnchors();
-        n += 1;
-        if (_wrapped || n > 80) root.clearInterval(wait);
-      }, 50);
-    }
     if (!_readyTimer && root.setTimeout) {
       _readyTimer = root.setTimeout(markLightsReady, 800);
     }
-    scheduleSettledFits();
     watchViewport();
   }
 
@@ -1377,14 +1566,9 @@
   function refitNow() {
     try { markNarrow(); } catch (e0) {}
     try { paintHint(); } catch (eH) {}
-    try { wrapAnchors(); } catch (eW) {}
     try { placeRoomsToggle(); } catch (e1) {}
+    try { ensurePhoneGrid(); } catch (eG) {}
     try { paintHint(); } catch (eH2) {}
-    try {
-      if (root.FractalGarden && typeof root.FractalGarden.getLuminoAnchors === 'function') {
-        root.FractalGarden.getLuminoAnchors();
-      }
-    } catch (e2) {}
   }
 
   function scheduleSettledFits() {
@@ -1405,9 +1589,7 @@
     function onChange() {
       if (timer) root.clearTimeout(timer);
       timer = root.setTimeout(function () {
-        _settleOnce = false;
         refitNow();
-        scheduleSettledFits();
       }, 60);
     }
     root.addEventListener('resize', onChange);
@@ -1429,6 +1611,7 @@
     fitProjected: fitProjected,
     reservedGardenBoxes: reservedGardenBoxes,
     placeRoomsToggle: placeRoomsToggle,
+    ensurePhoneGrid: ensurePhoneGrid,
     refitNow: refitNow,
     BOX_GAP: BOX_GAP,
     TAP: TAP,
@@ -1437,9 +1620,7 @@
   root.TreePhonePolish136 = api;
 
   addStyle();
-  hookFov();
   hookRender();
-  hookFractalGardenAssign();
 
   if (doc()) {
     if (doc().readyState === 'loading') doc().addEventListener('DOMContentLoaded', start);
