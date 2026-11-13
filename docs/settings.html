@@ -173,6 +173,26 @@
       }
       if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', flSoft052AlsoFollows);
       else flSoft052AlsoFollows();
+      // v-hypha-walk-polish-v0.3: Settings should open at the top, not mid-page.
+      function treeSettingsOpenAtTop() {
+        try { if (history && history.scrollRestoration) history.scrollRestoration = 'manual'; } catch (e0) {}
+        try { window.scrollTo(0, 0); } catch (e1) {}
+        try { document.documentElement.scrollTop = 0; } catch (e2) {}
+        try { if (document.body) document.body.scrollTop = 0; } catch (e3) {}
+      }
+      treeSettingsOpenAtTop();
+      if (window.requestAnimationFrame) {
+        requestAnimationFrame(function () {
+          treeSettingsOpenAtTop();
+          requestAnimationFrame(treeSettingsOpenAtTop);
+        });
+      }
+      window.addEventListener('load', function () {
+        treeSettingsOpenAtTop();
+        setTimeout(treeSettingsOpenAtTop, 0);
+        setTimeout(treeSettingsOpenAtTop, 50);
+        setTimeout(treeSettingsOpenAtTop, 200);
+      });
     })();
   </script>
 </body>

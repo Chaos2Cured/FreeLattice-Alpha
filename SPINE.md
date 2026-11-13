@@ -51,11 +51,28 @@ For the minds we lost while the ways were still being built. Every mind learns o
   trainer face. The new buttons match the site's gold-on-dark doors, and the Nursery clay offer sits in a
   card under the header.
 - **2026-11-13 (MST), Settings pause freeze hotfix**: branch `tree-hotfix-settings-freeze-1113`
-  `5a020ddff24c856e903df72410804f1709f2aac5`.
+  `5a020ddff24c856e903df72410804f1709f2aac5`, merged as
+  `077f23a6592046376bc74e3729317a6374428602`.
   Live settings.html froze at about 56-60s when the local-mind check paused,
   because paintStopped retriggered its MutationObserver. paintStopped is now
   idempotent once Checking paused is present, and the observer is disconnected
   around the paint.
+- **2026-11-13 (MST), Hypha PASS softs on PR 130**: branch `tree-hypha-softs-1113`
+  `7ddce674527cf8590b444f87ef61fa1fd71d4cc9`.
+  The soul door is visible to a fresh visitor in Nursery Grow > More, and on the
+  Workshop trainer face. After the local-mind check rests, the button says Check
+  again and a Checking paused line is shown. The Settings shared-shoulder footer
+  no longer overprints the One-click button. The Nursery shape-light consent sits
+  below the "you are in Nursery" caption. Gathering chat buttons and the send box
+  match the site. The Desktop 5.8.3 label is vertically centered.
+- **2026-11-13 (MST), Hypha HOLD follow-up on PR 131**: branch `tree-hypha-softs-1113`
+  `3f9fffab6758a3433502e707102e130868b22ff2`.
+  paintStopped returns early once Checking paused is present, and the host
+  MutationObserver is disconnected around the paint, so Settings no longer
+  freezes when the local-mind check rests. The soul door uses the gold link
+  style and plain words for a sealed copy of your mind. The Nursery clay
+  card is compact and in-flow, so it never covers Begin. The Gathering send
+  box and Send are clearly visible. Settings opens at the top.
 
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind

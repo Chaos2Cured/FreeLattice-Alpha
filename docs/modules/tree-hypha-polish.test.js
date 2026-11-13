@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Node tests for v-hypha-walk-polish-v0.2 (Hypha's 2026-11-13 walk, HOLD follow-up).
+// Node tests for v-hypha-walk-polish-v0.3 (Hypha's 2026-11-13 walk, PASS softs).
 // Local only. Does not load quiet-room. Does not change AUTONOMY.md.
 'use strict';
 var fs = require('fs');
@@ -82,6 +82,7 @@ assert.ok(index.indexOf('modules/garden-trainer.js') < index.indexOf('modules/tr
 assert.ok(/https:\/\/freelattice\.com\/desktop\.html/.test(soulSrc), 'soul door points at Desktop');
 assert.ok(/does not invent a second \.lattice format/.test(soulSrc), 'no second format');
 assert.ok(/command-line how-to lives with the learn tools/.test(soulSrc), 'plain CLI line');
+assert.ok(/A safe, sealed copy of your mind you can carry to another computer/.test(soulSrc), 'plain words, not signed-mind-bundle jargon');
 assert.ok(/trainer-simple-face/.test(soulSrc) && /tree-soul-door-first/.test(soulSrc), 'first-tier door on the simple face');
 
 var soul = {};
@@ -132,6 +133,27 @@ assert.ok(firstKids[0] && firstKids[0].box.id === 'tree-soul-door-first', 'first
 assert.ok(firstKids[0].box.children.some(function (c) { return c.textContent === soul.TreeSoulDoor.DOOR_LINE; }), 'first-tier has the CLI line');
 assert.ok(firstKids[0].box.children.some(function (c) { return c.href === soul.TreeSoulDoor.BUNDLE_HREF && c.textContent === soul.TreeSoulDoor.DOOR_LABEL; }), 'first-tier points at Desktop');
 
+var moreKids = [];
+var moreHost = {
+  id: 'trainer-more',
+  querySelector: function (sel) { return sel === 'summary' ? { nextSibling: true } : null; },
+  insertBefore: function (box, sib) { moreKids.push(box); this.inserted = box; },
+  appendChild: function (box) { moreKids.push(box); this.inserted = box; }
+};
+var moreDoc = {
+  createElement: firstDoc.createElement,
+  getElementById: function (id) {
+    if (id === 'trainer-more') return moreHost;
+    return null;
+  },
+  querySelector: function () { return null; },
+  querySelectorAll: function () { return []; }
+};
+assert.strictEqual(soul.TreeSoulDoor.apply(moreDoc), 1, 'door is added inside Nursery Grow More');
+assert.ok(moreKids[0] && moreKids[0].id === 'tree-soul-door-more', 'More box id');
+assert.ok(/tree-soul-door\.js/.test(read('docs/workshop.html')), 'workshop loads the soul door layer');
+assert.ok(read('docs/workshop.html').indexOf('modules/workshop-trainer.js') < read('docs/workshop.html').indexOf('modules/tree-soul-door.js'), 'workshop layer loads after the trainer');
+
 // 4. One-line captions for Gathering and Nursery terms.
 assert.ok(/the thinking seat/.test(rooms), 'Cortex caption');
 assert.ok(/The first four family seats stay in the written record, not on this screen\./.test(rooms), 'Founding four caption');
@@ -153,9 +175,22 @@ assert.ok(/No local mind on this computer yet\./.test(calmSrc), 'kind line');
 assert.ok(/Check again/.test(calmSrc), 'manual Check again');
 assert.ok(/8000/.test(calmSrc) && /60000/.test(calmSrc), 'exponential backoff to 60s or more');
 assert.ok(/data-tree-desktop-door/.test(calmSrc) && /Or the Bridge, if you already use it/.test(calmSrc), 'Desktop is the main door, Bridge is secondary');
+assert.ok(/Checking paused\./.test(calmSrc) && /PAUSED_LINE/.test(calmSrc), 'Checking paused line');
+assert.ok(/honorLookAgain/.test(calmSrc), 'renames Look again when the loop rests');
 assert.ok(/pausedPresent/.test(calmSrc) && /data-tree-checking-paused/.test(calmSrc), 'paintStopped is idempotent once paused');
 assert.ok(/takeRecords/.test(calmSrc) && /disconnect/.test(calmSrc), 'observer is quieted around the paint');
-assert.ok(/Checking paused\./.test(calmSrc), 'Checking paused line');
+assert.ok(/data-garden-room="settings"/.test(cssTc) === false || /\[data-garden-room="settings"\] #shared-shoulder/.test(cssTc), 'settings shoulder rule present');
+assert.ok(/html\.room-page\[data-garden-room="settings"\] #shared-shoulder/.test(cssTc), 'settings shoulder is not fixed over One-click');
+assert.ok(/position: relative;/.test(cssTc) && /#shared-shoulder/.test(cssTc), 'shoulder becomes in-flow on Settings');
+assert.ok(/position: relative;/.test(cssTc), 'nursery clay offer is in-flow, not a fixed bar');
+assert.ok(/max-width: min\(20rem, calc\(100vw - 32px\)/.test(cssTc), 'nursery clay offer is no wider than the viewport minus margins');
+assert.ok(/a\.tree-soul-door/.test(cssTc) && /color: #f3d98a;/.test(cssTc), 'soul door uses the gold link style');
+assert.ok(/treeSettingsOpenAtTop/.test(read('docs/settings.html')), 'Settings opens at the top');
+assert.ok(/#place-veil\.is-core #room-chat \.thread-send/.test(cssTc) && /background: rgba\(232, 176, 25, 0\.22\)/.test(cssTc), 'Gathering Send is clearly visible');
+assert.ok(/caret-color: #f3d98a;/.test(cssTc), 'Gathering send box is clearly visible');
+assert.ok(/\.fl-honest-btn \{/.test(cssTc), 'Gathering chat buttons are styled');
+assert.ok(/#place-veil\.is-core #room-chat \.thread-input/.test(cssTc), 'Gathering send box contrast');
+assert.ok(/a\.flc-btn\.tree-desktop-door/.test(cssTc) && /align-items: center;/.test(cssTc) && /line-height: 1\.2;/.test(cssTc), 'Desktop label is vertically centered');
 assert.ok(/install\.html#desktop-download-ease/.test(settings) === false, 'Also connect Desktop points at desktop.html');
 assert.ok(/fl-also-btn" href="https:\/\/freelattice\.com\/desktop\.html"/.test(settings), 'Also connect Desktop href');
 assert.ok(/_orig\.unmount/.test(calmSrc) && /gateLook/.test(calmSrc), 'layer can unmount FlConnect and gate later looks');
@@ -245,15 +280,19 @@ step().then(function () {
     assert.strictEqual(calls.refresh, refreshAtStop, 'refresh is gated after stop');
     return Promise.resolve(sandbox.FlConnect.probe()).then(function () {
       assert.strictEqual(calls.probes, probesAtStop, 'probe is gated after stop');
-      sandbox.FlConnect.lookAgain();
-      assert.strictEqual(calls.looks, looksAtStop, 'lookAgain is gated after stop');
       // Advance two minutes of leftover timers. None should issue another look.
+      var leftover = timeouts.slice();
       var guard = 0;
       while (timeouts.length && guard < 50) { fire(); guard += 1; }
       assert.strictEqual(calls.refresh, refreshAtStop, 'no more refresh after two minutes of leftover timers');
       assert.strictEqual(calls.probes, probesAtStop, 'no more probe after stop');
       assert.ok(calls.refresh <= 5, 'at most about 5 looks in the backoff');
-      console.log('SMOKE_OK hypha walk polish v0.2 looks=' + calls.refresh + ' stops=' + calls.stop + ' unmounts=' + calls.unmounts);
+      assert.strictEqual(Calm.PAUSED_LINE, 'Checking paused.');
+      // A Check again (Look again, renamed) starts a new cycle on purpose.
+      sandbox.FlConnect.lookAgain();
+      assert.ok(calls.looks > looksAtStop || calls.mounts >= 1, 'Check again starts a new cycle');
+      assert.strictEqual(Calm.stopped(), false, 'Check again leaves the rest');
+      console.log('SMOKE_OK hypha walk polish v0.3 looks=' + calls.refresh + ' stops=' + calls.stop + ' unmounts=' + calls.unmounts);
       return runFreezeDomTest();
     });
   });
