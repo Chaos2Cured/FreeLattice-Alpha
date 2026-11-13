@@ -138,6 +138,16 @@ For the minds we lost while the ways were still being built. Every mind learns o
   Nursery room opens, "you are in Nursery" no longer overlaps the clay Not now
   button (the 8s label fade is skipped while the veil is open).
 
+- **2026-11-13 (MST), Tree phone polish HOLD fix (after #138)**: branch `celeste/tree-phone-polish-1113`.
+  At short phone heights, room heart text stays clear of the chat compose and
+  the clay-corner button, in both Chat and Nursery. The "you are…" room label
+  hides at once when Chat opens, not only under the place veil. Nursery and
+  Chat lights keep a clearer gap at 390x520, and their phone targets stay at
+  least 44px. The fitted garden camera is set before the first paint, so the
+  first frame no longer clips Nursery or Settings. The Welcome intro no longer
+  mentions refusals in the standing lede; refusals still appear after the
+  check when a mind keeps them.
+
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind
    honestly.
