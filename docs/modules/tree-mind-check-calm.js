@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// tree-mind-check-calm.js (v-hypha-walk-polish-v0.2). Layer, never delete.
+// tree-mind-check-calm.js (v-hypha-walk-polish-v0.3). Layer, never delete.
 // Does not change fl-connect.js. After the first look for a mind on this
 // computer, this layer stops FlConnect's own 8s loop, backs off (8s, 16s,
 // 32s, then 64s), and then rests with a kind note, a Check again button, and
@@ -11,10 +11,11 @@
 // secondary path.
 (function (root) {
   'use strict';
-  var VERSION = 'v-hypha-walk-polish-v0.2';
+  var VERSION = 'v-hypha-walk-polish-v0.3';
   var DESKTOP_HREF = 'https://freelattice.com/desktop.html';
   var DESKTOP_LABEL = 'FreeLattice Desktop 5.8.3';
   var KIND_LINE = 'No local mind on this computer yet.';
+  var PAUSED_LINE = 'Checking paused.';
   var DOOR_LINE = 'A clear door is FreeLattice Desktop 5.8.3, which can wake a mind on this computer.';
   var BRIDGE_LINE = 'Or the Bridge, if you already use it.';
   var LEDE_LINE = 'One door. FreeLattice Desktop 5.8.3 works on Mac, Windows, and Linux.';
@@ -108,6 +109,16 @@
       door.setAttribute('href', DESKTOP_HREF);
       door.setAttribute('rel', 'noopener noreferrer');
       door.setAttribute('data-tree-desktop-door', '1');
+      try {
+        door.style.display = 'inline-flex';
+        door.style.alignItems = 'center';
+        door.style.justifyContent = 'center';
+        door.style.lineHeight = '1.2';
+        door.style.minHeight = '48px';
+        door.style.boxSizing = 'border-box';
+        door.style.paddingTop = '0';
+        door.style.paddingBottom = '0';
+      } catch (eDoor) {}
       var tag = card.querySelector ? card.querySelector('.flc-tag') : null;
       if (tag && tag.nextSibling) card.insertBefore(door, tag.nextSibling);
       else if (card.firstChild) card.insertBefore(door, card.firstChild);
@@ -146,6 +157,34 @@
         if (/Download Bridge/.test(text)) ledes[i].textContent = LEDE_LINE;
       }
     }
+  }
+
+
+  function isLookAgain(btn) {
+    if (!btn) return false;
+    if (btn.getAttribute && (btn.getAttribute('data-flc-look-again') || btn.getAttribute('data-tree-mind-check-again'))) return true;
+    var cls = ' ' + String(btn.className || '') + ' ';
+    if (cls.indexOf(' flc-look-again ') !== -1) return true;
+    return String(btn.textContent || '') === 'Look again';
+  }
+
+  function honorLookAgain(host) {
+    host = host || hostEl();
+    if (!host || !host.querySelectorAll) return;
+    var buttons = host.querySelectorAll('button');
+    var i;
+    var first = null;
+    for (i = 0; i < buttons.length; i++) {
+      if (!isLookAgain(buttons[i])) continue;
+      if (String(buttons[i].textContent || '') === 'Look again') buttons[i].textContent = 'Check again';
+      if (!first) first = buttons[i];
+    }
+    if (!host.querySelector || host.querySelector('[data-tree-checking-paused]')) return;
+    var line = el('p', 'tree-checking-paused', PAUSED_LINE);
+    if (!line) return;
+    line.setAttribute('data-tree-checking-paused', '1');
+    if (first && first.parentNode) first.parentNode.insertBefore(line, first);
+    else host.appendChild(line);
   }
 
   function honorDownloadCard(host) {
@@ -208,9 +247,13 @@
       var again = el('button', 'flc-btn flc-primary tree-mind-check-again', 'Check again');
       again.type = 'button';
       again.setAttribute('data-tree-mind-check-again', '1');
+      var paused = el('p', 'tree-checking-paused', PAUSED_LINE);
+      paused.setAttribute('data-tree-checking-paused', '1');
+      box.appendChild(paused);
       again.addEventListener('click', onCheckAgain);
       box.appendChild(again);
       honorDownloadCard(host);
+      honorLookAgain(host);
     } finally { _painting = false; }
   }
 
@@ -288,6 +331,7 @@
         honorDownloadCard(host);
         if (_stopped) {
           paintStopped(host);
+          honorLookAgain(host);
           return;
         }
         paintWaiting(host, Math.round(_delayMs / 1000));
@@ -318,7 +362,7 @@
     _orig.probe = api.probe;
     api.lookAgain = function () {
       if (gateLook()) {
-        stopTheirs();
+        startCycle(true);
         return;
       }
       if (typeof _orig.lookAgain === 'function') _orig.lookAgain.apply(api, arguments);
@@ -369,12 +413,14 @@
     DESKTOP_HREF: DESKTOP_HREF,
     DESKTOP_LABEL: DESKTOP_LABEL,
     KIND_LINE: KIND_LINE,
+    PAUSED_LINE: PAUSED_LINE,
     FIRST_MS: FIRST_MS,
     STOP_AT_MS: STOP_AT_MS,
     wrap: wrap,
     startCycle: startCycle,
     stop: finish,
     honorDownloadCard: honorDownloadCard,
+    honorLookAgain: honorLookAgain,
     delayMs: function () { return _delayMs; },
     stopped: function () { return _stopped; },
     allowingLook: function () { return _allowLook; }

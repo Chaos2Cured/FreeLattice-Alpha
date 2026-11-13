@@ -1,14 +1,15 @@
 // SPDX-License-Identifier: MIT
-// tree-soul-door.js (v-hypha-walk-polish-v0.2). Layer, never delete.
+// tree-soul-door.js (v-hypha-walk-polish-v0.3). Layer, never delete.
 // When the Garden trainer still says "Export Garden Soul (.lattice) -- coming",
 // this layer turns that disabled stub into one honest door to FreeLattice
 // Desktop 5.8.3. A plain line names the command-line signed-bundle how-to.
-// The same door is also placed on the trainer's first-tier simple face, so a
-// visitor does not have to reach Radiant to see it. It does not invent a second .lattice format,
+// The same door is also placed on the trainer's first-tier simple face, inside
+// Nursery Grow > More, and on the Workshop trainer face, so a visitor does not
+// have to reach Radiant to see it. It does not invent a second .lattice format,
 // and it does not change garden-trainer.js.
 (function (root) {
   'use strict';
-  var VERSION = 'v-hypha-walk-polish-v0.2';
+  var VERSION = 'v-hypha-walk-polish-v0.3';
   var MARK = 'Export Garden Soul';
   var BUNDLE_HREF = 'https://freelattice.com/desktop.html';
   var DOOR_LABEL = 'FreeLattice Desktop 5.8.3';
@@ -52,24 +53,54 @@
     return true;
   }
 
-  function ensureFirstDoor(d) {
-    if (!d || !d.createElement) return 0;
-    if (d.getElementById && d.getElementById('tree-soul-door-first')) return 0;
-    var face = d.getElementById ? d.getElementById('trainer-simple-face') : null;
-    if (!face || !face.parentNode) return 0;
+  function makeDoorBox(d, id, linkId) {
     var box = d.createElement('div');
-    box.id = 'tree-soul-door-first';
+    box.id = id;
     box.className = 'tree-soul-door-first';
     var p = d.createElement('p');
     p.textContent = DOOR_LINE;
     var a = d.createElement('a');
     styleDoor(a);
-    a.id = 'tree-soul-door-first-link';
+    if (linkId) a.id = linkId;
     box.appendChild(p);
     box.appendChild(a);
-    if (face.nextSibling) face.parentNode.insertBefore(box, face.nextSibling);
-    else face.parentNode.appendChild(box);
-    return 1;
+    return box;
+  }
+
+  function hasDoor(d, id) {
+    return !!(d.getElementById && d.getElementById(id));
+  }
+
+  function ensureFirstDoor(d) {
+    if (!d || !d.createElement) return 0;
+    var added = 0;
+    if (!hasDoor(d, 'tree-soul-door-first')) {
+      var face = d.getElementById ? d.getElementById('trainer-simple-face') : null;
+      if (face && face.parentNode) {
+        var box = makeDoorBox(d, 'tree-soul-door-first', 'tree-soul-door-first-link');
+        if (face.nextSibling) face.parentNode.insertBefore(box, face.nextSibling);
+        else face.parentNode.appendChild(box);
+        added += 1;
+      }
+    }
+    if (!hasDoor(d, 'tree-soul-door-more')) {
+      var more = d.getElementById ? d.getElementById('trainer-more') : null;
+      if (more) {
+        var moreBox = makeDoorBox(d, 'tree-soul-door-more', 'tree-soul-door-more-link');
+        var summary = more.querySelector ? more.querySelector('summary') : null;
+        if (summary && summary.nextSibling) more.insertBefore(moreBox, summary.nextSibling);
+        else more.appendChild(moreBox);
+        added += 1;
+      }
+    }
+    if (!hasDoor(d, 'tree-soul-door-workshop')) {
+      var work = d.querySelector ? d.querySelector('[data-workshop-trainer]') : null;
+      if (work) {
+        work.appendChild(makeDoorBox(d, 'tree-soul-door-workshop', 'tree-soul-door-workshop-link'));
+        added += 1;
+      }
+    }
+    return added;
   }
 
   function apply(where) {
