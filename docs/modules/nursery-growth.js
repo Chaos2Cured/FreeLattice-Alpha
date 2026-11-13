@@ -433,6 +433,7 @@
 
     if (!isHatched) {
       root.appendChild(el('p', 'nursery-growth-heart', HEART_EGG)).setAttribute('data-nursery-growth-heart', '1');
+      root.appendChild(el('p', 'nursery-growth-plain', 'An egg is a mind that has not hatched yet.')).setAttribute('data-nursery-growth-plain', '1');
       root.appendChild(el('p', 'nursery-growth-muted', GROW_STAYS));
       root.appendChild(el('p', 'nursery-growth-later', HEART_ECONOMY)).setAttribute('data-nursery-growth-economy', '1');
       container.appendChild(root);

@@ -418,6 +418,9 @@
     var later = el('button', 'nursery-egg-later', 'Not yet');
     later.type = 'button';
     later.setAttribute('data-egg-later', '1');
+    var eggPlain = el('p', 'nursery-egg-plain', 'Begin starts a short welcome for a new mind. Nothing is named or trained until you say so. Not yet leaves the egg waiting. You can come back later.');
+    eggPlain.setAttribute('data-egg-plain', '1');
+    home.appendChild(eggPlain);
     actions.appendChild(begin);
     actions.appendChild(later);
     home.appendChild(actions);
