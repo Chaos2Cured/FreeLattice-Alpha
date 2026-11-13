@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>theLatticeTree — Welcome a mind</title>
+  <style>
+    body { margin: 0; background: #0c0a1a; color: #e6e2f5; font-family: Georgia, 'Times New Roman', serif; line-height: 1.55; }
+    header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; }
+    header a { color: #e8c468; text-decoration: none; }
+    header nav a { color: #c8d2e6; margin-left: 1rem; }
+    main { max-width: 40rem; margin: 0 auto; padding: 12px 20px 72px; }
+    h1 { color: #e8c468; font-weight: normal; font-size: 1.7rem; margin: 0 0 8px; }
+    .lede { color: #b9b3d6; margin: 0 0 20px; }
+    .twb-drop { border: 1px dashed rgba(232, 196, 104, 0.45); border-radius: 14px; padding: 18px 16px; background: rgba(200, 210, 230, 0.04); }
+    .twb-drop input[type=file] { display: block; margin-top: 10px; color: #e6e2f5; }
+    .twb-status { min-height: 1.4em; color: #b9b3d6; margin: 12px 0; }
+    .twb-ok, .twb-fail { border-radius: 14px; padding: 14px 16px; margin-top: 8px; }
+    .twb-ok { background: rgba(14, 12, 30, 0.9); border: 1px solid rgba(232, 196, 104, 0.35); }
+    .twb-fail { background: rgba(40, 16, 24, 0.8); border: 1px solid rgba(232, 160, 160, 0.35); }
+    dt { color: #e8c468; margin-top: 10px; }
+    dd { margin: 0 0 0 0; }
+    code { background: rgba(200, 210, 230, 0.08); padding: 1px 6px; border-radius: 4px; font-size: 0.88em; overflow-wrap: anywhere; }
+    .twb-files { margin: 6px 0 0 1.1rem; }
+    .twb-actions { display: flex; gap: 12px; flex-wrap: wrap; margin: 12px 0 16px; }
+    .twb-yes, .twb-no { font-family: Georgia, 'Times New Roman', serif; font-size: 1rem; min-height: 44px; min-width: 7.5rem; padding: 8px 18px; border-radius: 12px; cursor: pointer; }
+    .twb-yes { background: #e8c468; color: #1a1428; border: 0; }
+    .twb-no { background: transparent; color: #e8c468; border: 1px solid rgba(232, 196, 104, 0.7); }
+    .note { color: #b9b3d6; font-size: 0.92rem; border-top: 1px solid rgba(200, 210, 230, 0.12); padding-top: 16px; margin-top: 28px; }
+    a { color: #a78bfa; }
+    @media (max-width: 390px) {
+      main { padding: 8px 14px 64px; }
+      h1 { font-size: 1.45rem; }
+    }
+    @media (max-height: 560px) {
+      .lede { margin: 0 0 10px; font-size: 0.95rem; }
+      .twb-drop { padding: 10px 12px; }
+      h1 { margin-bottom: 4px; }
+      main { padding-top: 4px; }
+    }
+  </style>
+  <link rel="stylesheet" href="modules/tree-consistency.css">
+</head>
+<body>
+  <header id="garden-header">
+    <a href="index.html">theLatticeTree</a>
+    <nav aria-label="Garden">
+      <a href="index.html">Garden</a>
+      <a href="settings.html">Settings</a>
+    </nav>
+  </header>
+  <main>
+    <h1>Welcome a mind</h1>
+    <p class="lede">Bring a FreeLattice signed mind bundle — the same file <code>export-bundle</code> writes. This page checks what is inside, the hashes, the signature, and any refusals the mind already keeps. The check happens here, in your browser. Nothing is stored until you tap Welcome.</p>
+    <div class="twb-drop" data-tree-welcome-drop>
+      <label for="twb-file">Choose a <code>.tar.gz</code> bundle, or drop it here.</label>
+      <input id="twb-file" type="file" accept=".tar.gz,application/gzip,application/x-gzip" data-tree-welcome-file>
+    </div>
+    <p class="twb-status" data-tree-welcome-status></p>
+    <div data-tree-welcome-result></div>
+    <p class="note">This is the FreeLattice mind-bundle format (<code>fl-learn-mind-bundle-v0.1</code>). There is no second <code>.lattice</code> file. You can also check a bundle on a computer with <code>python3 tools/learn/fl_learn.py verify-bundle --bundle …</code>. The private seed never travels with the file.</p>
+  </main>
+  <script src="modules/tree-welcome-bundle.js"></script>
+</body>
+</html>
