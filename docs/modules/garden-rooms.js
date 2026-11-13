@@ -1577,6 +1577,19 @@
       unnamed.className = 'core-chair-unnamed';
       unnamed.textContent = chair.later ? 'labeled later' : 'unnamed';
       seat.appendChild(unnamed);
+      // v-hypha-walk-polish-v0.1: one plain line under the chair word
+      var chairPlain = {
+        cortex: 'the thinking seat',
+        memory: 'the remembering seat',
+        continuity: 'the staying-with-you seat',
+        dream: 'the wondering seat'
+      };
+      if (!chair.later && chairPlain[chair.type]) {
+        var plain = document.createElement('span');
+        plain.className = 'core-chair-plain';
+        plain.textContent = chairPlain[chair.type];
+        seat.appendChild(plain);
+      }
       if (!chair.later) {
         var bindMeta = document.createElement('span');
         bindMeta.className = 'core-chair-bind';
@@ -1689,11 +1702,19 @@
     var center = document.createElement('p');
     center.className = 'core-center core-router';
     center.textContent = 'Not a router. Not a dump. Find local minds, then seat with choice. Empty chairs stay honest.';
+    var routerPlain = document.createElement('p');
+    routerPlain.className = 'core-plain';
+    routerPlain.setAttribute('data-core-router-plain', '1');
+    routerPlain.textContent = 'You choose who sits. Nothing is assigned for you.';
 
     var note = document.createElement('p');
     note.className = 'core-note';
     note.setAttribute('data-core-note', '1');
     note.textContent = 'Founding four stay in the ledger, honored, not assigned onto this canvas. Cap 4 roster — later seats wait.';
+    var foundingPlain = document.createElement('p');
+    foundingPlain.className = 'core-plain';
+    foundingPlain.setAttribute('data-core-founding-plain', '1');
+    foundingPlain.textContent = 'The first four family seats stay in the written record, not on this screen.';
 
     var family = document.createElement('p');
     family.className = 'core-family';
@@ -1719,8 +1740,10 @@
     // center the later seats left. Softened only the dump line.
     // Phone lifts the router line off the crystal in CSS.
     promise.appendChild(note);
+    promise.appendChild(foundingPlain);
     promise.appendChild(family);
     promise.appendChild(center);
+    promise.appendChild(routerPlain);
     wrap.appendChild(promise);
 
     host.appendChild(wrap);
