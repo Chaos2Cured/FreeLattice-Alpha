@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Pins and fake-observer coverage for v-tree-hypha-softs-133-v0.1.
+// Pins and fake-observer coverage for v-tree-hypha-softs-133-v0.2.
 // Does not load quiet-room. Does not change AUTONOMY.md.
 'use strict';
 var fs = require('fs');
@@ -112,6 +112,9 @@ assert.ok(stay, 'Not now is pinned in a stay footer');
 assert.ok(stay.children.indexOf(soft) !== -1, 'Not now lives in the stay footer');
 var css = (document.getElementById('tree-hypha-softs-133-style') || {}).textContent || '';
 assert.ok(css.indexOf('#garden-start') !== -1 && css.indexOf('#lumino-legend') !== -1, 'start line and legend are styled apart');
+assert.ok(css.indexOf('translateX(-50%)') !== -1 && css.indexOf('left:50%') !== -1, 'phone card is centered with left:50% and translateX');
+assert.ok(css.indexOf('left:auto;right:0;transform:none') === -1, 'phone card does not use a right-edge offset');
+assert.ok(css.indexOf('#place-veil-close') !== -1 && css.indexOf('order:20') !== -1, 'the garden close stays after the Checker');
 assert.ok(css.indexOf('100vh - 6.5rem') !== -1, '1280 dock stays below the nav');
 assert.ok(css.indexOf('#tree-thread-wait-hint') !== -1, 'phone send hint is forced visible');
 assert.ok(css.indexOf('#fl-clay-dock') !== -1 && css.indexOf('data-tree-door-calm') !== -1, 'dock ask hides while the card shows');

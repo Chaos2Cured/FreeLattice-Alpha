@@ -1,14 +1,14 @@
-// tree-hypha-softs-133.js v-tree-hypha-softs-133-v0.1
+// tree-hypha-softs-133.js v-tree-hypha-softs-133-v0.2
 // SPDX-License-Identifier: MIT
 // Layer, never delete. Does not rewrite tree-door.js, particle-clay.js,
 // clay-corner.js, or garden-rooms.js.
-// Hypha's four softs after PR 133 PASS: first-run card on a short phone,
-// a usable phone send strip, a 1280 chat dock that stays below the nav,
-// and one wake/shape ask at a time.
+// Hypha's four softs after PR 133, plus the HOLD fixes on PR 134:
+// centered compact phone bottom sheet, Start here in the chrome, and
+// “the garden” after the Checker.
 (function (root) {
   'use strict';
 
-  var VERSION = 'v-tree-hypha-softs-133-v0.1';
+  var VERSION = 'v-tree-hypha-softs-133-v0.2';
   var STYLE_ID = 'tree-hypha-softs-133-style';
   var STAY = 'data-tree-door-stay';
   var _obs = null;
@@ -35,19 +35,33 @@
     }
     s.setAttribute('data-tree-hypha-softs', VERSION);
     s.textContent = [
-      /* 1. Phone home: the Start here line leaves the legend, and clay leaves that line. */
+      /* 1. Phone home: Start here lives in the chrome under the header, not over the planets. */
       '@media (max-width:799px){',
-      '#garden-start{top:12.5rem !important;left:12px !important;right:8.75rem !important;',
-      'text-align:left;z-index:12;}',
+      '#garden-start{position:fixed !important;left:0 !important;right:0 !important;',
+      'top:3.25rem !important;width:auto;max-width:none;text-align:center;z-index:14;',
+      'margin:0;padding:0.3rem 0.8rem 0.4rem;background:rgba(10,8,22,0.92);',
+      'box-sizing:border-box;font-size:0.88rem;line-height:1.35;border-radius:0;}',
+      'html:not(:has(.tree-door-veil[data-tree-door-calm])) #lumino-legend{',
+      'top:7.15rem !important;z-index:13;}',
+      'html:not(:has(.tree-door-veil[data-tree-door-calm])) #galaxy-title{top:6.85rem !important;}',
+      'html:not(:has(.tree-door-veil[data-tree-door-calm])) #room-label{top:8.35rem !important;}',
+      'html:not(:has(.tree-door-veil[data-tree-door-calm])) #garden-footing{top:9.65rem !important;}',
       '#lumino-legend{z-index:13;}',
       '#fl-clay-corner{top:auto !important;bottom:4.75rem !important;right:8px !important;',
       'left:auto !important;z-index:30;}',
       '}',
       /* While the first-run card is up, the card is the start. Hide the overlapping hint. */
       'html:has(.tree-door-veil[data-tree-door-calm]) #garden-start{',
-      'visibility:hidden !important;pointer-events:none !important;',
+      'visibility:hidden !important;pointer-events:none !important;opacity:0 !important;',
       '}',
-      /* Sticky "Not now" so it stays in view even at 520px tall. Card leaves a left gutter for Nursery. */
+      /* After Not now, show Start here at once (do not wait for the 8s fade-in). */
+      'html[data-tree-start-ready] #garden-start{',
+      'opacity:0.92 !important;visibility:visible !important;animation:none !important;',
+      '}',
+      /* Pin the card title so a focused button cannot scroll it away on a short phone. */
+      '.tree-door-veil[data-tree-door-calm] .tree-door-sheet-head{',
+      'flex:0 0 auto;padding:0 0 0.2rem;background:rgba(14,12,30,0.98);}',
+      /* Sticky "Not now" so it stays in view even at 522px tall. */
       '.tree-door-veil[data-tree-door-calm] .tree-door{',
       'display:flex;flex-direction:column;overflow:hidden;',
       'max-height:calc(100vh - 11.25rem);',
@@ -59,17 +73,30 @@
       'flex:0 0 auto;position:relative;background:rgba(14,12,30,0.98);',
       'padding:0.4rem 0 0.15rem;margin-top:0.25rem;z-index:3;',
       '}',
+      /* Centered compact bottom sheet. Keep left:50% + translateX(-50%); do not use left:auto/right:0. */
       '@media (max-width:799px){',
-      '.tree-door-veil[data-tree-door-calm]{left:auto;right:0;transform:none;}',
+      '.tree-door-veil[data-tree-door-calm]{left:50% !important;right:auto !important;',
+      'transform:translateX(-50%) !important;top:auto !important;bottom:0 !important;',
+      'width:auto !important;max-width:calc(100vw - 2rem);padding:0 !important;}',
       '.tree-door-veil[data-tree-door-calm] .tree-door{',
-      'width:min(22rem,calc(100vw - 6rem));margin:0 8px 3rem auto;',
-      'max-height:calc(100vh - 14.75rem);',
+      'width:min(22rem,calc(100vw - 2rem));margin:0 auto 1rem auto;',
+      'max-height:min(20rem,calc(100vh - 16.5rem));box-sizing:border-box;',
       '}',
+      'html:has(.tree-door-veil[data-tree-door-calm]) #fl-clay-corner{',
+      'top:6.5rem !important;bottom:auto !important;right:8px !important;',
+      'left:auto !important;z-index:30;}',
       '}',
       '@media (max-width:799px) and (max-height:560px){',
       '.tree-door-veil[data-tree-door-calm] .tree-door{',
-      'margin:0 8px 0.5rem auto;max-height:calc(100vh - 12.25rem);',
+      'margin:0 auto 0.5rem auto;max-height:calc(100vh - 16rem);',
       '}',
+      '}',
+      /* (d) “the garden” stays after the Checker, even on a short phone (overrides order:-1). */
+      '@media (max-width:640px){',
+      '#place-veil.is-core #place-veil-close{order:20 !important;position:static !important;',
+      'top:auto !important;right:auto !important;left:auto !important;bottom:auto !important;',
+      'transform:none !important;align-self:center !important;',
+      'margin:0.85rem auto 2.75rem !important;}',
       '}',
       /* 2. Phone Gathering send strip: pin Say something, Send, and the waiting hint. */
       '@media (max-width:640px){',
@@ -131,20 +158,55 @@
     for (i = 0; i < kids.length; i++) {
       if (kids[i].className && String(kids[i].className).indexOf('tree-door-quiet') !== -1) quiet = kids[i];
     }
+    var headEl = null;
+    for (i = 0; i < kids.length; i++) {
+      if ((kids[i].tagName || '').toLowerCase() === 'h2' || (kids[i].className && String(kids[i].className).indexOf('tree-door-title') !== -1)) {
+        headEl = kids[i];
+      }
+    }
     var scroll = d.createElement('div');
     scroll.className = 'tree-door-scroll';
+    var head = d.createElement('div');
+    head.className = 'tree-door-sheet-head';
     var foot = d.createElement('div');
     foot.setAttribute(STAY, VERSION);
     var move = [];
     for (i = 0; i < kids.length; i++) move.push(kids[i]);
     for (i = 0; i < move.length; i++) {
-      if (move[i] === soft || move[i] === quiet) continue;
+      if (move[i] === soft || move[i] === quiet || move[i] === headEl) continue;
       scroll.appendChild(move[i]);
     }
-    if (scroll.children && scroll.children.length) box.insertBefore(scroll, box.firstChild);
+    if (headEl) head.appendChild(headEl);
+    if (headEl) box.insertBefore(head, box.firstChild);
+    if (scroll.children && scroll.children.length) {
+      if (head.parentNode === box && head.nextSibling) box.insertBefore(scroll, head.nextSibling);
+      else box.insertBefore(scroll, box.firstChild);
+    }
     if (soft) foot.appendChild(soft);
     if (quiet) foot.appendChild(quiet);
     box.appendChild(foot);
+  }
+
+  function markStartReady() {
+    var d = doc();
+    if (!d || !d.documentElement) return;
+    if (cardOpen()) {
+      try { d.documentElement.setAttribute('data-tree-door-saw-calm', '1'); } catch (e) {}
+      return;
+    }
+    var saw = false;
+    try { saw = d.documentElement.getAttribute('data-tree-door-saw-calm') === '1'; } catch (e2) {}
+    if (saw) {
+      try { d.documentElement.setAttribute('data-tree-start-ready', '1'); } catch (e3) {}
+    }
+  }
+
+  function placeStartHint() {
+    var d = doc();
+    if (!d) return;
+    var start = d.getElementById('garden-start');
+    if (!start || !start.style) return;
+    try { start.style.removeProperty('top'); } catch (e) {}
   }
 
   function isPhone() {
@@ -181,6 +243,8 @@
     addStyle();
     if (cardOpen()) pinNotNow();
     pinSendHint();
+    markStartReady();
+    placeStartHint();
   }
 
   function watch() {

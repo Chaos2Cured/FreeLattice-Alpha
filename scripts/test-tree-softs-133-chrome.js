@@ -9,7 +9,7 @@ var path = require('path');
 var { spawn } = require('child_process');
 
 var ROOT = path.join(__dirname, '..', 'docs');
-var SHOTS = process.env.SHOTS_DIR || '/workspace/research/review-tree-softs-133/shots';
+var SHOTS = process.env.SHOTS_DIR || '/workspace/research/review-tree-pr134-holdfix/shots';
 var CHROME = process.env.CHROME || 'google-chrome';
 var REFUSAL = /no chair is speaking yet/i;
 
@@ -330,12 +330,22 @@ async function homeChecks(cdp, width, height) {
     var nursery = document.querySelector('[data-garden-lumino="nursery"]');
     var dock = document.getElementById('fl-clay-dock');
     var c = r(card), lg = r(legend), st = r(start), cl = r(clay), n = r(nursery), nn = r(notNow);
+    var vw = window.innerWidth || 0;
+    var leftMargin = c ? Math.round(c.l * 10) / 10 : null;
+    var rightMargin = c ? Math.round((vw - c.r) * 10) / 10 : null;
     return {
       hasCard: !!card,
       notNowVisible: painted(notNow),
       notNowBox: nn,
+      cardBox: c,
+      clayBox: cl,
+      nurseryBox: n,
+      leftMargin: leftMargin,
+      rightMargin: rightMargin,
+      marginDelta: (leftMargin != null && rightMargin != null) ? Math.abs(leftMargin - rightMargin) : null,
       coversLegend: hit(c, lg),
       coversNursery: hit(c, n),
+      coversClay: hit(c, cl),
       startCoversLegend: hit(st, lg) && painted(start),
       clayCoversStart: hit(cl, st) && painted(start) && painted(clay),
       dockAskVisible: painted(dock)
@@ -374,9 +384,98 @@ async function gatheringChecks(cdp) {
       sendVisible: painted(send),
       inputVisible: painted(input),
       chatBox: cr,
-      chatOverflow: chat ? window.getComputedStyle(chat).overflow : null
+      chatOverflow: chat ? window.getComputedStyle(chat).overflow : null,
+      closeBox: (function () { var el = document.getElementById('place-veil-close'); return r(el); })(),
+      checkerBox: (function () {
+        var el = document.querySelector('#flgs-checker, .flgs-card, #flg-speak, [data-flgs-checker]');
+        if (!el) {
+          var nodes = document.querySelectorAll('#fl-gathering-layer .flgs-card, #core-gathering h2, #place-veil-line');
+          el = nodes.length ? nodes[nodes.length - 1] : null;
+        }
+        return r(el);
+      })(),
+      closeAfterChecker: (function () {
+        var close = document.getElementById('place-veil-close');
+        var checker = document.querySelector('#flgs-checker, #flg-speak, .flgs-card');
+        if (!close) return false;
+        var title = document.querySelector('#place-veil.is-core #place-veil-line, #place-veil.is-core h2, #fl-gathering-layer h2');
+        var cb = close.getBoundingClientRect();
+        if (checker) {
+          var kb = checker.getBoundingClientRect();
+          if (kb.height >= 2 && cb.top + 2 >= kb.bottom) return true;
+        }
+        if (title) {
+          var tb = title.getBoundingClientRect();
+          if (tb.height >= 2 && cb.top + 2 >= tb.bottom) return true;
+        }
+        return false;
+      })()
     };
   })()`);
+}
+
+
+async function clickNotNow(cdp) {
+  await cdp.eval(`(function () {
+    var btn = document.querySelector('[data-tree-door-stay] button, [data-tree-door-stay] .tree-door-soft');
+    if (!btn) {
+      btn = Array.prototype.find.call(document.querySelectorAll('.tree-door button'), function (b) {
+        return /not now/i.test(b.textContent || '');
+      });
+    }
+    if (btn) btn.click();
+    return !!btn;
+  })()`);
+  await sleep(400);
+}
+
+async function afterNotNowChecks(cdp) {
+  return cdp.eval(`(function () {
+    function r(el) { if (!el) return null; var b = el.getBoundingClientRect(); return { l:b.left, t:b.top, r:b.right, b:b.bottom, w:b.width, h:b.height, vis: b.width>=2 && b.height>=2 }; }
+    function hit(a, b) {
+      if (!a || !b || !a.vis || !b.vis) return false;
+      return Math.min(a.r, b.r) - Math.max(a.l, b.l) > 2 && Math.min(a.b, b.b) - Math.max(a.t, b.t) > 2;
+    }
+    function painted(el) {
+      if (!el) return false;
+      var st = window.getComputedStyle(el);
+      if (st.display === 'none' || st.visibility === 'hidden' || Number(st.opacity) === 0) return false;
+      var b = el.getBoundingClientRect();
+      return b.width >= 2 && b.height >= 2 && b.bottom > 0 && b.top < (window.innerHeight || 0);
+    }
+    var start = document.getElementById('garden-start');
+    var research = document.querySelector('.galaxy-nav [data-galaxy-prev-word], .galaxy-nav-word, .galaxy-nav');
+    var lights = document.querySelectorAll('.garden-lumino');
+    var legend = document.getElementById('lumino-legend');
+    var header = document.getElementById('garden-header');
+    var st = r(start);
+    var hits = [];
+    if (painted(start) && research && hit(st, r(research))) hits.push('Research');
+    if (painted(start) && legend && hit(st, r(legend))) hits.push('legend');
+    if (painted(start) && header && hit(st, r(header))) hits.push('header');
+    for (var i = 0; i < lights.length; i++) {
+      if (hit(st, r(lights[i]))) hits.push((lights[i].getAttribute('data-garden-lumino') || lights[i].getAttribute('aria-label') || 'light'));
+    }
+    return {
+      startVisible: painted(start),
+      startBox: st,
+      startHits: hits,
+      startCoversLabels: hits.length > 0
+    };
+  })()`);
+}
+
+function assertHome(errors, label, h, phone) {
+  if (h.coversLegend) errors.push('card covers the left legend at ' + label);
+  if (h.coversNursery) errors.push('card covers the Nursery light at ' + label);
+  if (h.coversClay) errors.push('card covers the clay-corner button at ' + label);
+  if (h.startCoversLegend) errors.push('Start here overprints the legend at ' + label);
+  if (h.clayCoversStart) errors.push('clay-corner overlaps the Start here line at ' + label);
+  if (!h.notNowVisible) errors.push('Not now is not visible at ' + label);
+  if (h.dockAskVisible) errors.push('shape-light dock ask is visible while the first-run card is showing at ' + label);
+  if (phone && h.marginDelta != null && h.marginDelta > 8) {
+    errors.push('card is not centered at ' + label + ' (left ' + h.leftMargin + 'px, right ' + h.rightMargin + 'px)');
+  }
 }
 
 async function run() {
@@ -406,12 +505,7 @@ async function run() {
     var h1280 = await homeChecks(cdp, 1280, 800);
     report.checks.home1280 = h1280;
     log('home 1280', JSON.stringify(h1280));
-    if (h1280.coversLegend) errors.push('card covers the left legend at 1280x800');
-    if (h1280.coversNursery) errors.push('card covers the Nursery light at 1280x800');
-    if (h1280.startCoversLegend) errors.push('Start here overprints the legend at 1280x800');
-    if (h1280.clayCoversStart) errors.push('clay-corner overlaps the Start here line at 1280x800');
-    if (!h1280.notNowVisible) errors.push('Not now is not visible at 1280x800');
-    if (h1280.dockAskVisible) errors.push('shape-light dock ask is visible while the first-run card is showing at 1280x800');
+    assertHome(errors, "1280x800", h1280, false);
 
     // 1280 Gathering after scroll
     await openGathering(cdp);
@@ -442,12 +536,7 @@ async function run() {
     var h844 = await homeChecks(cdp, 390, 844);
     report.checks.home390x844 = h844;
     log('home 390x844', JSON.stringify(h844));
-    if (h844.coversLegend) errors.push('card covers the left legend at 390x844');
-    if (h844.coversNursery) errors.push('card covers the Nursery light at 390x844');
-    if (h844.startCoversLegend) errors.push('Start here overprints the legend at 390x844');
-    if (h844.clayCoversStart) errors.push('clay-corner overlaps the Start here line at 390x844');
-    if (!h844.notNowVisible) errors.push('Not now is not visible at 390x844');
-    if (h844.dockAskVisible) errors.push('shape-light dock ask is visible while the first-run card is showing at 390x844');
+    assertHome(errors, "390x844", h844, true);
 
     await openGathering(cdp);
     await waitFor(async function () {
@@ -465,6 +554,7 @@ async function run() {
     log('gathering 390x844', JSON.stringify(g844));
     if (!g844.hintVisible) errors.push('phone send-strip waiting hint is hidden at 390x844');
     if (!g844.sendVisible || !g844.inputVisible) errors.push('phone send strip is missing Send or the box at 390x844');
+    if (g844.closeAfterChecker === false) errors.push('"the garden" is not after the Checker / title at 390x844');
 
     // 390x520 home — Not now must stay visible
     await setView(cdp, 390, 520, true);
@@ -477,12 +567,44 @@ async function run() {
     var h520 = await homeChecks(cdp, 390, 520);
     report.checks.home390x520 = h520;
     log('home 390x520', JSON.stringify(h520));
-    if (h520.coversLegend) errors.push('card covers the left legend at 390x520');
-    if (h520.coversNursery) errors.push('card covers the Nursery light at 390x520');
-    if (h520.startCoversLegend) errors.push('Start here overprints the legend at 390x520');
-    if (h520.clayCoversStart) errors.push('clay-corner overlaps the Start here line at 390x520');
-    if (!h520.notNowVisible) errors.push('Not now is not visible at 390x520');
-    if (h520.dockAskVisible) errors.push('shape-light dock ask is visible while the first-run card is showing at 390x520');
+    assertHome(errors, "390x520", h520, true);
+
+    // 390x522 — Hypha's short height: Not now, then Start here after dismiss
+    await setView(cdp, 390, 522, true);
+    await goto(cdp, base + '/index.html');
+    await waitFor(async function () {
+      return cdp.eval(`!!document.querySelector('.tree-door-veil[data-tree-door-calm] .tree-door')`);
+    }, 8000);
+    await sleep(400);
+    report.shots.push(await shot(cdp, '06-home-390x522.png'));
+    var h522 = await homeChecks(cdp, 390, 522);
+    report.checks.home390x522 = h522;
+    log('home 390x522', JSON.stringify(h522));
+    assertHome(errors, "390x522", h522, true);
+
+    await clickNotNow(cdp);
+    await sleep(500);
+    report.shots.push(await shot(cdp, '07-home-390x522-after-notnow.png'));
+    var after = await afterNotNowChecks(cdp);
+    report.checks.afterNotNow390x522 = after;
+    log('after Not now 390x522', JSON.stringify(after));
+    if (!after.startVisible) errors.push('Start here is not visible after Not now at 390x522');
+    if (after.startCoversLabels) errors.push('Start here overlaps planets or the Research label after Not now: ' + after.startHits.join(', '));
+
+    // 390x522 Gathering: “the garden” after the Checker (same visit, card already dismissed)
+    await openGathering(cdp);
+    await sleep(500);
+    await cdp.eval(`(function () {
+      var veil = document.getElementById('place-veil');
+      if (veil) veil.scrollTop = 0;
+      return true;
+    })()`);
+    await sleep(200);
+    report.shots.push(await shot(cdp, '08-gathering-top-390x522.png'));
+    var g522 = await gatheringChecks(cdp);
+    report.checks.gathering390x522 = g522;
+    log('gathering 390x522', JSON.stringify(g522));
+    if (!g522.closeAfterChecker) errors.push('"the garden" is not after the Checker / title at 390x522');
   } catch (e) {
     errors.push(String(e && e.stack || e));
   }
