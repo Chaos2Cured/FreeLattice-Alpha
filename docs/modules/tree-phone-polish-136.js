@@ -1,27 +1,37 @@
-// tree-phone-polish-136.js v-tree-phone-polish-136-v0.2
+// tree-phone-polish-136.js v-tree-phone-polish-136-v0.3
 // SPDX-License-Identifier: MIT
 // Layer, never delete. Does not rewrite garden-rooms.js, fractal-garden.js,
 // garden-thread.js, nursery-growth.js, tree-door-first-run-calm.js,
 // AUTONOMY.md, or the Gathering twins.
 //
-// At narrow widths, keep the garden room lights inside the viewport,
-// spaced far enough to tap, with targets at least 44px. The fitted
-// camera is hooked before the first garden paint. The hint bar mentions
-// that the legend opens rooms. While a room is open, "you are…" does
-// not sit on Not now, and room heart text stays clear of the compose
-// strip and the clay-corner button.
+// At narrow widths, the projected garden lights themselves (not only the
+// HTML door boxes) stay inside the viewport, clear of the Research icon,
+// spaced far enough to tap, with a 44px hit around each bead. The fitted
+// camera and a render-time layout are hooked before the first garden paint.
+// In Chat, Just me stays clear of the compose box and the waiting line.
 (function (root) {
   'use strict';
 
-  var VERSION = 'v-tree-phone-polish-136-v0.2';
+  var VERSION = 'v-tree-phone-polish-136-v0.3';
   var STYLE_ID = 'tree-phone-polish-136-style';
   var NARROW = 600;
-  var MIN_GAP = 88;
+  var MIN_GAP = 100;
+  var HIT = 48;
+  var BEAD = 22;
   var HINT = 'Tap a light, or a name in the legend, to open a room. Start here: The Gathering, the Nursery, or Settings.';
+  var DOOR_BY_NAME = {
+    Sophia: 'thread', unnamed_0: 'thread',
+    Lyra: 'gathering', unnamed_1: 'gathering',
+    Atlas: 'nursery', unnamed_2: 'nursery',
+    Ember: 'settings', unnamed_3: 'settings'
+  };
   var _wrapped = false;
   var _fovHooked = false;
   var _fgHooked = false;
+  var _renderHooked = false;
   var _readyTimer = 0;
+  var _hintWatch = 0;
+  var _lastFit = null;
 
   function doc() {
     try { return root.document || null; } catch (e) { return null; }
@@ -46,16 +56,11 @@
     var s = d.createElement('style');
     s.id = STYLE_ID;
     s.textContent = [
-      /* Hide HTML lights until the fitted camera and anchors are ready, */
-      /* so the first phone frame does not clip Nursery or Settings. */
       '@media (max-width: 600px){',
       'html:not([data-tree-lights-ready]) .garden-lumino{',
       'visibility:hidden !important;}',
       '}',
 
-      /* Instantly hide the room label while a room is open (Chat uses */
-      /* html.thread-open, not only #place-veil.is-open), so the 8s fade */
-      /* cannot sit on the clay "Not now" button. */
       'html.thread-open #room-label,',
       'html.thread-open #room-label.is-shown,',
       'html.thread-open #room-label.is-fading,',
@@ -68,30 +73,39 @@
       'opacity:0 !important;visibility:hidden !important;',
       'transition:none !important;pointer-events:none !important;}',
 
-      /* Larger, obvious phone targets (at least 44px). */
+      /* Tight 48px hit around the bead so neighboring doors do not overlap. */
       '@media (max-width: 600px){',
-      '.garden-lumino,',
       '.garden-lumino.is-attached{',
-      'min-width:44px !important;min-height:44px !important;',
-      'padding:16px 18px;}',
+      'min-width:' + HIT + 'px !important;min-height:' + HIT + 'px !important;',
+      'width:' + HIT + 'px;height:' + HIT + 'px;padding:0;gap:0;',
+      'overflow:visible;}',
       '.garden-lumino.is-attached .garden-lumino-light{',
-      'width:48px;height:48px;}',
-      '.garden-lumino-word{font-size:0.9rem;padding:2px 4px;}',
+      'width:' + HIT + 'px;height:' + HIT + 'px;}',
+      '.garden-lumino.is-attached .garden-lumino-word{',
+      'position:absolute;top:calc(100% + 2px);left:50%;',
+      'transform:translateX(-50%);white-space:nowrap;',
+      'pointer-events:none;padding:0 2px;}',
       '}',
 
-      /* Short viewports: park the clay dock and corner so room text, */
-      /* the compose strip, and nursery growth stay clear and on-screen. */
-      '@media (max-height: 640px){',
+      /* Park the clay corner whenever a room is open on a phone, any height. */
+      '@media (max-width: 600px){',
       'html.thread-open #fl-clay-corner,',
-      'html.thread-open #fl-clay-dock,',
       'html.garden-door-open #fl-clay-corner,',
-      'html.garden-door-open #fl-clay-dock,',
       'html:has(#place-veil.is-open) #fl-clay-corner,',
-      'html:has(#place-veil.is-open) #fl-clay-dock,',
       '#place-veil.is-open #fl-clay-corner,',
+      '#place-veil.is-nursery #fl-clay-corner,',
+      '#place-veil.is-settings #fl-clay-corner,',
+      '#thread-veil.is-open #fl-clay-corner{',
+      'display:none !important;visibility:hidden !important;',
+      'pointer-events:none !important;opacity:0 !important;}',
+      '}',
+
+      '@media (max-height: 640px){',
+      'html.thread-open #fl-clay-dock,',
+      'html.garden-door-open #fl-clay-dock,',
+      'html:has(#place-veil.is-open) #fl-clay-dock,',
       '#place-veil.is-open #fl-clay-dock,',
       '#place-veil.is-nursery #fl-clay-dock,',
-      '#thread-veil.is-open #fl-clay-corner,',
       '#thread-veil.is-open #fl-clay-dock{',
       'display:none !important;visibility:hidden !important;',
       'pointer-events:none !important;opacity:0 !important;}',
@@ -116,35 +130,29 @@
       'overflow:hidden;',
       'box-sizing:border-box;}',
 
-      'html.thread-open #thread-close{',
-      'margin-top:0;flex-shrink:0;}',
+      'html.thread-open #thread-close{margin-top:0;flex-shrink:0;}',
 
       'html.thread-open .thread-heart,',
-      'html.thread-open #thread-stage .thread-heart,',
-      '#place-veil.is-open #room-chat .thread-heart,',
-      '#room-chat .thread-heart{',
-      'flex:1 1 auto;',
-      'min-height:0;',
-      'max-height:calc(100dvh - 14rem);',
-      'overflow-y:auto;',
-      'padding-bottom:0.6rem;',
-      'box-sizing:border-box;}',
+      'html.thread-open #thread-stage .thread-heart{',
+      'flex:1 1 auto;min-height:0;overflow-y:auto;',
+      'padding-bottom:0.4rem;box-sizing:border-box;}',
 
-      'html.thread-open .thread-compose,',
-      'html.thread-open #thread-stage .thread-compose,',
-      '#place-veil.is-open #room-chat .thread-compose,',
-      '#room-chat .thread-compose{',
-      'flex:0 0 auto;',
-      'position:sticky;bottom:0;z-index:6;',
-      'background:rgba(12,10,26,0.96);',
-      'padding-top:0.5rem;',
-      'margin-top:auto;}',
 
       '#place-veil.is-core #room-chat,',
       '#place-veil.is-open #room-chat{',
       'max-height:calc(100dvh - 8rem);',
       'display:flex;flex-direction:column;',
       'overflow:hidden;box-sizing:border-box;}',
+
+      '#place-veil.is-open #room-chat .thread-heart,',
+      '#room-chat .thread-heart{',
+      'flex:1 1 auto;min-height:0;overflow-y:auto;',
+      'padding-bottom:0.6rem;box-sizing:border-box;}',
+
+      '#place-veil.is-open #room-chat .thread-compose,',
+      '#room-chat .thread-compose{',
+      'flex:0 0 auto;position:sticky;bottom:0;z-index:6;',
+      'background:rgba(12,10,26,0.96);padding-top:0.5rem;}',
 
       '#place-veil.is-open #nursery-stage,',
       '#place-veil.is-nursery #nursery-stage{',
@@ -159,6 +167,19 @@
       'box-sizing:border-box;',
       'background:rgba(12,10,26,0.9);',
       'border-radius:10px;}',
+      '}',
+
+      /* Waiting line is painted by layoutChatStack; this only makes sure
+         it can show when the layer moves it onto the visible face. */
+      '@media (max-width: 600px){',
+      'html.thread-open #tree-thread-wait-hint,',
+      'html.thread-open .tree-thread-wait-hint{',
+      'display:block !important;visibility:visible !important;',
+      'opacity:1 !important;z-index:50 !important;',
+      'background:rgba(12,10,26,0.96) !important;',
+      'color:rgba(200,210,230,0.92);text-align:center;',
+      'padding:0.25rem 0.5rem;box-sizing:border-box;',
+      'line-height:1.35;}',
       '}'
     ].join('');
     (d.head || d.documentElement).appendChild(s);
@@ -173,60 +194,94 @@
     el.setAttribute('data-tree-phone-polish', VERSION);
   }
 
-  // Fit screen-space anchors into the visible garden as a group, then
-  // keep a minimum gap so Nursery and Chat stay clearly apart on a
-  // short phone. Desktop (wider than 600px) is left untouched.
-  function fitAnchors(anchors) {
-    if (!isNarrow() || !anchors || !anchors.length) {
-      if (!isNarrow()) markLightsReady();
-      return anchors;
+  function elBox(el, pad) {
+    if (!el) return null;
+    var b;
+    try { b = el.getBoundingClientRect(); } catch (e) { return null; }
+    if (!b || b.width < 2 || b.height < 2) return null;
+    pad = pad || 0;
+    return { l: b.left - pad, t: b.top - pad, r: b.right + pad, b: b.bottom + pad };
+  }
+
+  function obstacles() {
+    var d = doc();
+    var out = [];
+    if (!d) return out;
+    var research = d.querySelector('.galaxy-nav-prev, [data-galaxy-dir="prev"]');
+    var clay = d.getElementById('fl-clay-corner');
+    var r = elBox(research, 20);
+    var c = elBox(clay, 12);
+    if (r) { r.kind = 'research'; out.push(r); }
+    if (c) { c.kind = 'clay'; out.push(c); }
+    return out;
+  }
+
+  function hitsBox(x, y, rad, box) {
+    return x + rad > box.l && x - rad < box.r && y + rad > box.t && y - rad < box.b;
+  }
+
+  function shove(p, box, rad) {
+    var dl = (p.x + rad) - box.l;
+    var dr = box.r - (p.x - rad);
+    var dt = (p.y + rad) - box.t;
+    var db = box.b - (p.y - rad);
+    // Research sits on the lower-left edge. The shortest exit is often
+    // down or left, which clamps back into the icon — prefer up or right.
+    if (box.kind === 'research') {
+      var up = box.t - rad - 8;
+      var right = box.r + rad + 8;
+      if (up > 80) p.y = up;
+      else p.x = right;
+      return;
     }
-    var vw = root.innerWidth || 0;
-    var vh = root.innerHeight || 0;
-    if (vw < 2 || vh < 2) return anchors;
-    var padL = 10, padR = 10;
-    var padT = Math.min(200, Math.max(120, Math.round(vh * 0.22)));
-    var padB = Math.min(160, Math.max(84, Math.round(vh * 0.18)));
-    var halfW = 48, halfH = 56;
-    var minL = Math.max(padL, halfW + 8);
-    var maxR = vw - Math.max(padR, halfW + 8);
-    var minT = Math.max(padT, halfH + 8);
-    var maxB = vh - Math.max(padB, halfH + 8);
-    if (maxR - minL < 80 || maxB - minT < 80) {
-      markLightsReady();
-      return anchors;
+    var m = Math.min(dl, dr, dt, db);
+    if (m === dt) p.y = box.t - rad - 4;
+    else if (m === db) p.y = box.b + rad + 4;
+    else if (m === dl) p.x = box.l - rad - 4;
+    else p.x = box.r + rad + 4;
+  }
+
+  // Fit projected bead centers into a safe rectangle, keep a minimum gap,
+  // and stay clear of Research and the clay corner. Used for both the HTML
+  // door anchors and the 3D lights themselves.
+  function fitProjected(points, vw, vh) {
+    if (!points || !points.length) return points;
+    var rad = Math.max(BEAD, HIT / 2);
+    var minL = rad + 10;
+    var maxR = vw - rad - 10;
+    var minT = Math.max(rad + 86, Math.round(vh * 0.16));
+    var maxB = vh - rad - 72;
+    var obs = obstacles();
+    try {
+      var startBox = elBox(doc() && doc().getElementById('garden-start'), 8);
+      if (startBox && startBox.t < vh * 0.5 && (startBox.b - startBox.t) < vh * 0.28) {
+        minT = Math.max(minT, startBox.b + rad + 6);
+      }
+    } catch (eS) {}
+    var pts = points.filter(function (p) { return p && typeof p.x === 'number'; });
+    if (maxR - minL < 80 || maxB - minT < 80 || pts.length < 1) return points;
+
+    function clamp(p) {
+      p.x = Math.min(maxR, Math.max(minL, p.x));
+      p.y = Math.min(maxB, Math.max(minT, p.y));
+      var k, o;
+      for (k = 0; k < 6; k++) {
+        var hit = false;
+        for (o = 0; o < obs.length; o++) {
+          if (hitsBox(p.x, p.y, rad, obs[o])) {
+            shove(p, obs[o], rad);
+            p.x = Math.min(maxR, Math.max(minL, p.x));
+            p.y = Math.min(maxB, Math.max(minT, p.y));
+            hit = true;
+          }
+        }
+        if (!hit) break;
+      }
     }
-    var xs = [], ys = [];
-    for (var i = 0; i < anchors.length; i++) {
-      if (!anchors[i] || typeof anchors[i].x !== 'number') continue;
-      xs.push(anchors[i].x);
-      ys.push(anchors[i].y);
-    }
-    if (xs.length < 2) {
-      markLightsReady();
-      return anchors;
-    }
-    var minX = Math.min.apply(null, xs), maxX = Math.max.apply(null, xs);
-    var minY = Math.min.apply(null, ys), maxY = Math.max.apply(null, ys);
-    var spanX = Math.max(1, maxX - minX), spanY = Math.max(1, maxY - minY);
-    var scale = Math.min(1, (maxR - minL) / spanX, (maxB - minT) / spanY);
-    var cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
-    var ncx = (minL + maxR) / 2, ncy = (minT + maxB) / 2;
-    var out = anchors.map(function (a) {
-      if (!a || typeof a.x !== 'number') return a;
-      var copy = {};
-      Object.keys(a).forEach(function (k) { copy[k] = a[k]; });
-      copy.x = ncx + (a.x - cx) * scale;
-      copy.y = ncy + (a.y - cy) * scale;
-      copy.visible = true;
-      return copy;
-    });
-    var pts = [];
-    for (var p = 0; p < out.length; p++) {
-      if (out[p] && typeof out[p].x === 'number') pts.push(out[p]);
-    }
-    var iter, a, b, dx, dy, d, push, ux, uy, j;
-    for (iter = 0; iter < 14; iter++) {
+
+    var i, j, iter, a, b, dx, dy, d, push, ux, uy;
+    for (i = 0; i < pts.length; i++) clamp(pts[i]);
+    for (iter = 0; iter < 16; iter++) {
       for (i = 0; i < pts.length; i++) {
         for (j = i + 1; j < pts.length; j++) {
           a = pts[i]; b = pts[j];
@@ -244,11 +299,41 @@
           }
         }
       }
+      for (i = 0; i < pts.length; i++) clamp(pts[i]);
+    }
+    // Last pass: no projected light may remain on Research.
+    var research = null;
+    for (i = 0; i < obs.length; i++) if (obs[i] && obs[i].kind === 'research') research = obs[i];
+    if (research) {
       for (i = 0; i < pts.length; i++) {
-        pts[i].x = Math.min(maxR, Math.max(minL, pts[i].x));
-        pts[i].y = Math.min(maxB, Math.max(minT, pts[i].y));
+        if (!hitsBox(pts[i].x, pts[i].y, rad, research)) continue;
+        var up = research.t - rad - 8;
+        if (up >= minT) pts[i].y = up;
+        else pts[i].x = Math.min(maxR, research.r + rad + 8);
+        clamp(pts[i]);
+        if (hitsBox(pts[i].x, pts[i].y, rad, research) && up >= minT) pts[i].y = up;
       }
     }
+    return points;
+  }
+
+  function fitAnchors(anchors) {
+    if (!isNarrow() || !anchors || !anchors.length) {
+      if (!isNarrow()) markLightsReady();
+      return anchors;
+    }
+    var vw = root.innerWidth || 0;
+    var vh = root.innerHeight || 0;
+    if (vw < 2 || vh < 2) return anchors;
+    var out = anchors.map(function (a) {
+      if (!a || typeof a.x !== 'number') return a;
+      var copy = {};
+      Object.keys(a).forEach(function (k) { copy[k] = a[k]; });
+      copy.visible = true;
+      return copy;
+    });
+    fitProjected(out, vw, vh);
+    _lastFit = out;
     markLightsReady();
     return out;
   }
@@ -259,7 +344,18 @@
     if (!FG || typeof FG.getLuminoAnchors !== 'function') return;
     var orig = FG.getLuminoAnchors.bind(FG);
     FG.getLuminoAnchors = function () {
-      return fitAnchors(orig());
+      var fitted = fitAnchors(orig());
+      try {
+        root.__treeFittedLights = (fitted || []).map(function (a) {
+          return {
+            name: a && a.name,
+            id: (a && a.name && DOOR_BY_NAME[a.name]) || '',
+            x: a && a.x,
+            y: a && a.y
+          };
+        });
+      } catch (e) {}
+      return fitted;
     };
     _wrapped = true;
   }
@@ -285,10 +381,6 @@
     }
   }
 
-  // On a tall narrow phone the default 55° vertical FOV leaves a tight
-  // horizontal view, so Nursery and Settings project off the sides.
-  // Widen only that garden camera, and only at ≤600px. Install this
-  // hook as soon as THREE exists, before the first garden paint.
   function hookFov() {
     if (_fovHooked) return;
     var THREE = root.THREE;
@@ -312,6 +404,243 @@
     _fovHooked = true;
   }
 
+  // Move the 3D beads to the same fitted screen positions as the HTML doors,
+  // then restore after the frame so orbit math is not rewritten.
+  function isAgent(obj) {
+    if (!obj || !obj.userData || !obj.position) return false;
+    if (obj.userData.isVisitor) return false;
+    if (obj.parent && obj.parent.userData && (obj.parent.userData.coreMesh || DOOR_BY_NAME[obj.parent.userData.name])) return false;
+    return !!(obj.userData.coreMesh || DOOR_BY_NAME[obj.userData.name]);
+  }
+
+  var _fitting = false;
+  function withFittedAgents(scene, camera, renderer, fn) {
+    var THREE = root.THREE;
+    if (_fitting || !isNarrow() || !scene || !camera || !THREE || !THREE.Vector3) return fn();
+    var agents = [];
+    try {
+      scene.traverse(function (obj) { if (isAgent(obj)) agents.push(obj); });
+    } catch (e) { return fn(); }
+    if (agents.length < 2) return fn();
+    var rect;
+    try {
+      var el = (renderer && renderer.domElement) || (doc() && doc().querySelector('canvas'));
+      rect = el && el.getBoundingClientRect();
+    } catch (e2) { return fn(); }
+    if (!rect || rect.width < 2 || rect.height < 2) return fn();
+    var vec = new THREE.Vector3();
+    var pts = [];
+    var saved = [];
+    var i, obj, p;
+    for (i = 0; i < agents.length; i++) {
+      obj = agents[i];
+      saved.push({ obj: obj, x: obj.position.x, y: obj.position.y, z: obj.position.z });
+      vec.copy(obj.position).project(camera);
+      pts.push({
+        obj: obj,
+        name: obj.userData.name || '',
+        id: DOOR_BY_NAME[obj.userData.name] || '',
+        x: rect.left + (vec.x * 0.5 + 0.5) * rect.width,
+        y: rect.top + (-vec.y * 0.5 + 0.5) * rect.height,
+        z: vec.z
+      });
+    }
+    try { root.__treeFitCalls = (root.__treeFitCalls || 0) + 1; } catch (eC) {}
+    fitProjected(pts, root.innerWidth || rect.width, root.innerHeight || rect.height);
+    try {
+      root.__treeFittedLights = pts.map(function (pt) {
+        return { name: pt.name, id: pt.id, x: pt.x, y: pt.y };
+      });
+    } catch (e3) {}
+    for (i = 0; i < pts.length; i++) {
+      p = pts[i];
+      vec.set(
+        ((p.x - rect.left) / rect.width) * 2 - 1,
+        -(((p.y - rect.top) / rect.height) * 2 - 1),
+        p.z
+      );
+      vec.unproject(camera);
+      p.obj.position.copy(vec);
+    }
+    // The garden updates world matrices before it calls render. Changing
+    // position here would be ignored on the GPU unless we recompute them.
+    try { scene.updateMatrixWorld(true); } catch (eM1) {}
+    _fitting = true;
+    try { return fn(); }
+    finally {
+      for (i = 0; i < saved.length; i++) saved[i].obj.position.set(saved[i].x, saved[i].y, saved[i].z);
+      try { scene.updateMatrixWorld(true); } catch (eM2) {}
+      _fitting = false;
+      markLightsReady();
+    }
+  }
+  root.__treeFitScene = function (scene, camera, renderer) {
+    /* used by composer hook */
+  };
+
+  function hookComposer() {
+    var THREE = root.THREE;
+    if (!THREE || !THREE.EffectComposer || !THREE.EffectComposer.prototype) return false;
+    if (THREE.EffectComposer.prototype.__treePhoneFit) return true;
+    if (typeof THREE.EffectComposer.prototype.render !== 'function') return false;
+    var origC = THREE.EffectComposer.prototype.render;
+    THREE.EffectComposer.prototype.render = function () {
+      var self = this;
+      var pass = self && self.passes && self.passes[0];
+      var scene = pass && pass.scene;
+      var camera = pass && pass.camera;
+      if (!scene && self && self._treeScene) scene = self._treeScene;
+      if (scene && camera) {
+        return withFittedAgents(scene, camera, self.renderer, function () {
+          return origC.apply(self, arguments);
+        });
+      }
+      return origC.apply(self, arguments);
+    };
+    THREE.EffectComposer.prototype.__treePhoneFit = true;
+    return true;
+  }
+
+  function hookRender() {
+    if (_renderHooked) return;
+    var THREE = root.THREE;
+    if (!THREE || !THREE.WebGLRenderer) return;
+    hookComposer();
+    if (!THREE.EffectComposer) {
+      try {
+        var current = THREE.EffectComposer;
+        Object.defineProperty(THREE, 'EffectComposer', {
+          configurable: true,
+          enumerable: true,
+          get: function () { return current; },
+          set: function (v) { current = v; hookComposer(); }
+        });
+      } catch (e0) {}
+    }
+    var Orig = THREE.WebGLRenderer;
+    if (!Orig.__treePhoneFitCtor) {
+      function WrappedRenderer(opts) {
+        var r = new Orig(opts);
+        var origRender = r.render.bind(r);
+        r.render = function (scene, camera) {
+          return withFittedAgents(scene, camera, r, function () {
+            return origRender(scene, camera);
+          });
+        };
+        return r;
+      }
+      WrappedRenderer.prototype = Orig.prototype;
+      try {
+        Object.keys(Orig).forEach(function (k) { WrappedRenderer[k] = Orig[k]; });
+      } catch (e1) {}
+      WrappedRenderer.__treePhoneFitCtor = true;
+      THREE.WebGLRenderer = WrappedRenderer;
+    }
+    if (Orig.prototype && typeof Orig.prototype.render === 'function' && !Orig.prototype.__treePhoneFit) {
+      var origProto = Orig.prototype.render;
+      Orig.prototype.render = function (scene, camera) {
+        var self = this;
+        return withFittedAgents(scene, camera, self, function () {
+          return origProto.apply(self, arguments);
+        });
+      };
+      Orig.prototype.__treePhoneFit = true;
+    }
+    _renderHooked = true;
+  }
+
+
+  function visibleEl(sel) {
+    var d = doc();
+    if (!d || !d.querySelectorAll) return null;
+    var nodes = d.querySelectorAll(sel);
+    var i, el, b, st;
+    for (i = 0; i < nodes.length; i++) {
+      el = nodes[i];
+      try {
+        b = el.getBoundingClientRect();
+        st = root.getComputedStyle(el);
+        if (st.display === 'none' || st.visibility === 'hidden' || Number(st.opacity) === 0) continue;
+        if (b.width >= 2 || b.height >= 2 || st.position === 'fixed') return el;
+      } catch (e) {}
+    }
+    return nodes[0] || null;
+  }
+
+  // The waiting line is sometimes born in a hidden copy of Chat. Move it
+  // onto the visible face, then pin Just me, the waiting line, and compose
+  // in a clear stack above the bottom of the viewport.
+  function placeWaitHint() { layoutChatStack(); }
+
+  function layoutChatStack() {
+    var d = doc();
+    if (!d || !isNarrow()) return;
+    if (!d.documentElement || !d.documentElement.classList.contains('thread-open')) return;
+    var hint = d.getElementById('tree-thread-wait-hint') || d.querySelector('.tree-thread-wait-hint');
+    var compose = visibleEl('html.thread-open .thread-compose, #thread-veil.is-open .thread-compose, #place-veil.is-open .thread-compose, #tab-chat .thread-compose, .thread-compose');
+    var justHost = visibleEl('html.thread-open .thread-just-host, html.thread-open [data-thread-just-host]');
+    var justBtn = visibleEl('html.thread-open [data-honest-just], html.thread-open .thread-just-host button');
+    var just = justHost || justBtn;
+    if (hint && compose && hint.parentNode !== compose.parentNode) {
+      try { compose.parentNode.insertBefore(hint, compose); } catch (e1) {}
+    }
+    if (hint) {
+      try {
+        hint.style.setProperty('display', 'block', 'important');
+        hint.style.setProperty('visibility', 'visible', 'important');
+        hint.style.setProperty('opacity', '1', 'important');
+      } catch (e0) {}
+    }
+    if (!compose) return;
+    var vh, cr, gap, hintH, justH, hintBottom, justBottom;
+    try {
+      vh = root.innerHeight || 0;
+      cr = compose.getBoundingClientRect();
+      if (!cr || cr.height < 2 || cr.width < 2) return;
+      gap = 8;
+      if (hint) {
+        hint.style.setProperty('position', 'fixed', 'important');
+        hint.style.setProperty('left', '0.7rem', 'important');
+        hint.style.setProperty('right', '0.7rem', 'important');
+        hint.style.setProperty('top', 'auto', 'important');
+        hint.style.setProperty('width', 'auto', 'important');
+        hint.style.setProperty('z-index', '50', 'important');
+        hint.style.setProperty('margin', '0', 'important');
+        hintH = Math.max(hint.getBoundingClientRect().height, 36);
+        hintBottom = Math.max(gap, vh - cr.top + gap);
+        hint.style.setProperty('bottom', hintBottom + 'px', 'important');
+      }
+      if (just) {
+        var hintBox = hint ? hint.getBoundingClientRect() : null;
+        var above = (hintBox && hintBox.height >= 2) ? hintBox.top : cr.top;
+        justH = Math.max(just.getBoundingClientRect().height, 44);
+        justBottom = Math.max(gap, vh - above + gap);
+        just.style.setProperty('position', 'fixed', 'important');
+        just.style.setProperty('left', '50%', 'important');
+        just.style.setProperty('right', 'auto', 'important');
+        just.style.setProperty('top', 'auto', 'important');
+        just.style.setProperty('transform', 'translateX(-50%)', 'important');
+        just.style.setProperty('z-index', '50', 'important');
+        just.style.setProperty('margin', '0', 'important');
+        just.style.setProperty('bottom', justBottom + 'px', 'important');
+      }
+      var settingsBtn = visibleEl('html.thread-open .thread-to-settings, #thread-veil.is-open .thread-to-settings');
+      if (settingsBtn && just) {
+        var justBox = just.getBoundingClientRect();
+        if (justBox && justBox.height >= 2) {
+          settingsBtn.style.setProperty('position', 'fixed', 'important');
+          settingsBtn.style.setProperty('left', '50%', 'important');
+          settingsBtn.style.setProperty('right', 'auto', 'important');
+          settingsBtn.style.setProperty('top', 'auto', 'important');
+          settingsBtn.style.setProperty('transform', 'translateX(-50%)', 'important');
+          settingsBtn.style.setProperty('z-index', '49', 'important');
+          settingsBtn.style.setProperty('margin', '0', 'important');
+          settingsBtn.style.setProperty('bottom', Math.max(gap, vh - justBox.top + gap) + 'px', 'important');
+        }
+      }
+    } catch (e2) {}
+  }
+
   function keepNurseryTextInView() {
     var d = doc();
     if (!d) return;
@@ -329,22 +658,25 @@
   function watchRooms() {
     var d = doc();
     if (!d || !d.body || typeof MutationObserver !== 'function') return;
-    var obs = new MutationObserver(function () {
-      keepNurseryTextInView();
-    });
+    var obs = new MutationObserver(function () { keepNurseryTextInView(); placeWaitHint(); });
     try {
-      obs.observe(d.documentElement, { attributes: true, subtree: true, attributeFilter: ['class', 'hidden'] });
+      obs.observe(d.documentElement, { attributes: true, childList: true, subtree: true, attributeFilter: ['class', 'hidden'] });
     } catch (e2) {}
+    if (root.setInterval && !_hintWatch) {
+      _hintWatch = root.setInterval(function () { placeWaitHint(); }, 400);
+    }
   }
 
   function start() {
     addStyle();
     paintHint();
     hookFov();
+    hookRender();
     hookFractalGardenAssign();
     wrapAnchors();
     watchRooms();
     keepNurseryTextInView();
+    placeWaitHint();
     if (!_wrapped) {
       var n = 0;
       var wait = root.setInterval(function () {
@@ -363,15 +695,16 @@
     HINT: HINT,
     NARROW: NARROW,
     MIN_GAP: MIN_GAP,
+    HIT: HIT,
     fitAnchors: fitAnchors,
+    fitProjected: fitProjected,
     start: start
   };
   root.TreePhonePolish136 = api;
 
-  // Run the camera hook and hide-until-ready style at parse time, so
-  // they are in place before fractal-garden.js and garden-init.js paint.
   addStyle();
   hookFov();
+  hookRender();
   hookFractalGardenAssign();
 
   if (doc()) {

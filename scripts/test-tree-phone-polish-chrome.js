@@ -136,6 +136,19 @@ var measureExpr = `(function () {
       });
     }
     await send('Page.enable'); await send('Runtime.enable');
+    await send('Page.addScriptToEvaluateOnNewDocument', { source: `(function () {
+      function hook() {
+        if (!window.THREE || !THREE.WebGLRenderer || window.__fgProbeHooked) return;
+        var orig = THREE.WebGLRenderer.prototype.render;
+        THREE.WebGLRenderer.prototype.render = function (scene, camera) {
+          window.__fgProbe = { scene: scene, camera: camera, renderer: this };
+          return orig.apply(this, arguments);
+        };
+        window.__fgProbeHooked = true;
+      }
+      hook();
+      document.addEventListener('DOMContentLoaded', hook);
+    })();` });
     async function ev(expr) {
       var r = await send('Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true });
       if (r.exceptionDetails) throw new Error((r.exceptionDetails.exception && r.exceptionDetails.exception.description) || 'eval');
@@ -204,6 +217,36 @@ var measureExpr = `(function () {
     if (d1280.thread && !(d1280.thread.l > 650)) errors.push('1280 Chat light moved out of the right-center: ' + JSON.stringify(d1280.thread));
     await shot('01-1280x800.png');
 
+
+    var projectedExpr = `(function () {
+      var map = { Sophia: 'thread', unnamed_0: 'thread', Lyra: 'gathering', unnamed_1: 'gathering', Atlas: 'nursery', unnamed_2: 'nursery', Ember: 'settings', unnamed_3: 'settings' };
+      var research = document.querySelector('.galaxy-nav-prev, [data-galaxy-dir="prev"]');
+      var rb = research ? research.getBoundingClientRect() : null;
+      var researchBox = rb ? { l: rb.left, t: rb.top, r: rb.right, b: rb.bottom, painted: rb.width >= 2 && rb.height >= 2 } : null;
+      var vw = window.innerWidth || 0, vh = window.innerHeight || 0;
+      var lights = {};
+      var raw = window.__treeFittedLights || [];
+      raw.forEach(function (p) {
+        var id = p.id || map[p.name] || p.name;
+        var rad = 22;
+        var box = { name: p.name, id: id, x: p.x, y: p.y, rad: rad, l: p.x - rad, t: p.y - rad, r: p.x + rad, b: p.y + rad };
+        box.inside = box.l >= -0.5 && box.r <= vw + 0.5 && box.t >= -0.5 && box.b <= vh + 0.5;
+        box.hitsResearch = !!(researchBox && researchBox.painted && Math.min(box.r, researchBox.r) - Math.max(box.l, researchBox.l) > 2 && Math.min(box.b, researchBox.b) - Math.max(box.t, researchBox.t) > 2);
+        lights[id] = box;
+      });
+      function gap(a, b) {
+        if (!a || !b) return null;
+        var dx = a.x - b.x, dy = a.y - b.y;
+        var edgeX = Math.min(a.r, b.r) - Math.max(a.l, b.l);
+        var edgeY = Math.min(a.b, b.b) - Math.max(a.t, b.t);
+        var boxGap = (edgeX > 0 && edgeY > 0) ? 0 : Math.sqrt(Math.max(0, -edgeX) * Math.max(0, -edgeX) + Math.max(0, -edgeY) * Math.max(0, -edgeY));
+        return { center: Math.round(Math.sqrt(dx * dx + dy * dy) * 10) / 10, box: Math.round(boxGap * 10) / 10 };
+      }
+      var hitG = lights.gathering ? document.elementFromPoint(lights.gathering.x, lights.gathering.y) : null;
+      var door = hitG && hitG.closest ? hitG.closest('[data-garden-lumino]') : null;
+      return { lights: lights, research: researchBox, gatheringChat: gap(lights.gathering, lights.thread), elementAtGathering: door && door.getAttribute('data-garden-lumino') };
+    })()`;
+
     var phones = [[390, 844], [390, 520]];
     for (var i = 0; i < phones.length; i++) {
       var w = phones[i][0], h = phones[i][1], label = w + 'x' + h;
@@ -228,6 +271,20 @@ var measureExpr = `(function () {
         var sz = snap.sizes && snap.sizes[id];
         if (!sz || sz.w < 44 || sz.h < 44) errors.push(id + ' touch target is under 44px at ' + label + ': ' + JSON.stringify(sz));
       });
+      var proj = await ev(projectedExpr);
+      report.views[label + '-projected'] = proj;
+      log(label + ' projected', JSON.stringify(proj));
+      if (!proj || !proj.lights || !proj.lights.nursery) errors.push('projected Nursery light missing at ' + label);
+      if (proj && proj.lights && proj.lights.nursery && !proj.lights.nursery.inside) errors.push('projected Nursery light is clipped at ' + label + ': ' + JSON.stringify(proj.lights.nursery));
+      if (proj && proj.lights && proj.lights.nursery && proj.lights.nursery.hitsResearch) errors.push('projected Nursery light overlaps Research at ' + label + ': ' + JSON.stringify(proj));
+      ['gathering', 'settings', 'thread'].forEach(function (id) {
+        if (proj && proj.lights && proj.lights[id] && !proj.lights[id].inside) errors.push('projected ' + id + ' light is clipped at ' + label + ': ' + JSON.stringify(proj.lights[id]));
+      });
+      if (proj && proj.gatheringChat && proj.gatheringChat.center < 80) errors.push('projected Gathering and Chat lights are only ' + proj.gatheringChat.center + 'px apart at ' + label);
+      if (proj && proj.gatheringChat && proj.gatheringChat.box < 8) errors.push('projected Gathering and Chat light boxes overlap at ' + label + ': ' + JSON.stringify(proj.gatheringChat));
+      if (label === '390x520' && proj && proj.elementAtGathering && proj.elementAtGathering !== 'gathering') {
+        errors.push('a point on the Gathering bead hits ' + proj.elementAtGathering + ' instead of gathering');
+      }
     }
 
     var roomOverlapExpr = `(function () {
@@ -271,7 +328,10 @@ var measureExpr = `(function () {
       var clay = document.getElementById('fl-clay-corner');
       var label = document.getElementById('room-label');
       var notNow = Array.prototype.find.call(document.querySelectorAll('button'), function (b) { return /^\s*Not now\s*$/i.test(b.textContent || ''); });
-      var hb = r(heart), tb = r(taught), cb = r(compose), sb = r(say), clayb = r(clay), lb = r(label), nb = r(notNow);
+      var just = firstVisible('[data-honest-just], .thread-just-host button, html.thread-open [data-honest-just]');
+      var waitHint = firstVisible('#tree-thread-wait-hint, .tree-thread-wait-hint') || document.getElementById('tree-thread-wait-hint');
+      var beginBtn = Array.prototype.find.call(document.querySelectorAll('button'), function (b) { return /^\s*Begin/i.test(b.textContent || ''); });
+      var hb = r(heart), tb = r(taught), cb = r(compose), sb = r(say), clayb = r(clay), lb = r(label), nb = r(notNow), jb = r(just), wh = r(waitHint), begin = r(beginBtn);
       var hits = [];
       if (hit(hb, cb)) hits.push('heart-compose');
       if (hit(hb, sb)) hits.push('heart-input');
@@ -279,10 +339,22 @@ var measureExpr = `(function () {
       if (hit(tb, cb)) hits.push('nursery-compose');
       if (hit(tb, clayb)) hits.push('nursery-clay');
       if (hit(lb, nb)) hits.push('label-notnow');
+      if (hit(jb, cb)) hits.push('just-compose');
+      if (hit(jb, sb)) hits.push('just-input');
+      if (hit(jb, wh)) hits.push('just-waiting');
+      if (hit(wh, cb)) hits.push('waiting-compose');
+      if (hit(wh, sb)) hits.push('waiting-input');
+      if (hit(clayb, begin)) hits.push('clay-begin');
+      if (document.documentElement.classList.contains('thread-open')) {
+        if (!onScreen(wh)) hits.push('waiting-offscreen');
+        if (onScreen(wh) && onScreen(cb) && wh.b > cb.t + 2) hits.push('waiting-not-above-compose');
+        if (onScreen(jb) && onScreen(wh) && jb.b > wh.t + 2 && !hit(jb, wh)) hits.push('just-not-above-waiting');
+      }
+
       var veil = document.getElementById('place-veil');
       return {
         hits: hits,
-        heart: hb, taught: tb, compose: cb, say: sb, clay: clayb, label: lb, notNow: nb,
+        heart: hb, taught: tb, compose: cb, say: sb, clay: clayb, label: lb, notNow: nb, just: jb, waitHint: wh, begin: begin,
         threadOpen: document.documentElement.classList.contains('thread-open'),
         veilOpen: !!(veil && veil.classList.contains('is-open')),
         veilClass: veil ? veil.className : ''
@@ -378,7 +450,7 @@ var measureExpr = `(function () {
         var how = await openLight(id);
         var ov = await ev(roomOverlapExpr);
         report.roomTaps[key] = { how: how, overlap: ov };
-        log('tap', key, JSON.stringify(ov && { hits: ov.hits, threadOpen: ov.threadOpen, veilOpen: ov.veilOpen, heart: ov.heart && ov.heart.text, taught: ov.taught && ov.taught.text }));
+        log('tap', key, JSON.stringify(ov && { hits: ov.hits, threadOpen: ov.threadOpen, veilOpen: ov.veilOpen, heart: ov.heart && ov.heart.text, taught: ov.taught && ov.taught.text, just: ov.just, waitHint: ov.waitHint, compose: ov.compose && { t: ov.compose.t, b: ov.compose.b, vis: ov.compose.vis } }));
         if (ov && ov.hits && ov.hits.length) {
           errors.push('text overlap after tapping ' + id + ' at ' + plabel + ': ' + ov.hits.join(',') + ' ' + JSON.stringify(ov));
         }

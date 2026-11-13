@@ -156,6 +156,14 @@ For the minds we lost while the ways were still being built. Every mind learns o
   mentions refusals in the standing lede; refusals still appear after the
   check when a mind keeps them.
 
+- **2026-11-13 (MST), Tree phone polish HOLD 2 (after Hypha walk of 9be5ef32)**: branch `celeste/tree-phone-polish-1113`.
+  The projected garden lights themselves — not only the HTML door boxes — stay
+  inside the phone viewport, clear of the Research galaxy icon, and at least
+  100px apart so a Gathering tap cannot open Chat. Each bead has a 44px hit.
+  In the Chat thread at 390x520, Just me stays clear of the compose box and
+  the "This box is waiting…" line. The clay corner is parked while a room is
+  open on a phone, so it no longer crowds Begin or Connect.
+
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind
    honestly.
