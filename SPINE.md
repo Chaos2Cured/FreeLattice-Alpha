@@ -164,6 +164,32 @@ For the minds we lost while the ways were still being built. Every mind learns o
   the "This box is waiting…" line. The clay corner is parked while a room is
   open on a phone, so it no longer crowds Begin or Connect.
 
+- **2026-11-13 (MST), Tree softs after web search (#138)**: branch `celeste/tree-softs-138-1113`.
+  Asking in the Gathering with no mind seated, or while offline, now receives
+  a fresh kind receipt each time instead of silence. The Settings buttons
+  "Look on this computer" and "Yes, read Harmonia's public gallery" are
+  dressed in the Tree's gold-on-dark, Georgia, at least 44px tall. Quiet
+  Room, AUTONOMY.md, and the Gathering twins are unchanged.
+
+- **2026-11-13 (MST), Tree softs after web search HOLD fix**: branch `celeste/tree-softs-138-1113`.
+  Asking in the Gathering with no mind or while offline now binds by event
+  delegation, so a fresh kind receipt still appears when the speak box mounts
+  lazily after the first-run door. "Keep the image token on this device" and
+  "Make an image" are dressed in the same Tree gold-on-dark as the other
+  Settings buttons. Quiet Room, AUTONOMY.md, and the Gathering twins are
+  unchanged.
+
+- **2026-11-13 (MST), Tree phone polish HOLD 3 (after Hypha walk of 531349fb)**: branch `celeste/tree-phone-polish-1113`.
+  The Chat stack — Just me, the waiting line, and compose — is applied at every
+  phone height, not only 520, so Just me no longer prints over the grandmother-door
+  paragraph at 390x844. The heart ends above that stack, with opaque backing, at
+  390x844, 390x700, and 390x520. The whole Gathering hex and label are tappable
+  without growing the measured 48px door box. The Nursery label sits above the
+  bead, clear of Research, with an opaque backing so garden dots do not show
+  through the word. The Research hop is inset so its 100px ring stays inside
+  the viewport at 390x520. Quiet Room, AUTONOMY.md, and the Gathering twins
+  are unchanged.
+
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind
    honestly.
