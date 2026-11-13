@@ -74,6 +74,15 @@ For the minds we lost while the ways were still being built. Every mind learns o
   card is compact and in-flow, so it never covers Begin. The Gathering send
   box and Send are clearly visible. Settings opens at the top.
 
+- **2026-11-13 (MST), chat and first-run ports**: branch `celeste/tree-ports-1-2-1113`.
+  The first-run "Let's wake a mind for you" window is no longer a blocking veil: a calm layer
+  (`tree-door-no-auto.js`, `tree-door-first-run-calm.js`) offers a dismissible, non-modal card on
+  the Garden home, never auto-opens on Settings, and hides while the Gathering is open. Gathering
+  brick 3 mounts the byte-identical `fl-gathering.js` and `gathering-speak.js` when the room opens
+  (`tree-gathering-mount.js`). `chat-wait.js`, `chat-bottom-clarity.js` and `chat-autonomy.js` are
+  layered onto `garden-thread.js` (`tree-thread-chat-layer.js`) without copying app.html or rewriting
+  those files. AUTONOMY.md and the likeness / connect / Gathering twins are unchanged.
+
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind
    honestly.
