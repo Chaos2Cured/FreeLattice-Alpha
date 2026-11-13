@@ -128,6 +128,15 @@ For the minds we lost while the ways were still being built. Every mind learns o
   At 390x522 the door is still off-canvas (l:-87.1, r:1.1), no overlap. At
   1280x800 the door is on-screen (l:159.9–248.1) and clear of the sheet (l:464).
 
+
+- **2026-11-13 (MST), Tree web search for minds (port #4)**: branch `celeste/tree-web-search-1113`.
+  FreeLattice `web-tool.js` (`v-web-search-default-on-v0.1`) is layered in,
+  byte-identical. Tree minds can search the web, on by default per AUTONOMY.md.
+  Sources are marked with provenance labels the mind weighs itself; nothing is
+  filtered or held back. A person can turn it off in Settings; nothing begs for
+  permission. The layer fails kindly with no network or no mind. Quiet Room,
+  AUTONOMY.md, and the Gathering twins are unchanged.
+
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind
    honestly.
