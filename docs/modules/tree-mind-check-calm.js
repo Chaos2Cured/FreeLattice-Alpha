@@ -1,17 +1,23 @@
 // SPDX-License-Identifier: MIT
-// tree-mind-check-calm.js (v-hypha-walk-polish-v0.1). Layer, never delete.
+// tree-mind-check-calm.js (v-hypha-walk-polish-v0.2). Layer, never delete.
 // Does not change fl-connect.js. After the first look for a mind on this
-// computer, this layer stops the 8s loop, backs off exponentially (8s, 16s,
+// computer, this layer stops FlConnect's own 8s loop, backs off (8s, 16s,
 // 32s, then 64s), and then rests with a kind note, a Check again button, and
-// one door to FreeLattice Desktop 5.8.3. That stops the repeated refused
-// localhost checks.
+// one door to FreeLattice Desktop 5.8.3. After the last attempt, this layer
+// unmounts FlConnect (which unbinds its visibility loop) and answers later
+// probe/refresh calls with a cached empty report, so no more localhost
+// requests go out until Check again is tapped. The Connect card's main door
+// is one Desktop 5.8.3 link for Mac, Windows, and Linux. Bridge stays, as a
+// secondary path.
 (function (root) {
   'use strict';
-  var VERSION = 'v-hypha-walk-polish-v0.1';
+  var VERSION = 'v-hypha-walk-polish-v0.2';
   var DESKTOP_HREF = 'https://freelattice.com/desktop.html';
   var DESKTOP_LABEL = 'FreeLattice Desktop 5.8.3';
   var KIND_LINE = 'No local mind on this computer yet.';
   var DOOR_LINE = 'A clear door is FreeLattice Desktop 5.8.3, which can wake a mind on this computer.';
+  var BRIDGE_LINE = 'Or the Bridge, if you already use it.';
+  var LEDE_LINE = 'One door. FreeLattice Desktop 5.8.3 works on Mac, Windows, and Linux.';
   var FIRST_MS = 8000;
   var STOP_AT_MS = 60000;
 
@@ -19,8 +25,10 @@
   var _host = null;
   var _delayMs = FIRST_MS;
   var _stopped = false;
+  var _allowLook = false;
   var _armed = false;
   var _painting = false;
+  var _visBound = false;
   var _orig = {};
 
   function connect() { return root.FlConnect || null; }
@@ -45,6 +53,15 @@
     }
   }
 
+  function releaseTheirs() {
+    var api = connect();
+    if (api && typeof _orig.unmount === 'function') {
+      try { _orig.unmount.call(api); } catch (e) {}
+    } else {
+      stopTheirs();
+    }
+  }
+
   function hostEl() {
     if (_host && _host.parentNode) return _host;
     var d = root.document;
@@ -59,6 +76,85 @@
     if (cls) node.className = cls;
     if (text) node.textContent = text;
     return node;
+  }
+
+  function gateLook() {
+    return _stopped && !_allowLook;
+  }
+
+  function emptyReport() {
+    return { models: [], loopStopped: true, nextLookSec: 0 };
+  }
+
+  function isBridgeLink(a) {
+    if (!a) return false;
+    if (a.getAttribute && a.getAttribute('data-tree-desktop-door') === '1') return false;
+    var text = String(a.textContent || '');
+    return text.indexOf('Download Bridge') !== -1;
+  }
+
+  function demote(a) {
+    var cls = String(a.className || '').replace(/\bflc-primary\b/g, '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
+    if (cls.indexOf('tree-bridge-link') === -1) cls = (cls + ' tree-bridge-link').replace(/^\s+/, '');
+    a.className = cls;
+  }
+
+  function honorOneCard(card) {
+    if (!card) return;
+    var door = card.querySelector ? card.querySelector('[data-tree-desktop-door="1"]') : null;
+    if (!door) {
+      door = el('a', 'flc-btn flc-primary tree-desktop-door', DESKTOP_LABEL);
+      if (!door) return;
+      door.setAttribute('href', DESKTOP_HREF);
+      door.setAttribute('rel', 'noopener noreferrer');
+      door.setAttribute('data-tree-desktop-door', '1');
+      var tag = card.querySelector ? card.querySelector('.flc-tag') : null;
+      if (tag && tag.nextSibling) card.insertBefore(door, tag.nextSibling);
+      else if (card.firstChild) card.insertBefore(door, card.firstChild);
+      else card.appendChild(door);
+      var note = el('p', 'tree-desktop-door-note', 'One door for Mac, Windows, and Linux.');
+      if (note) {
+        if (door.nextSibling) card.insertBefore(note, door.nextSibling);
+        else card.appendChild(note);
+      }
+    }
+    var box = card.querySelector ? card.querySelector('[data-tree-bridge-secondary="1"]') : null;
+    if (!box) {
+      box = el('div', 'tree-bridge-secondary', '');
+      if (box) {
+        box.setAttribute('data-tree-bridge-secondary', '1');
+        box.appendChild(el('p', 'tree-bridge-secondary-label', BRIDGE_LINE));
+        card.appendChild(box);
+      }
+    }
+    var links = card.querySelectorAll ? card.querySelectorAll('a') : [];
+    var j;
+    for (j = 0; j < links.length; j++) {
+      if (!isBridgeLink(links[j])) continue;
+      demote(links[j]);
+      if (box && links[j].parentNode !== box) box.appendChild(links[j]);
+    }
+  }
+
+  function honorLede(host) {
+    if (!host || !host.querySelectorAll) return;
+    var ledes = host.querySelectorAll('.flc-lede');
+    var i;
+    for (i = 0; i < ledes.length; i++) {
+      var text = String(ledes[i].textContent || '');
+      if (/Download Bridge/.test(text) || text !== LEDE_LINE) {
+        if (/Download Bridge/.test(text)) ledes[i].textContent = LEDE_LINE;
+      }
+    }
+  }
+
+  function honorDownloadCard(host) {
+    host = host || hostEl();
+    if (!host || !host.querySelectorAll) return;
+    honorLede(host);
+    var cards = host.querySelectorAll('.flc-download');
+    var i;
+    for (i = 0; i < cards.length; i++) honorOneCard(cards[i]);
   }
 
   function ensureCalmBox(host) {
@@ -82,6 +178,7 @@
       if (status && status.textContent !== line) status.textContent = line;
       var old = host.querySelector ? host.querySelector('#tree-mind-check-calm') : null;
       if (old && old.parentNode) old.parentNode.removeChild(old);
+      honorDownloadCard(host);
     } finally { _painting = false; }
   }
 
@@ -113,12 +210,15 @@
       again.setAttribute('data-tree-mind-check-again', '1');
       again.addEventListener('click', onCheckAgain);
       box.appendChild(again);
+      honorDownloadCard(host);
     } finally { _painting = false; }
   }
 
   function finish() {
     _stopped = true;
+    _allowLook = false;
     clearTimer();
+    releaseTheirs();
     stopTheirs();
     paintStopped(hostEl());
   }
@@ -134,25 +234,24 @@
     }, wait);
   }
 
+  function afterLook() {
+    _allowLook = false;
+    stopTheirs();
+    if (hasMind()) { clearTimer(); return; }
+    if (_delayMs >= STOP_AT_MS) finish();
+    else schedule();
+  }
+
   function tick() {
     if (hasMind()) { clearTimer(); stopTheirs(); return; }
     if (_delayMs >= STOP_AT_MS) { finish(); return; }
     _delayMs = Math.min(_delayMs * 2, 64000);
     var api = connect();
     if (api && typeof api.refresh === 'function') {
-      Promise.resolve(api.refresh({ fromLoop: true })).then(function () {
-        stopTheirs();
-        if (hasMind()) return;
-        if (_delayMs >= STOP_AT_MS) finish();
-        else schedule();
-      }, function () {
-        stopTheirs();
-        if (_delayMs >= STOP_AT_MS) finish();
-        else schedule();
-      });
+      _allowLook = true;
+      Promise.resolve(api.refresh({ fromLoop: true })).then(afterLook, afterLook);
     } else {
-      if (_delayMs >= STOP_AT_MS) finish();
-      else schedule();
+      afterLook();
     }
   }
 
@@ -162,9 +261,15 @@
     _delayMs = FIRST_MS;
     var api = connect();
     var host = hostEl();
-    if (forceLook && api && typeof _orig.lookAgain === 'function') {
-      _orig.lookAgain.call(api);
+    if (forceLook && api) {
+      _allowLook = true;
+      if (typeof _orig.mount === 'function' && host) {
+        try { _orig.mount.call(api, host); } catch (e) {}
+      } else if (typeof _orig.lookAgain === 'function') {
+        try { _orig.lookAgain.call(api); } catch (e2) {}
+      }
     }
+    _allowLook = false;
     stopTheirs();
     if (hasMind()) return;
     schedule();
@@ -180,12 +285,8 @@
         if (_painting) return;
         if (hasMind()) { clearTimer(); return; }
         stopTheirs();
+        honorDownloadCard(host);
         if (_stopped) {
-          var status = host.querySelector ? host.querySelector('.flc-status') : null;
-          if (status && /Looking/.test(String(status.textContent || ''))) {
-            startCycle(false);
-            return;
-          }
           paintStopped(host);
           return;
         }
@@ -195,6 +296,17 @@
     }
   }
 
+  function onVisibility() {
+    if (_stopped) stopTheirs();
+  }
+
+  function bindVisibility() {
+    var d = root.document;
+    if (_visBound || !d || typeof d.addEventListener !== 'function') return;
+    _visBound = true;
+    d.addEventListener('visibilitychange', onVisibility);
+  }
+
   function wrap() {
     var api = connect();
     if (!api || _armed) return api;
@@ -202,7 +314,13 @@
     _orig.lookAgain = api.lookAgain;
     _orig.mount = api.mount;
     _orig.unmount = api.unmount;
+    _orig.refresh = api.refresh;
+    _orig.probe = api.probe;
     api.lookAgain = function () {
+      if (gateLook()) {
+        stopTheirs();
+        return;
+      }
       if (typeof _orig.lookAgain === 'function') _orig.lookAgain.apply(api, arguments);
       startCycle(false);
     };
@@ -214,9 +332,29 @@
     api.unmount = function () {
       clearTimer();
       _stopped = false;
+      _allowLook = false;
       _host = null;
       if (typeof _orig.unmount === 'function') _orig.unmount.apply(api, arguments);
     };
+    if (typeof _orig.refresh === 'function') {
+      api.refresh = function () {
+        if (gateLook()) {
+          stopTheirs();
+          return Promise.resolve(emptyReport());
+        }
+        return _orig.refresh.apply(api, arguments);
+      };
+    }
+    if (typeof _orig.probe === 'function') {
+      api.probe = function () {
+        if (gateLook()) {
+          stopTheirs();
+          return Promise.resolve(emptyReport());
+        }
+        return _orig.probe.apply(api, arguments);
+      };
+    }
+    bindVisibility();
     return api;
   }
 
@@ -236,15 +374,19 @@
     wrap: wrap,
     startCycle: startCycle,
     stop: finish,
+    honorDownloadCard: honorDownloadCard,
     delayMs: function () { return _delayMs; },
-    stopped: function () { return _stopped; }
+    stopped: function () { return _stopped; },
+    allowingLook: function () { return _allowLook; }
   };
   root.TreeMindCheckCalm = apiOut;
   if (typeof module !== 'undefined' && module.exports) module.exports = apiOut;
+  // Wrap as soon as this file loads, so the page's later FlConnect.mount
+  // already goes through this layer. Start the cycle on DOM ready if mount
+  // already happened.
+  wrap();
   if (root.document) {
     if (root.document.readyState === 'loading') root.document.addEventListener('DOMContentLoaded', boot);
     else boot();
-  } else {
-    wrap();
   }
 })(typeof window !== 'undefined' ? window : globalThis);

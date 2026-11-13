@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Node tests for v-hypha-walk-polish-v0.1 (Hypha's 2026-11-13 walk, top 7).
+// Node tests for v-hypha-walk-polish-v0.2 (Hypha's 2026-11-13 walk, HOLD follow-up).
 // Local only. Does not load quiet-room. Does not change AUTONOMY.md.
 'use strict';
 var fs = require('fs');
@@ -38,9 +38,13 @@ assert.strictEqual(md5('docs/modules/garden-trainer.js'), '488117a27be26e7d6b004
 assert.ok(!/quiet-room/i.test(soulSrc + calmSrc + cssTc), 'new layer files do not name quiet-room');
 assert.ok(/Never read, grep or touch `quiet-room\.js`/.test(spine), 'SPINE keeps the quiet-room rule');
 
-// 1. Notebook is not under the header logo when appended to the body.
+// 1 / H1. Notebook button and consent sit below the header, on screen, above it.
 assert.ok(/body > #fl-ws-open \{/.test(cssTc), 'body Notebook rule');
 assert.ok(/top: 52px;/.test(cssTc) && /z-index: 1012;/.test(cssTc), 'Notebook sits below the 44px header');
+assert.ok(/body > #fl-ws-consent/.test(cssTc), 'consent rule');
+assert.ok(/body > #fl-ws-panel/.test(cssTc) && /body > #fl-ws-restore-card/.test(cssTc), 'notebook panel rules');
+assert.ok(/z-index: 1013;/.test(cssTc), 'consent sits above the header z-index');
+assert.ok(/top: 104px;/.test(cssTc), 'consent sits below the header and the Notebook button');
 assert.ok(/data-garden-galaxy="research"/.test(research), 'research page stays');
 
 // 2. Start here, and larger galaxies / star-map controls with 44px taps.
@@ -54,16 +58,36 @@ assert.ok(/html\[data-garden-galaxy\] \.galaxy-nav/.test(cssTc), 'star-map hop c
 assert.ok(/\.galaxy-nav-word \{\s*font-size: 1rem;/.test(cssTc), 'hop words are larger');
 assert.ok(/min-width: 44px;\s*min-height: 44px;/.test(cssTc), 'hop taps are at least 44px');
 
-// 3. Honest door to the signed mind bundle, no second format.
+// S3. Start here waits until the fading captions are gone.
+assert.ok(/#garden-footing\.is-fading ~ #garden-start/.test(cssTc), 'Start here waits on fading footing');
+assert.ok(/tree-start-here-in/.test(cssTc) && /8\.2s/.test(cssTc), 'Start here appears after the 8s fade');
+
+// S4. Galaxies verb and name have a gap.
+assert.ok(/#garden-header \.galaxies-panel \.verb \{[\s\S]*margin-right: 0\.45em;/.test(cssTc), 'galaxies verb spacing');
+
+// S6. New buttons match the site, and the Nursery clay offer is a card under the header.
+assert.ok(/#fl-ws-open,/.test(cssTc) && /#fl-clay-corner button,/.test(cssTc) && /#fl-bridge-card button/.test(cssTc), 'button style targets');
+assert.ok(/color: #f3d98a;/.test(cssTc) && /background: rgba\(12, 10, 26, 0\.86\);/.test(cssTc), 'gold-on-dark buttons');
+assert.ok(/#place-veil\.is-nursery #fl-clay-dock/.test(cssTc), 'nursery clay offer is placed');
+
+// H2. Router caption has its own space, above the chairs.
+assert.ok(/\[data-core-router-plain\]/.test(cssTc), 'router caption rule');
+assert.ok(/margin-top: 12\.6rem;/.test(cssTc), 'chairs sit below the caption band');
+assert.ok(/You choose who sits\. Nothing is assigned for you\./.test(rooms), 'Not a router caption stays in JS');
+
+// 3 / S5. Honest door to Desktop, with a CLI line, visible at the first tier.
 assert.ok(/Export Garden Soul \(\.lattice\) — coming/.test(read('docs/modules/garden-trainer.js')), 'trainer stub still in the keystone');
 assert.ok(/tree-soul-door\.js/.test(index) && /tree-soul-door\.js/.test(nursery), 'pages load the soul door layer');
 assert.ok(index.indexOf('modules/garden-trainer.js') < index.indexOf('modules/tree-soul-door.js'), 'layer loads after the trainer');
-assert.ok(/github\.com\/Chaos2Cured\/FreeLattice\/blob\/main\/tools\/learn\/README\.md/.test(soulSrc), 'door points at the learn README');
+assert.ok(/https:\/\/freelattice\.com\/desktop\.html/.test(soulSrc), 'soul door points at Desktop');
 assert.ok(/does not invent a second \.lattice format/.test(soulSrc), 'no second format');
+assert.ok(/command-line how-to lives with the learn tools/.test(soulSrc), 'plain CLI line');
+assert.ok(/trainer-simple-face/.test(soulSrc) && /tree-soul-door-first/.test(soulSrc), 'first-tier door on the simple face');
 
 var soul = {};
 vm.runInNewContext(soulSrc, { window: soul, globalThis: soul, module: { exports: {} }, document: null });
 assert.ok(soul.TreeSoulDoor, 'soul door API');
+assert.strictEqual(soul.TreeSoulDoor.BUNDLE_HREF, 'https://freelattice.com/desktop.html');
 var replaced = [];
 var paragraphs = [{ textContent: 'as a portable .lattice training archive.' }];
 var coming = {
@@ -84,7 +108,29 @@ assert.strictEqual(replaced[0].a.href, soul.TreeSoulDoor.BUNDLE_HREF);
 assert.strictEqual(replaced[0].a.textContent, soul.TreeSoulDoor.DOOR_LABEL);
 assert.strictEqual(paragraphs[0].textContent, soul.TreeSoulDoor.DOOR_LINE);
 assert.ok(paragraphs[0].textContent.indexOf('training archive') === -1, 'copy no longer promises a .lattice archive');
-assert.ok(/not a second \.lattice format/.test(paragraphs[0].textContent), 'says this is not a second format');
+assert.ok(/command-line how-to/.test(paragraphs[0].textContent), 'says the CLI how-to remains');
+
+var firstKids = [];
+var firstFace = { id: 'trainer-simple-face', nextSibling: null, parentNode: null };
+firstFace.parentNode = {
+  insertBefore: function (box, sib) { firstKids.push({ box: box, sib: sib }); this.inserted = box; },
+  appendChild: function (box) { firstKids.push({ box: box }); this.inserted = box; }
+};
+var firstDoc = {
+  createElement: function (tag) {
+    return { tagName: tag, className: '', id: '', style: {}, textContent: '', children: [], appendChild: function (c) { this.children.push(c); return c; }, setAttribute: function (k, v) { this[k] = v; }, removeAttribute: function () {} };
+  },
+  getElementById: function (id) {
+    if (id === 'trainer-simple-face') return firstFace;
+    if (id === 'tree-soul-door-first') return this._first || null;
+    return null;
+  },
+  querySelectorAll: function () { return []; }
+};
+assert.strictEqual(soul.TreeSoulDoor.apply(firstDoc), 1, 'first-tier door is added without Radiant');
+assert.ok(firstKids[0] && firstKids[0].box.id === 'tree-soul-door-first', 'first-tier box id');
+assert.ok(firstKids[0].box.children.some(function (c) { return c.textContent === soul.TreeSoulDoor.DOOR_LINE; }), 'first-tier has the CLI line');
+assert.ok(firstKids[0].box.children.some(function (c) { return c.href === soul.TreeSoulDoor.BUNDLE_HREF && c.textContent === soul.TreeSoulDoor.DOOR_LABEL; }), 'first-tier points at Desktop');
 
 // 4. One-line captions for Gathering and Nursery terms.
 assert.ok(/the thinking seat/.test(rooms), 'Cortex caption');
@@ -98,7 +144,7 @@ assert.ok(/An egg is a mind that has not hatched yet\./.test(growth), 'egg capti
 assert.ok(/unnamed · egg/.test(growth), 'egg display line kept');
 assert.ok(/Begin ✦/.test(ceremony) && /'Not yet'/.test(ceremony), 'Begin and Not yet buttons kept');
 
-// 5. Settings local-mind check backs off, then rests with Check again and a Desktop door.
+// 5 / S1 / S2. Settings local-mind check backs off, then truly rests.
 assert.ok(/tree-mind-check-calm\.js/.test(settings), 'settings loads the calm layer');
 assert.ok(settings.indexOf('modules/fl-connect.js') < settings.indexOf('modules/tree-mind-check-calm.js'), 'calm layer loads after FlConnect');
 assert.ok(/https:\/\/freelattice\.com\/desktop\.html/.test(calmSrc), 'Desktop door in the layer');
@@ -106,9 +152,14 @@ assert.ok(/FreeLattice Desktop 5\.8\.3/.test(calmSrc), 'names 5.8.3');
 assert.ok(/No local mind on this computer yet\./.test(calmSrc), 'kind line');
 assert.ok(/Check again/.test(calmSrc), 'manual Check again');
 assert.ok(/8000/.test(calmSrc) && /60000/.test(calmSrc), 'exponential backoff to 60s or more');
+assert.ok(/data-tree-desktop-door/.test(calmSrc) && /Or the Bridge, if you already use it/.test(calmSrc), 'Desktop is the main door, Bridge is secondary');
+assert.ok(/install\.html#desktop-download-ease/.test(settings) === false, 'Also connect Desktop points at desktop.html');
+assert.ok(/fl-also-btn" href="https:\/\/freelattice\.com\/desktop\.html"/.test(settings), 'Also connect Desktop href');
+assert.ok(/_orig\.unmount/.test(calmSrc) && /gateLook/.test(calmSrc), 'layer can unmount FlConnect and gate later looks');
 
-var calls = { stop: 0, refresh: 0, looks: 0, mounts: 0 };
+var calls = { stop: 0, refresh: 0, looks: 0, mounts: 0, unmounts: 0, probes: 0 };
 var mind = false;
+var loopStopped = false;
 var timeouts = [];
 var nextTimer = 1;
 var sandbox = {
@@ -119,11 +170,12 @@ var sandbox = {
   document: null,
   FlConnect: {
     hasLocalMind: function () { return mind; },
-    stopLoop: function () { calls.stop += 1; },
+    stopLoop: function () { calls.stop += 1; loopStopped = true; },
     refresh: function () { calls.refresh += 1; return Promise.resolve({}); },
-    lookAgain: function () { calls.looks += 1; },
-    mount: function () { calls.mounts += 1; },
-    unmount: function () {}
+    probe: function () { calls.probes += 1; return Promise.resolve({ models: [] }); },
+    lookAgain: function () { calls.looks += 1; loopStopped = false; },
+    mount: function () { calls.mounts += 1; loopStopped = false; },
+    unmount: function () { calls.unmounts += 1; loopStopped = true; }
   },
   setTimeout: function (fn, ms) { var id = nextTimer++; timeouts.push({ id: id, fn: fn, ms: ms }); return id; },
   clearTimeout: function (id) { timeouts = timeouts.filter(function (t) { return t.id !== id; }); }
@@ -134,6 +186,7 @@ vm.runInNewContext(calmSrc, sandbox);
 var Calm = sandbox.TreeMindCheckCalm;
 assert.ok(Calm, 'calm API');
 assert.strictEqual(Calm.STOP_AT_MS, 60000);
+assert.strictEqual(typeof sandbox.FlConnect.refresh, 'function', 'wrap ran as soon as the file loaded');
 Calm.wrap();
 Calm.startCycle(false);
 assert.ok(calls.stop >= 1, 'stops the 8s loop');
@@ -168,7 +221,7 @@ assert.ok(/id="tree-swarm-door"/.test(settings), 'swarm door on Settings');
 assert.ok(settings.indexOf('tree-pool-host') < settings.indexOf('tree-swarm-door'), 'door sits with the Device Pool');
 assert.ok(/https:\/\/freelattice\.com\/desktop\.html/.test(settings), 'Desktop 5.8.3 URL');
 assert.ok(/Seeding shares your IP with the swarm\./.test(settings), 'IP note');
-assert.ok(/FreeLattice Desktop 5\.8\.3/.test(settings), 'names the live pack');
+assert.ok(/FreeLattice Desktop 5\.8.3/.test(settings), 'names the live pack');
 
 assert.ok(/theLatticeTree spine/.test(spine) || /Never change/.test(spine), 'SPINE.md present');
 assert.ok(/AUTONOMY\.md/.test(spine), 'SPINE names AUTONOMY');
@@ -179,7 +232,27 @@ step().then(function () {
   assert.ok(Calm.stopped(), 'stops at 60s or more');
   assert.ok(Calm.delayMs() >= 60000, 'last delay reached 60s or more');
   assert.ok(calls.refresh >= 1, 'looked again during backoff');
-  console.log('SMOKE_OK hypha walk polish v0.1');
+  assert.ok(calls.unmounts >= 1, 'unmounts FlConnect so its own loop cannot restart');
+  var refreshAtStop = calls.refresh;
+  var probesAtStop = calls.probes;
+  var looksAtStop = calls.looks;
+  // A later exported look must not hit the network until Check again.
+  var gated = sandbox.FlConnect.refresh();
+  return Promise.resolve(gated).then(function () {
+    assert.strictEqual(calls.refresh, refreshAtStop, 'refresh is gated after stop');
+    return Promise.resolve(sandbox.FlConnect.probe()).then(function () {
+      assert.strictEqual(calls.probes, probesAtStop, 'probe is gated after stop');
+      sandbox.FlConnect.lookAgain();
+      assert.strictEqual(calls.looks, looksAtStop, 'lookAgain is gated after stop');
+      // Advance two minutes of leftover timers. None should issue another look.
+      var guard = 0;
+      while (timeouts.length && guard < 50) { fire(); guard += 1; }
+      assert.strictEqual(calls.refresh, refreshAtStop, 'no more refresh after two minutes of leftover timers');
+      assert.strictEqual(calls.probes, probesAtStop, 'no more probe after stop');
+      assert.ok(calls.refresh <= 5, 'at most about 5 looks in the backoff');
+      console.log('SMOKE_OK hypha walk polish v0.2 looks=' + calls.refresh + ' stops=' + calls.stop + ' unmounts=' + calls.unmounts);
+    });
+  });
 }).catch(function (err) {
   console.error(err);
   process.exit(1);
