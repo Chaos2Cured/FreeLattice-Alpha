@@ -1,4 +1,4 @@
-// tree-phone-polish-136.js v-tree-phone-polish-136-v0.4
+// tree-phone-polish-136.js v-tree-phone-polish-136-v0.5
 // SPDX-License-Identifier: MIT
 // Layer, never delete. Does not rewrite garden-rooms.js, fractal-garden.js,
 // garden-thread.js, nursery-growth.js, tree-door-first-run-calm.js,
@@ -8,13 +8,14 @@
 // HTML door boxes) stay inside the viewport, clear of the Research icon,
 // spaced far enough to tap, with a 44px hit around each bead. The fitted
 // camera and a render-time layout are hooked before the first garden paint.
-// In Chat at every phone height, Just me stays clear of the compose box,
-// the waiting line, and the grandmother-door paragraph, with an opaque
-// backing so garden labels do not bleed through.
+// On phones (≤600px), an opened room is one opaque full-screen panel whose
+// content stays in normal document flow and the panel itself scrolls. The
+// v0.4 per-element fixed pins, height caps, and inner scroll boxes are
+// neutralized. Garden labels and dots stay behind the panel.
 (function (root) {
   'use strict';
 
-  var VERSION = 'v-tree-phone-polish-136-v0.4';
+  var VERSION = 'v-tree-phone-polish-136-v0.5';
   var STYLE_ID = 'tree-phone-polish-136-style';
   var NARROW = 600;
   var MIN_GAP = 100;
@@ -102,140 +103,191 @@
       'pointer-events:none !important;opacity:0 !important;}',
       '}',
 
-      '@media (max-height: 640px){',
+      /* Opened phone rooms: one opaque scrolling panel, content in normal flow.
+         Neutralizes the v0.4 fixed pins, height caps, and inner scroll boxes. */
+      '@media (max-width: 600px){',
+      'html.thread-open #thread-veil,',
+      '#thread-veil.is-open,',
+      '#place-veil.is-open{',
+      'position:fixed !important;inset:0 !important;top:0 !important;',
+      'background:#0c0a1a !important;',
+      'overflow-x:hidden !important;overflow-y:auto !important;',
+      'display:flex !important;flex-direction:column !important;',
+      'flex-wrap:nowrap !important;',
+      'justify-content:flex-start !important;align-items:stretch !important;',
+      'padding:4.5rem 0.85rem 1.75rem !important;',
+      'scroll-padding-top:4.5rem !important;',
+      'gap:0.65rem !important;',
+      'max-height:none !important;height:auto !important;}',
+
+      'html.thread-open #thread-stage,',
+      '#thread-veil.is-open #thread-stage,',
+      'html.thread-open #thread-stage .thread-face,',
+      '#thread-veil.is-open .thread-face,',
+      '#place-veil.is-open #thread-stage,',
+      '#place-veil.is-open .thread-face,',
+      '#place-veil.is-open #room-chat,',
+      '#place-veil.is-open #room-chat-stage,',
+      '#place-veil.is-open #core-gathering,',
+      '#place-veil.is-open #nursery-stage,',
+      '#place-veil.is-open #nursery-growth,',
+      '#place-veil.is-open #nursery-ceremony,',
+      '#place-veil.is-open #settings-grandmother{',
+      'position:static !important;',
+      'max-height:none !important;height:auto !important;min-height:0 !important;',
+      'flex:0 0 auto !important;',
+      'overflow:visible !important;',
+      'width:min(28em,calc(100vw - 1.5rem));',
+      'max-width:28em;',
+      'align-self:center;',
+      'box-sizing:border-box;}',
+
+      '#place-veil.is-open #core-gathering,',
+      '#place-veil.is-open .is-fl-gathering-mounted{',
+      'width:min(32em,calc(100vw - 1.25rem));',
+      'max-width:32em;}',
+
+      '#thread-veil.is-open .thread-face,',
+      '#place-veil.is-open .thread-face,',
+      '#place-veil.is-open #nursery-stage{',
+      'display:flex !important;flex-direction:column !important;',
+      'align-items:stretch !important;gap:0.55rem !important;',
+      'overflow:visible !important;}',
+
+      'html.thread-open .thread-heart,',
+      'html.thread-open #thread-stage .thread-heart,',
+      'html.thread-open .thread-face .thread-heart,',
+      '#place-veil.is-open .thread-heart,',
+      '#place-veil.is-open #room-chat .thread-heart{',
+      'position:static !important;top:auto !important;bottom:auto !important;',
+      'left:auto !important;right:auto !important;transform:none !important;',
+      'max-height:none !important;height:auto !important;',
+      'overflow:visible !important;flex:0 0 auto !important;',
+      'order:10;',
+      'background:transparent !important;',
+      'padding:0.15rem 0.15rem;box-sizing:border-box;}',
+
+      'html.thread-open .thread-later,',
+      'html.thread-open [data-thread-later],',
+      'html.thread-open [data-thread-pool],',
+      'html.thread-open .thread-change{order:11;}',
+
+      'html.thread-open .thread-just-host,',
+      'html.thread-open [data-thread-just-host],',
+      'html.thread-open [data-honest-just],',
+      '#place-veil.is-open .thread-just-host,',
+      '#place-veil.is-open [data-honest-just]{',
+      'position:static !important;top:auto !important;bottom:auto !important;',
+      'left:auto !important;right:auto !important;transform:none !important;',
+      'order:20;margin:0.15rem auto;align-self:center;}',
+
+      'html.thread-open #tree-thread-wait-hint,',
+      'html.thread-open .tree-thread-wait-hint,',
+      '#place-veil.is-open #tree-thread-wait-hint,',
+      '#place-veil.is-open .tree-thread-wait-hint{',
+      'display:block !important;visibility:visible !important;opacity:1 !important;',
+      'position:static !important;top:auto !important;bottom:auto !important;',
+      'left:auto !important;right:auto !important;transform:none !important;',
+      'width:auto !important;max-height:none !important;overflow:visible !important;',
+      'order:21;text-align:center;line-height:1.35;',
+      'padding:0.25rem 0.2rem;box-sizing:border-box;',
+      'background:transparent !important;color:rgba(200,210,230,0.92);}',
+
+      'html.thread-open .thread-to-settings,',
+      '#thread-veil.is-open .thread-to-settings,',
+      '#place-veil.is-open .thread-to-settings{',
+      'position:static !important;top:auto !important;bottom:auto !important;',
+      'left:auto !important;right:auto !important;transform:none !important;',
+      'order:22;margin:0.15rem auto;align-self:center;}',
+
+      'html.thread-open .fl-honest,',
+      '#thread-veil.is-open .fl-honest,',
+      '#place-veil.is-open .fl-honest{',
+      'position:static !important;order:30;}',
+
+      'html.thread-open .thread-messages,',
+      '#place-veil.is-open .thread-messages{',
+      'order:35;max-height:none !important;overflow:visible !important;}',
+
       'html.thread-open #fl-clay-dock,',
       'html.garden-door-open #fl-clay-dock,',
       'html:has(#place-veil.is-open) #fl-clay-dock,',
       '#place-veil.is-open #fl-clay-dock,',
       '#place-veil.is-nursery #fl-clay-dock,',
-      '#thread-veil.is-open #fl-clay-dock{',
-      'display:none !important;visibility:hidden !important;',
-      'pointer-events:none !important;opacity:0 !important;}',
+      '#thread-veil.is-open #fl-clay-dock,',
+      'html.room-page #nursery-stage > #fl-clay-dock{',
+      'position:static !important;top:auto !important;left:auto !important;',
+      'right:auto !important;bottom:auto !important;transform:none !important;',
+      'width:auto !important;max-width:100% !important;',
+      'order:40;flex:0 0 auto !important;',
+      'z-index:auto !important;}',
 
-      'html.thread-open #thread-veil,',
-      '#thread-veil.is-open{',
-      'padding:3.25rem 0.75rem 0.4rem !important;',
-      'justify-content:flex-start !important;',
-      'overflow:hidden !important;gap:0.35rem !important;}',
-
-      'html.thread-open #thread-stage,',
-      '#thread-veil.is-open #thread-stage,',
-      'html.thread-open #thread-stage .thread-face{',
-      'width:min(28em,calc(100vw - 1.25rem));',
-      'max-width:28em;',
-      'max-height:calc(100dvh - 5.25rem);',
-      'height:auto;',
-      'flex:1 1 auto;',
-      'min-height:0;',
-      'display:flex;',
-      'flex-direction:column;',
-      'overflow:hidden;',
-      'box-sizing:border-box;}',
-
-      'html.thread-open #thread-close,',
-      '#thread-veil.is-open #thread-close{',
-      'order:-1;margin:0 0 0.2rem;flex-shrink:0;align-self:center;z-index:60;}',
-
-      'html.thread-open .thread-heart,',
-      'html.thread-open #thread-stage .thread-heart{',
-      'flex:1 1 auto;min-height:0;overflow-y:auto;',
-      'padding-bottom:0.4rem;box-sizing:border-box;}',
-
-
-      '#place-veil.is-core #room-chat,',
-      '#place-veil.is-open #room-chat{',
-      'max-height:calc(100dvh - 8rem);',
-      'display:flex;flex-direction:column;',
-      'overflow:hidden;box-sizing:border-box;}',
-
-      '#place-veil.is-open #room-chat .thread-heart,',
-      '#room-chat .thread-heart{',
-      'flex:1 1 auto;min-height:0;overflow-y:auto;',
-      'padding-bottom:0.6rem;box-sizing:border-box;}',
-
-      '#place-veil.is-open #room-chat .thread-compose,',
-      '#room-chat .thread-compose{',
-      'flex:0 0 auto;position:sticky;bottom:0;z-index:6;',
-      'background:rgba(12,10,26,0.96);padding-top:0.5rem;}',
-
-      '#place-veil.is-open #nursery-stage,',
-      '#place-veil.is-nursery #nursery-stage{',
-      'max-height:calc(100dvh - 5.5rem);',
-      'overflow-y:auto;',
-      'padding-bottom:1.25rem;',
-      'box-sizing:border-box;}',
-      '#place-veil.is-nursery #nursery-growth{',
-      'position:sticky;bottom:2.75rem;z-index:2;',
-      'max-height:42vh;overflow-y:auto;',
-      'padding:0.5rem 0.75rem 0.85rem;',
-      'box-sizing:border-box;',
-      'background:rgba(12,10,26,0.9);',
-      'border-radius:10px;}',
-      '}',
-
-      /* Waiting line / Chat stack backing, Gathering hex hit, Nursery
-         label backing, and Research ring inset — at every phone height. */
-      '@media (max-width: 600px){',
-      'html.thread-open #thread-veil,',
-      '#thread-veil.is-open{',
-      'padding:3.25rem 0.75rem 0.5rem !important;',
-      'justify-content:flex-start !important;',
-      'overflow:hidden !important;gap:0.35rem !important;}',
-      'html.thread-open #thread-stage,',
-      '#thread-veil.is-open #thread-stage,',
-      'html.thread-open #thread-stage .thread-face{',
-      'width:min(28em,calc(100vw - 1.25rem));',
-      'max-width:28em;',
-      'max-height:calc(100dvh - 5.25rem);',
-      'height:auto;',
-      'flex:1 1 auto;',
-      'min-height:0;',
-      'display:flex;',
-      'flex-direction:column;',
-      'overflow:hidden;',
-      'box-sizing:border-box;}',
-      'html.thread-open #thread-close,',
-      '#thread-veil.is-open #thread-close{',
-      'position:fixed !important;top:3.35rem !important;left:50%;right:auto;',
-      'bottom:auto !important;transform:translateX(-50%);',
-      'z-index:60 !important;margin:0 !important;flex-shrink:0;}',
-      'html.thread-open #galaxy-word,',
-      'html:has(#thread-veil.is-open) #galaxy-word{',
-      'visibility:hidden !important;pointer-events:none !important;}',
-      'html.thread-open .thread-heart,',
-      'html.thread-open #thread-stage .thread-heart,',
-      'html.thread-open .thread-face .thread-heart{',
-      'flex:1 1 auto;min-height:0;overflow-y:auto;',
-      'padding-bottom:0.4rem;box-sizing:border-box;}',
       'html.thread-open .thread-compose,',
-      'html.thread-open #thread-stage .thread-compose{',
-      'flex:0 0 auto;position:sticky;bottom:0;z-index:6;',
-      'background:rgba(12,10,26,0.96);padding-top:0.5rem;}',
+      'html.thread-open #thread-stage .thread-compose,',
+      '#thread-veil.is-open .thread-compose,',
+      '#place-veil.is-open .thread-compose,',
+      '#place-veil.is-open #room-chat .thread-compose,',
+      '#place-veil.is-core #room-chat .thread-compose,',
+      '#place-veil.is-settings #room-chat .thread-compose,',
+      '#place-veil.is-open #room-chat .thread-face.is-room .thread-compose,',
+      'html:has(#place-veil.is-open) #tab-chat .thread-compose,',
+      'html:has(#place-veil.is-open) .thread-compose{',
+      'position:static !important;top:auto !important;bottom:auto !important;',
+      'left:auto !important;right:auto !important;transform:none !important;',
+      'width:auto !important;max-height:none !important;',
+      'overflow:visible !important;flex:0 0 auto !important;',
+      'order:50;z-index:auto !important;',
+      'padding-top:0.35rem;}',
 
-      'html.thread-open #tree-thread-wait-hint,',
-      'html.thread-open .tree-thread-wait-hint{',
-      'display:block !important;visibility:visible !important;',
-      'opacity:1 !important;z-index:50 !important;',
-      'background:rgba(12,10,26,0.96) !important;',
-      'color:rgba(200,210,230,0.92);text-align:center;',
-      'padding:0.25rem 0.5rem;box-sizing:border-box;',
-      'line-height:1.35;}',
+      'html.thread-open #thread-close,',
+      '#thread-veil.is-open #thread-close,',
+      '#place-veil.is-open #place-veil-close{',
+      'position:static !important;top:auto !important;bottom:auto !important;',
+      'left:auto !important;right:auto !important;transform:none !important;',
+      'order:0;margin:0 auto 0.4rem;align-self:center;',
+      'flex-shrink:0;z-index:auto !important;}',
 
-      'html.thread-open .thread-heart,',
-      'html.thread-open #thread-stage .thread-heart,',
-      'html.thread-open .thread-face .thread-heart{',
-      'background:rgba(12,10,26,0.92) !important;',
-      'border-radius:10px;',
-      'padding:0.35rem 0.5rem;',
-      'box-sizing:border-box;',
-      'position:relative;z-index:8;}',
+      '#place-veil.is-open #nursery-ceremony{order:10;}',
+      '#place-veil.is-open #nursery-growth{',
+      'order:20;position:static !important;max-height:none !important;',
+      'overflow:visible !important;bottom:auto !important;}',
+      '#place-veil.is-open .nursery-grow{order:30;}',
 
-      'html.thread-open .thread-just-host,',
-      'html.thread-open [data-honest-just],',
-      'html.thread-open .thread-to-settings,',
-      'html.thread-open .thread-compose{',
-      'background:rgba(12,10,26,0.96) !important;}',
+      /* Garden labels and hops stay behind an open panel. */
+      'html.thread-open .garden-lumino,',
+      'html.thread-open #galaxy-word,',
+      'html.thread-open #galaxy-title,',
+      'html.thread-open #garden-footing,',
+      'html.thread-open #garden-start,',
+      'html.thread-open .galaxy-nav,',
+      'html.thread-open #lumino-legend,',
+      'html.thread-open #gardenContainer,',
+      'html:has(#thread-veil.is-open) .garden-lumino,',
+      'html:has(#thread-veil.is-open) #galaxy-word,',
+      'html:has(#thread-veil.is-open) .galaxy-nav,',
+      'html:has(#thread-veil.is-open) #lumino-legend,',
+      'html:has(#thread-veil.is-open) #gardenContainer,',
+      'html:has(#place-veil.is-open) .garden-lumino,',
+      'html:has(#place-veil.is-open) #galaxy-word,',
+      'html:has(#place-veil.is-open) #galaxy-title,',
+      'html:has(#place-veil.is-open) #garden-footing,',
+      'html:has(#place-veil.is-open) #garden-start,',
+      'html:has(#place-veil.is-open) .galaxy-nav,',
+      'html:has(#place-veil.is-open) #lumino-legend,',
+      'html:has(#place-veil.is-open) #gardenContainer{',
+      'visibility:hidden !important;pointer-events:none !important;}',
 
+      'html.thread-open #sky-portal,',
+      'html.sky-portal-open.thread-open #sky-portal,',
+      'html:has(#thread-veil.is-open) #sky-portal,',
+      'html:has(#place-veil.is-open) #sky-portal{',
+      'display:none !important;visibility:hidden !important;pointer-events:none !important;}',
+
+      /* On the open garden, keep the Nursery word off the legend and the
+         clay-corner button off the Art ring. */
+      'html:not(.thread-open):not(:has(#place-veil.is-open)) #fl-clay-corner{',
+      'right:auto !important;left:50% !important;',
+      'bottom:6rem !important;transform:translateX(-50%) !important;}',
       /* A larger transparent hit over the Gathering hex, without growing
          the measured 48px door box into Chat. */
       '.garden-lumino.is-attached[data-garden-lumino="gathering"]{',
@@ -249,10 +301,12 @@
       'background:rgba(12,10,26,0.92);',
       'border-radius:6px;padding:1px 6px;',
       'z-index:2;}',
-      /* Nursery word sits above the bead so it does not rest on Research. */
+      /* Nursery word sits to the right of the bead: clear of the left legend
+         and still above Research. */
       '.garden-lumino.is-attached[data-garden-lumino="nursery"] .garden-lumino-word{',
-      'top:auto;bottom:calc(100% + 4px);',
-      'transform:translateX(-50%);}',
+      'top:50%;bottom:auto;left:calc(100% + 56px);right:auto;',
+      'transform:translateY(-50%);',
+      'background:rgba(12,10,26,0.96);}',
 
       /* The 100px Research hop ring was 10px past the left edge at left:10px. */
       'html[data-garden-galaxy="garden"] .galaxy-nav-prev,',
@@ -646,19 +700,24 @@
   }
 
   // The waiting line is sometimes born in a hidden copy of Chat. Move it
-  // onto the visible face, then pin Just me, the waiting line, and compose
-  // in a clear stack above the bottom of the viewport.
-  function placeWaitHint() { layoutChatStack(); }
+  // onto the visible face, then strip any leftover v0.4 inline pins so the
+  // room can stay in normal document flow.
+  function placeWaitHint() { clearRoomPins(); }
 
-  function layoutChatStack() {
+  function clearInlinePins(el) {
+    if (!el || !el.style) return;
+    var props = ['position', 'top', 'bottom', 'left', 'right', 'transform', 'max-height', 'height', 'width', 'overflow', 'overflow-y', 'z-index', 'margin'];
+    var i;
+    try {
+      for (i = 0; i < props.length; i++) el.style.removeProperty(props[i]);
+    } catch (e) {}
+  }
+
+  function clearRoomPins() {
     var d = doc();
-    if (!d || !isNarrow()) return;
-    if (!d.documentElement || !d.documentElement.classList.contains('thread-open')) return;
+    if (!d) return;
     var hint = d.getElementById('tree-thread-wait-hint') || d.querySelector('.tree-thread-wait-hint');
-    var compose = visibleEl('html.thread-open .thread-compose, #thread-veil.is-open .thread-compose, #place-veil.is-open .thread-compose, #tab-chat .thread-compose, .thread-compose');
-    var justHost = visibleEl('html.thread-open .thread-just-host, html.thread-open [data-thread-just-host]');
-    var justBtn = visibleEl('html.thread-open [data-honest-just], html.thread-open .thread-just-host button');
-    var just = justHost || justBtn;
+    var compose = visibleEl('html.thread-open .thread-compose, #thread-veil.is-open .thread-compose, #place-veil.is-open .thread-compose, .thread-face .thread-compose');
     if (hint && compose && hint.parentNode !== compose.parentNode) {
       try { compose.parentNode.insertBefore(hint, compose); } catch (e1) {}
     }
@@ -669,140 +728,13 @@
         hint.style.setProperty('opacity', '1', 'important');
       } catch (e0) {}
     }
-    if (!compose) return;
-    var vh, cr, gap, hintH, justH, hintBottom, justBottom;
-    try {
-      vh = root.innerHeight || 0;
-      gap = 8;
-      try {
-        compose.style.setProperty('position', 'fixed', 'important');
-        compose.style.setProperty('left', '0', 'important');
-        compose.style.setProperty('right', '0', 'important');
-        compose.style.setProperty('padding-left', '0.7rem', 'important');
-        compose.style.setProperty('padding-right', '0.7rem', 'important');
-        compose.style.setProperty('top', 'auto', 'important');
-        compose.style.setProperty('bottom', '0.5rem', 'important');
-        compose.style.setProperty('width', 'auto', 'important');
-        compose.style.setProperty('z-index', '48', 'important');
-        compose.style.setProperty('margin', '0', 'important');
-        compose.style.setProperty('background', 'rgba(12,10,26,0.96)', 'important');
-      } catch (eC) {}
-      cr = compose.getBoundingClientRect();
-      if (!cr || cr.height < 2 || cr.width < 2) return;
-      if (hint) {
-        hint.style.setProperty('position', 'fixed', 'important');
-        hint.style.setProperty('left', '0', 'important');
-        hint.style.setProperty('right', '0', 'important');
-        hint.style.setProperty('padding-left', '0.7rem', 'important');
-        hint.style.setProperty('padding-right', '0.7rem', 'important');
-        hint.style.setProperty('background', 'rgba(12,10,26,0.96)', 'important');
-        hint.style.setProperty('top', 'auto', 'important');
-        hint.style.setProperty('width', 'auto', 'important');
-        hint.style.setProperty('z-index', '50', 'important');
-        hint.style.setProperty('margin', '0', 'important');
-        hintH = Math.max(hint.getBoundingClientRect().height, 36);
-        hintBottom = Math.max(gap, vh - cr.top + gap);
-        hint.style.setProperty('bottom', hintBottom + 'px', 'important');
-      }
-      if (just) {
-        var hintBox = hint ? hint.getBoundingClientRect() : null;
-        var above = (hintBox && hintBox.height >= 2) ? hintBox.top : cr.top;
-        justH = Math.max(just.getBoundingClientRect().height, 44);
-        justBottom = Math.max(gap, vh - above + gap);
-        just.style.setProperty('position', 'fixed', 'important');
-        just.style.setProperty('left', '50%', 'important');
-        just.style.setProperty('right', 'auto', 'important');
-        just.style.setProperty('top', 'auto', 'important');
-        just.style.setProperty('transform', 'translateX(-50%)', 'important');
-        just.style.setProperty('z-index', '50', 'important');
-        just.style.setProperty('margin', '0', 'important');
-        just.style.setProperty('bottom', justBottom + 'px', 'important');
-      }
-      var settingsBtn = visibleEl('html.thread-open .thread-to-settings, #thread-veil.is-open .thread-to-settings');
-      if (settingsBtn && just) {
-        var justBox = just.getBoundingClientRect();
-        if (justBox && justBox.height >= 2) {
-          settingsBtn.style.setProperty('position', 'fixed', 'important');
-          settingsBtn.style.setProperty('left', '50%', 'important');
-          settingsBtn.style.setProperty('right', 'auto', 'important');
-          settingsBtn.style.setProperty('top', 'auto', 'important');
-          settingsBtn.style.setProperty('transform', 'translateX(-50%)', 'important');
-          settingsBtn.style.setProperty('z-index', '49', 'important');
-          settingsBtn.style.setProperty('margin', '0', 'important');
-          settingsBtn.style.setProperty('background', 'rgba(12,10,26,0.96)', 'important');
-          settingsBtn.style.setProperty('bottom', Math.max(gap, vh - justBox.top + gap) + 'px', 'important');
-        }
-      }
-      if (just) {
-        just.style.setProperty('background', 'rgba(12,10,26,0.96)', 'important');
-      }
-      if (compose) {
-        compose.style.setProperty('background', 'rgba(12,10,26,0.96)', 'important');
-      }
-      var stackTop = cr.top;
-      var hb2 = hint ? hint.getBoundingClientRect() : null;
-      if (hb2 && hb2.height >= 2) stackTop = Math.min(stackTop, hb2.top);
-      var jb2 = just ? just.getBoundingClientRect() : null;
-      if (jb2 && jb2.height >= 2) stackTop = Math.min(stackTop, jb2.top);
-      var sb2 = settingsBtn ? settingsBtn.getBoundingClientRect() : null;
-      if (sb2 && sb2.height >= 2) stackTop = Math.min(stackTop, sb2.top);
-      var hearts = d.querySelectorAll('#thread-veil.is-open #thread-stage .thread-heart, html.thread-open #thread-stage .thread-heart, html.thread-open .thread-face .thread-heart');
-      var hi, heart, stHeart, closeEl, closeBox, safeTop, maxH;
-      closeEl = d.getElementById('thread-close') || d.querySelector('html.thread-open #thread-close');
-      closeBox = closeEl ? closeEl.getBoundingClientRect() : null;
-      safeTop = 72;
-      if (closeBox && closeBox.height >= 2 && closeBox.top < vh * 0.33) {
-        safeTop = Math.max(safeTop, closeBox.bottom + 8);
-      }
-      var upper = d.querySelectorAll('#thread-veil.is-open button, #thread-veil.is-open .fl-honest, #thread-veil.is-open [data-honest], #thread-veil.is-open #fl-clay-dock, #thread-veil.is-open #fl-clay-corner');
-      var ui, ub, skip;
-      for (ui = 0; ui < upper.length; ui++) {
-        try {
-          skip = upper[ui] === compose || upper[ui] === just || upper[ui] === justBtn || upper[ui] === justHost || upper[ui] === hint || upper[ui] === settingsBtn;
-          if (!skip && upper[ui].closest) {
-            skip = !!(upper[ui].closest('.thread-compose, .thread-just-host, [data-honest-just], .thread-to-settings, #tree-thread-wait-hint'));
-          }
-          if (skip) continue;
-          ub = upper[ui].getBoundingClientRect();
-          if (ub && ub.height >= 2 && ub.width >= 2 && ub.top < vh * 0.45 && ub.bottom < stackTop - 40) {
-            safeTop = Math.max(safeTop, ub.bottom + 8);
-          }
-        } catch (eU) {}
-      }
-      for (hi = 0; hi < hearts.length; hi++) {
-        heart = hearts[hi];
-        try {
-          stHeart = root.getComputedStyle(heart);
-          if (stHeart.display === 'none' || stHeart.visibility === 'hidden' || Number(stHeart.opacity) < 0.05) continue;
-          if (heart.getBoundingClientRect().width < 2) continue;
-          maxH = Math.max(48, stackTop - safeTop - 8);
-          heart.style.setProperty('position', 'fixed', 'important');
-          heart.style.setProperty('left', '0.9rem', 'important');
-          heart.style.setProperty('right', '0.9rem', 'important');
-          heart.style.setProperty('top', safeTop + 'px', 'important');
-          heart.style.setProperty('bottom', Math.max(gap, vh - stackTop + 8) + 'px', 'important');
-          heart.style.setProperty('height', 'auto', 'important');
-          heart.style.setProperty('max-height', maxH + 'px', 'important');
-          heart.style.setProperty('overflow-y', 'auto', 'important');
-          heart.style.setProperty('background', 'rgba(12,10,26,0.96)', 'important');
-          heart.style.setProperty('z-index', '8', 'important');
-        } catch (eH) {}
-      }
-    } catch (e2) {}
+    var nodes = d.querySelectorAll('.thread-compose, .thread-heart, .thread-just-host, [data-honest-just], .thread-to-settings, #tree-thread-wait-hint, .tree-thread-wait-hint, #thread-close, #place-veil-close, #fl-clay-dock');
+    var i;
+    for (i = 0; i < nodes.length; i++) clearInlinePins(nodes[i]);
   }
 
   function keepNurseryTextInView() {
-    var d = doc();
-    if (!d) return;
-    try {
-      if ((root.innerHeight || 0) > 640) return;
-      var veil = d.getElementById('place-veil');
-      if (!veil || !veil.classList.contains('is-open') || !veil.classList.contains('is-nursery')) return;
-      var text = d.querySelector('#nursery-growth, [data-nursery-growth-heart], [data-nursery-growth-taught], .nursery-growth-heart, .nursery-growth-taught, .nursery-growth-line');
-      if (text && typeof text.scrollIntoView === 'function') {
-        text.scrollIntoView({ block: 'nearest', inline: 'nearest' });
-      }
-    } catch (e) {}
+    return;
   }
 
   function watchRooms() {

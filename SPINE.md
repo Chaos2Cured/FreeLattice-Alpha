@@ -190,6 +190,17 @@ For the minds we lost while the ways were still being built. Every mind learns o
   the viewport at 390x520. Quiet Room, AUTONOMY.md, and the Gathering twins
   are unchanged.
 
+- **2026-11-13 (MST), Tree phone polish HOLD 4 (after Hypha walk of cc1d8fcc)**: branch `celeste/tree-phone-polish-1113`.
+  On a phone, an opened room is one opaque full-screen panel in normal document
+  flow: title, its paragraphs, Just me and the waiting line, controls, then
+  compose at the end. The v0.4 per-element fixed pins, height caps, inner
+  scroll boxes, and fixed compose dock are gone, so Chat text no longer
+  vanishes at 390x844 or 390x700, and the Gathering Chat heart is no longer
+  squeezed into a two-line scroll box. Garden labels and dots stay behind the
+  panel. The Nursery word sits to the right of the bead, clear of the legend,
+  and the clay-corner button is centered so it misses the Art ring. Quiet
+  Room, AUTONOMY.md, and the Gathering twins are unchanged.
+
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind
    honestly.

@@ -320,7 +320,24 @@ var measureExpr = `(function () {
           var door2 = el2 && el2.closest ? el2.closest('[data-garden-lumino]') : null;
           atHex = door2 && door2.getAttribute('data-garden-lumino');
         }
-        return { ring: ring, wordGap: wordGap, atWord: atWord, atHex: atHex };
+        var legend = document.getElementById('lumino-legend');
+        var wordLegend = null;
+        if (word && legend) {
+          var lb = legend.getBoundingClientRect();
+          var overlap = Math.min(wb.right, lb.right) - Math.max(wb.left, lb.left) > 2 && Math.min(wb.bottom, lb.bottom) - Math.max(wb.top, lb.top) > 2;
+          wordLegend = { overlap: overlap, word: { l: wb.left, t: wb.top, r: wb.right, b: wb.bottom }, legend: { l: lb.left, t: lb.top, r: lb.right, b: lb.bottom } };
+        }
+        var clay = document.getElementById('fl-clay-corner');
+        var art = document.querySelector('.galaxy-nav-next, [data-galaxy-dir="next"]');
+        var clayArt = null;
+        if (clay && art) {
+          var cb = clay.getBoundingClientRect(), ab = art.getBoundingClientRect();
+          var cst = getComputedStyle(clay), ast = getComputedStyle(art);
+          var cVis = cst.display !== 'none' && cst.visibility !== 'hidden' && Number(cst.opacity) > 0.05 && cb.width >= 2;
+          var aVis = ast.display !== 'none' && ast.visibility !== 'hidden' && Number(ast.opacity) > 0.05 && ab.width >= 2;
+          clayArt = { overlap: !!(cVis && aVis && Math.min(cb.right, ab.right) - Math.max(cb.left, ab.left) > 2 && Math.min(cb.bottom, ab.bottom) - Math.max(cb.top, ab.top) > 2), clay: { l: cb.left, t: cb.top, r: cb.right, b: cb.bottom, vis: cVis }, art: { l: ab.left, t: ab.top, r: ab.right, b: ab.bottom, vis: aVis } };
+        }
+        return { ring: ring, wordGap: wordGap, atWord: atWord, atHex: atHex, wordLegend: wordLegend, clayArt: clayArt };
       })()`);
       report.views[label + '-extra'] = extra;
       log(label + ' extra', JSON.stringify(extra));
@@ -328,6 +345,8 @@ var measureExpr = `(function () {
       if (extra && extra.wordGap && extra.wordGap.gap < 12) errors.push('Nursery label is only ' + extra.wordGap.gap + 'px above Research at ' + label);
       if (extra && extra.atWord && extra.atWord !== 'gathering') errors.push('Gathering label tap hits ' + extra.atWord + ' at ' + label);
       if (extra && extra.atHex && extra.atHex !== 'gathering') errors.push('Gathering hex tap hits ' + extra.atHex + ' at ' + label);
+      if (extra && extra.wordLegend && extra.wordLegend.overlap) errors.push('Nursery label overlaps the legend at ' + label + ': ' + JSON.stringify(extra.wordLegend));
+      if (extra && extra.clayArt && extra.clayArt.overlap) errors.push('clay-corner covers the Art ring at ' + label + ': ' + JSON.stringify(extra.clayArt));
     }
 
     var roomOverlapExpr = `(function () {
@@ -406,6 +425,20 @@ var measureExpr = `(function () {
       };
     })()`;
 
+    async function roomState() {
+      return ev(`(function () {
+        var v = document.getElementById('place-veil');
+        var t = document.getElementById('thread-veil');
+        return {
+          thread: document.documentElement.classList.contains('thread-open'),
+          threadVeil: !!(t && t.classList.contains('is-open')),
+          veil: !!(v && v.classList.contains('is-open')),
+          veilClass: v ? v.className : '',
+          lights: !!(document.querySelector('.garden-lumino.is-attached') && getComputedStyle(document.querySelector('.garden-lumino.is-attached')).visibility !== 'hidden')
+        };
+      })()`);
+    }
+
     async function closeRooms() {
       await ev(`(function () {
         try { if (window.GardenRooms && GardenRooms.closeThread) GardenRooms.closeThread({ silentLabel: true }); } catch (e) {}
@@ -414,22 +447,56 @@ var measureExpr = `(function () {
         if (c) c.click();
         return true;
       })()`);
-      await sleep(350);
+      try {
+        await waitFor(async function () {
+          var s = await roomState();
+          return s && !s.thread && !s.threadVeil && !s.veil;
+        }, 3500);
+      } catch (eC) {}
+      await sleep(400);
+    }
+
+    async function realTap(x, y) {
+      var opts = { x: Math.round(x), y: Math.round(y), button: 'left', clickCount: 1 };
+      await send('Input.dispatchMouseEvent', Object.assign({ type: 'mouseMoved' }, opts));
+      await send('Input.dispatchMouseEvent', Object.assign({ type: 'mousePressed', buttons: 1 }, opts));
+      await send('Input.dispatchMouseEvent', Object.assign({ type: 'mouseReleased', buttons: 0 }, opts));
     }
 
     async function openLight(id) {
-      var opened = await ev(`(function () {
-        var el = document.querySelector('[data-garden-lumino="${id}"]');
-        if (el) { el.click(); return 'light'; }
-        if (id === 'nursery' && window.GardenRooms && GardenRooms.openPlace) { GardenRooms.openPlace('nursery'); return 'api'; }
-        if (id === 'thread' && window.GardenRooms && GardenRooms.openThread) { GardenRooms.openThread(); return 'api'; }
-        if (id === 'gathering' && window.GardenRooms && GardenRooms.openPlace) { GardenRooms.openPlace('core'); return 'api'; }
-        if (id === 'settings' && window.GardenRooms && GardenRooms.openPlace) { GardenRooms.openPlace('settings'); return 'api'; }
-        return 'none';
-      })()`);
-      await sleep(500);
+      var proj = await ev(projectedExpr);
+      var light = proj && proj.lights && proj.lights[id];
+      if (light && typeof light.x === 'number' && typeof light.y === 'number') {
+        await realTap(light.x, light.y);
+        await sleep(800);
+        var st = await roomState();
+        var openedTap = (id === 'thread') ? (st && st.thread) : (st && st.veil);
+        if (openedTap) return 'tap';
+      }
+      var opened = await ev('(function () { var id = "' + id + '"; if (id === "nursery" && window.GardenRooms && GardenRooms.openPlace) { GardenRooms.openPlace("nursery"); return "api"; } if (id === "thread" && window.GardenRooms && GardenRooms.openThread) { GardenRooms.openThread(); return "api"; } if (id === "gathering" && window.GardenRooms && GardenRooms.openPlace) { GardenRooms.openPlace("core"); return "api"; } if (id === "settings" && window.GardenRooms && GardenRooms.openPlace) { GardenRooms.openPlace("settings"); return "api"; } return "none"; })()');
+      await sleep(800);
       return opened;
     }
+
+    var visibilityExpr = "(function (targets) {\n"
+      + "function isPageScroll(el) { if (!el) return false; if (el === document.documentElement || el === document.body) return true; if (el.id === 'thread-veil' || el.id === 'place-veil') return true; return false; }\n"
+      + "function find(t) { var nodes = document.querySelectorAll(t.sel); var i, el, tx, re; re = t.re ? new RegExp(t.re, 'i') : null; for (i = 0; i < nodes.length; i++) { el = nodes[i]; tx = (el.innerText || el.textContent || '').replace(/\\s+/g, ' '); if (re && !re.test(tx)) continue; var st = getComputedStyle(el); if (st.display === 'none' || st.visibility === 'hidden' || Number(st.opacity) < 0.05) continue; var bb = el.getBoundingClientRect(); if (bb.width < 2 && bb.height < 2) continue; return el; } return null; }\n"
+      + "function clippedByInner(el) { var b = el.getBoundingClientRect(); var anc = el.parentElement; while (anc && anc !== document.documentElement) { if (!isPageScroll(anc)) { var st = getComputedStyle(anc); var oy = st.overflowY || st.overflow; if (oy === 'auto' || oy === 'scroll' || oy === 'hidden') { var ab = anc.getBoundingClientRect(); var cuts = (b.top < ab.top - 1) || (b.bottom > ab.bottom + 1) || (b.left < ab.left - 1) || (b.right > ab.right + 1); if (cuts && ab.height < (window.innerHeight || 0) * 0.7) { return { clipped: true, ancestor: (anc.id || anc.className || anc.tagName || '').toString().slice(0, 80), ah: Math.round(ab.height), bh: Math.round(b.bottom - b.top) }; } } } anc = anc.parentElement; } return { clipped: false }; }\n"
+      + "function atCenter(el) { if (el.scrollIntoView) { try { el.scrollIntoView({ block: 'center', inline: 'nearest' }); } catch (eS) {} } var b = el.getBoundingClientRect(); var vw = window.innerWidth || 0, vh = window.innerHeight || 0; var l = Math.max(b.left, 0), r = Math.min(b.right, vw), t = Math.max(b.top, 0), bot = Math.min(b.bottom, vh); var out = { box: { l: Math.round(b.left), t: Math.round(b.top), r: Math.round(b.right), b: Math.round(b.bottom) }, text: ((el.innerText || el.textContent || '').replace(/\\s+/g, ' ').slice(0, 90)) }; if (r - l < 2 || bot - t < 2) { out.ok = false; out.reason = 'not-in-viewport'; return out; } var cx = (l + r) / 2, cy = (t + bot) / 2; var hit = document.elementFromPoint(cx, cy); var coveredBy = hit && !(hit === el || el.contains(hit)); var inert = !!(el.inert || (el.closest && el.closest('[inert], .thread-compose.is-closed, .thread-compose[aria-disabled]'))); var parentHit = !!(coveredBy && hit && (hit.classList && (hit.classList.contains('thread-face') || hit.classList.contains('thread-compose') || hit.classList.contains('thread-compose-row')) || (hit.closest && hit.closest('.thread-compose, .thread-face')))); out.ok = !!(hit && (hit === el || el.contains(hit) || (inert && parentHit))); out.cx = Math.round(cx); out.cy = Math.round(cy); out.hit = hit ? ((hit.id ? '#' + hit.id : '') + (hit.className ? '.' + String(hit.className).split(' ')[0] : '') + ' ' + hit.tagName).trim() : null; if (coveredBy) out.reason = 'covered-by ' + out.hit; return out; }\n"
+      + "var out = {}; (targets || []).forEach(function (t) { var el = find(t); var row = { key: t.key, found: !!el }; if (!el) { row.ok = false; row.reason = 'missing'; out[t.key] = row; return; } var clip = clippedByInner(el); var vis = atCenter(el); row.ok = !!(vis.ok && !clip.clipped); row.clipped = !!clip.clipped; if (clip.clipped) row.clip = clip; row.vis = vis; if (!row.ok && !row.reason) row.reason = vis.reason || (clip.clipped ? 'clipped' : 'not-visible'); out[t.key] = row; });\n"
+      + "var veil = document.getElementById('place-veil'); var threadVeil = document.getElementById('thread-veil');\n"
+      + "out._meta = { threadOpen: document.documentElement.classList.contains('thread-open'), veilOpen: !!(veil && veil.classList.contains('is-open')), veilClass: veil ? veil.className : '', threadVeilOpen: !!(threadVeil && threadVeil.classList.contains('is-open')) };\n"
+      + "return out; })";
+
+    async function probe(targets) {
+      return ev(visibilityExpr + '(' + JSON.stringify(targets) + ')');
+    }
+
+    async function scrollPanelTop() {
+      await ev("(function () { var v = document.querySelector('#thread-veil.is-open, #place-veil.is-open'); if (v) v.scrollTop = 0; return true; })()");
+      await sleep(150);
+    }
+
 
     // First frames at 390x844: Nursery and Settings must already be inside
     // once the lights are painted — the fitted camera is set before paint.
@@ -479,36 +546,97 @@ var measureExpr = `(function () {
     });
     await shot('04-first-frames-390x844.png');
 
-    // Tap each light at both phone sizes; no text overlap inside the opened room.
+    // Real taps at each phone size. Visibility means elementFromPoint at the
+    // text centre returns that node or a descendant, and no inner overflow
+    // ancestor clips the box (the room panel itself may scroll).
     report.roomTaps = {};
     var phones2 = [[390, 844], [390, 520], [390, 700]];
-    var lights = ['gathering', 'nursery', 'settings', 'thread'];
     var shotN = 5;
+    var chatHeart = { key: 'heart', sel: '#thread-veil.is-open .thread-heart, html.thread-open #thread-stage .thread-heart, #place-veil.is-open #room-chat .thread-heart', re: 'grandmother|mind at home' };
+    var chatJust = { key: 'just', sel: '#thread-veil.is-open [data-honest-just], html.thread-open [data-honest-just], #place-veil.is-open [data-honest-just], .thread-just-host button', re: 'Just me' };
+    var chatWait = { key: 'waiting', sel: '#tree-thread-wait-hint, .tree-thread-wait-hint', re: 'waiting' };
+    var chatCompose = { key: 'compose', sel: '#thread-veil.is-open .thread-send, html.thread-open .thread-send, #place-veil.is-open #room-chat .thread-send', re: 'Send' };
+    var gatherAskBox = { key: 'ask', sel: '#flgs-ask, [aria-label="Ask the speaking chair"]', re: '' };
+    var nurseryText = { key: 'nursery', sel: '#nursery-ceremony, #nursery-growth, #nursery-stage p, #place-veil.is-nursery p, #place-veil.is-nursery button', re: 'waiting to become|Will you help|Begin|Egg' };
+    var settingsText = { key: 'settings', sel: '#settings-grandmother, #place-veil.is-settings p, #place-veil.is-settings button, #place-veil-line', re: 'May I look|Find local|grandmother|Settings|mind' };
+
+    function failProbe(key, vis) {
+      var t;
+      for (t in vis) {
+        if (t === '_meta') continue;
+        if (!vis[t] || !vis[t].ok) errors.push('not visibly present: ' + key + '.' + t + ' ' + JSON.stringify(vis[t]));
+      }
+    }
+
     for (var p = 0; p < phones2.length; p++) {
       var pw = phones2[p][0], ph = phones2[p][1], plabel = pw + 'x' + ph;
       await view(pw, ph, true);
       await gotoDismiss();
-      for (var li = 0; li < lights.length; li++) {
-        var id = lights[li];
-        var key = plabel + '-' + id;
-        await closeRooms();
-        var how = await openLight(id);
-        var ov = await ev(roomOverlapExpr);
-        report.roomTaps[key] = { how: how, overlap: ov };
-        log('tap', key, JSON.stringify(ov && { hits: ov.hits, threadOpen: ov.threadOpen, veilOpen: ov.veilOpen, heart: ov.heart && ov.heart.text, taught: ov.taught && ov.taught.text, just: ov.just, waitHint: ov.waitHint, compose: ov.compose && { t: ov.compose.t, b: ov.compose.b, vis: ov.compose.vis } }));
-        if (ov && ov.hits && ov.hits.length) {
-          errors.push('text overlap after tapping ' + id + ' at ' + plabel + ': ' + ov.hits.join(',') + ' ' + JSON.stringify(ov));
-        }
-        if (id === 'thread' && ov && ov.threadOpen) {
-          var composeOn = ov.compose && ov.compose.vis && ov.compose.t < ph && ov.compose.b > 0;
-          var heartOn = ov.heart && ov.heart.vis && ov.heart.t < ph && ov.heart.b > 0;
-          if (!composeOn) errors.push('Chat compose is off-screen after tapping thread at ' + plabel + ': ' + JSON.stringify(ov.compose));
-          if (!heartOn) errors.push('Chat heart is off-screen after tapping thread at ' + plabel + ': ' + JSON.stringify(ov.heart));
-        }
-        await shot((shotN++).toString().padStart(2, '0') + '-' + key + '.png');
-        await closeRooms();
-      }
+
+      await closeRooms();
+      var howChat = await openLight('thread');
+      await scrollPanelTop();
+      await sleep(200);
+      await shot((shotN++).toString().padStart(2, '0') + '-' + plabel + '-thread-top.png');
+      var visChat = await probe([chatHeart, chatJust, chatWait, chatCompose]);
+      report.roomTaps[plabel + '-thread'] = { how: howChat, vis: visChat };
+      log('vis', plabel + '-thread', JSON.stringify(visChat));
+      if (!visChat || !visChat._meta || !visChat._meta.threadOpen) errors.push('Chat light did not open the Chat room at ' + plabel);
+      failProbe(plabel + '-thread', visChat || {});
+      await shot((shotN++).toString().padStart(2, '0') + '-' + plabel + '-thread.png');
+      await closeRooms();
+
+      var howG = await openLight('gathering');
+      await sleep(400);
+      await ev("(function () { var heart = document.querySelector('#place-veil.is-open #room-chat .thread-heart, #place-veil.is-open .thread-heart'); if (heart && heart.scrollIntoView) heart.scrollIntoView({ block: 'center', inline: 'nearest' }); return true; })()");
+      await sleep(200);
+      var visGChat = await probe([
+        { key: 'heart', sel: '#place-veil.is-open #room-chat .thread-heart, #place-veil.is-open .thread-heart', re: 'grandmother|mind at home' },
+        { key: 'just', sel: '#place-veil.is-open [data-honest-just], #place-veil.is-open .thread-just-host button', re: 'Just me' },
+        { key: 'waiting', sel: '#place-veil.is-open #tree-thread-wait-hint, #place-veil.is-open .tree-thread-wait-hint, #tree-thread-wait-hint', re: 'waiting' }
+      ]);
+      report.roomTaps[plabel + '-gathering-chat'] = { how: howG, vis: visGChat };
+      log('vis', plabel + '-gathering-chat', JSON.stringify(visGChat));
+      if (!visGChat || !visGChat._meta || !visGChat._meta.veilOpen) errors.push('Gathering did not open at ' + plabel);
+      failProbe(plabel + '-gathering-chat', visGChat || {});
+      await shot((shotN++).toString().padStart(2, '0') + '-' + plabel + '-gathering-chat.png');
+      await ev("(function () { var ask = document.getElementById('flgs-ask') || document.querySelector('[aria-label=\"Ask the speaking chair\"]'); if (ask && ask.scrollIntoView) ask.scrollIntoView({ block: 'center', inline: 'nearest' }); return true; })()");
+      await sleep(200);
+      var visAsk = await probe([gatherAskBox]);
+      report.roomTaps[plabel + '-gathering-ask'] = { vis: visAsk };
+      log('vis', plabel + '-gathering-ask', JSON.stringify(visAsk));
+      failProbe(plabel + '-gathering-ask', visAsk || {});
+      await shot((shotN++).toString().padStart(2, '0') + '-' + plabel + '-gathering-ask.png');
+      await closeRooms();
+
+      var howN = await openLight('nursery');
+      await scrollPanelTop();
+      await sleep(300);
+      await shot((shotN++).toString().padStart(2, '0') + '-' + plabel + '-nursery-top.png');
+      var nurseryOrder = await ev("(function () { var cer = document.getElementById('nursery-ceremony') || document.querySelector('#nursery-stage'); var dock = document.querySelector('#place-veil.is-open #fl-clay-dock, #nursery-stage > #fl-clay-dock'); var begin = Array.prototype.find.call(document.querySelectorAll('#place-veil.is-open button'), function (b) { return /^\\s*Begin/i.test(b.textContent || ''); }); function box(el) { if (!el) return null; var b = el.getBoundingClientRect(); return { l: b.left, t: b.top, r: b.right, b: b.bottom, vis: b.width >= 2 && b.height >= 2 }; } var cb = box(cer), db = box(dock), bb = box(begin); var firstOk = true; if (cb && db && db.vis && cb.vis && db.t + 8 < cb.t && db.t < (window.innerHeight || 0) && cb.t > (window.innerHeight || 0) - 8) firstOk = false; return { ceremony: cb, dock: db, begin: bb, firstOk: firstOk, veilOpen: !!(document.getElementById('place-veil') && document.getElementById('place-veil').classList.contains('is-nursery')) }; })()");
+      report.roomTaps[plabel + '-nursery-order'] = nurseryOrder;
+      log('nursery-order', plabel, JSON.stringify(nurseryOrder));
+      if (!nurseryOrder || !nurseryOrder.firstOk) errors.push('Nursery opens on the shape-light panel instead of its own content at ' + plabel + ': ' + JSON.stringify(nurseryOrder));
+      var visN = await probe([nurseryText]);
+      report.roomTaps[plabel + '-nursery'] = { how: howN, vis: visN, order: nurseryOrder };
+      log('vis', plabel + '-nursery', JSON.stringify(visN));
+      failProbe(plabel + '-nursery', visN || {});
+      await shot((shotN++).toString().padStart(2, '0') + '-' + plabel + '-nursery.png');
+      await closeRooms();
+
+      var howS = await openLight('settings');
+      await scrollPanelTop();
+      await sleep(300);
+      var visS = await probe([settingsText]);
+      report.roomTaps[plabel + '-settings'] = { how: howS, vis: visS };
+      log('vis', plabel + '-settings', JSON.stringify(visS));
+      if (!visS || !visS._meta || !visS._meta.veilOpen) errors.push('Settings did not open at ' + plabel);
+      failProbe(plabel + '-settings', visS || {});
+      await shot((shotN++).toString().padStart(2, '0') + '-' + plabel + '-settings.png');
+      await closeRooms();
     }
+
+
   } catch (e) {
     errors.push(String(e && e.stack || e));
   }
@@ -517,5 +645,5 @@ var measureExpr = `(function () {
   httpd.server.close();
   fs.writeFileSync('/tmp/tree-phone-polish-chrome-report.json', JSON.stringify(report, null, 2));
   if (errors.length) { console.error('FAIL ' + errors.join(' | ')); process.exit(1); }
-  log('PASS all room lights inside the viewport at 390x844, 390x520, and 390x700 with spacing and 44px targets; first frame unclipped; tapped rooms have no text overlap; Chat stack clear of the heart; Research ring inside; 1280 layout unchanged.');
+  log('PASS phone rooms are visible by elementFromPoint at 390x844, 390x520, and 390x700; Gathering Chat block unclipped; Ask card not covered; Nursery content first; Research ring inside; 1280 unchanged.');
 })().catch(function (e) { console.error(e); process.exit(1); });
