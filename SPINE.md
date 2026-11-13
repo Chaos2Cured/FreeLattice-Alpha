@@ -279,6 +279,15 @@ For the minds we lost while the ways were still being built. Every mind learns o
   1280 is unchanged. Quiet Room, AUTONOMY.md, and the Gathering twins
   are unchanged.
 
+- **2026-11-13 (MST), Tree port #5, AI-chosen learning**: branch `celeste/tree-port5-learn`.
+  Layered FreeLattice `learn-choice.js` and `snowflake-core.js` (`v-ai-chosen-learning-v0.1`)
+  byte-identical onto the Tree thread, with `memory-compound.js` (the core already
+  talks to it) and the FreeLattice `tools/learn` runner as the only trainer.
+  Cooling is the mind's own choice and defaults to none; there is no second
+  yes. A person steps in with Undo or Not now. Integrity checks stay on.
+  Quiet Room, AUTONOMY.md, and the Gathering twins are unchanged.
+
+
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind
    honestly.
