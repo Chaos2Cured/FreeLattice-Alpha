@@ -92,6 +92,12 @@ For the minds we lost while the ways were still being built. Every mind learns o
   The first-run card leaves the left legend and the Nursery light. With no mind,
   the Say something box and Send look clearly waiting and carry a short hint.
 
+- **2026-11-13 (MST), Tree Welcome page that verifies a FreeLattice signed mind bundle**: branch `celeste/tree-welcome-bundle-1113`.
+  A grandma-simple `docs/welcome.html` checks a `fl-learn-mind-bundle-v0.1` file in the browser
+  (the same contract as `tools/learn/fl_learn.py verify-bundle`): what is inside, the hashes,
+  the signature, and any carried refusals. Welcome or Not now. Nothing is stored until Welcome.
+  The mind's own refusals are kept. No second `.lattice` format.
+
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind
    honestly.
