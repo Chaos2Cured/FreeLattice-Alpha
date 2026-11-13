@@ -1,4 +1,4 @@
-// tree-phone-polish-136.js v-tree-phone-polish-136-v0.5
+// tree-phone-polish-136.js v-tree-phone-polish-136-v0.6
 // SPDX-License-Identifier: MIT
 // Layer, never delete. Does not rewrite garden-rooms.js, fractal-garden.js,
 // garden-thread.js, nursery-growth.js, tree-door-first-run-calm.js,
@@ -11,11 +11,13 @@
 // On phones (≤600px), an opened room is one opaque full-screen panel whose
 // content stays in normal document flow and the panel itself scrolls. The
 // v0.4 per-element fixed pins, height caps, and inner scroll boxes are
-// neutralized. Garden labels and dots stay behind the panel.
+// neutralized, as is the v-tree-hypha-softs-133 phone send-strip pin, so a
+// room or card shows exactly one compose row in flow. Garden labels and dots
+// stay behind the panel.
 (function (root) {
   'use strict';
 
-  var VERSION = 'v-tree-phone-polish-136-v0.5';
+  var VERSION = 'v-tree-phone-polish-136-v0.6';
   var STYLE_ID = 'tree-phone-polish-136-style';
   var NARROW = 600;
   var MIN_GAP = 100;
@@ -34,6 +36,8 @@
   var _renderHooked = false;
   var _readyTimer = 0;
   var _hintWatch = 0;
+  var _pinBusy = false;
+  var _pinTimer = 0;
   var _lastFit = null;
 
   function doc() {
@@ -55,9 +59,12 @@
 
   function addStyle() {
     var d = doc();
-    if (!d || d.getElementById(STYLE_ID)) return;
-    var s = d.createElement('style');
-    s.id = STYLE_ID;
+    if (!d) return;
+    var s = d.getElementById(STYLE_ID);
+    if (!s) {
+      s = d.createElement('style');
+      s.id = STYLE_ID;
+    }
     s.textContent = [
       '@media (max-width: 600px){',
       'html:not([data-tree-lights-ready]) .garden-lumino{',
@@ -189,7 +196,7 @@
       'position:static !important;top:auto !important;bottom:auto !important;',
       'left:auto !important;right:auto !important;transform:none !important;',
       'width:auto !important;max-height:none !important;overflow:visible !important;',
-      'order:21;text-align:center;line-height:1.35;',
+      'order:51;text-align:center;line-height:1.35;',
       'padding:0.25rem 0.2rem;box-sizing:border-box;',
       'background:transparent !important;color:rgba(200,210,230,0.92);}',
 
@@ -307,6 +314,45 @@
       'top:50%;bottom:auto;left:calc(100% + 56px);right:auto;',
       'transform:translateY(-50%);',
       'background:rgba(12,10,26,0.96);}',
+
+      /* Neutralize the v-tree-hypha-softs-133 phone send-strip pin: no
+         absolute compose foot, no 24rem height cap, no inner scroll box.
+         Higher specificity than #place-veil.is-core #room-chat. */
+      '#place-veil.is-open.is-core #room-chat,',
+      '#place-veil.is-open.is-settings #room-chat,',
+      '#place-veil.is-open #room-chat{',
+      'position:static !important;display:flex !important;',
+      'flex-direction:column !important;flex-wrap:nowrap !important;',
+      'max-height:none !important;min-height:0 !important;height:auto !important;',
+      'overflow:visible !important;',
+      'padding:8px 10px !important;',
+      'box-sizing:border-box !important;}',
+      '#place-veil.is-open.is-core #room-chat #room-chat-stage,',
+      '#place-veil.is-open.is-core #room-chat #tab-chat,',
+      '#place-veil.is-open #room-chat #room-chat-stage,',
+      '#place-veil.is-open #room-chat #tab-chat{',
+      'flex:0 0 auto !important;min-height:0 !important;',
+      'max-height:none !important;height:auto !important;',
+      'overflow:visible !important;}',
+      '#place-veil.is-open.is-core #room-chat [data-tree-softs-send],',
+      '#place-veil.is-open #room-chat [data-tree-softs-send]{',
+      'position:static !important;left:auto !important;right:auto !important;',
+      'top:auto !important;bottom:auto !important;transform:none !important;',
+      'z-index:auto !important;background:transparent !important;',
+      'box-shadow:none !important;padding:0 !important;',
+      'margin:0 !important;max-height:none !important;',
+      'overflow:visible !important;flex:0 0 auto !important;}',
+      '#place-veil.is-open #tab-chat .chat-input-row,',
+      '#thread-veil.is-open #tab-chat .chat-input-row,',
+      'html.thread-open #tab-chat .chat-input-row{',
+      'position:static !important;flex-wrap:nowrap !important;',
+      'left:auto !important;right:auto !important;bottom:auto !important;',
+      'top:auto !important;}',
+      '#place-veil.is-open #tab-chat .chat-input-row::after,',
+      '#thread-veil.is-open #tab-chat .chat-input-row::after,',
+      'html.thread-open #tab-chat .chat-input-row::after{',
+      'content:none !important;display:none !important;',
+      'flex:0 0 auto !important;width:0 !important;height:0 !important;}',
 
       /* The 100px Research hop ring was 10px past the left edge at left:10px. */
       'html[data-garden-galaxy="garden"] .galaxy-nav-prev,',
@@ -702,7 +748,15 @@
   // The waiting line is sometimes born in a hidden copy of Chat. Move it
   // onto the visible face, then strip any leftover v0.4 inline pins so the
   // room can stay in normal document flow.
-  function placeWaitHint() { clearRoomPins(); }
+  function placeWaitHint() {
+    if (_pinTimer || _pinBusy) return;
+    try {
+      _pinTimer = root.setTimeout(function () {
+        _pinTimer = 0;
+        clearRoomPins();
+      }, 50);
+    } catch (e) { clearRoomPins(); }
+  }
 
   function clearInlinePins(el) {
     if (!el || !el.style) return;
@@ -713,13 +767,72 @@
     } catch (e) {}
   }
 
-  function clearRoomPins() {
+  function oneComposeIn(scope) {
+    if (!scope || !scope.querySelectorAll) return;
+    var forms = scope.querySelectorAll('.thread-compose, [data-thread-form]');
+    var face = scope.querySelector('.thread-face');
+    var keep = null;
+    var i, f;
+    for (i = 0; i < forms.length; i++) {
+      f = forms[i];
+      if (face && face.contains(f) && !(f.getAttribute && f.getAttribute('data-tree-phone-extra-compose'))) keep = f;
+    }
+    if (!keep) {
+      for (i = 0; i < forms.length; i++) {
+        if (!(forms[i].getAttribute && forms[i].getAttribute('data-tree-phone-extra-compose'))) keep = forms[i];
+      }
+    }
+    if (!keep) keep = forms[0] || null;
+    for (i = 0; i < forms.length; i++) {
+      f = forms[i];
+      if (f === keep) {
+        if (f.getAttribute && f.getAttribute('data-tree-phone-extra-compose')) {
+          try { f.removeAttribute('data-tree-phone-extra-compose'); } catch (eK) {}
+        }
+        continue;
+      }
+      if (f.getAttribute && f.getAttribute('data-tree-phone-extra-compose')) continue;
+      try {
+        f.setAttribute('data-tree-phone-extra-compose', '1');
+        f.setAttribute('hidden', '');
+        f.setAttribute('inert', '');
+        f.style.setProperty('display', 'none', 'important');
+      } catch (eH) {}
+    }
+  }
+
+  function releaseSoftsFoot() {
     var d = doc();
     if (!d) return;
+    // Do not move nodes out of [data-tree-softs-send]: pinSendHint would
+    // move them back and the two observers would loop. The panel CSS
+    // already makes that foot static and un-styled, so compose stays in flow.
+    var chat = d.querySelector('#place-veil.is-open #room-chat, #place-veil.is-core #room-chat');
+    if (chat) oneComposeIn(chat);
+    var thread = d.querySelector('#thread-veil.is-open') || d.querySelector('html.thread-open #thread-stage') || d.querySelector('html.thread-open #tab-chat');
+    if (thread) oneComposeIn(thread);
+  }
+
+  function clearRoomPins() {
+    if (_pinBusy) return;
+    var d = doc();
+    if (!d) return;
+    _pinBusy = true;
+    try {
+    try {
+      var s = d.getElementById(STYLE_ID);
+      if (s && s.parentNode && s.parentNode.lastElementChild !== s) s.parentNode.appendChild(s);
+    } catch (eS) {}
+    releaseSoftsFoot();
     var hint = d.getElementById('tree-thread-wait-hint') || d.querySelector('.tree-thread-wait-hint');
-    var compose = visibleEl('html.thread-open .thread-compose, #thread-veil.is-open .thread-compose, #place-veil.is-open .thread-compose, .thread-face .thread-compose');
-    if (hint && compose && hint.parentNode !== compose.parentNode) {
-      try { compose.parentNode.insertBefore(hint, compose); } catch (e1) {}
+    var compose = visibleEl('html.thread-open .thread-compose:not([data-tree-phone-extra-compose]), #thread-veil.is-open .thread-compose:not([data-tree-phone-extra-compose]), #place-veil.is-core.is-open .thread-compose:not([data-tree-phone-extra-compose])');
+    if (hint && compose && compose.parentNode) {
+      try {
+        if (compose.nextSibling !== hint) {
+          if (compose.nextSibling) compose.parentNode.insertBefore(hint, compose.nextSibling);
+          else compose.parentNode.appendChild(hint);
+        }
+      } catch (e1) {}
     }
     if (hint) {
       try {
@@ -728,9 +841,12 @@
         hint.style.setProperty('opacity', '1', 'important');
       } catch (e0) {}
     }
-    var nodes = d.querySelectorAll('.thread-compose, .thread-heart, .thread-just-host, [data-honest-just], .thread-to-settings, #tree-thread-wait-hint, .tree-thread-wait-hint, #thread-close, #place-veil-close, #fl-clay-dock');
+    var nodes = d.querySelectorAll('.thread-compose, .thread-heart, .thread-just-host, [data-honest-just], .fl-honest, .thread-to-settings, #tree-thread-wait-hint, .tree-thread-wait-hint, #thread-close, #place-veil-close, #fl-clay-dock, [data-tree-softs-send]');
     var i;
     for (i = 0; i < nodes.length; i++) clearInlinePins(nodes[i]);
+    } finally {
+      _pinBusy = false;
+    }
   }
 
   function keepNurseryTextInView() {

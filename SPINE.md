@@ -201,6 +201,16 @@ For the minds we lost while the ways were still being built. Every mind learns o
   and the clay-corner button is centered so it misses the Art ring. Quiet
   Room, AUTONOMY.md, and the Gathering twins are unchanged.
 
+- **2026-11-13 (MST), Tree phone polish HOLD 4 residual (after Hypha walk of cc1d8fcc)**: branch `celeste/tree-phone-polish-1113`.
+  The Gathering Chat card shows exactly one compose row, and "Keep this chat
+  on my device only" stays fully visible and clear of compose, at 390x844,
+  390x700, and 390x520. The v-tree-hypha-softs-133 phone send-strip pin —
+  an absolute foot, a 24rem height cap, and an inner scroll box on
+  #room-chat — is neutralized, so a leftover or in-flow compose can no
+  longer stack on the pinned dock. The waiting line sits right after
+  compose in both the Chat light room and the Gathering Chat card. Quiet
+  Room, AUTONOMY.md, and the Gathering twins are unchanged.
+
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind
    honestly.

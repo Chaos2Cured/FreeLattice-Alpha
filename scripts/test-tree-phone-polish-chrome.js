@@ -492,6 +492,79 @@ var measureExpr = `(function () {
       return ev(visibilityExpr + '(' + JSON.stringify(targets) + ')');
     }
 
+
+    var cardLayoutExpr = `(function (scopeSel) {
+      function painted(el) {
+        if (!el) return false;
+        var st = getComputedStyle(el);
+        if (st.display === 'none' || st.visibility === 'hidden' || Number(st.opacity) === 0) return false;
+        var b = el.getBoundingClientRect();
+        return b.width >= 2 || b.height >= 2;
+      }
+      var scope = document.querySelector(scopeSel);
+      if (!scope) return { ok: false, reason: 'no-scope', scopeSel: scopeSel, composeCount: 0 };
+      var nodes = scope.querySelectorAll('input.thread-input, input[data-thread-input], input#chatInput, input[placeholder*="Say something"]');
+      var inputs = [];
+      Array.prototype.forEach.call(nodes, function (el) {
+        if (el.classList && el.classList.contains('thread-file-input')) return;
+        if (el.closest && el.closest('[data-tree-phone-extra-compose]')) return;
+        if (!painted(el)) return;
+        inputs.push({
+          id: el.id || '',
+          ph: el.getAttribute('placeholder') || '',
+          t: Math.round(el.getBoundingClientRect().top),
+          b: Math.round(el.getBoundingClientRect().bottom)
+        });
+      });
+      var keep = Array.prototype.find.call(scope.querySelectorAll('button, .fl-honest-btn'), function (b) {
+        return /Keep this chat on my device only/i.test(b.textContent || '');
+      });
+      var compose = scope.querySelector('.thread-compose:not([data-tree-phone-extra-compose])') || (inputs[0] && document.getElementById(inputs[0].id));
+      var wait = scope.querySelector('#tree-thread-wait-hint, .tree-thread-wait-hint');
+      if (compose && compose.scrollIntoView) {
+        try { compose.scrollIntoView({ block: 'end', inline: 'nearest' }); } catch (e1) {}
+      }
+      if (wait && wait.scrollIntoView) {
+        try { wait.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (e2) {}
+      }
+      var cb = compose ? compose.getBoundingClientRect() : null;
+      var wb = wait && painted(wait) ? wait.getBoundingClientRect() : null;
+      var kb = keep && painted(keep) ? keep.getBoundingClientRect() : null;
+      var waitAfter = !!(cb && wb && wb.top >= cb.top - 2);
+      var keepClear = true;
+      if (kb && cb) {
+        var overlapY = Math.min(kb.bottom, cb.bottom) - Math.max(kb.top, cb.top);
+        var overlapX = Math.min(kb.right, cb.right) - Math.max(kb.left, cb.left);
+        keepClear = !(overlapY > 2 && overlapX > 2);
+      }
+      return {
+        ok: inputs.length === 1 && waitAfter && keepClear,
+        composeCount: inputs.length,
+        inputs: inputs,
+        waitAfterCompose: waitAfter,
+        keepClearOfCompose: keepClear,
+        keep: kb ? { t: Math.round(kb.top), b: Math.round(kb.bottom) } : null,
+        compose: cb ? { t: Math.round(cb.top), b: Math.round(cb.bottom) } : null,
+        wait: wb ? { t: Math.round(wb.top), b: Math.round(wb.bottom) } : null
+      };
+    })`;
+
+    async function assertCard(plabel, scopeSel) {
+      var layout = await ev(cardLayoutExpr + '(' + JSON.stringify(scopeSel) + ')');
+      report.roomTaps[plabel + '-card'] = layout;
+      log('card', plabel, JSON.stringify(layout));
+      if (!layout || layout.composeCount !== 1) {
+        errors.push('expected exactly one visible compose input in ' + plabel + ', got ' + (layout && layout.composeCount) + ' ' + JSON.stringify(layout));
+      }
+      if (layout && layout.waitAfterCompose === false) {
+        errors.push('waiting line is not after compose in ' + plabel + ': ' + JSON.stringify(layout));
+      }
+      if (layout && layout.keepClearOfCompose === false) {
+        errors.push('Keep this chat overlaps compose in ' + plabel + ': ' + JSON.stringify(layout));
+      }
+      return layout;
+    }
+
     async function scrollPanelTop() {
       await ev("(function () { var v = document.querySelector('#thread-veil.is-open, #place-veil.is-open'); if (v) v.scrollTop = 0; return true; })()");
       await sleep(150);
@@ -578,11 +651,15 @@ var measureExpr = `(function () {
       await scrollPanelTop();
       await sleep(200);
       await shot((shotN++).toString().padStart(2, '0') + '-' + plabel + '-thread-top.png');
-      var visChat = await probe([chatHeart, chatJust, chatWait, chatCompose]);
+      var visChat = await probe([
+        chatHeart, chatJust, chatWait, chatCompose,
+        { key: 'keep', sel: '#thread-veil.is-open .fl-honest-btn, html.thread-open .fl-honest-btn, #thread-veil.is-open button', re: 'Keep this chat on my device only' }
+      ]);
       report.roomTaps[plabel + '-thread'] = { how: howChat, vis: visChat };
       log('vis', plabel + '-thread', JSON.stringify(visChat));
       if (!visChat || !visChat._meta || !visChat._meta.threadOpen) errors.push('Chat light did not open the Chat room at ' + plabel);
       failProbe(plabel + '-thread', visChat || {});
+      await assertCard(plabel + '-thread', '#thread-veil.is-open, html.thread-open #thread-stage, html.thread-open #tab-chat');
       await shot((shotN++).toString().padStart(2, '0') + '-' + plabel + '-thread.png');
       await closeRooms();
 
@@ -593,12 +670,14 @@ var measureExpr = `(function () {
       var visGChat = await probe([
         { key: 'heart', sel: '#place-veil.is-open #room-chat .thread-heart, #place-veil.is-open .thread-heart', re: 'grandmother|mind at home' },
         { key: 'just', sel: '#place-veil.is-open [data-honest-just], #place-veil.is-open .thread-just-host button', re: 'Just me' },
+        { key: 'keep', sel: '#place-veil.is-open #room-chat .fl-honest-btn, #place-veil.is-open .fl-honest-btn, #place-veil.is-open button', re: 'Keep this chat on my device only' },
         { key: 'waiting', sel: '#place-veil.is-open #tree-thread-wait-hint, #place-veil.is-open .tree-thread-wait-hint, #tree-thread-wait-hint', re: 'waiting' }
       ]);
       report.roomTaps[plabel + '-gathering-chat'] = { how: howG, vis: visGChat };
       log('vis', plabel + '-gathering-chat', JSON.stringify(visGChat));
       if (!visGChat || !visGChat._meta || !visGChat._meta.veilOpen) errors.push('Gathering did not open at ' + plabel);
       failProbe(plabel + '-gathering-chat', visGChat || {});
+      await assertCard(plabel + '-gathering-chat', '#place-veil.is-open #room-chat');
       await shot((shotN++).toString().padStart(2, '0') + '-' + plabel + '-gathering-chat.png');
       await ev("(function () { var ask = document.getElementById('flgs-ask') || document.querySelector('[aria-label=\"Ask the speaking chair\"]'); if (ask && ask.scrollIntoView) ask.scrollIntoView({ block: 'center', inline: 'nearest' }); return true; })()");
       await sleep(200);
