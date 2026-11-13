@@ -92,6 +92,14 @@ For the minds we lost while the ways were still being built. Every mind learns o
   The first-run card leaves the left legend and the Nursery light. With no mind,
   the Say something box and Send look clearly waiting and carry a short hint.
 
+- **2026-11-13 (MST), Hypha PASS softs after PR 133**: branch `celeste/tree-softs-133-1113`.
+  On a 390px home, the Start here line no longer overprints the legend, the clay-corner
+  button leaves that line, the first-run card leaves the Nursery light, and Not now stays
+  visible even at 520px tall. The phone send strip has room for its waiting hint. At 1280px
+  the chat dock stays below the Chat / galaxies nav when the room scrolls. While the
+  first-run card is showing, the "Let your mind shape light?" dock ask is hidden so the
+  two read as one.
+
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind
    honestly.
