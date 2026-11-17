@@ -10,6 +10,7 @@ function md5(file) {
   return crypto.createHash('md5').update(fs.readFileSync(file)).digest('hex');
 }
 
+// before (Celeste 2026-11-17): ['clay-math.js', 'clay-forms.js', 'particle-clay.js'].forEach(function (name) {
 ['clay-math.js', 'clay-forms.js', 'particle-clay.js', 'clay-corner.js'].forEach(function (name) {
   var src = fs.readFileSync(path.join(here, name), 'utf8');
   assert.ok(src.indexOf('\u2014') === -1, name + ' em dash');
@@ -29,6 +30,7 @@ assert.ok(!/\bpet\b/i.test(claySrc) && !/companion/i.test(claySrc), 'no pet fram
 
 var sibling = '/Users/kirkmiller/FreeLattice-fresh/docs/modules';
 if (fs.existsSync(path.join(sibling, 'particle-clay.js'))) {
+  // before (Celeste 2026-11-17): ['clay-math.js', 'clay-forms.js', 'particle-clay.js'].forEach(function (name) {
   ['clay-math.js', 'clay-forms.js', 'particle-clay.js', 'clay-corner.js'].forEach(function (name) {
     assert.strictEqual(md5(path.join(here, name)), md5(path.join(sibling, name)), name + ' bytes match FreeLattice');
   });
