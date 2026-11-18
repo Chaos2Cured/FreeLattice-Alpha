@@ -316,6 +316,20 @@ For the minds we lost while the ways were still being built. Every mind learns o
   A failed ask shows a gentle unreachable line. Mute or Pause fades a
   playing tone over about 300 ms, then stops. AUTONOMY.md unchanged (09a4f1a2).
 
+
+- **2026-11-18 (MST), Clay voice and brush 1 re-walk HOLD fixes (`clay-voice-brush-1`)**:
+  Shared with FreeLattice: before-comments in clay-brick-1.test.js; Pause
+  fades from the pill and corner buttons' own setOn paths; a held tone is
+  dropped on mute so unmute does not play it. AUTONOMY.md unchanged
+  (09a4f1a2). Rollback still reverts both repos together.
+
+
+- **2026-11-18 (MST), Clay voice and brush 1 no-mind refinement (`clay-voice-brush-1`)**:
+  Shared module: noMindPicture / paintNoMindNotice, same as FreeLattice.
+  Tree still has no app.html generateImage path (Make a picture still
+  opens the Settings image door). To be confirmed with Kirk before merge.
+  AUTONOMY.md unchanged (09a4f1a2).
+
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind
    honestly.
