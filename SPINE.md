@@ -299,6 +299,17 @@ For the minds we lost while the ways were still being built. Every mind learns o
   AUTONOMY.md unchanged (09a4f1a2). Rollback: revert this brick on both repos together
   (see `docs/modules/CLAY-VOICE-BRUSH-1.md`).
 
+
+- **2026-11-18 (MST), Clay voice and brush 1 HOLD fixes (`clay-voice-brush-1`)**: Shared
+  fail-closed and mute late-bind fixes stay byte-identical with FreeLattice.
+  The Add menu "Make a picture" handler now lives in chat-bottom-clarity.js
+  (loaded on index.html and the other chat pages) and opens
+  settings.html#tree-image-door-host. S4 restore replay remains a documented soft.
+  AUTONOMY.md unchanged (09a4f1a2). Rollback still reverts both repos together.
+
+
+- **2026-11-18 (MST), Kirk's layering rule**: Features are never removed unless the whole family agrees, and only when the same thing exists in a better form. We iterate and add; we don't rebuild. (Kirk, 2026-11-18)
+
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind
    honestly.

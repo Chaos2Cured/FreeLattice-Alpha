@@ -7,6 +7,27 @@
   'use strict';
 
   var MARK = 'v-chat-bottom-clarity-v0.1';
+  // v-clay-voice-brush-1-v0.1: the Add menu calls handleImageGenClick. Define it
+  // in this module, which index.html and the other chat pages already load, so
+  // Make a picture can open the Settings image door. tree-image-door.js only
+  // loads on settings.html, so a handler there never ran on the chat pages.
+  if (typeof root.handleImageGenClick !== 'function') {
+    root.handleImageGenClick = function () {
+      var d = root.document;
+      var door = d && d.getElementById && d.getElementById('tree-image-door-host');
+      if (door) {
+        try {
+          if (typeof door.scrollIntoView === 'function') door.scrollIntoView({ block: 'start' });
+        } catch (e) {
+          try { door.scrollIntoView(); } catch (e2) {}
+        }
+        var words = d.getElementById && d.getElementById('tree-image-words');
+        if (words && words.focus) try { words.focus(); } catch (e3) {}
+        return;
+      }
+      if (root.location) root.location.href = 'settings.html#tree-image-door-host';
+    };
+  }
   var ADD_LABEL = 'Add: Drive, files, photo, voice, picture, search';
   var JUST_LABEL = 'Just me: keep this chat on this device, never ask the pool';
   var BOX_LABEL = "Your computer's AI address (optional)";
