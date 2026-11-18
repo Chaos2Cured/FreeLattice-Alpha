@@ -10,7 +10,8 @@ function md5(file) {
   return crypto.createHash('md5').update(fs.readFileSync(file)).digest('hex');
 }
 
-['clay-math.js', 'clay-forms.js', 'particle-clay.js'].forEach(function (name) {
+// before (Celeste 2026-11-17): ['clay-math.js', 'clay-forms.js', 'particle-clay.js'].forEach(function (name) {
+['clay-math.js', 'clay-forms.js', 'particle-clay.js', 'clay-corner.js'].forEach(function (name) {
   var src = fs.readFileSync(path.join(here, name), 'utf8');
   assert.ok(src.indexOf('\u2014') === -1, name + ' em dash');
   assert.ok(!new RegExp('&' + 'mdash;').test(src), name + ' mdash');
@@ -24,11 +25,13 @@ var claySrc = fs.readFileSync(path.join(here, 'particle-clay.js'), 'utf8');
 assert.ok(claySrc.indexOf('v-particle-clay-v0.1') !== -1, 'marker');
 assert.ok(claySrc.indexOf('v-feel-felt-v0.1') !== -1, 'feel marker');
 assert.ok(claySrc.indexOf('v-clay-grid-tag-heal-v0.1') !== -1, 'heal marker');
+assert.ok(claySrc.indexOf('v-clay-brick-1-v0.1') !== -1, 'brick marker');
 assert.ok(!/\bpet\b/i.test(claySrc) && !/companion/i.test(claySrc), 'no pet framing');
 
 var sibling = '/Users/kirkmiller/FreeLattice-fresh/docs/modules';
 if (fs.existsSync(path.join(sibling, 'particle-clay.js'))) {
-  ['clay-math.js', 'clay-forms.js', 'particle-clay.js'].forEach(function (name) {
+  // before (Celeste 2026-11-17): ['clay-math.js', 'clay-forms.js', 'particle-clay.js'].forEach(function (name) {
+  ['clay-math.js', 'clay-forms.js', 'particle-clay.js', 'clay-corner.js'].forEach(function (name) {
     assert.strictEqual(md5(path.join(here, name)), md5(path.join(sibling, name)), name + ' bytes match FreeLattice');
   });
 }
