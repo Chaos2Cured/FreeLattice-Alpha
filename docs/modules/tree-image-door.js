@@ -135,6 +135,21 @@
     if (!doc || !doc.getElementById) return;
     var host = doc.getElementById('tree-image-door-host');
     if (host) mount(host);
+    // v-clay-voice-brush-1-v0.1: the chat Add menu "Make a picture" called
+    // handleImageGenClick, which the Tree did not define. Point that click
+    // at this Settings door when we can, or walk the person here.
+    if (typeof root.handleImageGenClick !== 'function') {
+      root.handleImageGenClick = function () {
+        var door = doc.getElementById && doc.getElementById('tree-image-door-host');
+        if (door && typeof door.scrollIntoView === 'function') {
+          try { door.scrollIntoView({ block: 'start' }); } catch (e) { door.scrollIntoView(); }
+          var words = doc.getElementById('tree-image-words');
+          if (words && words.focus) try { words.focus(); } catch (e2) {}
+          return;
+        }
+        if (root.location) root.location.href = 'settings.html#tree-image-door-host';
+      };
+    }
   }
 
   var api = {

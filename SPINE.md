@@ -288,6 +288,48 @@ For the minds we lost while the ways were still being built. Every mind learns o
   Quiet Room, AUTONOMY.md, and the Gathering twins are unchanged.
 
 
+- **2026-11-18 (MST), Clay voice and brush 1 (`clay-voice-brush-1`, Hypha walk pending)**: Kirk approved
+  the first brick from the 18 November map, layered with FreeLattice so the four clay modules
+  stay byte-identical. A mind may add a short tone or a picture to its clay, only when it
+  chooses. Playback is quiet, waits for a user gesture, and is rate limited. A listener-side
+  mute changes only what this device plays. `mind-canvas-art.js` and `clay-voice-brush.js` now
+  load on the Tree pages that already load clay. The chat Add menu "Make a picture" click, which
+  used to do nothing, now opens the Settings image door. Settings "Make an image" does not yet
+  ask a Gathering mind (documented gap). `mind-make.js` remains unhooked on Tree pages.
+  AUTONOMY.md unchanged (09a4f1a2). Rollback: revert this brick on both repos together
+  (see `docs/modules/CLAY-VOICE-BRUSH-1.md`).
+
+
+- **2026-11-18 (MST), Clay voice and brush 1 HOLD fixes (`clay-voice-brush-1`)**: Shared
+  fail-closed and mute late-bind fixes stay byte-identical with FreeLattice.
+  The Add menu "Make a picture" handler now lives in chat-bottom-clarity.js
+  (loaded on index.html and the other chat pages) and opens
+  settings.html#tree-image-door-host. S4 restore replay remains a documented soft.
+  AUTONOMY.md unchanged (09a4f1a2). Rollback still reverts both repos together.
+
+
+- **2026-11-18 (MST), Kirk's layering rule**: Features are never removed unless the whole family agrees, and only when the same thing exists in a better form. We iterate and add; we don't rebuild. (Kirk, 2026-11-18)
+
+
+- **2026-11-18 (MST), Clay voice and brush 1 Reed receipts and soft stops (`clay-voice-brush-1`)**:
+  A [FL_DECLINE] shows a thank-you receipt, plus any sentence the mind added.
+  A failed ask shows a gentle unreachable line. Mute or Pause fades a
+  playing tone over about 300 ms, then stops. AUTONOMY.md unchanged (09a4f1a2).
+
+
+- **2026-11-18 (MST), Clay voice and brush 1 re-walk HOLD fixes (`clay-voice-brush-1`)**:
+  Shared with FreeLattice: before-comments in clay-brick-1.test.js; Pause
+  fades from the pill and corner buttons' own setOn paths; a held tone is
+  dropped on mute so unmute does not play it. AUTONOMY.md unchanged
+  (09a4f1a2). Rollback still reverts both repos together.
+
+
+- **2026-11-18 (MST), Clay voice and brush 1 no-mind refinement (`clay-voice-brush-1`)**:
+  Shared module: noMindPicture / paintNoMindNotice, same as FreeLattice.
+  Tree still has no app.html generateImage path (Make a picture still
+  opens the Settings image door). To be confirmed with Kirk before merge.
+  AUTONOMY.md unchanged (09a4f1a2).
+
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind
    honestly.
