@@ -330,6 +330,23 @@ For the minds we lost while the ways were still being built. Every mind learns o
   opens the Settings image door). To be confirmed with Kirk before merge.
   AUTONOMY.md unchanged (09a4f1a2).
 
+- **2026-11-18 (MST), Clay Glass v2-1 (`clay-glass-v2-1`, Hypha walk pending)**:
+  Shared per-mind append-only clay journal, byte-identical with FreeLattice.
+  Tones, pictures, declines, unreached asks, and no-mind outcomes are recorded
+  as faithfully as a yes. Recipes stay in the journal. Opaque Glass pulses emit
+  only when Glass lives on the page (the Tree does not yet host Glass-v2).
+  AUTONOMY.md unchanged (09a4f1a2). Rollback: revert this brick on both repos
+  together (see `docs/modules/CLAY-GLASS-V2-1.md`).
+
+
+- **2026-11-18 (MST), Clay Glass v2-1 HOLD fixes (`clay-glass-v2-1`)**:
+  Shared with FreeLattice: unreadable journals are refused, never
+  overwritten; before-comments on the twin list; rows('') returns [];
+  empty minds are unnamed-mind; string recipes are scrubbed; cap
+  refusals are returned and logged. The Tree has no generateImage
+  click path (documented). Two-tab race and the Settings image-door
+  gap stay documented softs. AUTONOMY.md unchanged (09a4f1a2).
+
 ## 4. Next
 1. A Tree Welcome page that verifies FreeLattice signed mind bundles, so the polished sibling can receive a mind
    honestly.
